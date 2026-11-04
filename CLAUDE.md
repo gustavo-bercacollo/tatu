@@ -38,12 +38,16 @@ Minimalista, iPhone/Mac. Fundo branco, cinzas translúcidos, texto preto, botão
 docs/          guia-de-design.md, Manifesto-Tatu.pdf
 design/        SVGs das telas (user/, worker/) + index.html
 app/           Flutter (package `tatu`, org `com.tatu`)
-  lib/core/      tema, rotas, widgets base
-  lib/shared/    widgets reutilizáveis
-  lib/features/  uma pasta por funcionalidade
+  lib/main.dart                 TatuApp (tema + tela inicial)
+  lib/core/theme/               tatu_colors.dart, tatu_theme.dart
+  lib/shared/widgets/           componentes reutilizáveis (option_card.dart…)
+  lib/features/entrada/         telas comuns aos dois modos (boas_vindas_page.dart)
+  lib/features/cliente/         telas do cliente (C3–C13)
+  lib/features/profissional/    telas do profissional (P1–P13)
+  assets/fonts/                 Inter 400/500/600/700 (embutida; não usar google_fonts, é incompatível)
 backend/       Python (venv em backend/.venv): app/main.py, config, db, models, routers, services, worker
 ```
-Sugestão do guia para o app (ainda não aplicada): `lib/core/theme`, `lib/core/widgets`, `lib/features/client/…`, `lib/features/pro/…`, `lib/data/mock`, rotas com `go_router`, estado com Riverpod.
+Ícones: `flutter_tabler_icons` (`TablerIcons.*`). Arquivos de tela: `<nome>_page.dart`. Ainda não adotados (decidir quando houver 2+ telas): rotas com `go_router`, estado com Riverpod, mocks em `lib/data/mock`.
 
 ## Como trabalhar
 - Uma tela ou componente por vez. Cada tela a partir do SVG correspondente, com os estados do guia (vazio, carregando, erro).
