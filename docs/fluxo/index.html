@@ -1,0 +1,808 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fluxo do Tatu</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: barra fixa no topo + tela de fluxograma (pan/zoom) + painel de detalhe à direita (folha embaixo no celular). */
+:root {
+  --bg: #F4F4F7;
+  --grid: #DEDEE5;
+  --surface: #FFFFFF;
+  --surface-2: #EEEEF2;
+  --ink: #0B0B0C;
+  --muted: #6B6B73;
+  --line: #D6D6DD;
+  --edge: #2C2C30;
+  --edge-auto: #9A9AA3;
+  --app: #1E8E45;
+  --app-dot: #34C759;
+  --app-soft: #E3F6E9;
+  --wip: #A85F00;
+  --wip-dot: #FF9F0A;
+  --wip-soft: #FFF2DE;
+  --sync: #007AFF;
+  --sync-soft: #E2EEFF;
+  --lane: rgb(255 255 255 / .55);
+  --lane-line: #D2D2DA;
+  --font-ui: "Inter", -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font-code: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --shadow: 0 1px 2px rgb(0 0 0 / .06), 0 6px 18px rgb(0 0 0 / .06);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0F0F11; --grid: #24242A; --surface: #19191C; --surface-2: #232328; --ink: #F2F2F5; --muted: #9C9CA6;
+  --line: #34343B; --edge: #D8D8DE; --edge-auto: #6E6E78; --app: #4CD07A; --app-dot: #34C759; --app-soft: #12301D;
+  --wip: #FFB547; --wip-dot: #FF9F0A; --wip-soft: #33240C; --sync: #4DA3FF; --sync-soft: #10243F; --lane: rgb(255 255 255 / .03); --lane-line: #3A3A42;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px rgb(0 0 0 / .35); color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0F0F11; --grid: #24242A; --surface: #19191C; --surface-2: #232328; --ink: #F2F2F5; --muted: #9C9CA6;
+  --line: #34343B; --edge: #D8D8DE; --edge-auto: #6E6E78; --app: #4CD07A; --app-dot: #34C759; --app-soft: #12301D;
+  --wip: #FFB547; --wip-dot: #FF9F0A; --wip-soft: #33240C; --sync: #4DA3FF; --sync-soft: #10243F; --lane: rgb(255 255 255 / .03); --lane-line: #3A3A42;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px rgb(0 0 0 / .35); color-scheme: dark }
+
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); overflow: hidden; display: flex; flex-direction: column; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--sync); outline-offset: 2px; }
+
+/* Topo */
+.top { flex: none; background: var(--surface); border-bottom: 1px solid var(--line);
+  padding-block: 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; position: relative; z-index: 5; }
+.brand { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.brand h1 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+.brand p { margin: 0; font-size: 12.5px; color: var(--muted); }
+.tabs { display: flex; gap: 4px; background: var(--surface-2); padding: 3px; border-radius: 999px; }
+.tabs button { border: 0; background: transparent; padding: 6px 13px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .12); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--muted); align-items: center; }
+.legend .k { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.legend b { color: var(--ink); font-variant-numeric: tabular-nums; font-weight: 600; }
+.dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.dot.app { background: var(--app-dot); } .dot.desenho { background: var(--ink); } .dot.andamento { background: var(--wip-dot); }
+.lk { display: inline-block; width: 22px; height: 0; border-top: 2px solid var(--edge); }
+.lk.auto { border-top: 2px dashed var(--edge-auto); } .lk.sync { border-top: 2px dashed var(--sync); }
+.search { margin-left: auto; position: relative; }
+.search input { width: 200px; max-width: 46vw; border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 7px 12px; font-size: 13px; }
+.search ul { position: absolute; right: 0; top: calc(100% + 6px); list-style: none; margin: 0; padding: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); width: 260px; max-height: 300px; overflow: auto; }
+.search li button { width: 100%; text-align: left; border: 0; background: transparent; padding: 7px 9px; border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; gap: 8px; align-items: center; }
+.search li button:hover, .search li button:focus-visible { background: var(--surface-2); }
+
+/* Tela do fluxograma */
+.stage { flex: 1; position: relative; overflow: hidden; cursor: grab; touch-action: none;
+  background-color: var(--bg); background-image: radial-gradient(var(--grid) 1px, transparent 1.2px); background-size: 22px 22px; }
+.stage.dragging { cursor: grabbing; }
+.world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.world svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+.cluster { position: absolute; border: 1.5px solid var(--lane-line); background: var(--lane); border-radius: 26px; }
+.cluster span { position: absolute; left: 22px; top: 16px; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+path.entre { opacity: .5; }
+.cluster.lado-profissional span::before { content: "Profissional · "; color: var(--ink); }
+.cluster.lado-cliente span::before { content: "Cliente · "; color: var(--ink); }
+
+.node { position: absolute; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 10px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: box-shadow .15s, opacity .2s; }
+.node:hover { box-shadow: 0 0 0 2px var(--edge), var(--shadow); }
+.node.sel { box-shadow: 0 0 0 3px var(--sync), var(--shadow); }
+.node.dim { opacity: .28; }
+.node .hd { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.code { font-family: var(--font-code); font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: .02em; }
+.node .nm { font-size: 13px; font-weight: 600; line-height: 1.25; letter-spacing: -.01em; }
+.node .shot { width: 100%; aspect-ratio: 393 / 852; border-radius: 12px; overflow: hidden; background: #fff; border: 1px solid var(--line); }
+.node .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.pill.app { background: var(--app-soft); color: var(--app); }
+.pill.desenho { background: var(--surface-2); color: var(--ink); }
+.pill.andamento { background: var(--wip-soft); color: var(--wip); }
+.node .notes { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; font-size: 11px; color: var(--muted); line-height: 1.35; }
+.node .notes li::before { content: "↻ "; }
+.node.andamento { border: 1.5px dashed var(--wip-dot); background: var(--wip-soft); box-shadow: none; justify-content: center; }
+.node.andamento .nm { color: var(--ink); }
+
+.elabel { position: absolute; transform: translate(-50%, -50%); background: var(--surface); border: 1px solid var(--line); color: var(--ink); font-size: 11px; font-weight: 500; line-height: 1.25; padding: 3px 8px; border-radius: 999px; white-space: nowrap; pointer-events: none; }
+.elabel.auto { color: var(--muted); font-style: italic; border-style: dashed; }
+.elabel.sync { color: var(--sync); border-color: var(--sync); background: var(--sync-soft); }
+.elabel.dim { opacity: .25; }
+
+/* Zoom */
+.zoom { position: absolute; z-index: 4; right: max(14px, env(safe-area-inset-right, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; box-shadow: var(--shadow); align-items: center; }
+.zoom button { border: 0; background: transparent; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 17px; font-weight: 600; }
+.zoom button:hover { background: var(--surface-2); }
+.zoom .fit { width: auto; padding: 0 12px; border-radius: 999px; font-size: 12.5px; }
+.zoom output { font-family: var(--font-code); font-size: 11px; color: var(--muted); min-width: 40px; text-align: center; font-variant-numeric: tabular-nums; }
+.hint { position: absolute; z-index: 4; left: max(14px, env(safe-area-inset-left, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
+
+/* Painel */
+.panel { position: absolute; z-index: 6; top: 12px; right: max(12px, env(safe-area-inset-right, 0px)); bottom: 12px; width: min(380px, calc(100% - 24px)); background: var(--surface); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 10px 40px rgb(0 0 0 / .18); display: flex; flex-direction: column; overflow: hidden; }
+.panel .ph { padding: 16px 16px 12px; display: flex; gap: 10px; align-items: flex-start; border-bottom: 1px solid var(--line); }
+.panel .ph h2 { margin: 2px 0 6px; font-size: 18px; letter-spacing: -.02em; text-wrap: balance; }
+.panel .x { margin-left: auto; border: 0; background: var(--surface-2); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; flex: none; font-size: 16px; }
+.panel .pb { overflow: auto; padding: 14px 16px 20px; display: flex; flex-direction: column; gap: 16px; }
+.panel .big { flex: none; width: 100%; max-width: 260px; margin: 0 auto; aspect-ratio: 393 / 852; border-radius: 22px; overflow: hidden; border: 1px solid var(--line); background: #fff; }
+.panel .big img { width: 100%; height: 100%; display: block; }
+.panel h3 { margin: 0 0 6px; font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.panel ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.panel li button { width: 100%; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 8px 10px; cursor: pointer; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center; }
+.panel li button:hover { background: var(--surface-2); }
+.panel li .t { font-size: 13px; font-weight: 600; }
+.panel li .d { font-size: 12px; color: var(--muted); grid-column: 1; }
+.panel li .arrow { grid-row: 1 / span 2; grid-column: 2; color: var(--muted); }
+.panel .note { font-size: 13px; color: var(--muted); line-height: 1.45; margin: 0; }
+.panel .path { font-family: var(--font-code); font-size: 11px; color: var(--muted); word-break: break-all; }
+@media (max-width: 640px) {
+  .panel { top: auto; left: 8px; right: 8px; width: auto; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); max-height: 72%; }
+  .panel .big { max-width: 180px; }
+  .search { margin-left: 0; width: 100%; }
+  .search input { width: 100%; max-width: none; }
+  .hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .world { transition: none !important; } }
+</style>
+
+<header class="top">
+  <div class="brand">
+    <h1>Fluxo do Tatu</h1>
+    <p>Todas as telas e o que cada toque abre · atualizado em <time id="data">04/11/2026</time></p>
+  </div>
+  <div class="tabs" role="tablist" aria-label="Lado do app">
+    <button role="tab" id="tab-cliente" data-v="cliente">Cliente</button>
+    <button role="tab" id="tab-profissional" data-v="profissional">Profissional</button>
+    <button role="tab" id="tab-ambos" data-v="ambos">Os dois lados</button>
+  </div>
+  <div class="legend" id="legend"></div>
+  <div class="search">
+    <input id="busca" type="search" placeholder="Buscar tela…" autocomplete="off" aria-label="Buscar tela">
+    <ul id="resultados" hidden></ul>
+  </div>
+</header>
+
+<main class="stage" id="stage" aria-label="Fluxograma das telas">
+  <div class="world" id="world"></div>
+  <div class="hint">Arraste para mover · roda do mouse ou pinça para zoom · toque numa tela para detalhes</div>
+  <div class="zoom">
+    <button id="zout" aria-label="Diminuir zoom">−</button>
+    <output id="zval">100%</output>
+    <button id="zin" aria-label="Aumentar zoom">+</button>
+    <button id="zfit" class="fit">Ajustar</button>
+  </div>
+  <aside class="panel" id="panel" hidden aria-live="polite"></aside>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+<script>
+/* ===== DADOS =====
+   status: app (já no app, imagem real) · desenho (desenho pronto, ainda não no app) · andamento (tela ainda não desenhada)
+   Para atualizar: mudar o status/imagem da tela, ou acrescentar telas e ligações. */
+const ATUALIZADO = '04/11/2026';
+
+const ETAPAS = {
+  entrada:   { nome: 'Entrada e cadastro', lado: 'ambos' },
+  pedir:     { nome: 'Pedir serviço', lado: 'cliente' },
+  procurar:  { nome: 'Procurar profissional', lado: 'cliente' },
+  combinar:  { nome: 'Combinar e pagar', lado: 'cliente' },
+  contaC:    { nome: 'Atividade, mensagens e perfil', lado: 'cliente' },
+  cadastro:  { nome: 'Cadastro', lado: 'profissional' },
+  chamados:  { nome: 'Chamados', lado: 'profissional' },
+  servico:   { nome: 'Serviço e cobrança', lado: 'profissional' },
+  contaP:    { nome: 'Atividade, ganhos e perfil', lado: 'profissional' },
+};
+
+const U = 'design/user/', W = 'design/worker/';
+// [id, código, nome, etapa, status, arquivo no repositório, notas]
+const TELAS_RAW = [
+  ['e01','E01','Abertura','entrada','desenho', U+'01 - Entrada/01-abertura.svg'],
+  ['e02','E02','Boas-vindas','entrada','app','docs/fluxo/app/boas-vindas.png',["No app, “Quero trabalhar” e “Entrar” ainda mostram “em breve”"]],
+  ['e03','E03','Celular','entrada','app','docs/fluxo/app/celular.png',["Continuar só libera com 11 dígitos"]],
+  ['e04','E04','Código SMS','entrada','app','docs/fluxo/app/codigo.png',["Reenviar código: libera depois de 1:00","Sem backend: aceita qualquer código de 6 dígitos"]],
+  ['e05','E05','Nome','entrada','app','docs/fluxo/app/nome.png',["No app, Continuar ainda mostra “em breve”"]],
+  ['a-entrar','—','Entrar (já tenho conta)','entrada','andamento'],
+
+  ['c03','C03','Home · vazia','pedir','desenho', U+'02 - Pedir serviço/03-home-vazia.svg',["Abas: Início · Atividade · Mensagens"]],
+  ['c04','C04','Home · IA marcou o serviço','pedir','desenho', U+'02 - Pedir serviço/04-home-ia-marcou.svg',["Toque em outro serviço troca a escolha (✦ some)"]],
+  ['c05','C05','Home · conflito','pedir','desenho', U+'02 - Pedir serviço/05-home-conflito.svg'],
+  ['c06','C06','Outros serviços','pedir','desenho', U+'02 - Pedir serviço/06-home-outros-lista.svg'],
+  ['c07','C07','Home · serviço de Outros','pedir','desenho', U+'02 - Pedir serviço/07-home-outros-escolhido.svg'],
+  ['c08','C08','Endereço · busca','pedir','desenho', U+'02 - Pedir serviço/08-endereco-busca.svg'],
+  ['c09','C09','Endereço · confirmar no mapa','pedir','desenho', U+'02 - Pedir serviço/09-endereco-mapa.svg'],
+
+  ['c10','C10','Procurando · início','procurar','desenho', U+'03 - Procurar profissional/10-procurando-inicio.svg'],
+  ['c11','C11','Procurando · expandindo','procurar','desenho', U+'03 - Procurar profissional/11-procurando-expandindo.svg'],
+  ['c12','C12','Procurando · ninguém ativo','procurar','desenho', U+'03 - Procurar profissional/12-procurando-ninguem-ativo.svg',["Busca continua em segundo plano (válido por 1 hora)"]],
+  ['c13','C13','Profissional encontrado','procurar','desenho', U+'03 - Procurar profissional/13-profissional-encontrado.svg',["Ver outro profissional → próximo da fila, mesma tela","Prazo para responder acaba → próximo da fila"]],
+  ['c14','C14','Perfil do profissional · topo','procurar','desenho', U+'03 - Procurar profissional/14-perfil-profissional-topo.svg'],
+  ['c15','C15','Perfil do profissional · fotos e avaliações','procurar','desenho', U+'03 - Procurar profissional/15-perfil-profissional-avaliacoes.svg'],
+  ['a-cancelar','—','Cancelar pedido','procurar','andamento'],
+  ['a-todas','—','Todas as avaliações','procurar','andamento'],
+
+  ['c16','C16','Chat','combinar','desenho', U+'04 - Combinar e pagar/16-chat.svg',["Respostas rápidas: “Pode vir agora” · “Quanto fica?”"]],
+  ['c17','C17','Chat · valor combinado','combinar','desenho', U+'04 - Combinar e pagar/17-chat-valor-combinado.svg'],
+  ['c18','C18','Chat · pedir outro valor','combinar','desenho', U+'04 - Combinar e pagar/18-chat-pedir-outro-valor.svg',["Até 3 propostas"]],
+  ['c19','C19','Chat · cobrança pendente','combinar','desenho', U+'04 - Combinar e pagar/19-chat-cobranca.svg'],
+  ['c20','C20','Pagamento','combinar','desenho', U+'04 - Combinar e pagar/20-pagamento.svg',["Cartão (até 6x) ou Pix"]],
+  ['c21','C21','Pagamento feito · recibo','combinar','desenho', U+'04 - Combinar e pagar/21-pagamento-feito.svg'],
+  ['c22','C22','Avaliação','combinar','desenho', U+'04 - Combinar e pagar/22-avaliacao.svg'],
+  ['a-foto','—','Enviar foto no chat','combinar','andamento'],
+  ['a-porfora','—','Paguei por fora · aguardando a profissional confirmar','combinar','andamento'],
+  ['a-recibo','—','Baixar recibo','combinar','andamento'],
+
+  ['c23','C23','Atividade · em andamento','contaC','desenho', U+'05 - Atividade, mensagens e perfil/23-atividade-em-andamento.svg'],
+  ['c24','C24','Atividade · concluídos','contaC','desenho', U+'05 - Atividade, mensagens e perfil/24-atividade-concluidos.svg'],
+  ['c25','C25','Mensagens','contaC','desenho', U+'05 - Atividade, mensagens e perfil/25-mensagens.svg'],
+  ['c26','C26','Mensagens · vazio','contaC','desenho', U+'05 - Atividade, mensagens e perfil/26-mensagens-vazio.svg'],
+  ['c27','C27','Perfil do cliente','contaC','desenho', U+'05 - Atividade, mensagens e perfil/27-perfil.svg'],
+  ['c28','C28','Perfil · sem cartão e avisos desligados','contaC','desenho', U+'05 - Atividade, mensagens e perfil/28-perfil-sem-cartao-notificacoes.svg'],
+  ['a-pedirdenovo','—','Pedir de novo','contaC','andamento'],
+  ['a-pagamento','—','Formas de pagamento','contaC','andamento'],
+  ['a-minhasav','—','Minhas avaliações','contaC','andamento'],
+  ['a-notifC','—','Notificações','contaC','andamento'],
+  ['a-dadosC','—','Dados da conta','contaC','andamento'],
+  ['a-ajudaC','—','Ajuda','contaC','andamento'],
+  ['a-privC','—','Privacidade e termos','contaC','andamento'],
+
+  ['p01','P01','Boas-vindas do profissional','cadastro','desenho', W+'01 - Cadastro/01-boas-vindas.svg'],
+  ['p02','P02','Passo 1 · Seus dados (celular + SMS)','cadastro','desenho', W+'01 - Cadastro/02-passo1-dados-sms.svg'],
+  ['p03','P03','Passo 1 · Seus dados (e-mail e senha)','cadastro','desenho', W+'01 - Cadastro/03-passo1-dados-email.svg',["Alternativa ao P02: decisão de login em aberto"]],
+  ['p04','P04','Passo 2 · Profissão','cadastro','desenho', W+'01 - Cadastro/04-passo2-profissao.svg'],
+  ['p05','P05','Passo 2 · Especialidades','cadastro','desenho', W+'01 - Cadastro/05-passo2-especialidades.svg',["Até 3 especialidades"]],
+  ['p06','P06','Passo 2 · Suas profissões','cadastro','desenho', W+'01 - Cadastro/06-passo2-suas-profissoes.svg',["Até 3 profissões"]],
+  ['p07','P07','Passo 2 · Outras profissões','cadastro','desenho', W+'01 - Cadastro/07-passo2-outras-profissoes.svg'],
+  ['p08','P08','Passo 3 · Onde receber (Pix)','cadastro','desenho', W+'01 - Cadastro/08-passo3-pix.svg'],
+  ['p09','P09','Passo 3 · Taxas do Tatu','cadastro','desenho', W+'01 - Cadastro/09-passo3-taxas.svg'],
+  ['p10','P10','Passo 3 · Fazer isso depois?','cadastro','desenho', W+'01 - Cadastro/10-passo3-fazer-depois.svg'],
+  ['p11','P11','Passo 3 · Chave Pix com erro','cadastro','desenho', W+'01 - Cadastro/11-passo3-pix-erro.svg'],
+  ['p12','P12','Passo 4 · Verificação','cadastro','desenho', W+'01 - Cadastro/12-passo4-intro.svg'],
+  ['p13','P13','Câmera do documento','cadastro','desenho', W+'01 - Cadastro/13-passo4-camera-documento.svg',["Só câmera, sem galeria; foto tirada sozinha"]],
+  ['p14','P14','Selfie','cadastro','desenho', W+'01 - Cadastro/14-passo4-selfie.svg'],
+  ['p15','P15','Em análise','cadastro','desenho', W+'01 - Cadastro/15-passo4-em-analise.svg',["Ativar avisos → pedido de permissão do celular"]],
+  ['p16','P16','Cadastro aprovado','cadastro','desenho', W+'01 - Cadastro/16-passo4-aprovada.svg'],
+  ['p17','P17','Reprovada · corrigível','cadastro','desenho', W+'01 - Cadastro/17-passo4-reprovada-corrigivel.svg',["Até 3 tentativas"]],
+  ['p18','P18','Reprovada · definitiva','cadastro','desenho', W+'01 - Cadastro/18-passo4-reprovada-definitiva.svg'],
+  ['pa-sms','—','Código SMS do profissional','cadastro','andamento'],
+  ['pa-outraesp','—','+ Outra especialidade','cadastro','andamento'],
+  ['pa-escrever','—','Escrever outra profissão','cadastro','andamento'],
+  ['pa-editarpix','—','Editar chave Pix','cadastro','andamento'],
+  ['pa-verso','—','Verso do documento e conferência','cadastro','andamento'],
+  ['pa-equipe','—','Falar com a equipe','cadastro','andamento'],
+
+  ['p19','P19','Primeira Home · dica','chamados','desenho', W+'02 - Chamados/19-home-primeira-vez.svg'],
+  ['p20','P20','Home · offline','chamados','desenho', W+'02 - Chamados/20-home-offline.svg',["Abas: Início · Atividade · Mensagens · Perfil","O app sempre abre offline"]],
+  ['p21','P21','Home · online','chamados','desenho', W+'02 - Chamados/21-home-online.svg'],
+  ['p22','P22','Novo chamado','chamados','desenho', W+'02 - Chamados/22-novo-chamado.svg',["Contagem para aceitar"]],
+  ['p23','P23','Chat do profissional','chamados','desenho', W+'02 - Chamados/23-chat.svg'],
+  ['p24','P24','A caminho','chamados','desenho', W+'02 - Chamados/24-andamento-a-caminho.svg',["Abrir rota → app de mapas do celular"]],
+  ['pa-valor','—','Enviar valor (folha)','chamados','andamento'],
+  ['pa-foto','—','Enviar foto no chat','chamados','andamento'],
+  ['pa-chegou','—','Chegou · iniciar serviço','chamados','andamento'],
+  ['pa-msgs','—','Mensagens do profissional','chamados','andamento'],
+
+  ['p25','P25','Serviço em curso','servico','desenho', W+'03 - Serviço e cobrança/25-andamento-em-servico.svg'],
+  ['p26','P26','Cobrar o cliente','servico','desenho', W+'03 - Serviço e cobrança/26-cobrar-cliente.svg',["Fotos do serviço (opcional) → câmera"]],
+  ['p27','P27','Cobrança · aguardando','servico','desenho', W+'03 - Serviço e cobrança/27-cobranca-aguardando.svg'],
+  ['p28','P28','Pagamento recebido · avaliar o cliente','servico','desenho', W+'03 - Serviço e cobrança/28-avaliar-cliente.svg'],
+  ['pa-porfora','—','Recebi por fora · aguardando o cliente confirmar','servico','andamento'],
+
+  ['p29','P29','Atividade · serviços','contaP','desenho', W+'04 - Atividade, ganhos e perfil/29-atividade-servicos.svg'],
+  ['p30','P30','Atividade · ganhos','contaP','desenho', W+'04 - Atividade, ganhos e perfil/30-atividade-ganhos.svg'],
+  ['p31','P31','Perfil do profissional','contaP','desenho', W+'04 - Atividade, ganhos e perfil/31-perfil.svg'],
+  ['p32','P32','Prévia: como o cliente vê','contaP','desenho', W+'04 - Atividade, ganhos e perfil/32-perfil-previa-cliente.svg'],
+  ['pa-fotos','—','Fotos de trabalhos','contaP','andamento'],
+  ['pa-sobre','—','Sobre você','contaP','andamento'],
+  ['pa-regiao','—','Região de atendimento','contaP','andamento'],
+  ['pa-verif','—','Verificação','contaP','andamento'],
+  ['pa-notif','—','Notificações','contaP','andamento'],
+  ['pa-dados','—','Dados da conta','contaP','andamento'],
+  ['pa-ajuda','—','Ajuda','contaP','andamento'],
+  ['pa-priv','—','Privacidade e termos','contaP','andamento'],
+];
+
+// [de, para, toque, tipo]  tipo: t = toque · a = automático · e = outro estado da mesma tela · alt = alternativa · s = entre os dois apps
+const LIGACOES = [
+  ['e01','e02','abre sozinha','a'],
+  ['e02','e03','Preciso de um serviço','t'],
+  ['e02','p01','Quero trabalhar','t'],
+  ['e02','a-entrar','Entrar','t'],
+  ['e03','e04','Continuar','t'],
+  ['e04','e03','Trocar número','t'],
+  ['e04','e05','Continuar','t'],
+  ['e05','c03','Continuar','t'],
+
+  ['c03','c04','descreve o problema · IA marca','a'],
+  ['c03','c05','escolhe serviço que não bate com a descrição','t'],
+  ['c03','c06','Outros','t'],
+  ['c03','c08','Endereço no topo','t'],
+  ['c03','c27','Avatar','t'],
+  ['c03','c23','Aba Atividade','t'],
+  ['c03','c25','Aba Mensagens','t'],
+  ['c04','c10','Chamar encanador','t'],
+  ['c05','c10','Chamar encanador · Manter pintor','t'],
+  ['c06','c07','escolhe Chaveiro','t'],
+  ['c06','c04','Não sei qual serviço','t'],
+  ['c07','c10','Chamar chaveiro','t'],
+  ['c08','c09','escolhe um endereço','t'],
+  ['c09','c03','Confirmar endereço','t'],
+
+  ['c10','c11','60–90 s sem aceite','a'],
+  ['c11','c12','ninguém ativo','a'],
+  ['c10','c13','alguém aceita','a'],
+  ['c11','c13','alguém aceita','a'],
+  ['c12','c13','alguém aceita · aviso','a'],
+  ['c10','a-cancelar','Cancelar pedido','t'],
+  ['c11','a-cancelar','Cancelar pedido','t'],
+  ['c12','a-cancelar','Cancelar pedido','t'],
+  ['c12','c03','Voltar ao início','t'],
+  ['c13','c14','toca no card','t'],
+  ['c13','c16','Aceitar Luiza','t'],
+  ['c14','c15','rola a tela','t'],
+  ['c14','c16','Aceitar Luiza','t'],
+  ['c15','c16','Aceitar Luiza','t'],
+  ['c14','c13','Ver outro','t'],
+  ['c15','c13','Ver outro','t'],
+  ['c15','a-todas','Ver todas','t'],
+
+  ['c16','c17','profissional envia o valor','a'],
+  ['c16','a-foto','Enviar foto','t'],
+  ['c17','c18','Pedir outro valor','t'],
+  ['c18','c17','Enviar proposta','t'],
+  ['c17','c19','Confirmar valor · serviço concluído','t'],
+  ['c19','c20','Pagar R$ 150,00','t'],
+  ['c19','a-porfora','Já paguei por fora','t'],
+  ['c20','a-porfora','Já paguei por fora','t'],
+  ['c20','c21','Pagar R$ 150,00','t'],
+  ['c21','c22','Avaliar a Luiza','t'],
+  ['c21','a-recibo','Baixar recibo','t'],
+  ['c22','c03','Enviar avaliação · Pular','t'],
+
+  ['c23','c24','Concluídos','t'],
+  ['c24','c23','Em andamento','t'],
+  ['c23','c16','toca no pedido','t'],
+  ['c23','a-cancelar','Cancelar','t'],
+  ['c24','a-pedirdenovo','Pedir de novo','t'],
+  ['c24','c21','Recibo','t'],
+  ['c24','c22','Avaliar','t'],
+  ['c25','c26','sem conversas','e'],
+  ['c25','c20','Pagar','t'],
+  ['c25','c16','toca na conversa','t'],
+  ['c27','c28','sem cartão · avisos desligados','e'],
+  ['c27','c08','Endereços','t'],
+  ['c27','a-pagamento','Pagamento','t'],
+  ['c28','a-pagamento','Adicionar','t'],
+  ['c27','a-minhasav','Minhas avaliações','t'],
+  ['c27','a-notifC','Notificações','t'],
+  ['c27','a-dadosC','Dados da conta','t'],
+  ['c27','a-ajudaC','Ajuda','t'],
+  ['c27','a-privC','Privacidade e termos','t'],
+  ['c27','e02','Sair da conta','t'],
+
+  ['p01','p02','Começar cadastro','t'],
+  ['p01','p03','opção B: e-mail e senha','alt'],
+  ['p02','pa-sms','Continuar','t'],
+  ['pa-sms','p04','código confirmado','a'],
+  ['p03','p04','Continuar','t'],
+  ['p04','p05','escolhe uma profissão','t'],
+  ['p04','p07','Outros','t'],
+  ['p05','pa-outraesp','+ Outra','t'],
+  ['p05','p06','Salvar profissão','t'],
+  ['p07','p05','escolhe da lista','t'],
+  ['p07','pa-escrever','Não achei: escrever outro','t'],
+  ['p06','p04','Adicionar outra profissão','t'],
+  ['p06','p08','Continuar','t'],
+  ['p08','pa-editarpix','Editar','t'],
+  ['p08','p09','Ver taxas do Tatu','t'],
+  ['p09','p08','Entendi','t'],
+  ['p08','p11','chave em nome de outra pessoa','a'],
+  ['p08','p12','Salvar e continuar','t'],
+  ['p08','p10','Fazer isso depois','t'],
+  ['p10','p08','Cadastrar agora','t'],
+  ['p10','p12','Fazer depois','t'],
+  ['p11','p08','Corrigir chave','t'],
+  ['p11','p10','Fazer isso depois','t'],
+  ['p12','p13','Começar verificação','t'],
+  ['p13','pa-verso','foto tirada sozinha','a'],
+  ['pa-verso','p14','Continuar','t'],
+  ['p14','p15','selfie tirada','a'],
+  ['p15','p16','aprovado','a'],
+  ['p15','p17','foto ruim','a'],
+  ['p15','p18','dados não conferem','a'],
+  ['p15','p19','Ir para o início','t'],
+  ['p16','p19','Começar','t'],
+  ['p17','p14','Refazer selfie','t'],
+  ['p18','pa-equipe','Falar com a equipe','t'],
+  ['p18','e02','Sair','t'],
+
+  ['p19','p21','Ficar online','t'],
+  ['p19','p20','da segunda vez em diante','e'],
+  ['p19','p08','Cadastre onde receber','t'],
+  ['p20','p08','Cadastre onde receber','t'],
+  ['p20','p21','Ficar online','t'],
+  ['p21','p20','Ficar offline','t'],
+  ['p20','p29','Aba Atividade','t'],
+  ['p20','pa-msgs','Aba Mensagens','t'],
+  ['p20','p31','Aba Perfil','t'],
+  ['p21','p22','chega um chamado','a'],
+  ['p22','p23','Aceitar chamado','t'],
+  ['p22','p21','Recusar · tempo acaba','t'],
+  ['p23','pa-valor','Enviar valor','t'],
+  ['p23','pa-foto','Enviar foto','t'],
+  ['pa-valor','p24','cliente confirma o valor','a'],
+  ['p24','pa-chegou','Cheguei (perto do local)','t'],
+  ['pa-chegou','p25','Iniciar serviço','t'],
+
+  ['p25','p26','Concluir e cobrar','t'],
+  ['p25','p23','Precisa mudar o valor?','t'],
+  ['p26','p27','Cobrar R$ 150,00','t'],
+  ['p26','pa-porfora','Recebi por fora','t'],
+  ['p27','pa-porfora','Recebi por fora','t'],
+  ['p27','p28','cliente paga','a'],
+  ['p27','p21','Voltar ao início','t'],
+  ['p28','p21','Enviar avaliação','t'],
+
+  ['p29','p30','Ganhos','t'],
+  ['p30','p29','Serviços','t'],
+  ['p31','p32','Ver como o cliente vê','t'],
+  ['p32','p31','Voltar ao perfil','t'],
+  ['p31','p06','Profissões','t'],
+  ['p31','p08','Onde receber','t'],
+  ['p31','pa-fotos','Fotos de trabalhos','t'],
+  ['p31','pa-sobre','Sobre você','t'],
+  ['p31','pa-regiao','Região de atendimento','t'],
+  ['p31','pa-verif','Verificação','t'],
+  ['p31','pa-notif','Notificações','t'],
+  ['p31','pa-dados','Dados da conta','t'],
+  ['p31','pa-ajuda','Ajuda','t'],
+  ['p31','pa-priv','Privacidade e termos','t'],
+  ['p31','e02','Sair da conta','t'],
+
+  // Entre os dois apps (só na vista "Os dois lados")
+  ['c10','p22','chamado vai para todos os ativos','s'],
+  ['p22','c13','profissional aceitou','s'],
+  ['c16','p23','mesma conversa','s'],
+  ['pa-valor','c17','valor chega no chat','s'],
+  ['c17','p24','valor confirmado libera o endereço','s'],
+  ['p26','c19','cobrança chega no chat','s'],
+  ['c21','p28','pagamento confirmado','s'],
+  ['a-porfora','pa-porfora','a outra parte confirma','s'],
+];
+
+/* ===== MONTAGEM ===== */
+// Caminho publicado da imagem: telas/cliente/<arquivo> ou telas/profissional/<arquivo>
+const pub = p => 'telas/' + (p.startsWith('design/user/') ? 'cliente/' : 'profissional/') + p.split('/').pop();
+const TELAS = TELAS_RAW.map(([id, cod, nome, etapa, status, repo, notas]) => ({
+  id, cod, nome, etapa, status, repo, notas: notas || [],
+  img: repo ? (repo.startsWith('docs/fluxo/') ? repo.slice(11) : pub(repo)) : null,
+  lado: ETAPAS[etapa].lado,
+}));
+const POR_ID = Object.fromEntries(TELAS.map(t => [t.id, t]));
+LIGACOES.forEach(([de, para]) => { if (!POR_ID[de] || !POR_ID[para]) console.error('Ligação inválida', de, para); });
+
+const STATUS = { app: 'No app', desenho: 'Desenhada', andamento: 'Em andamento' };
+const VISTAS = {
+  cliente: { lados: ['ambos', 'cliente'], extra: ['p01'] },
+  profissional: { lados: ['ambos', 'profissional'], extra: [], tirar: ['e03', 'e04', 'e05', 'c03'] },
+  ambos: { lados: ['ambos', 'cliente', 'profissional'], extra: [] },
+};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const stage = $('#stage'), world = $('#world'), panel = $('#panel');
+let vista = 'cliente', view = { x: 0, y: 0, k: 1 }, layout = null, selecionada = null;
+
+function telasDaVista(v) {
+  const cfg = VISTAS[v];
+  return TELAS.filter(t => (cfg.lados.includes(t.lado) || cfg.extra.includes(t.id)) && !(cfg.tirar || []).includes(t.id));
+}
+
+function ligacoesDaVista(v, ids) {
+  const set = new Set(ids);
+  const grupos = new Map();
+  for (const [de, para, toque, tipo] of LIGACOES) {
+    if (!set.has(de) || !set.has(para)) continue;
+    if (tipo === 's' && v !== 'ambos') continue;
+    const k = de + '>' + para + '>' + tipo;
+    if (!grupos.has(k)) grupos.set(k, { de, para, tipo, toques: [] });
+    if (!grupos.get(k).toques.includes(toque)) grupos.get(k).toques.push(toque);
+  }
+  return [...grupos.values()].map(g => ({ ...g, rotulo: g.toques.join(' · ') }));
+}
+
+function medir(texto, px = 11) { return Math.ceil(texto.length * px * 0.56) + 20; }
+
+/* Cada etapa vira uma faixa: layout da esquerda para a direita dentro da faixa;
+   as faixas ficam empilhadas e as setas entre faixas são curvas desenhadas à parte. */
+const PAD = { lado: 34, topo: 54, base: 34, entre: 90, margem: 60 };
+function tamanho(t) {
+  if (t.status === 'andamento') return { width: 170, height: 78 + (t.nome.length > 22 ? 16 : 0) };
+  return { width: 168, height: Math.round(76 + 146 * 852 / 393 + t.notas.reduce((a, n) => a + (n.length > 30 ? 30 : 16), 0)) };
+}
+function montar() {
+  const telas = telasDaVista(vista);
+  const ligs = ligacoesDaVista(vista, telas.map(t => t.id));
+  const etapaDe = Object.fromEntries(telas.map(t => [t.id, t.etapa]));
+  const etapas = Object.keys(ETAPAS).filter(e => telas.some(t => t.etapa === e));
+  const nos = {}, arestas = [], faixas = [];
+  let y = PAD.margem, largura = 0;
+  for (const e of etapas) {
+    const g = new dagre.graphlib.Graph({ multigraph: true });
+    g.setGraph({ rankdir: 'LR', nodesep: 28, ranksep: 120, edgesep: 16, marginx: 0, marginy: 0 });
+    g.setDefaultEdgeLabel(() => ({}));
+    telas.filter(t => t.etapa === e).forEach(t => g.setNode(t.id, tamanho(t)));
+    ligs.forEach((l, i) => {
+      if (etapaDe[l.de] !== e || etapaDe[l.para] !== e) return;
+      const w = Math.min(medir(l.rotulo), 220);
+      g.setEdge(l.de, l.para, { l, width: w, height: medir(l.rotulo) > 220 ? 36 : 22, labelpos: 'c' }, 'e' + i);
+    });
+    dagre.layout(g);
+    const gr = g.graph(), ox = PAD.margem + PAD.lado, oy = y + PAD.topo;
+    g.nodes().forEach(id => { const n = g.node(id); nos[id] = { x: n.x + ox, y: n.y + oy, w: n.width, h: n.height }; });
+    g.edges().forEach(k => {
+      const d = g.edge(k);
+      arestas.push({ ...d.l, d: caminho(d.points.map(p => ({ x: p.x + ox, y: p.y + oy }))), lx: d.x + ox, ly: d.y + oy, lw: d.width, alto: d.height > 22 });
+    });
+    const w = gr.width + PAD.lado * 2, h = gr.height + PAD.topo + PAD.base;
+    faixas.push({ etapa: e, x: PAD.margem, y, w, h });
+    largura = Math.max(largura, w);
+    y += h + PAD.entre;
+  }
+  // Setas entre faixas: saem por baixo/cima do cartão e entram pelo outro lado.
+  const saidas = {};
+  ligs.forEach(l => {
+    if (etapaDe[l.de] === etapaDe[l.para]) return;
+    const a = nos[l.de], b = nos[l.para];
+    const desce = b.y > a.y;
+    const k = l.de + (desce ? 'v' : '^');
+    const n = (saidas[k] = (saidas[k] || 0) + 1);
+    const off = ((n % 5) - 2) * 14;
+    const p0 = { x: a.x + off, y: a.y + (desce ? a.h / 2 : -a.h / 2) };
+    const p3 = { x: b.x, y: b.y + (desce ? -b.h / 2 : b.h / 2) };
+    const dy = Math.max(80, Math.abs(p3.y - p0.y) * 0.45) * (desce ? 1 : -1);
+    const p1 = { x: p0.x, y: p0.y + dy }, p2 = { x: p3.x, y: p3.y - dy };
+    const t = 0.5, m = (a1, a2, a3, a4) => (1 - t) ** 3 * a1 + 3 * (1 - t) ** 2 * t * a2 + 3 * (1 - t) * t * t * a3 + t ** 3 * a4;
+    arestas.push({ ...l, entre: true, d: `M${p0.x},${p0.y} C${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`,
+      lx: m(p0.x, p1.x, p2.x, p3.x), ly: m(p0.y, p1.y, p2.y, p3.y), lw: Math.min(medir(l.rotulo), 220), alto: medir(l.rotulo) > 220 });
+  });
+  layout = { telas, ligs, nos, arestas, faixas, w: largura + PAD.margem * 2, h: y - PAD.entre + PAD.margem };
+  desenhar();
+}
+
+function caminho(pts) {
+  if (pts.length < 2) return '';
+  let d = `M${pts[0].x},${pts[0].y}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const m = { x: (pts[i].x + pts[i + 1].x) / 2, y: (pts[i].y + pts[i + 1].y) / 2 };
+    d += ` Q${pts[i].x},${pts[i].y} ${m.x},${m.y}`;
+  }
+  const u = pts[pts.length - 1];
+  return d + ` L${u.x},${u.y}`;
+}
+
+function desenhar() {
+  const { telas, nos, arestas, faixas, w, h } = layout;
+  let html = '';
+  for (const f of faixas) {
+    const e = ETAPAS[f.etapa];
+    html += `<div class="cluster lado-${e.lado}" style="left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px"><span>${esc(e.nome)}</span></div>`;
+  }
+  let svg = `<svg width="${w}" height="${h}" aria-hidden="true"><defs>
+    <marker id="m-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" fill="var(--edge)"/></marker>
+    <marker id="m-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" fill="var(--edge-auto)"/></marker>
+    <marker id="m-s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" fill="var(--sync)"/></marker></defs>`;
+  let rotulos = '';
+  for (const l of arestas) {
+    const cls = l.tipo === 's' ? 's' : (l.tipo === 't' ? 't' : 'a');
+    const cor = cls === 's' ? 'var(--sync)' : cls === 't' ? 'var(--edge)' : 'var(--edge-auto)';
+    const dash = cls === 't' ? '' : (l.tipo === 'e' || l.tipo === 'alt' ? '2 5' : '7 6');
+    svg += `<path class="${l.entre && cls !== 's' ? 'entre' : ''}" data-de="${l.de}" data-para="${l.para}" d="${l.d}" fill="none" stroke="${cor}" stroke-width="${cls === 's' ? 2 : 1.6}" ${dash ? `stroke-dasharray="${dash}"` : ''} stroke-linecap="round" marker-end="url(#m-${cls})"/>`;
+    rotulos += `<div class="elabel ${cls === 't' ? '' : cls === 's' ? 'sync' : 'auto'}" data-de="${l.de}" data-para="${l.para}" style="left:${l.lx}px;top:${l.ly}px;max-width:${l.lw}px;white-space:${l.alto ? 'normal' : 'nowrap'};text-align:center">${esc(l.rotulo)}</div>`;
+  }
+  svg += '</svg>';
+  for (const t of telas) {
+    const n = nos[t.id];
+    const pos = `left:${n.x - n.w / 2}px;top:${n.y - n.h / 2}px;width:${n.w}px;height:${n.h}px`;
+    if (t.status === 'andamento') {
+      html += `<div class="node andamento" data-id="${t.id}" style="${pos}" role="button" tabindex="0" aria-label="${esc(t.nome)}, em andamento">
+        <span class="pill andamento"><span class="dot andamento"></span>Em andamento</span><div class="nm">${esc(t.nome)}</div></div>`;
+    } else {
+      html += `<div class="node" data-id="${t.id}" style="${pos}" role="button" tabindex="0" aria-label="${esc(t.cod + ' ' + t.nome)}">
+        <div class="hd"><span class="code">${t.cod}</span><span class="pill ${t.status}" style="margin-left:auto"><span class="dot ${t.status}"></span>${STATUS[t.status]}</span></div>
+        <div class="nm">${esc(t.nome)}</div>
+        <div class="shot"><img alt="" decoding="async" src="${esc(t.img)}" data-repo="${esc(t.repo)}"></div>
+        ${t.notas.length ? `<ul class="notes">${t.notas.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</div>`;
+    }
+  }
+  world.style.width = w + 'px';
+  world.style.height = h + 'px';
+  world.innerHTML = svg + html + rotulos;
+  world.querySelectorAll('img').forEach(img => img.addEventListener('error', () => {
+    if (img.dataset.tried) return; img.dataset.tried = 1;
+    img.src = '../../' + img.dataset.repo.split('/').map(encodeURIComponent).join('/');
+  }));
+  legenda(telas);
+  if (selecionada && !nos[selecionada]) selecionada = null;
+  realcar();
+}
+
+function legenda(telas) {
+  const c = { app: 0, desenho: 0, andamento: 0 };
+  telas.forEach(t => c[t.status]++);
+  $('#legend').innerHTML = `
+    <span class="k"><span class="dot app"></span>No app <b>${c.app}</b></span>
+    <span class="k"><span class="dot desenho"></span>Desenhada <b>${c.desenho}</b></span>
+    <span class="k"><span class="dot andamento"></span>Em andamento <b>${c.andamento}</b></span>
+    <span class="k"><span class="lk"></span>toque</span>
+    <span class="k"><span class="lk auto"></span>automático</span>
+    ${vista === 'ambos' ? '<span class="k"><span class="lk sync"></span>entre os dois apps</span>' : ''}`;
+}
+
+/* ===== PAN / ZOOM ===== */
+function aplicar() {
+  world.style.transform = `translate(${view.x}px,${view.y}px) scale(${view.k})`;
+  $('#zval').textContent = Math.round(view.k * 100) + '%';
+}
+function zoomEm(k, cx, cy) {
+  k = Math.min(2.5, Math.max(0.08, k));
+  view.x = cx - (cx - view.x) * (k / view.k);
+  view.y = cy - (cy - view.y) * (k / view.k);
+  view.k = k; aplicar();
+}
+function ajustar() {
+  const gr = { width: layout.w, height: layout.h }, r = stage.getBoundingClientRect();
+  const k = Math.min(r.width / gr.width, r.height / gr.height) * 0.96;
+  view.k = Math.max(0.08, Math.min(1, k));
+  view.x = (r.width - gr.width * view.k) / 2;
+  view.y = (r.height - gr.height * view.k) / 2;
+  aplicar();
+}
+// Abertura: começa pela primeira etapa, num tamanho em que dá para ler.
+function inicio() {
+  const r = stage.getBoundingClientRect(), f = layout.faixas[0];
+  view.k = Math.max(0.3, Math.min(0.75, (r.width - 40) / (f.w + 40)));
+  view.x = 20 - f.x * view.k + Math.max(0, (r.width - 40 - f.w * view.k) / 2);
+  view.y = 24 - f.y * view.k;
+  aplicar();
+}
+function centrar(id) {
+  const n = layout.nos[id]; if (!n) return;
+  const r = stage.getBoundingClientRect();
+  const k = Math.max(view.k, 0.55);
+  const larguraUtil = panel.hidden || r.width < 640 ? r.width : r.width - 400;
+  const alturaUtil = r.width < 640 && !panel.hidden ? r.height * 0.32 : r.height;
+  view.k = k;
+  view.x = larguraUtil / 2 - n.x * k;
+  view.y = alturaUtil / 2 - n.y * k;
+  aplicar();
+}
+
+const toques = new Map();
+let arrasto = null, pinca = null;
+stage.addEventListener('pointerdown', e => {
+  if (e.target.closest('.zoom, .panel, .hint')) return;
+  stage.setPointerCapture(e.pointerId);
+  toques.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (toques.size === 1) arrasto = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moveu: false, alvo: e.target.closest('.node') };
+  if (toques.size === 2) {
+    const [a, b] = [...toques.values()];
+    pinca = { d: Math.hypot(a.x - b.x, a.y - b.y), k: view.k };
+    arrasto = null;
+  }
+});
+stage.addEventListener('pointermove', e => {
+  if (!toques.has(e.pointerId)) return;
+  toques.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pinca && toques.size === 2) {
+    const [a, b] = [...toques.values()], r = stage.getBoundingClientRect();
+    zoomEm(pinca.k * Math.hypot(a.x - b.x, a.y - b.y) / pinca.d, (a.x + b.x) / 2 - r.left, (a.y + b.y) / 2 - r.top);
+  } else if (arrasto) {
+    const dx = e.clientX - arrasto.x, dy = e.clientY - arrasto.y;
+    if (Math.abs(dx) + Math.abs(dy) > 4) { arrasto.moveu = true; stage.classList.add('dragging'); }
+    view.x = arrasto.vx + dx; view.y = arrasto.vy + dy; aplicar();
+  }
+});
+function soltar(e) {
+  if (arrasto && !arrasto.moveu) {
+    if (arrasto.alvo) abrir(arrasto.alvo.dataset.id);
+    else fechar();
+  }
+  toques.delete(e.pointerId);
+  if (toques.size < 2) pinca = null;
+  if (toques.size === 0) arrasto = null;
+  stage.classList.remove('dragging');
+}
+stage.addEventListener('pointerup', soltar);
+stage.addEventListener('pointercancel', soltar);
+stage.addEventListener('wheel', e => {
+  if (e.target.closest('.panel')) return;
+  e.preventDefault();
+  const r = stage.getBoundingClientRect();
+  if (e.ctrlKey || Math.abs(e.deltaY) > 40 && !e.deltaX && e.deltaMode === 0 && Number.isInteger(e.deltaY)) {
+    zoomEm(view.k * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015)), e.clientX - r.left, e.clientY - r.top);
+  } else { view.x -= e.deltaX; view.y -= e.deltaY; aplicar(); }
+}, { passive: false });
+$('#zin').onclick = () => { const r = stage.getBoundingClientRect(); zoomEm(view.k * 1.25, r.width / 2, r.height / 2); };
+$('#zout').onclick = () => { const r = stage.getBoundingClientRect(); zoomEm(view.k / 1.25, r.width / 2, r.height / 2); };
+$('#zfit').onclick = ajustar;
+world.addEventListener('keydown', e => {
+  const n = e.target.closest('.node');
+  if (n && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); abrir(n.dataset.id); }
+});
+
+/* ===== PAINEL ===== */
+function itemLig(id, rotulo, tipo, sentido) {
+  const t = POR_ID[id];
+  const tipoTxt = { a: 'automático', e: 'outro estado', alt: 'alternativa', s: 'no outro app', t: '' }[tipo];
+  return `<li><button data-ir="${id}"><span class="t">${esc(rotulo)}</span><span class="d">${sentido} ${t.cod !== '—' ? t.cod + ' · ' : ''}${esc(t.nome)}${tipoTxt ? ' · ' + tipoTxt : ''}</span><span class="arrow">›</span></button></li>`;
+}
+function abrir(id) {
+  const t = POR_ID[id]; if (!t) return;
+  selecionada = id;
+  const sai = layout.ligs.filter(l => l.de === id), entra = layout.ligs.filter(l => l.para === id);
+  panel.innerHTML = `
+    <div class="ph"><div><span class="code">${t.cod}</span>
+      <h2>${esc(t.nome)}</h2>
+      <span class="pill ${t.status}"><span class="dot ${t.status}"></span>${STATUS[t.status]}</span>
+      <span class="pill desenho" style="margin-left:4px">${esc(ETAPAS[t.etapa].nome)}</span></div>
+      <button class="x" id="fechar" aria-label="Fechar">✕</button></div>
+    <div class="pb">
+      ${t.img ? `<div class="big"><img alt="${esc(t.nome)}" src="${esc(t.img)}" data-repo="${esc(t.repo)}"></div>` :
+        `<p class="note">Esta tela ainda não foi desenhada. Ela aparece aqui porque um toque leva até ela.</p>`}
+      ${t.notas.length ? `<div><h3>Observações</h3><ul>${t.notas.map(n => `<li class="note">↻ ${esc(n)}</li>`).join('')}</ul></div>` : ''}
+      <div><h3>Toques nesta tela</h3>${sai.length ? `<ul>${sai.map(l => itemLig(l.para, l.rotulo, l.tipo, 'abre')).join('')}</ul>` : '<p class="note">Nenhum toque mapeado ainda.</p>'}</div>
+      <div><h3>Como se chega aqui</h3>${entra.length ? `<ul>${entra.map(l => itemLig(l.de, l.rotulo, l.tipo, 'vindo de')).join('')}</ul>` : '<p class="note">É a primeira tela.</p>'}</div>
+      ${t.repo ? `<div><h3>Arquivo</h3><p class="path">${esc(t.repo)}</p></div>` : ''}
+    </div>`;
+  panel.hidden = false;
+  const big = panel.querySelector('.big img');
+  if (big) big.addEventListener('error', () => { if (!big.dataset.tried) { big.dataset.tried = 1; big.src = '../../' + big.dataset.repo.split('/').map(encodeURIComponent).join('/'); } });
+  $('#fechar').onclick = fechar;
+  panel.querySelectorAll('[data-ir]').forEach(b => b.onclick = () => { abrir(b.dataset.ir); centrar(b.dataset.ir); });
+  realcar();
+}
+function fechar() { panel.hidden = true; selecionada = null; realcar(); }
+function realcar() {
+  const viz = new Set();
+  if (selecionada) {
+    viz.add(selecionada);
+    layout.ligs.forEach(l => { if (l.de === selecionada) viz.add(l.para); if (l.para === selecionada) viz.add(l.de); });
+  }
+  world.querySelectorAll('.node').forEach(n => {
+    n.classList.toggle('sel', n.dataset.id === selecionada);
+    n.classList.toggle('dim', !!selecionada && !viz.has(n.dataset.id));
+  });
+  world.querySelectorAll('path[data-de]').forEach(p => {
+    const on = !selecionada || p.dataset.de === selecionada || p.dataset.para === selecionada;
+    p.style.opacity = !selecionada ? '' : on ? 1 : 0.12;
+  });
+  world.querySelectorAll('.elabel').forEach(l => {
+    l.classList.toggle('dim', !!selecionada && l.dataset.de !== selecionada && l.dataset.para !== selecionada);
+  });
+}
+
+/* ===== BUSCA ===== */
+const busca = $('#busca'), res = $('#resultados');
+busca.addEventListener('input', () => {
+  const q = busca.value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  if (!q) { res.hidden = true; return; }
+  const ids = new Set(layout.telas.map(t => t.id));
+  const achados = TELAS.filter(t => ids.has(t.id) && (t.nome + ' ' + t.cod).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q)).slice(0, 12);
+  res.innerHTML = achados.length ? achados.map(t => `<li><button data-id="${t.id}"><span class="dot ${t.status}"></span><span class="code">${t.cod}</span>${esc(t.nome)}</button></li>`).join('') : '<li class="note" style="padding:8px">Nada nesta vista.</li>';
+  res.hidden = false;
+  res.querySelectorAll('button').forEach(b => b.onclick = () => { res.hidden = true; busca.value = ''; abrir(b.dataset.id); centrar(b.dataset.id); });
+});
+busca.addEventListener('keydown', e => { if (e.key === 'Escape') { busca.value = ''; res.hidden = true; } if (e.key === 'Enter') res.querySelector('button')?.click(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !panel.hidden) fechar(); });
+
+/* ===== VISTAS ===== */
+function trocar(v, primeira) {
+  if (!VISTAS[v]) v = 'cliente';
+  vista = v;
+  document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.v === v));
+  fechar();
+  montar();
+  inicio();
+  if (!primeira && location.hash !== '#' + v) history.replaceState(null, '', '#' + v);
+}
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => trocar(b.dataset.v));
+window.addEventListener('hashchange', () => trocar(location.hash.slice(1)));
+window.addEventListener('resize', () => { if (layout) aplicar(); });
+$('#data').textContent = ATUALIZADO;
+trocar(location.hash.slice(1) || 'cliente', true);
+</script>

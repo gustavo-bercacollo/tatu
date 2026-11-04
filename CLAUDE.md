@@ -49,6 +49,13 @@ backend/       Python (venv em backend/.venv): app/main.py, config, db, models, 
 ```
 Ícones: `flutter_tabler_icons` (`TablerIcons.*`). Arquivos de tela: `<nome>_page.dart`. Ainda não adotados (decidir quando houver 2+ telas): rotas com `go_router`, estado com Riverpod, mocks em `lib/data/mock`.
 
+## Fluxograma das telas (mostrado a devs e investidores — manter sempre atualizado)
+Publicado em https://claude.ai/artifact/UbvPYpEqyP5sWj9cbtvT7B. Fonte: `docs/fluxo/index.html` (dados em `TELAS_RAW` e `LIGACOES` no topo do script), imagens do app em `docs/fluxo/app/`, mapa de arquivos para publicar em `docs/fluxo/arquivos.json`.
+**A cada mudança em qualquer tela** (nova, alterada, novo toque ou destino):
+1. Atualizar `TELAS_RAW`/`LIGACOES` e a data `ATUALIZADO`. Status: `app` (no app, imagem real), `desenho` (só desenho), `andamento` (destino de um toque que ainda não tem tela — **nunca inventar** tela).
+2. Tela nova no app → acrescentar em `app/tool/capturas_test.dart` e rodar `flutter test tool/capturas_test.dart --update-goldens` (dentro de `app/`).
+3. Imagem nova → acrescentar em `arquivos.json`. Republicar com o Artifact (mesmo arquivo `docs/fluxo/index.html`, `root` = raiz do repo, `files` = conteúdo de `arquivos.json`) para manter o mesmo link.
+
 ## Como trabalhar
 - Uma tela ou componente por vez. Cada tela a partir do SVG correspondente, com os estados do guia (vazio, carregando, erro).
 - Commit a cada tela/componente pronto; atualizar `PROGRESSO.md`.

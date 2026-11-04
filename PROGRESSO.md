@@ -13,6 +13,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - 04/11/2026 — Tema (`TatuColors`, `tatuTheme()`), fonte Inter embutida, ícones Tabler, componente `OptionCard` e tela de **Boas-vindas** (comum aos dois modos, referência `boas_vindas_escolha_perfil.html`).
 - 04/11/2026 — Tela **Celular** (referência `tatu-tela-2-celular.html`) e componentes `TatuField` (campo do guia) e `BackCircleButton`; botão principal com estado desabilitado no tema.
 - 04/11/2026 — Tela **Nome** (referência `tatu-tela-4-nome.html`); esqueleto `CadastroScaffold` + `CadastroNota` compartilhado pelas telas de cadastro.
+- 04/11/2026 — **Fluxograma** de todas as telas (cliente + profissional, toques, status) publicado: https://claude.ai/artifact/UbvPYpEqyP5sWj9cbtvT7B. Fonte em `docs/fluxo/`. Atualizar a cada mudança de tela (ver CLAUDE.md).
 - 04/11/2026 — Tela **Código SMS** (referência `tatu-tela-3-codigo-sms.html`) entre Celular e Nome. Corrigido: texto dos botões não usava Inter; botão desabilitado com texto `#B0B0B5`.
 
 ## Telas comuns
