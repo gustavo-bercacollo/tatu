@@ -56,6 +56,7 @@ backend/       Python (venv em backend/.venv): app/main.py, config, db, models, 
 
 ## Comandos
 - App: `cd app` → `flutter run -d chrome` · `flutter analyze` · `flutter test`. Erro estranho de compilação → `flutter clean` e rodar de novo.
+- Celular do Gustavo (mesmo Wi-Fi, http://192.168.1.173:8080): `cd app` → `flutter build web --release` e servir com `py -m http.server 8080 --bind 0.0.0.0 --directory build\web` (aba de terminal "app celular"). Depois de cada mudança, só rodar o build de novo; o servidor continua. **Não usar** `flutter run -d web-server` para o celular: o modo debug fica em branco pela rede e o `--release` dele quebra no Windows.
 - API: `cd backend` → `.venv\Scripts\python -m uvicorn app.main:app --reload` (`/health`)
 - Worker: `cd backend` → `.venv\Scripts\arq app.worker.main.WorkerSettings` (precisa de Redis)
 - Flutter em `C:\src\flutter`; GitHub CLI em `%LOCALAPPDATA%\Programs\gh\bin\gh.exe`. Android Studio não instalado.
