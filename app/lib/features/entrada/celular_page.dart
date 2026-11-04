@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import '../../core/theme/tatu_colors.dart';
 import '../../shared/widgets/cadastro_scaffold.dart';
 import '../../shared/widgets/tatu_field.dart';
-import 'nome_page.dart';
+import 'codigo_page.dart';
 
 /// Cadastro · celular: pede o número para enviar o código por SMS.
 class CelularPage extends StatefulWidget {
@@ -29,9 +29,9 @@ class _CelularPageState extends State<CelularPage> {
 
   void _continuar() {
     if (!_valido) return;
-    // A tela do código SMS ainda não existe; por enquanto vai direto ao nome.
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => const NomePage()));
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => CodigoPage(celular: _controller.text)),
+    );
   }
 
   @override

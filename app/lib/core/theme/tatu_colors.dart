@@ -11,6 +11,7 @@ class TatuColors {
   static const textPrimary = Color(0xFF000000);
   static const textSecondary = Color(0xFF8E8E93);
   static const chevron = Color(0xFFC7C7CC);
+  static const textDisabled = Color(0xFFB0B0B5);
   static const action = Color(0xFF1C1C1E);
   static const onAction = Color(0xFFFFFFFF);
   static const online = Color(0xFF34C759);

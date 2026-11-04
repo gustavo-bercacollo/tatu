@@ -41,6 +41,41 @@ void main() {
     expect(find.text('Como você quer usar o Tatu?'), findsOneWidget);
   });
 
+  testWidgets('Código: mostra o número, conta 60 s e libera com 6 dígitos', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const TatuApp());
+    await tester.tap(find.text('Preciso de um serviço'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), '11988887777');
+    await tester.pump();
+    await tester.tap(find.text('Continuar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Digite o código'), findsOneWidget);
+    expect(
+      find.text('Enviamos um SMS para\n+55 (11) 98888-7777'),
+      findsOneWidget,
+    );
+    expect(find.text('Reenviar código em 1:00'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 18));
+    expect(find.text('Reenviar código em 0:42'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 42));
+    expect(find.text('Reenviar código'), findsOneWidget);
+
+    FilledButton botao() => tester.widget(find.byType(FilledButton));
+    await tester.enterText(find.byType(TextField), '48271');
+    await tester.pump();
+    expect(botao().onPressed, isNull);
+    await tester.enterText(find.byType(TextField), '482719');
+    await tester.pump();
+    expect(botao().onPressed, isNotNull);
+
+    await tester.tap(find.text('Continuar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Como podemos\nte chamar?'), findsOneWidget);
+  });
+
   testWidgets('Nome: Continuar só com nome; sobrenome é opcional', (
     tester,
   ) async {
@@ -48,6 +83,10 @@ void main() {
     await tester.tap(find.text('Preciso de um serviço'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), '11988887777');
+    await tester.pump();
+    await tester.tap(find.text('Continuar'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), '482719');
     await tester.pump();
     await tester.tap(find.text('Continuar'));
     await tester.pumpAndSettle();
