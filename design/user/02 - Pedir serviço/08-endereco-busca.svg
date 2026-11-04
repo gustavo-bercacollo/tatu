@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Endereço · busca</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="40" cy="82" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,73) scale(0.75)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></g>
+  <text x="196.5" y="88" font-size="17" font-weight="600" fill="#000000" text-anchor="middle">Onde é o serviço?</text>
+  <rect x="20" y="130" width="353" height="48" rx="14" fill="#EEEEF0"/>
+  <g transform="translate(32,143) scale(0.8333333333333334)" fill="none" stroke="#8E8E93" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/><path d="M21 21l-6 -6"/></g>
+  <text x="60" y="160" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Rua das Flo</text>
+  <line x1="333" y1="0" x2="0" y2="0" stroke="#D9D9DC" stroke-width="0.5"/>
+  <circle cx="341" cy="154" r="10" fill="#E4E4E7"/>
+  <g transform="translate(336,149) scale(0.4166666666666667)" fill="none" stroke="#000000" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></g>
+  <text x="20" y="214" font-size="13" font-weight="600" fill="#8E8E93" text-anchor="start">Resultados</text>
+  <circle cx="40" cy="254" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,245) scale(0.75)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/></g>
+  <text x="70" y="252" font-size="16" font-weight="600" fill="#000000" text-anchor="start">Rua das Flores, 120</text>
+  <text x="70" y="272" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="start">Jardim Primavera · São Paulo</text>
+  <line x1="70" y1="292" x2="373" y2="292" stroke="#D9D9DC" stroke-width="0.5"/>
+  <circle cx="40" cy="318" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,309) scale(0.75)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/></g>
+  <text x="70" y="316" font-size="16" font-weight="600" fill="#000000" text-anchor="start">Rua das Flores, 45</text>
+  <text x="70" y="336" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="start">Centro · São Paulo</text>
+  <line x1="70" y1="356" x2="373" y2="356" stroke="#D9D9DC" stroke-width="0.5"/>
+  <circle cx="40" cy="382" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,373) scale(0.75)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/></g>
+  <text x="70" y="380" font-size="16" font-weight="600" fill="#000000" text-anchor="start">Rua das Flores, 300</text>
+  <text x="70" y="400" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="start">Vila Nova · São Paulo</text>
+  <line x1="70" y1="420" x2="373" y2="420" stroke="#D9D9DC" stroke-width="0.5"/>
+  <text x="20" y="454" font-size="13" font-weight="600" fill="#8E8E93" text-anchor="start">Recentes</text>
+  <circle cx="40" cy="494" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,485) scale(0.75)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 7v5l3 3"/></g>
+  <text x="70" y="492" font-size="16" font-weight="600" fill="#000000" text-anchor="start">Casa</text>
+  <text x="70" y="512" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="start">Rua das Flores, 120</text>
+  <circle cx="40" cy="558" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,549) scale(0.75)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 7v5l3 3"/></g>
+  <text x="70" y="556" font-size="16" font-weight="600" fill="#000000" text-anchor="start">Trabalho</text>
+  <text x="70" y="576" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="start">Av. Paulista, 1000</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>

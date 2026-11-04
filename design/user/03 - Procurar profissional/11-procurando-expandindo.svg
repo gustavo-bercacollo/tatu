@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Procurando · expandindo</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <rect x="0" y="0" width="393" height="520" rx="0" fill="#EAEAEE"/>
+  <path d="M0 0 L-30 520" stroke="#fff" stroke-width="10"/>
+  <path d="M70 0 L40 520" stroke="#fff" stroke-width="10"/>
+  <path d="M140 0 L110 520" stroke="#fff" stroke-width="10"/>
+  <path d="M210 0 L180 520" stroke="#fff" stroke-width="10"/>
+  <path d="M280 0 L250 520" stroke="#fff" stroke-width="10"/>
+  <path d="M350 0 L320 520" stroke="#fff" stroke-width="10"/>
+  <path d="M420 0 L390 520" stroke="#fff" stroke-width="10"/>
+  <path d="M0 40 L393 54" stroke="#fff" stroke-width="8"/>
+  <path d="M0 135 L393 149" stroke="#fff" stroke-width="8"/>
+  <path d="M0 230 L393 244" stroke="#fff" stroke-width="8"/>
+  <path d="M0 325 L393 339" stroke="#fff" stroke-width="8"/>
+  <path d="M0 420 L393 434" stroke="#fff" stroke-width="8"/>
+  <path d="M0 515 L393 529" stroke="#fff" stroke-width="8"/>
+  <rect x="250" y="50" width="90" height="60" rx="10" fill="#DDEBD9"/>
+  <rect x="30" y="400" width="100" height="70" rx="10" fill="#DDEBD9"/>
+  <circle cx="196" cy="290" r="170" fill="#34C759" stroke="#34C759" stroke-width="1.2" opacity="0.07"/>
+  <circle cx="196" cy="290" r="115" fill="#34C759" stroke="#34C759" stroke-width="1.2" opacity="0.1"/>
+  <circle cx="196" cy="290" r="60" fill="#34C759" stroke="#34C759" stroke-width="1.2" opacity="0.14"/>
+  <circle cx="110" cy="170" r="9" fill="#34C759" stroke="#fff" stroke-width="3"/>
+  <circle cx="290" cy="210" r="9" fill="#34C759" stroke="#fff" stroke-width="3"/>
+  <circle cx="230" cy="360" r="9" fill="#34C759" stroke="#fff" stroke-width="3"/>
+  <circle cx="150" cy="400" r="9" fill="#34C759" stroke="#fff" stroke-width="3"/>
+  <circle cx="196" cy="290" r="11" fill="#1C1C1E" stroke="#fff" stroke-width="4"/>
+  <circle cx="40" cy="82" r="18" fill="#fff"/>
+  <g transform="translate(32,74) scale(0.6666666666666666)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></g>
+  <rect x="0" y="500" width="393" height="352" rx="30" fill="#fff"/>
+  <rect x="178.5" y="508" width="36" height="5" rx="2.5" fill="#C7C7CC"/>
+  <text x="20" y="554" font-size="24" font-weight="700" fill="#000000" text-anchor="start" letter-spacing="-0.4">Procurando um profissional</text>
+  <text x="20" y="582" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="start">Ninguém aceitou ainda. Estamos chamando</text>
+  <text x="20" y="603" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="start">mais profissionais.</text>
+  <circle cx="30" cy="634" r="5" fill="#34C759"/>
+  <text x="42" y="639" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Expandindo a busca para sua região…</text>
+  <rect x="20" y="658" width="353" height="6" rx="3" fill="#E4E4E7"/>
+  <rect x="20" y="658" width="229" height="6" rx="3" fill="#1C1C1E"/>
+  <rect x="20" y="688" width="353" height="56" rx="28.0" fill="#EEEEF0"/>
+  <text x="196.5" y="722.0" font-size="17" font-weight="600" fill="#000000" text-anchor="middle">Cancelar pedido</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>

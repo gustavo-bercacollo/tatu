@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Abertura</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
+  <rect x="150" y="356" width="36" height="36" rx="11" fill="#1C1C1E"/>
+  <circle cx="168" cy="374" r="8" fill="#34C759"/>
+  <text x="196" y="392" font-size="44" font-weight="800" fill="#000000" text-anchor="start" letter-spacing="-2">tatu</text>
+  <text x="196.5" y="782" font-size="15" font-weight="500" fill="#8E8E93" text-anchor="middle">Ajuda quando você precisa</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>

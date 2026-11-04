@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Passo 2 · Especialidades</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="40" cy="82" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,73) scale(0.75)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></g>
+  <rect x="24" y="100" width="80" height="4" rx="2" fill="#1C1C1E"/>
+  <rect x="112" y="100" width="80" height="4" rx="2" fill="#1C1C1E"/>
+  <rect x="200" y="100" width="80" height="4" rx="2" fill="#E4E4E7"/>
+  <rect x="288" y="100" width="80" height="4" rx="2" fill="#E4E4E7"/>
+  <text x="24" y="126" font-size="13" font-weight="500" fill="#8E8E93" text-anchor="start">Passo 2 de 4</text>
+  <text x="24" y="182" font-size="30" font-weight="700" fill="#000000" text-anchor="start" letter-spacing="-0.6">Eletricista</text>
+  <text x="24" y="218" font-size="16" font-weight="400" fill="#8E8E93" text-anchor="start">Escolha até 3 especialidades.</text>
+  <text x="24" y="240" font-size="16" font-weight="400" fill="#8E8E93" text-anchor="start">Elas aparecem para o cliente.</text>
+  <rect x="24" y="290" width="195.109375" height="38" rx="19.0" fill="#1C1C1E"/>
+  <text x="40" y="314.0" font-size="15" font-weight="600" fill="#fff" text-anchor="start">Instalação de tomadas</text>
+  <rect x="24" y="342" width="156.140625" height="38" rx="19.0" fill="#1C1C1E"/>
+  <text x="40" y="366.0" font-size="15" font-weight="600" fill="#fff" text-anchor="start">Chuveiro elétrico</text>
+  <rect x="188.140625" y="342" width="132.90625" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="204.140625" y="366.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Quadro de luz</text>
+  <rect x="24" y="394" width="111.09375" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="40" y="418.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Iluminação</text>
+  <rect x="143.09375" y="394" width="79.96875" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="159.09375" y="418.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Fiação</text>
+  <rect x="24" y="446" width="153.6875" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="40" y="470.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Ar-condicionado</text>
+  <rect x="186.1875" y="446.5" width="85.3125" height="37" rx="19.0" fill="none" stroke="#8E8E93" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="201.6875" y="470.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">+ Outra</text>
+  <text x="24" y="520" font-size="13" font-weight="500" fill="#8E8E93" text-anchor="start">2 de 3 escolhidas</text>
+  <rect x="24" y="756" width="345" height="56" rx="28.0" fill="#1C1C1E"/>
+  <text x="196.5" y="790.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Salvar profissão</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>

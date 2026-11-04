@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Verificação · câmera do documento</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#000"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#FFFFFF" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#FFFFFF"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#FFFFFF"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#FFFFFF"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#FFFFFF"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#FFFFFF"/>
+  <circle cx="40" cy="82" r="18" fill="#2C2C2E"/>
+  <g transform="translate(31,73) scale(0.75)" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></g>
+  <text x="196.5" y="94" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Frente do documento</text>
+  <rect x="36" y="230" width="321" height="210" rx="18" fill="#1c1c1e"/>
+  <rect x="36" y="230" width="321" height="210" rx="18" fill="none" stroke="#fff" stroke-width="3"/>
+  <path d="M36 264 V230 H70" fill="none" stroke="#34C759" stroke-width="5" stroke-linecap="round"/>
+  <path d="M357 264 V230 H323" fill="none" stroke="#34C759" stroke-width="5" stroke-linecap="round"/>
+  <path d="M36 406 V440 H70" fill="none" stroke="#34C759" stroke-width="5" stroke-linecap="round"/>
+  <path d="M357 406 V440 H323" fill="none" stroke="#34C759" stroke-width="5" stroke-linecap="round"/>
+  <text x="196.5" y="500" font-size="16" font-weight="500" fill="#fff" text-anchor="middle">Encaixe o documento no quadro</text>
+  <text x="196.5" y="526" font-size="13" font-weight="400" fill="#AEAEB2" text-anchor="middle">A foto é tirada sozinha quando estiver nítida.</text>
+  <circle cx="196.5" cy="722" r="34" fill="none" stroke="#fff" stroke-width="4"/>
+  <circle cx="196.5" cy="722" r="27" fill="#fff"/>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#FFFFFF"/>
+</svg>

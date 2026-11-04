@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Passo 2 · Profissão</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="40" cy="82" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,73) scale(0.75)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></g>
+  <rect x="24" y="100" width="80" height="4" rx="2" fill="#1C1C1E"/>
+  <rect x="112" y="100" width="80" height="4" rx="2" fill="#1C1C1E"/>
+  <rect x="200" y="100" width="80" height="4" rx="2" fill="#E4E4E7"/>
+  <rect x="288" y="100" width="80" height="4" rx="2" fill="#E4E4E7"/>
+  <text x="24" y="126" font-size="13" font-weight="500" fill="#8E8E93" text-anchor="start">Passo 2 de 4</text>
+  <text x="24" y="182" font-size="30" font-weight="700" fill="#000000" text-anchor="start" letter-spacing="-0.6">Qual é a sua profissão?</text>
+  <text x="24" y="218" font-size="16" font-weight="400" fill="#8E8E93" text-anchor="start">Escolha até 3 em que você manda muito bem.</text>
+  <rect x="24" y="264" width="109.96875" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="40" y="288.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Encanador</text>
+  <rect x="141.96875" y="264" width="104.0625" height="38" rx="19.0" fill="#1C1C1E"/>
+  <text x="157.96875" y="288.0" font-size="15" font-weight="600" fill="#fff" text-anchor="start">Eletricista</text>
+  <rect x="254.03125" y="264" width="92.984375" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="270.03125" y="288.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Pedreiro</text>
+  <rect x="24" y="316" width="75.015625" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="40" y="340.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Pintor</text>
+  <rect x="107.015625" y="316" width="102.578125" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="123.015625" y="340.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Montador</text>
+  <rect x="217.59375" y="316" width="114.40625" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="233.59375" y="340.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Marceneiro</text>
+  <rect x="24" y="368" width="96.671875" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="40" y="392.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Chaveiro</text>
+  <rect x="128.671875" y="368" width="104.9375" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="144.671875" y="392.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Jardineiro</text>
+  <rect x="242.109375" y="368.5" width="80.015625" height="37" rx="19.0" fill="none" stroke="#8E8E93" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="257.609375" y="392.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Outros</text>
+  <rect x="24" y="756" width="345" height="56" rx="28.0" fill="#1C1C1E"/>
+  <text x="196.5" y="790.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Continuar</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Boas-vindas do profissional</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="40" cy="82" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,73) scale(0.75)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></g>
+  <text x="24" y="150" font-size="32" font-weight="700" fill="#000000" text-anchor="start" letter-spacing="-0.8">Trabalhe com o que</text>
+  <text x="24" y="188" font-size="32" font-weight="700" fill="#000000" text-anchor="start" letter-spacing="-0.8">você sabe fazer</text>
+  <circle cx="48" cy="268" r="24" fill="#EEEEF0"/>
+  <g transform="translate(36,256) scale(1.0)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/></g>
+  <text x="88" y="264" font-size="17" font-weight="600" fill="#000000" text-anchor="start">Chamados perto de você</text>
+  <text x="88" y="286" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="start">Receba pedidos da sua região</text>
+  <circle cx="48" cy="352" r="24" fill="#EEEEF0"/>
+  <g transform="translate(36,340) scale(1.0)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12"/><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4"/></g>
+  <text x="88" y="348" font-size="17" font-weight="600" fill="#000000" text-anchor="start">Receba pelo app</text>
+  <text x="88" y="370" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="start">Pix ou cartão, com comprovante</text>
+  <circle cx="48" cy="436" r="24" fill="#EEEEF0"/>
+  <g transform="translate(36,424) scale(1.0)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 7v5l3 3"/></g>
+  <text x="88" y="432" font-size="17" font-weight="600" fill="#000000" text-anchor="start">Você escolhe quando</text>
+  <text x="88" y="454" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="start">Fique online só quando quiser</text>
+  <rect x="24" y="516" width="345" height="72" rx="16" fill="#EEEEF0"/>
+  <g transform="translate(40,540) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 7v5l3 3"/></g>
+  <text x="74" y="548" font-size="15" font-weight="600" fill="#000000" text-anchor="start">O cadastro leva uns 5 minutos</text>
+  <text x="74" y="568" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">Dados · Profissão · Pix · Verificação</text>
+  <rect x="24" y="756" width="345" height="56" rx="28.0" fill="#1C1C1E"/>
+  <text x="196.5" y="790.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Começar cadastro</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>

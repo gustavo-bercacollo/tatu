@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Perfil · prévia do cliente</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <rect x="0" y="0" width="393" height="100" rx="0" fill="#1C1C1E"/>
+  <text x="196.5" y="70" font-size="15" font-weight="600" fill="#fff" text-anchor="middle">Assim o cliente vê você</text>
+  <circle cx="36" cy="64" r="0" fill="#fff"/>
+  <circle cx="196.5" cy="170" r="40" fill="#E4E4E7"/>
+  <text x="196.5" y="178.8" font-size="24" font-weight="600" fill="#000000" text-anchor="middle">LS</text>
+  <text x="196.5" y="240" font-size="26" font-weight="700" fill="#000000" text-anchor="middle" letter-spacing="-0.4">Luiza Souza</text>
+  <circle cx="289.1171875" cy="232" r="9" fill="#007AFF"/>
+  <g transform="translate(283.7171875,226.6) scale(0.44999999999999996)" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></g>
+  <text x="196.5" y="264" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="middle">Eletricista · Encanadora</text>
+  <rect x="20" y="290" width="111" height="64" rx="16" fill="#EEEEF0"/>
+  <text x="75" y="320" font-size="20" font-weight="700" fill="#000000" text-anchor="middle">4,9 ★</text>
+  <text x="75" y="340" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="middle">Nota</text>
+  <rect x="141" y="290" width="111" height="64" rx="16" fill="#EEEEF0"/>
+  <text x="196" y="320" font-size="20" font-weight="700" fill="#000000" text-anchor="middle">312</text>
+  <text x="196" y="340" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="middle">Serviços</text>
+  <rect x="262" y="290" width="111" height="64" rx="16" fill="#EEEEF0"/>
+  <text x="317" y="320" font-size="20" font-weight="700" fill="#000000" text-anchor="middle">5 min</text>
+  <text x="317" y="340" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="middle">Resposta</text>
+  <text x="20" y="390" font-size="13" font-weight="600" fill="#8E8E93" text-anchor="start">Especialidades</text>
+  <rect x="20" y="404" width="98.1875" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="36" y="428.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Tomadas</text>
+  <rect x="126.1875" y="404" width="97.5" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="142.1875" y="428.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Chuveiro</text>
+  <rect x="231.6875" y="404" width="121.84375" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="247.6875" y="428.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Vazamentos</text>
+  <text x="20" y="482" font-size="13" font-weight="600" fill="#8E8E93" text-anchor="start">Sobre</text>
+  <text x="20" y="506" font-size="15" font-weight="400" fill="#000000" text-anchor="start">Eletricista e encanadora há 9 anos.</text>
+  <text x="20" y="528" font-size="15" font-weight="400" fill="#000000" text-anchor="start">Atendo a região sul.</text>
+  <rect x="20" y="756" width="353" height="56" rx="28.0" fill="#EEEEF0"/>
+  <text x="196.5" y="790.0" font-size="17" font-weight="600" fill="#000000" text-anchor="middle">Voltar ao perfil</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>

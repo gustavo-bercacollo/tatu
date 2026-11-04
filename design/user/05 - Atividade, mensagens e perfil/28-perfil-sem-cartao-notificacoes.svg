@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Perfil do cliente · sem cartão e notificações desativadas</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#F2F2F7"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="196.5" cy="108" r="38" fill="#E4E4E7"/>
+  <text x="196.5" y="116.36" font-size="23" font-weight="600" fill="#000000" text-anchor="middle">AM</text>
+  <text x="196.5" y="178" font-size="24" font-weight="700" fill="#000000" text-anchor="middle" letter-spacing="-0.4">Ana Martins</text>
+  <circle cx="281.8515625" cy="171" r="8" fill="#007AFF"/>
+  <g transform="translate(277.0515625,166.2) scale(0.39999999999999997)" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></g>
+  <g transform="translate(162.5,188) scale(0.5833333333333334)" fill="#FF9F0A" stroke="#FF9F0A" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"/></g>
+  <text x="180.5" y="201" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="start">4,8 · 23 pedidos</text>
+  <text x="36" y="242" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="start" letter-spacing="0.3">PEDIDO RÁPIDO</text>
+  <rect x="20" y="254" width="353" height="104" rx="16" fill="#fff"/>
+  <g transform="translate(36,269.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/></g>
+  <text x="74" y="286.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Endereços</text>
+  <text x="335" y="285.0" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="end">Casa</text>
+  <g transform="translate(343,273.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <line x1="74" y1="306" x2="373" y2="306" stroke="#D9D9DC" stroke-width="0.5"/>
+  <g transform="translate(36,321.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-18a1 1 0 0 1 -1 -1v-12a1 1 0 0 1 1 -1z"/><path d="M2 10h20"/><path d="M6 15h3"/></g>
+  <text x="74" y="338.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Pagamento</text>
+  <text x="335" y="337.0" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="end">Adicionar</text>
+  <g transform="translate(343,325.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <text x="36" y="388" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="start" letter-spacing="0.3">CONTA</text>
+  <rect x="20" y="398" width="353" height="156" rx="16" fill="#fff"/>
+  <g transform="translate(36,413.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"/></g>
+  <text x="74" y="430.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Minhas avaliações</text>
+  <g transform="translate(343,417.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <line x1="74" y1="450" x2="373" y2="450" stroke="#D9D9DC" stroke-width="0.5"/>
+  <g transform="translate(36,465.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/><path d="M9 17v1a3 3 0 0 0 6 0v-1"/></g>
+  <text x="74" y="482.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Notificações</text>
+  <text x="335" y="481.0" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="end">Desativadas</text>
+  <g transform="translate(343,469.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <line x1="74" y1="502" x2="373" y2="502" stroke="#D9D9DC" stroke-width="0.5"/>
+  <g transform="translate(36,517.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></g>
+  <text x="74" y="534.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Dados da conta</text>
+  <g transform="translate(343,521.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <text x="36" y="576" font-size="12" font-weight="400" fill="#FF3B30" text-anchor="start">Ative para saber quando um profissional aceitar.</text>
+  <rect x="20" y="584" width="353" height="96" rx="16" fill="#fff"/>
+  <g transform="translate(36,597.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 17v.01"/><path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"/></g>
+  <text x="74" y="614.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Ajuda</text>
+  <g transform="translate(343,601.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <line x1="74" y1="632" x2="373" y2="632" stroke="#D9D9DC" stroke-width="0.5"/>
+  <g transform="translate(36,645.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z"/><path d="M8 11v-4a4 4 0 1 1 8 0v4"/></g>
+  <text x="74" y="662.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Privacidade e termos</text>
+  <g transform="translate(343,649.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <rect x="20" y="696" width="353" height="48" rx="16" fill="#fff"/>
+  <text x="196.5" y="727" font-size="17" font-weight="400" fill="#FF3B30" text-anchor="middle">Sair da conta</text>
+  <rect x="0" y="769" width="393" height="83" rx="0" fill="#F9F9F9"/>
+  <line x1="0" y1="769" x2="393" y2="769" stroke="#D9D9DC" stroke-width="0.5"/>
+  <g transform="translate(53.5,778) scale(1.0)" fill="none" stroke="#000000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></g>
+  <text x="65.5" y="817" font-size="11" font-weight="600" fill="#000000" text-anchor="middle">Início</text>
+  <g transform="translate(184.5,778) scale(1.0)" fill="none" stroke="#8E8E93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 7v5l3 3"/></g>
+  <text x="196.5" y="817" font-size="11" font-weight="500" fill="#8E8E93" text-anchor="middle">Atividade</text>
+  <g transform="translate(315.5,778) scale(1.0)" fill="none" stroke="#8E8E93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"/></g>
+  <text x="327.5" y="817" font-size="11" font-weight="500" fill="#8E8E93" text-anchor="middle">Mensagens</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Pagamento feito · recibo</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="196.5" cy="200" r="44" fill="#34C759"/>
+  <g transform="translate(174.5,178) scale(1.8333333333333333)" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></g>
+  <text x="196.5" y="300" font-size="28" font-weight="700" fill="#000000" text-anchor="middle" letter-spacing="-0.5">Pagamento feito</text>
+  <text x="196.5" y="330" font-size="16" font-weight="400" fill="#8E8E93" text-anchor="middle">R$ 150,00 para Luiza Souza</text>
+  <rect x="20" y="380" width="353" height="170" rx="18" fill="#F2F2F7"/>
+  <text x="36" y="412" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="start">Serviço</text>
+  <text x="357" y="412" font-size="15" font-weight="500" fill="#000000" text-anchor="end">Encanador</text>
+  <text x="36" y="450" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="start">Data</text>
+  <text x="357" y="450" font-size="15" font-weight="500" fill="#000000" text-anchor="end">04/11/2026</text>
+  <text x="36" y="488" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="start">Forma</text>
+  <text x="357" y="488" font-size="15" font-weight="500" fill="#000000" text-anchor="end">Cartão Visa 4242</text>
+  <text x="36" y="526" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="start">Recibo</text>
+  <text x="357" y="526" font-size="15" font-weight="500" fill="#000000" text-anchor="end">nº 000482</text>
+  <rect x="20" y="687" width="353" height="56" rx="28.0" fill="#1C1C1E"/>
+  <text x="196.5" y="721.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Avaliar a Luiza</text>
+  <text x="196.5" y="802" font-size="16" font-weight="600" fill="#007AFF" text-anchor="middle">Baixar recibo</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>
