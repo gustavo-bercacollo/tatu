@@ -4,6 +4,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
 import '../../shared/widgets/option_card.dart';
+import 'celular_page.dart';
 
 /// Boas-vindas: primeira tela, comum ao cliente e ao profissional.
 class BoasVindasPage extends StatelessWidget {
@@ -69,7 +70,8 @@ class BoasVindasPage extends StatelessWidget {
             icon: TablerIcons.home,
             title: 'Preciso de um serviço',
             subtitle: 'Peça um profissional e resolva rápido.',
-            onTap: () => _emBreve(context, 'Cliente'),
+            onTap: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const CelularPage())),
           ),
           const SizedBox(height: 12),
           OptionCard(

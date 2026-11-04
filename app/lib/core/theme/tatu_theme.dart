@@ -19,6 +19,10 @@ ThemeData tatuTheme() => ThemeData(
       minimumSize: const Size.fromHeight(56),
       shape: const StadiumBorder(),
       textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+      backgroundColor: TatuColors.action,
+      foregroundColor: TatuColors.onAction,
+      disabledBackgroundColor: TatuColors.fill,
+      disabledForegroundColor: TatuColors.textSecondary,
     ),
   ),
   dividerTheme: const DividerThemeData(
