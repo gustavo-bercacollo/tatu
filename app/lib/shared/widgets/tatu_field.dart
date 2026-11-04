@@ -13,6 +13,9 @@ class TatuField extends StatefulWidget {
     this.hintText,
     this.errorText,
     this.keyboardType,
+    this.textInputAction,
+    this.textCapitalization = TextCapitalization.none,
+    this.autofillHints,
     this.inputFormatters,
     this.autofocus = false,
     this.onChanged,
@@ -24,6 +27,9 @@ class TatuField extends StatefulWidget {
   final String? hintText;
   final String? errorText;
   final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final TextCapitalization textCapitalization;
+  final Iterable<String>? autofillHints;
   final List<TextInputFormatter>? inputFormatters;
   final bool autofocus;
   final ValueChanged<String>? onChanged;
@@ -88,6 +94,9 @@ class _TatuFieldState extends State<TatuField> {
                   focusNode: _focus,
                   autofocus: widget.autofocus,
                   keyboardType: widget.keyboardType,
+                  textInputAction: widget.textInputAction,
+                  textCapitalization: widget.textCapitalization,
+                  autofillHints: widget.autofillHints,
                   inputFormatters: widget.inputFormatters,
                   onChanged: widget.onChanged,
                   onSubmitted: widget.onSubmitted,

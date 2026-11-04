@@ -40,7 +40,7 @@ design/        SVGs das telas (user/, worker/) + index.html
 app/           Flutter (package `tatu`, org `com.tatu`)
   lib/main.dart                 TatuApp (tema + tela inicial)
   lib/core/theme/               tatu_colors.dart, tatu_theme.dart
-  lib/shared/widgets/           componentes reutilizáveis (option_card.dart…)
+  lib/shared/widgets/           componentes reutilizáveis (option_card, tatu_field, back_circle_button, cadastro_scaffold…)
   lib/features/entrada/         telas comuns aos dois modos (boas_vindas_page.dart)
   lib/features/cliente/         telas do cliente (C3–C13)
   lib/features/profissional/    telas do profissional (P1–P13)

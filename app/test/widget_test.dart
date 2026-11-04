@@ -40,4 +40,28 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Como você quer usar o Tatu?'), findsOneWidget);
   });
+
+  testWidgets('Nome: Continuar só com nome; sobrenome é opcional', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const TatuApp());
+    await tester.tap(find.text('Preciso de um serviço'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), '11988887777');
+    await tester.pump();
+    await tester.tap(find.text('Continuar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Como podemos\nte chamar?'), findsOneWidget);
+    FilledButton botao() => tester.widget(find.byType(FilledButton).last);
+    expect(botao().onPressed, isNull);
+
+    await tester.enterText(find.byType(TextField).first, '   ');
+    await tester.pump();
+    expect(botao().onPressed, isNull);
+
+    await tester.enterText(find.byType(TextField).first, 'Ana');
+    await tester.pump();
+    expect(botao().onPressed, isNotNull);
+  });
 }
