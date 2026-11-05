@@ -92,7 +92,11 @@ class BoasVindasPage extends StatelessWidget {
                     color: TatuColors.textPrimary,
                   ),
                   recognizer: TapGestureRecognizer()
-                    ..onTap = () => _emBreve(context, 'Entrar'),
+                    ..onTap = () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const CelularPage.entrar(),
+                      ),
+                    ),
                 ),
               ],
             ),

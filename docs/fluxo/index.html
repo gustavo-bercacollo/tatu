@@ -105,9 +105,12 @@ path.entre { opacity: .5; }
 .node.dim { opacity: .28; }
 .node .hd { display: flex; align-items: center; gap: 6px; min-width: 0; }
 .code { font-family: var(--font-code); font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: .02em; }
-.node .nm { font-size: 13px; font-weight: 600; line-height: 1.25; letter-spacing: -.01em; }
-.node .shot { width: 100%; aspect-ratio: 393 / 852; border-radius: 12px; overflow: hidden; background: #fff; border: 1px solid var(--line); }
-.node .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.node { box-sizing: border-box; }
+.node .nm { font-size: 13px; font-weight: 600; line-height: 1.25; letter-spacing: -.01em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: none; }
+.node .hd, .node .lado { flex: none; }
+/* A tela inteira, sem cortar: o quadro tem a proporção exata do celular e não encolhe. */
+.node .shot { flex: none; width: 100%; aspect-ratio: 393 / 852; border-radius: 12px; overflow: hidden; background: #fff; border: 1px solid var(--line); box-sizing: content-box; }
+.node .shot img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
 .pill.app { background: var(--app-soft); color: var(--app); }
 .pill.desenho { background: var(--surface-2); color: var(--ink); }
@@ -208,14 +211,16 @@ const U = 'design/user/', W = 'design/worker/';
 // [id, código, nome, etapa, status, arquivo no repositório, notas]
 const TELAS_RAW = [
   ['e01','E01','Abertura','entrada','desenho', U+'01 - Entrada/01-abertura.svg'],
-  ['e02','E02','Boas-vindas','entrada','app','docs/fluxo/app/boas-vindas.png',["No app, “Quero trabalhar” e “Entrar” ainda mostram “em breve”"]],
-  ['e03','E03','Celular','entrada','app','docs/fluxo/app/celular.png',["Continuar só libera com 11 dígitos","Desenho novo tem o botão “Usar e-mail”; o app ainda não"]],
-  ['e06','E06','E-mail','entrada','desenho', U+'01 - Entrada/03b-email.svg',["Depois pedimos o celular, para o profissional falar com o cliente"]],
-  ['e07','E07','Código por e-mail','entrada','desenho', U+'01 - Entrada/04b-codigo-email.svg',["Reenviar código: contagem","Não chegou? Veja a caixa de spam"]],
+  ['e02','E02','Boas-vindas','entrada','app','docs/fluxo/app/boas-vindas.png',["No app, “Quero trabalhar” ainda mostra “em breve”"]],
+  ['e03','E03','Celular','entrada','app','docs/fluxo/app/celular.png',["Continuar só libera com 11 dígitos"]],
+  ['e06','E06','E-mail','entrada','app','docs/fluxo/app/email.png',["Continuar só libera com e-mail válido","Depois pedimos o celular, para o profissional falar com o cliente"]],
+  ['e07','E07','Código por e-mail','entrada','app','docs/fluxo/app/codigo-email.png',["Reenviar código: libera depois de 1:00","No app, Continuar ainda mostra “em breve”"]],
   ['a-celdepois','—','Pedir o celular (depois do e-mail)','entrada','andamento'],
   ['e04','E04','Código SMS','entrada','app','docs/fluxo/app/codigo.png',["Reenviar código: libera depois de 1:00","Sem backend: aceita qualquer código de 6 dígitos"]],
   ['e05','E05','Nome','entrada','app','docs/fluxo/app/nome.png',["No app, Continuar ainda mostra “em breve”"]],
-  ['a-entrar','—','Entrar (já tenho conta)','entrada','andamento'],
+  ['e08','E08','Entrar','entrada','app','docs/fluxo/app/entrar.png',["Mesma tela do Celular, para quem já tem conta","Usa o mesmo Código SMS (E04)"]],
+  ['a-poslogin','—','Depois de entrar','entrada','andamento'],
+  ['a-entraremail','—','Entrar com e-mail','entrada','andamento'],
 
   ['c03','C03','Home · vazia','pedir','desenho', U+'02 - Pedir serviço/03-home-vazia.svg',["Abas: Início · Atividade · Mensagens"]],
   ['c04','C04','Home · IA marcou o serviço','pedir','desenho', U+'02 - Pedir serviço/04-home-ia-marcou.svg',["Toque em outro serviço troca a escolha (✦ some)"]],
@@ -320,7 +325,11 @@ const LIGACOES = [
   ['e01','e02','abre sozinha','a'],
   ['e02','e03','Preciso de um serviço','t'],
   ['e02','p01','Quero trabalhar','t'],
-  ['e02','a-entrar','Entrar','t'],
+  ['e02','e08','Entrar','t'],
+  ['e08','e04','Continuar','t'],
+  ['e08','e03','Criar conta','t'],
+  ['e08','a-entraremail','Usar e-mail','t'],
+  ['e04','a-poslogin','Continuar · quando veio do Entrar','t'],
   ['e03','e04','Continuar','t'],
   ['e03','e06','Usar e-mail','t'],
   ['e06','e03','Usar celular','t'],
@@ -504,7 +513,7 @@ const STATUS = { app: 'No app', desenho: 'Desenhada', andamento: 'Em andamento' 
 const VISTAS = {
   cliente: { raiz: 'e01', etapas: ['entrada', 'pedir', 'procurar', 'combinar', 'contaC'], tirar: [],
     titulo: 'Do primeiro acesso até o serviço pago e avaliado, pelo lado de quem pede.' },
-  profissional: { raiz: 'e01', etapas: ['entrada', 'cadastro', 'chamados', 'servico', 'contaP'], tirar: ['e03', 'e04', 'e05', 'e06', 'e07', 'a-celdepois'],
+  profissional: { raiz: 'e01', etapas: ['entrada', 'cadastro', 'chamados', 'servico', 'contaP'], tirar: ['e03', 'e05', 'e06', 'e07', 'a-celdepois'],
     titulo: 'Do cadastro até receber pelo serviço, pelo lado de quem trabalha.' },
   ambos: { raiz: 'c10', etapas: ['procurar', 'combinar', 'chamados', 'servico'], tirar: [], sincronia: true,
     titulo: 'Um pedido do começo ao fim: o que cada lado vê no mesmo momento.' },
@@ -542,8 +551,12 @@ const GAP = { x: 230, y: 18 };
 function altura(item) {
   if (item.tipo === 'tela') {
     const t = POR_ID[item.id];
-    if (t.status === 'andamento') return 70 + (t.nome.length > 24 ? 16 : 0);
-    return 64 + Math.round(CARD.shot * 852 / 393) + (VISTAS[vista].sincronia ? 22 : 0) + (t.nome.length > 22 ? 16 : 0);
+    if (t.status === 'andamento') return 70 + (t.nome.length > 20 ? 16 : 0);
+    // Medidas reais do cartão: bordas e espaço interno 23 · cabeçalho 18 · 2 vãos de 8 ·
+    // nome (até 2 linhas de 16,25) · tela (largura interna 127 na proporção 393×852, + borda 2).
+    const linhas = t.nome.length > 17 ? 2 : 1;
+    const tela = (CARD.w - 23) * 852 / 393 + 2;
+    return Math.ceil(23 + 18 + 16 + 16.25 * linhas + tela + (VISTAS[vista].sincronia ? 26 : 0)) + 2;
   }
   return 44;
 }

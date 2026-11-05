@@ -62,6 +62,7 @@
  "app/celular.png": "docs/fluxo/app/celular.png",
  "app/codigo.png": "docs/fluxo/app/codigo.png",
  "app/nome.png": "docs/fluxo/app/nome.png",
- "telas/cliente/03b-email.svg": "design/user/01 - Entrada/03b-email.svg",
- "telas/cliente/04b-codigo-email.svg": "design/user/01 - Entrada/04b-codigo-email.svg"
+ "app/email.png": "docs/fluxo/app/email.png",
+ "app/codigo-email.png": "docs/fluxo/app/codigo-email.png",
+ "app/entrar.png": "docs/fluxo/app/entrar.png"
 }

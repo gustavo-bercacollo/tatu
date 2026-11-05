@@ -7,12 +7,22 @@ import '../../core/theme/tatu_colors.dart';
 import '../../shared/widgets/cadastro_scaffold.dart';
 import 'nome_page.dart';
 
-/// Cadastro · código SMS: 6 dígitos enviados para o celular informado.
+/// Cadastro · código de 6 dígitos, enviado por SMS ou por e-mail.
 class CodigoPage extends StatefulWidget {
-  const CodigoPage({super.key, required this.celular});
+  /// Código por SMS. [destino] é o número formatado, ex.: (11) 98888-7777.
+  const CodigoPage({super.key, required this.destino, this.entrar = false})
+    : porEmail = false;
 
-  /// Número já formatado, ex.: (11) 98888-7777.
-  final String celular;
+  /// Código por e-mail. [destino] é o e-mail informado.
+  const CodigoPage.email({super.key, required this.destino})
+    : porEmail = true,
+      entrar = false;
+
+  final String destino;
+  final bool porEmail;
+
+  /// Veio da tela Entrar (conta que já existe), não do cadastro.
+  final bool entrar;
 
   @override
   State<CodigoPage> createState() => _CodigoPageState();
@@ -62,6 +72,13 @@ class _CodigoPageState extends State<CodigoPage> {
 
   void _continuar() {
     if (!_completo) return;
+    if (widget.porEmail || widget.entrar) {
+      // Ainda não desenhadas: o celular depois do e-mail e a tela depois de entrar.
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text('Próxima tela: em breve')));
+      return;
+    }
     // Sem backend ainda: qualquer código de 6 dígitos é aceito.
     Navigator.of(context)
         .pushReplacement(MaterialPageRoute(builder: (_) => const NomePage()));
@@ -74,7 +91,9 @@ class _CodigoPageState extends State<CodigoPage> {
   Widget build(BuildContext context) {
     return CadastroScaffold(
       titulo: 'Digite o código',
-      subtitulo: 'Enviamos um SMS para\n+55 ${widget.celular}',
+      subtitulo: widget.porEmail
+          ? 'Enviamos um e-mail para\n${widget.destino}'
+          : 'Enviamos um SMS para\n+55 ${widget.destino}',
       botao: 'Continuar',
       onBotao: _completo ? _continuar : null,
       children: [
@@ -104,10 +123,17 @@ class _CodigoPageState extends State<CodigoPage> {
         Align(
           alignment: Alignment.centerLeft,
           child: _Link(
-            'Trocar número',
+            widget.porEmail ? 'Trocar e-mail' : 'Trocar número',
             onTap: () => Navigator.of(context).maybePop(),
           ),
         ),
+        if (widget.porEmail) ...[
+          const SizedBox(height: 12),
+          const Text(
+            'Não chegou? Veja a caixa de spam.',
+            style: TextStyle(fontSize: 13, color: TatuColors.textSecondary),
+          ),
+        ],
       ],
     );
   }

@@ -13,6 +13,8 @@ class CadastroScaffold extends StatelessWidget {
     required this.children,
     required this.botao,
     required this.onBotao,
+    this.botaoSecundario,
+    this.onSecundario,
   });
 
   final String titulo;
@@ -22,6 +24,10 @@ class CadastroScaffold extends StatelessWidget {
 
   /// `null` deixa o botão desabilitado.
   final VoidCallback? onBotao;
+
+  /// Botão cinza abaixo do principal (ex.: "Usar e-mail").
+  final String? botaoSecundario;
+  final VoidCallback? onSecundario;
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +77,17 @@ class CadastroScaffold extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   FilledButton(onPressed: onBotao, child: Text(botao)),
+                  if (botaoSecundario != null) ...[
+                    const SizedBox(height: 10),
+                    FilledButton(
+                      onPressed: onSecundario,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: TatuColors.fill,
+                        foregroundColor: TatuColors.textPrimary,
+                      ),
+                      child: Text(botaoSecundario!),
+                    ),
+                  ],
                 ],
               ),
             ),

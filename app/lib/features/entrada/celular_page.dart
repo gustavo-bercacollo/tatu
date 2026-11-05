@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -5,10 +6,17 @@ import '../../core/theme/tatu_colors.dart';
 import '../../shared/widgets/cadastro_scaffold.dart';
 import '../../shared/widgets/tatu_field.dart';
 import 'codigo_page.dart';
+import 'email_page.dart';
 
-/// Cadastro · celular: pede o número para enviar o código por SMS.
+/// Celular para receber o código por SMS: no cadastro ou para entrar.
 class CelularPage extends StatefulWidget {
-  const CelularPage({super.key});
+  /// Cadastro: "Qual é o seu celular?".
+  const CelularPage({super.key}) : entrar = false;
+
+  /// Entrar numa conta que já existe.
+  const CelularPage.entrar({super.key}) : entrar = true;
+
+  final bool entrar;
 
   @override
   State<CelularPage> createState() => _CelularPageState();
@@ -16,31 +24,63 @@ class CelularPage extends StatefulWidget {
 
 class _CelularPageState extends State<CelularPage> {
   final _controller = TextEditingController();
+  final _criarConta = TapGestureRecognizer();
 
   // Celular com DDD: 11 dígitos.
   bool get _valido =>
       _controller.text.replaceAll(RegExp(r'\D'), '').length == 11;
 
   @override
+  void initState() {
+    super.initState();
+    _criarConta.onTap = () => Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => const CelularPage()));
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
+    _criarConta.dispose();
     super.dispose();
   }
 
   void _continuar() {
     if (!_valido) return;
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => CodigoPage(celular: _controller.text)),
+      MaterialPageRoute(
+        builder: (_) =>
+            CodigoPage(destino: _controller.text, entrar: widget.entrar),
+      ),
     );
+  }
+
+  void _usarEmail() {
+    if (widget.entrar) {
+      // "Entrar com e-mail" ainda não foi desenhado.
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Entrar com e-mail: em breve')),
+        );
+      return;
+    }
+    // Volta do e-mail com "Usar celular" é um pop; daqui para o e-mail é push.
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const EmailPage()));
   }
 
   @override
   Widget build(BuildContext context) {
     return CadastroScaffold(
-      titulo: 'Qual é o seu celular?',
-      subtitulo: 'Vamos enviar um código por SMS.\nSem senha para decorar.',
+      titulo: widget.entrar ? 'Entrar' : 'Qual é o seu celular?',
+      subtitulo: widget.entrar
+          ? 'Digite o celular do seu cadastro.\nEnviamos um código por SMS.'
+          : 'Vamos enviar um código por SMS.\nSem senha para decorar.',
       botao: 'Continuar',
       onBotao: _valido ? _continuar : null,
+      botaoSecundario: 'Usar e-mail',
+      onSecundario: _usarEmail,
       children: [
         Row(
           children: [
@@ -76,10 +116,34 @@ class _CelularPageState extends State<CelularPage> {
             ),
           ],
         ),
-        const SizedBox(height: 14),
-        const CadastroNota(
-          'Usamos o número só para entrar e avisar sobre seus pedidos.',
-        ),
+        if (widget.entrar) ...[
+          const SizedBox(height: 26),
+          Text.rich(
+            TextSpan(
+              text: 'Não tem conta? ',
+              children: [
+                TextSpan(
+                  text: 'Criar conta',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: TatuColors.verified,
+                  ),
+                  recognizer: _criarConta,
+                ),
+              ],
+            ),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 15,
+              color: TatuColors.textSecondary,
+            ),
+          ),
+        ] else ...[
+          const SizedBox(height: 14),
+          const CadastroNota(
+            'Usamos o número só para entrar e avisar sobre seus pedidos.',
+          ),
+        ],
       ],
     );
   }

@@ -20,8 +20,9 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Boas-vindas ("Como você quer usar o Tatu?") — `features/entrada/boas_vindas_page.dart`
 - [x] Celular ("Qual é o seu celular?", máscara (11) 98888-7777, Continuar só com 11 dígitos) — `features/entrada/celular_page.dart`
 - [x] Código SMS (6 caixas, contagem 1:00 para reenviar, "Trocar número" volta) — `features/entrada/codigo_page.dart`
-- [ ] Celular: botão "Usar e-mail" (desenho novo `design/user/01 - Entrada/03-celular.svg`, falta no app)
-- [ ] E-mail (`03b-email.svg`) e Código por e-mail (`04b-codigo-email.svg`) — desenhados, falta no app; depois do código, a tela que pede o celular ainda não foi desenhada
+- [x] Celular com botão "Usar e-mail"
+- [x] E-mail e Código por e-mail — `email_page.dart`, `CodigoPage.email`. Depois do código: tela que pede o celular ainda não desenhada ("em breve")
+- [x] Entrar (`CelularPage.entrar`): "Criar conta" → cadastro; Continuar → Código SMS → depois de entrar ainda não desenhado; "Usar e-mail" no Entrar ainda não desenhado
 - [x] Nome ("Como podemos te chamar?", sobrenome opcional, Continuar só com nome) — `features/entrada/nome_page.dart`
 
 ## Telas do cliente (C1–C13)

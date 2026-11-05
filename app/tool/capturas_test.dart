@@ -10,6 +10,7 @@ import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/features/entrada/boas_vindas_page.dart';
 import 'package:tatu/features/entrada/celular_page.dart';
 import 'package:tatu/features/entrada/codigo_page.dart';
+import 'package:tatu/features/entrada/email_page.dart';
 import 'package:tatu/features/entrada/nome_page.dart';
 
 Future<void> _carregarFontes() async {
@@ -79,7 +80,43 @@ void main() {
     await _capturar(
       t,
       'codigo',
-      const CodigoPage(celular: '(11) 98888-7777'),
+      const CodigoPage(destino: '(11) 98888-7777'),
+      preparar: () async {
+        await t.enterText(find.byType(TextField), '4827');
+        await t.pump(const Duration(seconds: 18));
+      },
+    );
+  });
+
+  testWidgets('entrar', (t) async {
+    await _capturar(
+      t,
+      'entrar',
+      const CelularPage.entrar(),
+      preparar: () async {
+        await t.enterText(find.byType(TextField), '11988887777');
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('email', (t) async {
+    await _capturar(
+      t,
+      'email',
+      const EmailPage(),
+      preparar: () async {
+        await t.enterText(find.byType(TextField), 'ana@email.com');
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('codigo-email', (t) async {
+    await _capturar(
+      t,
+      'codigo-email',
+      const CodigoPage.email(destino: 'ana@email.com'),
       preparar: () async {
         await t.enterText(find.byType(TextField), '4827');
         await t.pump(const Duration(seconds: 18));

@@ -21,7 +21,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Qual é o seu celular?'), findsOneWidget);
-    FilledButton botao() => tester.widget(find.byType(FilledButton));
+    FilledButton botao() =>
+        tester.widget(find.widgetWithText(FilledButton, 'Continuar'));
     String valor() =>
         tester.widget<TextField>(find.byType(TextField)).controller!.text;
     expect(botao().onPressed, isNull);
@@ -63,7 +64,8 @@ void main() {
     await tester.pump(const Duration(seconds: 42));
     expect(find.text('Reenviar código'), findsOneWidget);
 
-    FilledButton botao() => tester.widget(find.byType(FilledButton));
+    FilledButton botao() =>
+        tester.widget(find.widgetWithText(FilledButton, 'Continuar'));
     await tester.enterText(find.byType(TextField), '48271');
     await tester.pump();
     expect(botao().onPressed, isNull);
@@ -92,7 +94,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Como podemos\nte chamar?'), findsOneWidget);
-    FilledButton botao() => tester.widget(find.byType(FilledButton).last);
+    FilledButton botao() =>
+        tester.widget(find.widgetWithText(FilledButton, 'Continuar'));
     expect(botao().onPressed, isNull);
 
     await tester.enterText(find.byType(TextField).first, '   ');
@@ -102,5 +105,68 @@ void main() {
     await tester.enterText(find.byType(TextField).first, 'Ana');
     await tester.pump();
     expect(botao().onPressed, isNotNull);
+  });
+
+  testWidgets(
+    'Entrar: abre pelo Entrar, manda código e Criar conta leva ao cadastro',
+    (tester) async {
+      // Tamanho de celular (393×852) para o "Entrar" ficar visível.
+      tester.view.physicalSize = const Size(1179, 2556);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(const TatuApp());
+      await tester.tapOnText(find.textRange.ofSubstring('Entrar'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(
+          'Digite o celular do seu cadastro.\nEnviamos um código por SMS.',
+        ),
+        findsOneWidget,
+      );
+      await tester.enterText(find.byType(TextField), '11988887777');
+      await tester.pump();
+      await tester.tap(find.text('Continuar'));
+      await tester.pumpAndSettle();
+      expect(find.text('Digite o código'), findsOneWidget);
+
+      await tester.tap(find.text('Trocar número'));
+      await tester.pumpAndSettle();
+      await tester.tapOnText(find.textRange.ofSubstring('Criar conta'));
+      await tester.pumpAndSettle();
+      expect(find.text('Qual é o seu celular?'), findsOneWidget);
+    },
+  );
+
+  testWidgets('E-mail: Usar e-mail, valida o e-mail e manda código', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const TatuApp());
+    await tester.tap(find.text('Preciso de um serviço'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Usar e-mail'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Qual é o seu e-mail?'), findsOneWidget);
+    FilledButton botao() =>
+        tester.widget(find.widgetWithText(FilledButton, 'Continuar'));
+    await tester.enterText(find.byType(TextField), 'ana@email');
+    await tester.pump();
+    expect(botao().onPressed, isNull);
+    await tester.enterText(find.byType(TextField), 'ana@email.com');
+    await tester.pump();
+    expect(botao().onPressed, isNotNull);
+
+    await tester.tap(find.text('Continuar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Enviamos um e-mail para\nana@email.com'), findsOneWidget);
+    expect(find.text('Trocar e-mail'), findsOneWidget);
+    expect(find.text('Não chegou? Veja a caixa de spam.'), findsOneWidget);
+
+    await tester.tap(find.text('Trocar e-mail'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Usar celular'));
+    await tester.pumpAndSettle();
+    expect(find.text('Qual é o seu celular?'), findsOneWidget);
   });
 }
