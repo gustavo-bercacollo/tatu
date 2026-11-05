@@ -132,6 +132,11 @@ void main() {
 
       await tester.tap(find.text('Trocar número'));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Usar e-mail'));
+      await tester.pumpAndSettle();
+      expect(find.text('Qual é o seu e-mail?'), findsOneWidget);
+      await tester.tap(find.text('Usar celular'));
+      await tester.pumpAndSettle();
       await tester.tapOnText(find.textRange.ofSubstring('Criar conta'));
       await tester.pumpAndSettle();
       expect(find.text('Qual é o seu celular?'), findsOneWidget);

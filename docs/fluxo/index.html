@@ -213,14 +213,13 @@ const TELAS_RAW = [
   ['e01','E01','Abertura','entrada','desenho', U+'01 - Entrada/01-abertura.svg'],
   ['e02','E02','Boas-vindas','entrada','app','docs/fluxo/app/boas-vindas.png',["No app, “Quero trabalhar” ainda mostra “em breve”"]],
   ['e03','E03','Celular','entrada','app','docs/fluxo/app/celular.png',["Continuar só libera com 11 dígitos"]],
-  ['e06','E06','E-mail','entrada','app','docs/fluxo/app/email.png',["Continuar só libera com e-mail válido","Depois pedimos o celular, para o profissional falar com o cliente"]],
-  ['e07','E07','Código por e-mail','entrada','app','docs/fluxo/app/codigo-email.png',["Reenviar código: libera depois de 1:00","No app, Continuar ainda mostra “em breve”"]],
+  ['e06','E06','E-mail','entrada','app','docs/fluxo/app/email.png',["Usada no cadastro e no Entrar","Continuar só libera com e-mail válido","Depois pedimos o celular, para o profissional falar com o cliente"]],
+  ['e07','E07','Código por e-mail','entrada','app','docs/fluxo/app/codigo-email.png',["Usada no cadastro e no Entrar","Reenviar código: libera depois de 1:00","No app, Continuar ainda mostra “em breve”"]],
   ['a-celdepois','—','Pedir o celular (depois do e-mail)','entrada','andamento'],
   ['e04','E04','Código SMS','entrada','app','docs/fluxo/app/codigo.png',["Reenviar código: libera depois de 1:00","Sem backend: aceita qualquer código de 6 dígitos"]],
   ['e05','E05','Nome','entrada','app','docs/fluxo/app/nome.png',["No app, Continuar ainda mostra “em breve”"]],
-  ['e08','E08','Entrar','entrada','app','docs/fluxo/app/entrar.png',["Mesma tela do Celular, para quem já tem conta","Usa o mesmo Código SMS (E04)"]],
+  ['e08','E08','Entrar','entrada','app','docs/fluxo/app/entrar.png',["Mesma tela do Celular, para quem já tem conta","Usa o mesmo Código SMS (E04) e as mesmas telas de e-mail (E06, E07)"]],
   ['a-poslogin','—','Depois de entrar','entrada','andamento'],
-  ['a-entraremail','—','Entrar com e-mail','entrada','andamento'],
 
   ['c03','C03','Home · vazia','pedir','desenho', U+'02 - Pedir serviço/03-home-vazia.svg',["Abas: Início · Atividade · Mensagens"]],
   ['c04','C04','Home · IA marcou o serviço','pedir','desenho', U+'02 - Pedir serviço/04-home-ia-marcou.svg',["Toque em outro serviço troca a escolha (✦ some)"]],
@@ -328,7 +327,8 @@ const LIGACOES = [
   ['e02','e08','Entrar','t'],
   ['e08','e04','Continuar','t'],
   ['e08','e03','Criar conta','t'],
-  ['e08','a-entraremail','Usar e-mail','t'],
+  ['e08','e06','Usar e-mail','t'],
+  ['e07','a-poslogin','Continuar · quando veio do Entrar','t'],
   ['e04','a-poslogin','Continuar · quando veio do Entrar','t'],
   ['e03','e04','Continuar','t'],
   ['e03','e06','Usar e-mail','t'],
@@ -513,7 +513,7 @@ const STATUS = { app: 'No app', desenho: 'Desenhada', andamento: 'Em andamento' 
 const VISTAS = {
   cliente: { raiz: 'e01', etapas: ['entrada', 'pedir', 'procurar', 'combinar', 'contaC'], tirar: [],
     titulo: 'Do primeiro acesso até o serviço pago e avaliado, pelo lado de quem pede.' },
-  profissional: { raiz: 'e01', etapas: ['entrada', 'cadastro', 'chamados', 'servico', 'contaP'], tirar: ['e03', 'e05', 'e06', 'e07', 'a-celdepois'],
+  profissional: { raiz: 'e01', etapas: ['entrada', 'cadastro', 'chamados', 'servico', 'contaP'], tirar: ['e03', 'e05', 'a-celdepois'],
     titulo: 'Do cadastro até receber pelo serviço, pelo lado de quem trabalha.' },
   ambos: { raiz: 'c10', etapas: ['procurar', 'combinar', 'chamados', 'servico'], tirar: [], sincronia: true,
     titulo: 'Um pedido do começo ao fim: o que cada lado vê no mesmo momento.' },
@@ -676,7 +676,7 @@ function desenhar() {
     }
     if (n.tipo === 'atalho' || n.tipo === 'fora') {
       const fora = n.tipo === 'fora';
-      const txt = fora ? `Abre o fluxo do ${n.vista === 'profissional' ? 'profissional' : 'cliente'}` : 'Volta para';
+      const txt = fora ? `Abre o fluxo do ${n.vista === 'profissional' ? 'profissional' : 'cliente'}` : 'Segue em';
       html += `<div class="node ref" data-alvo="${n.id}" ${fora ? `data-vista="${n.vista}"` : ''} style="${pos}" role="button" tabindex="0">
         <span class="seta">${fora ? '⇢' : '↪'}</span><span class="rt"><span class="d">${txt}</span><span class="nm">${t.cod !== '—' ? `<span class="code">${t.cod}</span> ` : ''}${esc(t.nome)}</span></span></div>`;
     } else if (t.status === 'andamento') {
@@ -713,7 +713,7 @@ function legenda(telas) {
     <span class="k"><span class="dot andamento"></span>Em andamento <b>${c.andamento}</b></span>
     <span class="k"><span class="lk"></span>toque</span>
     <span class="k"><span class="lk auto"></span>automático</span>
-    <span class="k">↪ volta para uma tela que já apareceu</span>
+    <span class="k">↪ segue numa tela que já aparece em outro galho</span>
     ${VISTAS[vista].sincronia ? '<span class="k"><span class="lk sync"></span>o outro lado recebe</span>' : ''}`;
 }
 

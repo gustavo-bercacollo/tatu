@@ -55,20 +55,10 @@ class _CelularPageState extends State<CelularPage> {
     );
   }
 
-  void _usarEmail() {
-    if (widget.entrar) {
-      // "Entrar com e-mail" ainda não foi desenhado.
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(content: Text('Entrar com e-mail: em breve')),
-        );
-      return;
-    }
-    // Volta do e-mail com "Usar celular" é um pop; daqui para o e-mail é push.
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => const EmailPage()));
-  }
+  // Volta do e-mail com "Usar celular" é um pop; daqui para o e-mail é push.
+  void _usarEmail() => Navigator.of(
+    context,
+  ).push(MaterialPageRoute(builder: (_) => EmailPage(entrar: widget.entrar)));
 
   @override
   Widget build(BuildContext context) {

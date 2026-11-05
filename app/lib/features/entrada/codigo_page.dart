@@ -14,9 +14,11 @@ class CodigoPage extends StatefulWidget {
     : porEmail = false;
 
   /// Código por e-mail. [destino] é o e-mail informado.
-  const CodigoPage.email({super.key, required this.destino})
-    : porEmail = true,
-      entrar = false;
+  const CodigoPage.email({
+    super.key,
+    required this.destino,
+    this.entrar = false,
+  }) : porEmail = true;
 
   final String destino;
   final bool porEmail;

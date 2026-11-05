@@ -4,9 +4,12 @@ import '../../shared/widgets/cadastro_scaffold.dart';
 import '../../shared/widgets/tatu_field.dart';
 import 'codigo_page.dart';
 
-/// Cadastro · e-mail: alternativa ao celular; o código vai por e-mail.
+/// E-mail no lugar do celular (cadastro ou entrar); o código vai por e-mail.
 class EmailPage extends StatefulWidget {
-  const EmailPage({super.key});
+  const EmailPage({super.key, this.entrar = false});
+
+  /// Veio da tela Entrar (conta que já existe), não do cadastro.
+  final bool entrar;
 
   @override
   State<EmailPage> createState() => _EmailPageState();
@@ -28,7 +31,10 @@ class _EmailPageState extends State<EmailPage> {
     if (!_valido) return;
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => CodigoPage.email(destino: _controller.text.trim()),
+        builder: (_) => CodigoPage.email(
+          destino: _controller.text.trim(),
+          entrar: widget.entrar,
+        ),
       ),
     );
   }

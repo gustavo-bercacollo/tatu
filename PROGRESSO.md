@@ -22,7 +22,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Código SMS (6 caixas, contagem 1:00 para reenviar, "Trocar número" volta) — `features/entrada/codigo_page.dart`
 - [x] Celular com botão "Usar e-mail"
 - [x] E-mail e Código por e-mail — `email_page.dart`, `CodigoPage.email`. Depois do código: tela que pede o celular ainda não desenhada ("em breve")
-- [x] Entrar (`CelularPage.entrar`): "Criar conta" → cadastro; Continuar → Código SMS → depois de entrar ainda não desenhado; "Usar e-mail" no Entrar ainda não desenhado
+- [x] Entrar (`CelularPage.entrar`): "Criar conta" → cadastro; Continuar → Código SMS → depois de entrar ainda não desenhado; "Usar e-mail" → mesmas telas E-mail e Código por e-mail
 - [x] Nome ("Como podemos te chamar?", sobrenome opcional, Continuar só com nome) — `features/entrada/nome_page.dart`
 
 ## Telas do cliente (C1–C13)
