@@ -5,8 +5,6 @@
  "telas/cliente/05-home-conflito.svg": "design/user/02 - Pedir serviço/05-home-conflito.svg",
  "telas/cliente/06-home-outros-lista.svg": "design/user/02 - Pedir serviço/06-home-outros-lista.svg",
  "telas/cliente/07-home-outros-escolhido.svg": "design/user/02 - Pedir serviço/07-home-outros-escolhido.svg",
- "telas/cliente/08-endereco-busca.svg": "design/user/02 - Pedir serviço/08-endereco-busca.svg",
- "telas/cliente/09-endereco-mapa.svg": "design/user/02 - Pedir serviço/09-endereco-mapa.svg",
  "telas/cliente/10-procurando-inicio.svg": "design/user/03 - Procurar profissional/10-procurando-inicio.svg",
  "telas/cliente/11-procurando-expandindo.svg": "design/user/03 - Procurar profissional/11-procurando-expandindo.svg",
  "telas/cliente/12-procurando-ninguem-ativo.svg": "design/user/03 - Procurar profissional/12-procurando-ninguem-ativo.svg",
@@ -68,5 +66,12 @@
  "app/perfil-cliente.png": "docs/fluxo/app/perfil-cliente.png",
  "telas/profissional/31-perfil.png": "design/worker/04 - Atividade, ganhos e perfil/31-perfil.png",
  "telas/profissional/21b-trocar-para-cliente.png": "design/worker/02 - Chamados/21b-trocar-para-cliente.png",
- "telas/profissional/25b-trocar-bloqueado.png": "design/worker/03 - Serviço e cobrança/25b-trocar-bloqueado.png"
+ "telas/profissional/25b-trocar-bloqueado.png": "design/worker/03 - Serviço e cobrança/25b-trocar-bloqueado.png",
+ "app/endereco-folha.png": "docs/fluxo/app/endereco-folha.png",
+ "app/endereco-busca.png": "docs/fluxo/app/endereco-busca.png",
+ "app/endereco-mapa.png": "docs/fluxo/app/endereco-mapa.png",
+ "app/localizacao-desativada.png": "docs/fluxo/app/localizacao-desativada.png",
+ "app/enderecos.png": "docs/fluxo/app/enderecos.png",
+ "app/enderecos-vazio.png": "docs/fluxo/app/enderecos-vazio.png",
+ "app/editar-endereco.png": "docs/fluxo/app/editar-endereco.png"
 }

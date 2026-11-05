@@ -4,7 +4,9 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../core/theme/tatu_colors.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import '../../shared/widgets/lista_agrupada.dart';
+import '../../data/enderecos.dart';
 import '../entrada/boas_vindas_page.dart';
+import 'endereco/enderecos_page.dart';
 
 /// Perfil do cliente: dados, troca de modo e atalhos da conta.
 class PerfilClientePage extends StatelessWidget {
@@ -32,6 +34,13 @@ class PerfilClientePage extends StatelessWidget {
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text('$o: em breve')));
 
+    return ListenableBuilder(
+      listenable: enderecos,
+      builder: (context, _) => _tela(context, emBreve),
+    );
+  }
+
+  Widget _tela(BuildContext context, void Function(String) emBreve) {
     return Scaffold(
       backgroundColor: TatuColors.surfaceGrouped,
       bottomNavigationBar: AbasCliente(
@@ -124,8 +133,14 @@ class PerfilClientePage extends StatelessWidget {
                     ItemLista(
                       icone: TablerIcons.map_pin,
                       texto: 'Endereços',
-                      valor: 'Casa',
-                      onTap: () => emBreve('Endereços'),
+                      valor: enderecos.salvos.isEmpty
+                          ? null
+                          : enderecos.atual.nome,
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const EnderecosPage(),
+                        ),
+                      ),
                     ),
                     ItemLista(
                       icone: TablerIcons.credit_card,

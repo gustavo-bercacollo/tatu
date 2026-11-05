@@ -64,7 +64,7 @@ Publicado em https://claude.ai/artifact/UbvPYpEqyP5sWj9cbtvT7B. Fonte: `docs/flu
 
 ## Comandos
 - App: `cd app` → `flutter run -d chrome` · `flutter analyze` · `flutter test`. Erro estranho de compilação → `flutter clean` e rodar de novo.
-- Celular do Gustavo (mesmo Wi-Fi, http://192.168.1.173:8080): `cd app` → `flutter build web --release --no-web-resources-cdn` e servir com `py tool/serve_web.py` (aba de terminal "app celular"; manda `no-store` para o celular não mostrar versão velha; CanvasKit local, sem baixar do Google). Depois de cada mudança, só rodar o build de novo; o servidor continua. **Não usar** `flutter run -d web-server` para o celular: o modo debug fica em branco pela rede e o `--release` dele quebra no Windows.
+- Celular do Gustavo (mesmo Wi-Fi, http://<IP do PC>:8080 — o IP muda com o Wi-Fi; ver com `Get-NetIPAddress -AddressFamily IPv4`; em 05/11/2026 era 192.168.0.102. Rede "Pública" no Windows bloqueia o acesso: o Gustavo precisa marcar como Privada ou permitir o Python no firewall): `cd app` → `flutter build web --release --no-web-resources-cdn` e servir com `py tool/serve_web.py` (aba de terminal "app celular"; manda `no-store` para o celular não mostrar versão velha; CanvasKit local, sem baixar do Google). Depois de cada mudança, só rodar o build de novo; o servidor continua. **Não usar** `flutter run -d web-server` para o celular: o modo debug fica em branco pela rede e o `--release` dele quebra no Windows.
 - API: `cd backend` → `.venv\Scripts\python -m uvicorn app.main:app --reload` (`/health`)
 - Worker: `cd backend` → `.venv\Scripts\arq app.worker.main.WorkerSettings` (precisa de Redis)
 - Flutter em `C:\src\flutter`; GitHub CLI em `%LOCALAPPDATA%\Programs\gh\bin\gh.exe`. Android Studio não instalado.

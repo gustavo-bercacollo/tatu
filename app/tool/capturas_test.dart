@@ -7,6 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
+import 'package:tatu/data/enderecos.dart';
+import 'package:tatu/features/cliente/endereco/buscar_endereco_page.dart';
+import 'package:tatu/features/cliente/endereco/confirmar_endereco_page.dart';
+import 'package:tatu/features/cliente/endereco/editar_endereco_page.dart';
+import 'package:tatu/features/cliente/endereco/enderecos_page.dart';
+import 'package:tatu/features/cliente/endereco/localizacao_desativada_page.dart';
 import 'package:tatu/features/cliente/home_page.dart';
 import 'package:tatu/features/cliente/perfil_page.dart';
 import 'package:tatu/features/entrada/boas_vindas_page.dart';
@@ -42,6 +48,7 @@ Future<void> _capturar(
 }) async {
   tester.view.physicalSize = const Size(786, 1704); // 393×852 @2x
   tester.view.devicePixelRatio = 2;
+  enderecos.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -52,8 +59,9 @@ Future<void> _capturar(
   await tester.pump();
   if (preparar != null) await preparar();
   await tester.pump(const Duration(milliseconds: 600)); // fim das animações
+  // A tela inteira do app (inclui folhas abertas por cima da página).
   await expectLater(
-    find.byWidget(tela),
+    find.byType(MaterialApp),
     matchesGoldenFile('../../docs/fluxo/app/$nome.png'),
   );
   await tester.pumpWidget(const SizedBox()); // encerra timers da tela
@@ -122,6 +130,80 @@ void main() {
       preparar: () async {
         await t.enterText(find.byType(TextField), '4827');
         await t.pump(const Duration(seconds: 18));
+      },
+    );
+  });
+
+  testWidgets('endereco-folha', (t) async {
+    await _capturar(
+      t,
+      'endereco-folha',
+      const HomeClientePage(nome: 'Ana Martins'),
+      preparar: () async {
+        await t.tap(find.text('Rua Bruno Lobo, 29'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('endereco-busca', (t) async {
+    await _capturar(
+      t,
+      'endereco-busca',
+      const BuscarEnderecoPage(),
+      preparar: () async {
+        await t.enterText(find.byType(TextField), 'Rua Bruno Lo');
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('endereco-mapa', (t) async {
+    await _capturar(
+      t,
+      'endereco-mapa',
+      const ConfirmarEnderecoPage(resultado: EnderecosRepo.localAtual),
+    );
+  });
+
+  testWidgets('localizacao-desativada', (t) async {
+    await _capturar(
+      t,
+      'localizacao-desativada',
+      const LocalizacaoDesativadaPage(),
+    );
+  });
+
+  testWidgets('enderecos', (t) async {
+    await _capturar(t, 'enderecos', const EnderecosPage());
+  });
+
+  testWidgets('enderecos-vazio', (t) async {
+    await _capturar(
+      t,
+      'enderecos-vazio',
+      const EnderecosPage(),
+      preparar: () async {
+        for (final e in enderecos.salvos) {
+          enderecos.excluir(e.id);
+        }
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('editar-endereco', (t) async {
+    final casa = EnderecosRepo().salvos.first;
+    await _capturar(
+      t,
+      'editar-endereco',
+      EditarEnderecoPage(endereco: casa),
+      preparar: () async {
+        // Foco sem toque (o toque desenharia a alça de seleção do texto).
+        t
+            .state<EditableTextState>(find.byType(EditableText).at(2))
+            .requestKeyboard();
+        await t.pump();
       },
     );
   });

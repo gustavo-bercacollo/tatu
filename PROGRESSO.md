@@ -32,6 +32,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] C3 Home vazia + C4 IA marcou — `features/cliente/home_page.dart` (referências `tatu-home-cliente.html` e `tatu-home-ia-marcou.html`; verdinho "Profissionais ativos" embaixo, junto do botão). IA simulada em `data/sugestao_servico.dart`. Falta: conflito (C5), Outros (C6/C7), endereço, perfil, abas, Chamar → Procurando
 - [x] C13 Perfil do cliente — `features/cliente/perfil_page.dart` (abre pelo avatar; "Trocar para modo profissional" e demais linhas ainda "em breve"; Sair da conta → Boas-vindas). Componentes `GrupoLista`/`ItemLista` e `AbasCliente` em `shared/widgets`
 - Troca de modo desenhada (só no fluxograma): Perfil do profissional com "Trocar para modo cliente", folha "Ficar offline e trocar?" (P21b) e "Termine o serviço antes de trocar" (P25b)
+- [x] C4 Endereço (7 telas) — `features/cliente/endereco/`: folha "Onde é o serviço?" (pelo topo da Home), Buscar endereço, Confirme no mapa, Localização desativada, Endereços (pelo Perfil), Endereços vazio, Editar endereço. Dados simulados em `data/enderecos.dart` (`enderecos`, ChangeNotifier). Falta: mapa e localização reais, "Abrir Ajustes"
 - [ ] C1 Abertura
 - [ ] C3 Home (vazia, IA marcou, conflito, Outros)
 - [ ] C4 Endereço

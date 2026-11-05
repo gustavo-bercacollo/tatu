@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../data/enderecos.dart';
 import '../../data/sugestao_servico.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import '../../shared/widgets/tatu_chip.dart';
+import 'endereco/onde_sheet.dart';
 import 'perfil_page.dart';
 
 /// Home do cliente: descreve o problema, escolhe (ou a IA marca) o serviço e chama.
@@ -14,12 +16,10 @@ class HomeClientePage extends StatefulWidget {
   const HomeClientePage({
     super.key,
     required this.nome,
-    this.endereco = 'Rua das Flores, 120',
     this.ia = const SugestaoServicoMock(),
   });
 
   final String nome;
-  final String endereco;
   final SugestaoServico ia;
 
   @override
@@ -231,18 +231,21 @@ class _HomeClientePageState extends State<HomeClientePage> {
         Expanded(
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: () => _emBreve('Endereço'),
+            onTap: () => abrirOndeServico(context),
             child: Row(
               children: [
                 const Icon(TablerIcons.map_pin, size: 18),
                 const SizedBox(width: 6),
                 Flexible(
-                  child: Text(
-                    widget.endereco,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
+                  child: ListenableBuilder(
+                    listenable: enderecos,
+                    builder: (context, _) => Text(
+                      enderecos.atual.rua,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),

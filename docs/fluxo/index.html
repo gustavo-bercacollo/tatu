@@ -193,7 +193,7 @@ path.entre { opacity: .5; }
 /* ===== DADOS =====
    status: app (já no app, imagem real) · desenho (desenho pronto, ainda não no app) · andamento (tela ainda não desenhada)
    Para atualizar: mudar o status/imagem da tela, ou acrescentar telas e ligações. */
-const ATUALIZADO = '04/11/2026';
+const ATUALIZADO = '05/11/2026';
 
 const ETAPAS = {
   entrada:   { nome: 'Entrada e cadastro', lado: 'ambos' },
@@ -224,8 +224,10 @@ const TELAS_RAW = [
   ['c05','C05','Home · conflito','pedir','desenho', U+'02 - Pedir serviço/05-home-conflito.svg'],
   ['c06','C06','Outros serviços','pedir','desenho', U+'02 - Pedir serviço/06-home-outros-lista.svg'],
   ['c07','C07','Home · serviço de Outros','pedir','desenho', U+'02 - Pedir serviço/07-home-outros-escolhido.svg'],
-  ['c08','C08','Endereço · busca','pedir','desenho', U+'02 - Pedir serviço/08-endereco-busca.svg'],
-  ['c09','C09','Endereço · confirmar no mapa','pedir','desenho', U+'02 - Pedir serviço/09-endereco-mapa.svg'],
+  ['c08a','C08a','Folha · onde é o serviço?','pedir','app','docs/fluxo/app/endereco-folha.png',["Abre pelo endereço no topo da Home","✓ marca o endereço em uso"]],
+  ['c08','C08','Buscar endereço','pedir','app','docs/fluxo/app/endereco-busca.png',["Sem backend: busca numa lista de exemplo"]],
+  ['c09','C09','Confirme o endereço (mapa)','pedir','app','docs/fluxo/app/endereco-mapa.png',["Mapa ilustrativo até termos o serviço de mapas","Casa e Trabalho substituem o salvo do mesmo tipo"]],
+  ['c08b','C08b','Localização desativada','pedir','app','docs/fluxo/app/localizacao-desativada.png',["No app, “Abrir Ajustes” ainda mostra “em breve”"]],
 
   ['c10','C10','Procurando · início','procurar','desenho', U+'03 - Procurar profissional/10-procurando-inicio.svg'],
   ['c11','C11','Procurando · expandindo','procurar','desenho', U+'03 - Procurar profissional/11-procurando-expandindo.svg'],
@@ -253,6 +255,9 @@ const TELAS_RAW = [
   ['c26','C26','Mensagens · vazio','contaC','desenho', U+'05 - Atividade, mensagens e perfil/26-mensagens-vazio.svg'],
   ['c27','C27','Perfil do cliente','contaC','app','docs/fluxo/app/perfil-cliente.png',["Abre pelo avatar da Home; a aba Início volta","No app, as linhas (e a troca de modo) ainda mostram “em breve”"]],
   ['c28','C28','Perfil · sem cartão e avisos desligados','contaC','desenho', U+'05 - Atividade, mensagens e perfil/28-perfil-sem-cartao-notificacoes.svg'],
+  ['c27a','C27a','Endereços','contaC','app','docs/fluxo/app/enderecos.png'],
+  ['c27b','C27b','Endereços · vazio','contaC','app','docs/fluxo/app/enderecos-vazio.png'],
+  ['c27c','C27c','Editar endereço','contaC','app','docs/fluxo/app/editar-endereco.png'],
   ['a-pedirdenovo','—','Pedir de novo','contaC','andamento'],
   ['a-pagamento','—','Formas de pagamento','contaC','andamento'],
   ['a-minhasav','—','Minhas avaliações','contaC','andamento'],
@@ -343,7 +348,7 @@ const LIGACOES = [
   ['c03','c04','descreve o problema · IA marca','a'],
   ['c03','c05','escolhe serviço que não bate com a descrição','t'],
   ['c03','c06','Outros','t'],
-  ['c03','c08','Endereço no topo','t'],
+  ['c03','c08a','Endereço no topo','t'],
   ['c03','c27','Avatar','t'],
   ['c03','c23','Aba Atividade','t'],
   ['c03','c25','Aba Mensagens','t'],
@@ -352,8 +357,14 @@ const LIGACOES = [
   ['c06','c07','escolhe Chaveiro','t'],
   ['c06','c04','Não sei qual serviço','t'],
   ['c07','c10','Chamar chaveiro','t'],
-  ['c08','c09','escolhe um endereço','t'],
-  ['c09','c03','Confirmar endereço','t'],
+  ['c08a','c08','Buscar rua e número · Adicionar endereço','t'],
+  ['c08a','c03','escolhe um salvo · Usar minha localização atual','t'],
+  ['c08a','c08b','Usar minha localização · sem permissão','t'],
+  ['c08','c09','escolhe um resultado','t'],
+  ['c08','c03','toca num recente','t'],
+  ['c09','c03','Confirmar endereço · quando veio da Home','t'],
+  ['c09','c27a','Confirmar endereço · quando veio de Endereços','t'],
+  ['c08b','c08','Digitar endereço','t'],
 
   ['c10','c11','60–90 s sem aceite','a'],
   ['c11','c12','ninguém ativo','a'],
@@ -397,7 +408,12 @@ const LIGACOES = [
   ['c25','c20','Pagar','t'],
   ['c25','c16','toca na conversa','t'],
   ['c27','c28','sem cartão · avisos desligados','e'],
-  ['c27','c08','Endereços','t'],
+  ['c27','c27a','Endereços','t'],
+  ['c27a','c27c','toca num endereço','t'],
+  ['c27a','c08','Adicionar endereço','t'],
+  ['c27a','c27b','sem endereços salvos','e'],
+  ['c27b','c08','Adicionar endereço','t'],
+  ['c27c','c27a','Salvar · Excluir endereço','t'],
   ['c27','a-pagamento','Pagamento','t'],
   ['c28','a-pagamento','Adicionar','t'],
   ['c27','a-minhasav','Minhas avaliações','t'],

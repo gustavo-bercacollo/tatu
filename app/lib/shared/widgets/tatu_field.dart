@@ -5,10 +5,11 @@ import '../../core/theme/tatu_colors.dart';
 
 /// Campo de texto do guia: fundo cinza, rótulo pequeno dentro e valor
 /// embaixo; contorno preto no foco e vermelho com [errorText].
+/// Sem [label], mostra só o valor (ou o [hintText]) no meio do campo.
 class TatuField extends StatefulWidget {
   const TatuField({
     super.key,
-    required this.label,
+    this.label,
     this.controller,
     this.hintText,
     this.errorText,
@@ -18,11 +19,12 @@ class TatuField extends StatefulWidget {
     this.autofillHints,
     this.inputFormatters,
     this.autofocus = false,
+    this.readOnly = false,
     this.onChanged,
     this.onSubmitted,
   });
 
-  final String label;
+  final String? label;
   final TextEditingController? controller;
   final String? hintText;
   final String? errorText;
@@ -32,6 +34,9 @@ class TatuField extends StatefulWidget {
   final Iterable<String>? autofillHints;
   final List<TextInputFormatter>? inputFormatters;
   final bool autofocus;
+
+  /// Só leitura: mostra o valor sem abrir o teclado nem ganhar contorno.
+  final bool readOnly;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
 
@@ -58,7 +63,7 @@ class _TatuFieldState extends State<TatuField> {
   Widget build(BuildContext context) {
     final borderColor = widget.errorText != null
         ? TatuColors.danger
-        : _focus.hasFocus
+        : _focus.hasFocus && !widget.readOnly
         ? TatuColors.textPrimary
         : Colors.transparent;
 
@@ -80,19 +85,23 @@ class _TatuFieldState extends State<TatuField> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  widget.label,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: TatuColors.textSecondary,
+                if (widget.label != null) ...[
+                  Text(
+                    widget.label!,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: TatuColors.textSecondary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
+                  const SizedBox(height: 2),
+                ],
                 TextField(
                   controller: widget.controller,
                   focusNode: _focus,
                   autofocus: widget.autofocus,
+                  readOnly: widget.readOnly,
+                  showCursor: !widget.readOnly,
                   keyboardType: widget.keyboardType,
                   textInputAction: widget.textInputAction,
                   textCapitalization: widget.textCapitalization,
