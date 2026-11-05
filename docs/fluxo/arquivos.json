@@ -24,7 +24,6 @@
  "telas/cliente/24-atividade-concluidos.svg": "design/user/05 - Atividade, mensagens e perfil/24-atividade-concluidos.svg",
  "telas/cliente/25-mensagens.svg": "design/user/05 - Atividade, mensagens e perfil/25-mensagens.svg",
  "telas/cliente/26-mensagens-vazio.svg": "design/user/05 - Atividade, mensagens e perfil/26-mensagens-vazio.svg",
- "telas/cliente/27-perfil.svg": "design/user/05 - Atividade, mensagens e perfil/27-perfil.svg",
  "telas/cliente/28-perfil-sem-cartao-notificacoes.svg": "design/user/05 - Atividade, mensagens e perfil/28-perfil-sem-cartao-notificacoes.svg",
  "telas/profissional/01-boas-vindas.svg": "design/worker/01 - Cadastro/01-boas-vindas.svg",
  "telas/profissional/02-passo1-dados-sms.svg": "design/worker/01 - Cadastro/02-passo1-dados-sms.svg",
@@ -56,7 +55,6 @@
  "telas/profissional/28-avaliar-cliente.svg": "design/worker/03 - Serviço e cobrança/28-avaliar-cliente.svg",
  "telas/profissional/29-atividade-servicos.svg": "design/worker/04 - Atividade, ganhos e perfil/29-atividade-servicos.svg",
  "telas/profissional/30-atividade-ganhos.svg": "design/worker/04 - Atividade, ganhos e perfil/30-atividade-ganhos.svg",
- "telas/profissional/31-perfil.svg": "design/worker/04 - Atividade, ganhos e perfil/31-perfil.svg",
  "telas/profissional/32-perfil-previa-cliente.svg": "design/worker/04 - Atividade, ganhos e perfil/32-perfil-previa-cliente.svg",
  "app/boas-vindas.png": "docs/fluxo/app/boas-vindas.png",
  "app/celular.png": "docs/fluxo/app/celular.png",
@@ -66,5 +64,9 @@
  "app/codigo-email.png": "docs/fluxo/app/codigo-email.png",
  "app/entrar.png": "docs/fluxo/app/entrar.png",
  "app/home-vazia.png": "docs/fluxo/app/home-vazia.png",
- "app/home-ia.png": "docs/fluxo/app/home-ia.png"
+ "app/home-ia.png": "docs/fluxo/app/home-ia.png",
+ "app/perfil-cliente.png": "docs/fluxo/app/perfil-cliente.png",
+ "telas/profissional/31-perfil.png": "design/worker/04 - Atividade, ganhos e perfil/31-perfil.png",
+ "telas/profissional/21b-trocar-para-cliente.png": "design/worker/02 - Chamados/21b-trocar-para-cliente.png",
+ "telas/profissional/25b-trocar-bloqueado.png": "design/worker/03 - Serviço e cobrança/25b-trocar-bloqueado.png"
 }

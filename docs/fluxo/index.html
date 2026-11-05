@@ -251,7 +251,7 @@ const TELAS_RAW = [
   ['c24','C24','Atividade · concluídos','contaC','desenho', U+'05 - Atividade, mensagens e perfil/24-atividade-concluidos.svg'],
   ['c25','C25','Mensagens','contaC','desenho', U+'05 - Atividade, mensagens e perfil/25-mensagens.svg'],
   ['c26','C26','Mensagens · vazio','contaC','desenho', U+'05 - Atividade, mensagens e perfil/26-mensagens-vazio.svg'],
-  ['c27','C27','Perfil do cliente','contaC','desenho', U+'05 - Atividade, mensagens e perfil/27-perfil.svg'],
+  ['c27','C27','Perfil do cliente','contaC','app','docs/fluxo/app/perfil-cliente.png',["Abre pelo avatar da Home; a aba Início volta","No app, as linhas (e a troca de modo) ainda mostram “em breve”"]],
   ['c28','C28','Perfil · sem cartão e avisos desligados','contaC','desenho', U+'05 - Atividade, mensagens e perfil/28-perfil-sem-cartao-notificacoes.svg'],
   ['a-pedirdenovo','—','Pedir de novo','contaC','andamento'],
   ['a-pagamento','—','Formas de pagamento','contaC','andamento'],
@@ -292,6 +292,7 @@ const TELAS_RAW = [
   ['p22','P22','Novo chamado','chamados','desenho', W+'02 - Chamados/22-novo-chamado.svg',["Contagem para aceitar"]],
   ['p23','P23','Chat do profissional','chamados','desenho', W+'02 - Chamados/23-chat.svg'],
   ['p24','P24','A caminho','chamados','desenho', W+'02 - Chamados/24-andamento-a-caminho.svg',["Abrir rota → app de mapas do celular"]],
+  ['p21b','P21b','Folha · ficar offline e trocar?','chamados','desenho', W+'02 - Chamados/21b-trocar-para-cliente.png',["Aparece ao trocar para cliente estando online"]],
   ['pa-valor','—','Enviar valor (folha)','chamados','andamento'],
   ['pa-foto','—','Enviar foto no chat','chamados','andamento'],
   ['pa-chegou','—','Chegou · iniciar serviço','chamados','andamento'],
@@ -301,11 +302,12 @@ const TELAS_RAW = [
   ['p26','P26','Cobrar o cliente','servico','desenho', W+'03 - Serviço e cobrança/26-cobrar-cliente.svg',["Fotos do serviço (opcional) → câmera"]],
   ['p27','P27','Cobrança · aguardando','servico','desenho', W+'03 - Serviço e cobrança/27-cobranca-aguardando.svg'],
   ['p28','P28','Pagamento recebido · avaliar o cliente','servico','desenho', W+'03 - Serviço e cobrança/28-avaliar-cliente.svg'],
+  ['p25b','P25b','Folha · termine o serviço antes de trocar','servico','desenho', W+'03 - Serviço e cobrança/25b-trocar-bloqueado.png',["Com serviço em andamento não dá para trocar de modo"]],
   ['pa-porfora','—','Recebi por fora · aguardando o cliente confirmar','servico','andamento'],
 
   ['p29','P29','Atividade · serviços','contaP','desenho', W+'04 - Atividade, ganhos e perfil/29-atividade-servicos.svg'],
   ['p30','P30','Atividade · ganhos','contaP','desenho', W+'04 - Atividade, ganhos e perfil/30-atividade-ganhos.svg'],
-  ['p31','P31','Perfil do profissional','contaP','desenho', W+'04 - Atividade, ganhos e perfil/31-perfil.svg'],
+  ['p31','P31','Perfil do profissional','contaP','desenho', W+'04 - Atividade, ganhos e perfil/31-perfil.png'],
   ['p32','P32','Prévia: como o cliente vê','contaP','desenho', W+'04 - Atividade, ganhos e perfil/32-perfil-previa-cliente.svg'],
   ['pa-fotos','—','Fotos de trabalhos','contaP','andamento'],
   ['pa-sobre','—','Sobre você','contaP','andamento'],
@@ -404,6 +406,8 @@ const LIGACOES = [
   ['c27','a-ajudaC','Ajuda','t'],
   ['c27','a-privC','Privacidade e termos','t'],
   ['c27','e02','Sair da conta','t'],
+  ['c27','p20','Trocar para modo profissional · já tem cadastro','t'],
+  ['c27','p01','Trocar para modo profissional · sem cadastro','t'],
 
   ['p01','p02','Começar cadastro','t'],
   ['p01','p03','opção B: e-mail e senha','alt'],
@@ -483,6 +487,13 @@ const LIGACOES = [
   ['p31','pa-ajuda','Ajuda','t'],
   ['p31','pa-priv','Privacidade e termos','t'],
   ['p31','e02','Sair da conta','t'],
+  ['p31','c03','Trocar para modo cliente · offline','t'],
+  ['p31','p21b','Trocar para modo cliente · online','t'],
+  ['p31','p25b','Trocar para modo cliente · com serviço em andamento','t'],
+  ['p21b','c03','Trocar para cliente','t'],
+  ['p21b','p21','Continuar online','t'],
+  ['p25b','p25','Voltar ao serviço','t'],
+  ['p25b','p31','Fechar','t'],
 
   // Entre os dois apps (só na vista "Os dois lados")
   ['c10','p22','chamado vai para todos os ativos','s'],
@@ -894,6 +905,13 @@ function trocar(v, primeira) {
 document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => trocar(b.dataset.v));
 window.addEventListener('hashchange', () => { if (location.hash.slice(1) !== vista) trocar(location.hash.slice(1)); });
 window.addEventListener('resize', () => { if (layout) aplicar(); });
+// O foco numa tela faz o navegador rolar a área por conta própria e tira o painel do lugar:
+// a área nunca rola (o movimento é só pelo arrastar/zoom); a tela focada é centralizada.
+stage.addEventListener('scroll', () => { stage.scrollLeft = 0; stage.scrollTop = 0; });
+world.addEventListener('focusin', e => {
+  const n = e.target.closest('.node[data-id]');
+  if (n && e.target.matches(':focus-visible')) centrar(n.dataset.id);
+});
 $('#data').textContent = ATUALIZADO;
 trocar(location.hash.slice(1) || 'cliente', true);
 </script>

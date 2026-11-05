@@ -56,6 +56,28 @@ void main() {
     expect(find.text('Chamar eletricista'), findsOneWidget);
   });
 
+  testWidgets('Avatar abre o Perfil; Início volta; Sair leva às Boas-vindas', (
+    t,
+  ) async {
+    await _abrir(t);
+    await t.tap(find.text('AM'));
+    await t.pumpAndSettle();
+    expect(find.text('Ana Martins'), findsOneWidget);
+    expect(find.text('Trocar para modo profissional'), findsOneWidget);
+    expect(find.text('4,8 · 23 pedidos'), findsOneWidget);
+
+    await t.tap(find.text('Início'));
+    await t.pumpAndSettle();
+    expect(find.text('Do que você precisa?'), findsOneWidget);
+
+    await t.tap(find.text('AM'));
+    await t.pumpAndSettle();
+    await t.scrollUntilVisible(find.text('Sair da conta'), 200);
+    await t.tap(find.text('Sair da conta'));
+    await t.pumpAndSettle();
+    expect(find.text('Como você quer usar o Tatu?'), findsOneWidget);
+  });
+
   testWidgets('Sem confiança, a IA não marca nada', (t) async {
     await _abrir(t);
     await t.enterText(find.byType(TextField), 'preciso de ajuda em casa');

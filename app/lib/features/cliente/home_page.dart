@@ -5,7 +5,9 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
 import '../../data/sugestao_servico.dart';
+import '../../shared/widgets/abas_cliente.dart';
 import '../../shared/widgets/tatu_chip.dart';
+import 'perfil_page.dart';
 
 /// Home do cliente: descreve o problema, escolhe (ou a IA marca) o serviço e chama.
 class HomeClientePage extends StatefulWidget {
@@ -74,7 +76,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
   Widget build(BuildContext context) {
     final servico = _servico;
     return Scaffold(
-      bottomNavigationBar: const _AbasCliente(),
+      bottomNavigationBar: const AbasCliente(),
       body: SafeArea(
         bottom: false,
         child: Center(
@@ -258,7 +260,11 @@ class _HomeClientePageState extends State<HomeClientePage> {
           button: true,
           label: 'Perfil',
           child: GestureDetector(
-            onTap: () => _emBreve('Perfil'),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => PerfilClientePage(nome: widget.nome),
+              ),
+            ),
             child: Container(
               width: 36,
               height: 36,
@@ -332,91 +338,6 @@ class _HomeClientePageState extends State<HomeClientePage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Barra de abas do cliente: Início · Atividade · Mensagens.
-class _AbasCliente extends StatelessWidget {
-  const _AbasCliente();
-
-  @override
-  Widget build(BuildContext context) {
-    void emBreve(String o) => ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('$o: em breve')));
-
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: TatuColors.tabBar,
-        border: Border(
-          top: BorderSide(color: TatuColors.tabBarLine, width: 0.5),
-        ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 49,
-          child: Row(
-            children: [
-              const _Aba(icone: TablerIcons.home, texto: 'Início', ativa: true),
-              _Aba(
-                icone: TablerIcons.clock,
-                texto: 'Atividade',
-                onTap: () => emBreve('Atividade'),
-              ),
-              _Aba(
-                icone: TablerIcons.message_circle,
-                texto: 'Mensagens',
-                onTap: () => emBreve('Mensagens'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Aba extends StatelessWidget {
-  const _Aba({
-    required this.icone,
-    required this.texto,
-    this.ativa = false,
-    this.onTap,
-  });
-
-  final IconData icone;
-  final String texto;
-  final bool ativa;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final cor = ativa ? TatuColors.textPrimary : TatuColors.textSecondary;
-    return Expanded(
-      child: Semantics(
-        button: true,
-        selected: ativa,
-        child: InkWell(
-          onTap: onTap,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icone, size: 24, color: cor),
-              const SizedBox(height: 3),
-              Text(
-                texto,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: ativa ? FontWeight.w600 : FontWeight.w500,
-                  color: cor,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

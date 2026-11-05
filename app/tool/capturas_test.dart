@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/features/cliente/home_page.dart';
+import 'package:tatu/features/cliente/perfil_page.dart';
 import 'package:tatu/features/entrada/boas_vindas_page.dart';
 import 'package:tatu/features/entrada/celular_page.dart';
 import 'package:tatu/features/entrada/codigo_page.dart';
@@ -122,6 +123,14 @@ void main() {
         await t.enterText(find.byType(TextField), '4827');
         await t.pump(const Duration(seconds: 18));
       },
+    );
+  });
+
+  testWidgets('perfil-cliente', (t) async {
+    await _capturar(
+      t,
+      'perfil-cliente',
+      const PerfilClientePage(nome: 'Ana Martins'),
     );
   });
 
