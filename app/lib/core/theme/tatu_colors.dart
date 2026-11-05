@@ -20,6 +20,8 @@ class TatuColors {
   static const online = Color(0xFF34C759);
   static const verified = Color(0xFF007AFF);
   static const warning = Color(0xFFFF9F0A); // também as estrelas
+  static const warningSoft = Color(0xFFFFF1DB); // fundo do ícone de atenção
+  static const warningTexto = Color(0xFFA85F00); // ícone/texto de atenção
   static const trilho = Color(0xFFE5E5EA); // fundo de seletor e de barras
   static const danger = Color(0xFFFF3B30);
 

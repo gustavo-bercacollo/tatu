@@ -1,10 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../data/pagamentos.dart';
 import '../../../shared/widgets/folha.dart';
+import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/tela_interna.dart';
 
 /// Detalhe do cartão: desenho do cartão, padrão, validade e remover.
@@ -38,39 +38,18 @@ class CartaoPage extends StatelessWidget {
         children: [
           _DesenhoCartao(cartao: cartao),
           const SizedBox(height: TatuMedidas.entreSecoes),
-          Material(
-            color: TatuColors.bg,
-            borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              children: [
-                _Linha(
+          GrupoCartao(
+            linhas: [
+              ListenableBuilder(
+                listenable: pagamentos,
+                builder: (context, _) => LinhaInterruptor(
                   texto: 'Cartão padrão',
-                  direita: ListenableBuilder(
-                    listenable: pagamentos,
-                    builder: (context, _) => CupertinoSwitch(
-                      value: pagamentos.ePadrao(cartao),
-                      activeTrackColor: TatuColors.online,
-                      onChanged: (v) => pagamentos.definirPadrao(cartao, v),
-                    ),
-                  ),
+                  valor: pagamentos.ePadrao(cartao),
+                  onMudar: (v) => pagamentos.definirPadrao(cartao, v),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(left: 16),
-                  child: Divider(height: 0.5),
-                ),
-                _Linha(
-                  texto: 'Validade',
-                  direita: Text(
-                    cartao.validade,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      color: TatuColors.textSecondary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+              _LinhaValor(texto: 'Validade', valor: cartao.validade),
+            ],
           ),
         ],
       ),
@@ -86,11 +65,12 @@ class CartaoPage extends StatelessWidget {
   }
 }
 
-class _Linha extends StatelessWidget {
-  const _Linha({required this.texto, required this.direita});
+/// Linha simples com texto e valor cinza à direita.
+class _LinhaValor extends StatelessWidget {
+  const _LinhaValor({required this.texto, required this.valor});
 
   final String texto;
-  final Widget direita;
+  final String valor;
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +81,13 @@ class _Linha extends StatelessWidget {
         child: Row(
           children: [
             Expanded(child: Text(texto, style: const TextStyle(fontSize: 17))),
-            direita,
+            Text(
+              valor,
+              style: const TextStyle(
+                fontSize: 17,
+                color: TatuColors.textSecondary,
+              ),
+            ),
           ],
         ),
       ),

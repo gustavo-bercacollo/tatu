@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
+import '../../core/theme/tatu_theme.dart';
 import '../../core/theme/tatu_texto.dart';
 
 /// Alça cinza no topo das folhas.
@@ -47,8 +48,12 @@ Future<T?> mostrarFolha<T>(
   );
 }
 
-/// Folha de confirmação: título, texto e dois botões. Com [perigo], o botão
-/// de confirmar fica vermelho claro (ex.: remover). Devolve `true` se confirmou.
+/// Folha de confirmação: ícone opcional, título, texto e dois botões.
+/// Devolve `true` se a pessoa escolheu [confirmar].
+/// - [perigo]: o botão de confirmar fica vermelho claro (ex.: remover).
+/// - [destacarCancelar]: a opção segura vira o botão principal (preto) e a
+///   de confirmar fica embaixo, cinza (ex.: "Manter ligado" / "Desligar").
+/// - [icone]: círculo no topo; [iconeAviso] usa o laranja de atenção.
 Future<bool> confirmar(
   BuildContext context, {
   required String titulo,
@@ -56,55 +61,83 @@ Future<bool> confirmar(
   required String confirmar,
   String cancelar = 'Cancelar',
   bool perigo = false,
+  bool destacarCancelar = false,
+  IconData? icone,
+  bool iconeAviso = true,
 }) async {
   final r = await mostrarFolha<bool>(
     context,
-    builder: (ctx) => SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          TatuMedidas.margem,
-          10,
-          TatuMedidas.margem,
-          TatuMedidas.base,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const AlcaFolha(),
-            const SizedBox(height: 26),
-            Text(
-              titulo,
-              textAlign: TextAlign.center,
-              style: TatuTexto.tituloFolha,
-            ),
-            const SizedBox(height: 8),
-            Text(texto, textAlign: TextAlign.center, style: TatuTexto.corpo),
-            const SizedBox(height: TatuMedidas.entreSecoes),
-            FilledButton(
-              style: perigo
-                  ? FilledButton.styleFrom(
-                      backgroundColor: TatuColors.dangerSoft,
-                      foregroundColor: TatuColors.danger,
-                    )
-                  : null,
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: Text(confirmar),
-            ),
-            const SizedBox(height: 10),
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: TatuColors.fill,
-                foregroundColor: TatuColors.textPrimary,
+    builder: (ctx) {
+      final botaoConfirmar = FilledButton(
+        style: perigo
+            ? FilledButton.styleFrom(
+                backgroundColor: TatuColors.dangerSoft,
+                foregroundColor: TatuColors.danger,
+              )
+            : destacarCancelar
+            ? tatuBotaoSecundario()
+            : null,
+        onPressed: () => Navigator.of(ctx).pop(true),
+        child: Text(confirmar),
+      );
+      final botaoCancelar = FilledButton(
+        style: destacarCancelar ? null : tatuBotaoSecundario(),
+        onPressed: () => Navigator.of(ctx).pop(false),
+        child: Text(cancelar),
+      );
+      return SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            TatuMedidas.margem,
+            10,
+            TatuMedidas.margem,
+            TatuMedidas.base,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const AlcaFolha(),
+              const SizedBox(height: 26),
+              if (icone != null) ...[
+                Center(
+                  child: Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: iconeAviso
+                          ? TatuColors.warningSoft
+                          : TatuColors.fill,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icone,
+                      size: 26,
+                      color: iconeAviso
+                          ? TatuColors.warningTexto
+                          : TatuColors.textPrimary,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+              Text(
+                titulo,
+                textAlign: TextAlign.center,
+                style: TatuTexto.tituloFolha,
               ),
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: Text(cancelar),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(texto, textAlign: TextAlign.center, style: TatuTexto.corpo),
+              const SizedBox(height: TatuMedidas.entreSecoes),
+              if (destacarCancelar) botaoCancelar else botaoConfirmar,
+              const SizedBox(height: 10),
+              if (destacarCancelar) botaoConfirmar else botaoCancelar,
+            ],
+          ),
         ),
-      ),
-    ),
+      );
+    },
   );
   return r ?? false;
 }

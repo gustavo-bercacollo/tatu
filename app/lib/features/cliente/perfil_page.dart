@@ -5,12 +5,14 @@ import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
 import '../../core/theme/tatu_texto.dart';
 import '../../data/enderecos.dart';
+import '../../data/notificacoes.dart';
 import '../../data/pagamentos.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import '../../shared/widgets/lista_agrupada.dart';
 import '../entrada/boas_vindas_page.dart';
 import 'avaliacoes/minhas_avaliacoes_page.dart';
 import 'endereco/enderecos_page.dart';
+import 'notificacoes/notificacoes_page.dart';
 import 'pagamento/pagamento_page.dart';
 
 /// Perfil do cliente: dados, troca de modo e atalhos da conta.
@@ -40,7 +42,7 @@ class PerfilClientePage extends StatelessWidget {
       ..showSnackBar(SnackBar(content: Text('$o: em breve')));
 
     return ListenableBuilder(
-      listenable: Listenable.merge([enderecos, pagamentos]),
+      listenable: Listenable.merge([enderecos, pagamentos, notificacoes]),
       builder: (context, _) => _tela(context, emBreve),
     );
   }
@@ -174,8 +176,12 @@ class PerfilClientePage extends StatelessWidget {
                     ItemLista(
                       icone: TablerIcons.bell,
                       texto: 'Notificações',
-                      valor: 'Ativadas',
-                      onTap: () => emBreve('Notificações'),
+                      valor: notificacoes.ativas ? 'Ativadas' : 'Desativadas',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const NotificacoesPage(),
+                        ),
+                      ),
                     ),
                     ItemLista(
                       icone: TablerIcons.user,

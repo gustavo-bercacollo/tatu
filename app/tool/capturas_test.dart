@@ -3,12 +3,15 @@
 //   flutter test tool/capturas_test.dart --update-goldens
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/avaliacoes.dart';
 import 'package:tatu/data/enderecos.dart';
+import 'package:tatu/data/notificacoes.dart';
+import 'package:tatu/features/cliente/notificacoes/notificacoes_page.dart';
 import 'package:tatu/features/cliente/avaliacoes/avaliacao_page.dart';
 import 'package:tatu/features/cliente/avaliacoes/minhas_avaliacoes_page.dart';
 import 'package:tatu/data/pagamentos.dart';
@@ -58,6 +61,7 @@ Future<void> _capturar(
   enderecos.restaurar();
   pagamentos.restaurar();
   avaliacoes.restaurar();
+  notificacoes.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -324,6 +328,34 @@ void main() {
       t,
       'avaliacao-detalhe',
       AvaliacaoPage(avaliacao: AvaliacoesRepo().recebidas.first),
+    );
+  });
+
+  testWidgets('notificacoes', (t) async {
+    await _capturar(t, 'notificacoes', const NotificacoesPage());
+  });
+
+  testWidgets('notificacoes-desativadas', (t) async {
+    await _capturar(
+      t,
+      'notificacoes-desativadas',
+      const NotificacoesPage(),
+      preparar: () async {
+        notificacoes.negarNoCelular();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('notificacoes-desligar', (t) async {
+    await _capturar(
+      t,
+      'notificacoes-desligar',
+      const NotificacoesPage(),
+      preparar: () async {
+        await t.tap(find.byType(CupertinoSwitch).first);
+        await t.pumpAndSettle();
+      },
     );
   });
 

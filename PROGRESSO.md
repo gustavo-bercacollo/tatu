@@ -35,6 +35,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] C4 Endereço (7 telas) — `features/cliente/endereco/`: folha "Onde é o serviço?" (pelo topo da Home), Buscar endereço, Confirme no mapa, Localização desativada, Endereços (pelo Perfil), Endereços vazio, Editar endereço. Dados simulados em `data/enderecos.dart` (`enderecos`, ChangeNotifier). Falta: mapa e localização reais, "Abrir Ajustes"
 - [x] Pagamento (6 telas) — `features/cliente/pagamento/`: Pagamento (lista e vazio), Novo cartão (normal e recusado), Cartão (detalhe), folha Remover. Pelo Perfil → Pagamento. Dados simulados em `data/pagamentos.dart` (recusa cartões terminados em 0002). Falta: ler cartão com a câmera
 - [x] Minhas avaliações (4 telas) — `features/cliente/avaliacoes/`: Recebidas (média, barras, tags, recentes), Enviadas, vazio, detalhe. Pelo Perfil. Dados simulados em `data/avaliacoes.dart`. Falta: contestar e recibo do serviço
+- [x] Notificações (3 telas) — `features/cliente/notificacoes/`: lista com "Ativar todas", desativadas no celular (aviso vermelho), folha "Desligar este aviso?" (só avisos de pedido). Pelo Perfil (mostra Ativadas/Desativadas). Dados simulados em `data/notificacoes.dart`. Componentes `GrupoCartao`/`LinhaInterruptor`. Falta: permissão real e "Abrir Ajustes"
 - [x] Padronização: `TatuMedidas`, `TatuTexto`, `TelaInterna`, `EstadoVazio`, `mostrarFolha`/`confirmar`, `LinhaIcone` (ver CLAUDE.md)
 - [ ] C1 Abertura
 - [ ] C3 Home (vazia, IA marcou, conflito, Outros)

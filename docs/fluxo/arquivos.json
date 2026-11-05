@@ -83,5 +83,8 @@
  "app/avaliacao-detalhe.png": "docs/fluxo/app/avaliacao-detalhe.png",
  "app/avaliacoes-enviadas.png": "docs/fluxo/app/avaliacoes-enviadas.png",
  "app/avaliacoes-recebidas.png": "docs/fluxo/app/avaliacoes-recebidas.png",
- "app/avaliacoes-vazio.png": "docs/fluxo/app/avaliacoes-vazio.png"
+ "app/avaliacoes-vazio.png": "docs/fluxo/app/avaliacoes-vazio.png",
+ "app/notificacoes.png": "docs/fluxo/app/notificacoes.png",
+ "app/notificacoes-desativadas.png": "docs/fluxo/app/notificacoes-desativadas.png",
+ "app/notificacoes-desligar.png": "docs/fluxo/app/notificacoes-desligar.png"
 }
