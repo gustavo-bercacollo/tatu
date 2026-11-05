@@ -7,6 +7,8 @@ const avataresProntos = [
   'assets/avatares/avatar-2.png',
   'assets/avatares/avatar-3.png',
   'assets/avatares/avatar-4.png',
+  'assets/avatares/avatar-5.png',
+  'assets/avatares/avatar-6.png',
 ];
 
 /// De onde vem a foto do perfil.

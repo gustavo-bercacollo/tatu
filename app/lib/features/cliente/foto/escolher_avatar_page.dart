@@ -43,8 +43,9 @@ class _EscolherAvatarPageState extends State<EscolherAvatarPage> {
             style: TatuTexto.detalhe,
           ),
           const SizedBox(height: TatuMedidas.entreSecoes + 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceEvenly,
+            runSpacing: TatuMedidas.entreSecoes,
             children: [
               for (final (i, a) in avataresProntos.indexed)
                 Semantics(
