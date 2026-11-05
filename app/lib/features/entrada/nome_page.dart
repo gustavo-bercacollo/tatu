@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../shared/widgets/cadastro_scaffold.dart';
-import '../cliente/home_page.dart';
 import '../../shared/widgets/tatu_field.dart';
+import '../cliente/home_page.dart';
 
 /// Cadastro · seu nome: como o profissional vai chamar o cliente.
 class NomePage extends StatefulWidget {

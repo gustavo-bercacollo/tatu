@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../core/theme/tatu_medidas.dart';
+import '../../core/theme/tatu_texto.dart';
 import '../../data/enderecos.dart';
 import '../../data/sugestao_servico.dart';
 import '../../shared/widgets/abas_cliente.dart';
@@ -81,13 +83,18 @@ class _HomeClientePageState extends State<HomeClientePage> {
         bottom: false,
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 430),
+            constraints: const BoxConstraints(maxWidth: TatuMedidas.larguraMax),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
+                    padding: const EdgeInsets.fromLTRB(
+                      TatuMedidas.margem,
+                      14,
+                      TatuMedidas.margem,
+                      12,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -95,10 +102,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
                         const SizedBox(height: 40),
                         Text(
                           'Oi, ${widget.nome.split(' ').first}',
-                          style: const TextStyle(
-                            fontSize: 15,
-                            color: TatuColors.textSecondary,
-                          ),
+                          style: TatuTexto.detalhe,
                         ),
                         const SizedBox(height: 10),
                         const Text(
@@ -172,7 +176,12 @@ class _HomeClientePageState extends State<HomeClientePage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 17),
+                  padding: const EdgeInsets.fromLTRB(
+                    TatuMedidas.margem,
+                    0,
+                    TatuMedidas.margem,
+                    17,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -295,7 +304,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
       height: 150,
       decoration: BoxDecoration(
         color: TatuColors.fill,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
       ),
       child: Stack(
         children: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../core/theme/tatu_medidas.dart';
 
 /// Botão com contorno tracejado para "adicionar" (ex.: Adicionar endereço).
 class BotaoTracejado extends StatelessWidget {
@@ -20,7 +21,7 @@ class BotaoTracejado extends StatelessWidget {
         child: CustomPaint(
           painter: const _Tracejado(),
           child: SizedBox(
-            height: 56,
+            height: TatuMedidas.alturaBotao,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -54,7 +55,7 @@ class _Tracejado extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final rrect = RRect.fromRectAndRadius(
       Offset.zero & size,
-      const Radius.circular(18),
+      const Radius.circular(TatuMedidas.raioCartao),
     ).deflate(0.75);
     final tinta = Paint()
       ..color = TatuColors.textSecondary

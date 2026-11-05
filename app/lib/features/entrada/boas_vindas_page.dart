@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../core/theme/tatu_medidas.dart';
 import '../../shared/widgets/option_card.dart';
 import 'celular_page.dart';
 
@@ -23,7 +24,7 @@ class BoasVindasPage extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 430),
+            constraints: const BoxConstraints(maxWidth: TatuMedidas.larguraMax),
             // Rola só se a tela for baixa; senão o rodapé fica embaixo.
             child: LayoutBuilder(
               builder: (context, constraints) => SingleChildScrollView(
@@ -41,7 +42,9 @@ class BoasVindasPage extends StatelessWidget {
 
   Widget _conteudo(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(
+        horizontal: TatuMedidas.margemCadastro,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

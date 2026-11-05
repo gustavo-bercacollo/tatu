@@ -73,5 +73,11 @@
  "app/localizacao-desativada.png": "docs/fluxo/app/localizacao-desativada.png",
  "app/enderecos.png": "docs/fluxo/app/enderecos.png",
  "app/enderecos-vazio.png": "docs/fluxo/app/enderecos-vazio.png",
- "app/editar-endereco.png": "docs/fluxo/app/editar-endereco.png"
+ "app/editar-endereco.png": "docs/fluxo/app/editar-endereco.png",
+ "app/cartao-remover.png": "docs/fluxo/app/cartao-remover.png",
+ "app/cartao.png": "docs/fluxo/app/cartao.png",
+ "app/novo-cartao-recusado.png": "docs/fluxo/app/novo-cartao-recusado.png",
+ "app/novo-cartao.png": "docs/fluxo/app/novo-cartao.png",
+ "app/pagamento-vazio.png": "docs/fluxo/app/pagamento-vazio.png",
+ "app/pagamento.png": "docs/fluxo/app/pagamento.png"
 }

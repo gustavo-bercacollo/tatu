@@ -8,6 +8,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/enderecos.dart';
+import 'package:tatu/data/pagamentos.dart';
+import 'package:tatu/features/cliente/pagamento/cartao_page.dart';
+import 'package:tatu/features/cliente/pagamento/novo_cartao_page.dart';
+import 'package:tatu/features/cliente/pagamento/pagamento_page.dart';
 import 'package:tatu/features/cliente/endereco/buscar_endereco_page.dart';
 import 'package:tatu/features/cliente/endereco/confirmar_endereco_page.dart';
 import 'package:tatu/features/cliente/endereco/editar_endereco_page.dart';
@@ -49,6 +53,7 @@ Future<void> _capturar(
   tester.view.physicalSize = const Size(786, 1704); // 393×852 @2x
   tester.view.devicePixelRatio = 2;
   enderecos.restaurar();
+  pagamentos.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -204,6 +209,84 @@ void main() {
             .state<EditableTextState>(find.byType(EditableText).at(2))
             .requestKeyboard();
         await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pagamento', (t) async {
+    await _capturar(t, 'pagamento', const PagamentoPage());
+  });
+
+  testWidgets('pagamento-vazio', (t) async {
+    await _capturar(
+      t,
+      'pagamento-vazio',
+      const PagamentoPage(),
+      preparar: () async {
+        for (final c in pagamentos.cartoes) {
+          pagamentos.remover(c);
+        }
+        await t.pump();
+      },
+    );
+  });
+
+  Future<void> preencherCartao(WidgetTester t, String numero) async {
+    final campos = find.byType(TextField);
+    await t.enterText(campos.at(0), numero);
+    await t.enterText(campos.at(1), '0828');
+    await t.enterText(campos.at(2), '123');
+    await t.enterText(campos.at(3), 'ANA MARTINS');
+    await t.enterText(campos.at(4), '12345678900');
+    await t.pump();
+  }
+
+  testWidgets('novo-cartao', (t) async {
+    await _capturar(
+      t,
+      'novo-cartao',
+      NovoCartaoPage(agora: DateTime(2026, 11, 5)),
+      preparar: () async {
+        await preencherCartao(t, '4242424242424242');
+        t
+            .state<EditableTextState>(find.byType(EditableText).at(0))
+            .requestKeyboard();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('novo-cartao-recusado', (t) async {
+    await _capturar(
+      t,
+      'novo-cartao-recusado',
+      NovoCartaoPage(agora: DateTime(2026, 11, 5)),
+      preparar: () async {
+        await preencherCartao(t, '4000000000000002');
+        await t.tap(find.text('Salvar cartão'));
+        await t.pump();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('cartao', (t) async {
+    await _capturar(
+      t,
+      'cartao',
+      CartaoPage(cartao: PagamentosRepo().cartoes.first),
+    );
+  });
+
+  testWidgets('cartao-remover', (t) async {
+    await _capturar(
+      t,
+      'cartao-remover',
+      CartaoPage(cartao: PagamentosRepo().cartoes.first),
+      preparar: () async {
+        await t.tap(find.text('Remover cartão'));
+        await t.pumpAndSettle();
       },
     );
   });

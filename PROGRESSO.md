@@ -33,6 +33,8 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] C13 Perfil do cliente — `features/cliente/perfil_page.dart` (abre pelo avatar; "Trocar para modo profissional" e demais linhas ainda "em breve"; Sair da conta → Boas-vindas). Componentes `GrupoLista`/`ItemLista` e `AbasCliente` em `shared/widgets`
 - Troca de modo desenhada (só no fluxograma): Perfil do profissional com "Trocar para modo cliente", folha "Ficar offline e trocar?" (P21b) e "Termine o serviço antes de trocar" (P25b)
 - [x] C4 Endereço (7 telas) — `features/cliente/endereco/`: folha "Onde é o serviço?" (pelo topo da Home), Buscar endereço, Confirme no mapa, Localização desativada, Endereços (pelo Perfil), Endereços vazio, Editar endereço. Dados simulados em `data/enderecos.dart` (`enderecos`, ChangeNotifier). Falta: mapa e localização reais, "Abrir Ajustes"
+- [x] Pagamento (6 telas) — `features/cliente/pagamento/`: Pagamento (lista e vazio), Novo cartão (normal e recusado), Cartão (detalhe), folha Remover. Pelo Perfil → Pagamento. Dados simulados em `data/pagamentos.dart` (recusa cartões terminados em 0002). Falta: ler cartão com a câmera
+- [x] Padronização: `TatuMedidas`, `TatuTexto`, `TelaInterna`, `EstadoVazio`, `mostrarFolha`/`confirmar`, `LinhaIcone` (ver CLAUDE.md)
 - [ ] C1 Abertura
 - [ ] C3 Home (vazia, IA marcou, conflito, Outros)
 - [ ] C4 Endereço

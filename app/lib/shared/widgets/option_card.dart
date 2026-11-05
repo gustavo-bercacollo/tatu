@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../core/theme/tatu_medidas.dart';
 
 /// Cartão de escolha: ícone num círculo branco, título, descrição e seta.
 class OptionCard extends StatelessWidget {
@@ -22,10 +23,10 @@ class OptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: TatuColors.fill,
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
         highlightColor: TatuColors.fill,
         child: Padding(
           padding: const EdgeInsets.all(18),

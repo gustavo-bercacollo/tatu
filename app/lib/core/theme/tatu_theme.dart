@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'tatu_colors.dart';
 
+/// Botão secundário: cinza claro com texto preto (ex.: "Usar e-mail").
+ButtonStyle tatuBotaoSecundario() => FilledButton.styleFrom(
+  backgroundColor: TatuColors.fill,
+  foregroundColor: TatuColors.textPrimary,
+);
+
 ThemeData tatuTheme() => ThemeData(
   useMaterial3: true,
   fontFamily: 'Inter',

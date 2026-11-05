@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../core/theme/tatu_medidas.dart';
 import '../../shared/widgets/cadastro_scaffold.dart';
 import '../cliente/home_page.dart';
 import 'nome_page.dart';
@@ -239,7 +240,7 @@ class _Caixa extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: TatuColors.fill,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(TatuMedidas.raioCodigo),
         border: Border.all(
           color: atual ? TatuColors.textPrimary : Colors.transparent,
           width: 1.5,

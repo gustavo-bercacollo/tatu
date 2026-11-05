@@ -1,0 +1,35 @@
+/// Medidas padrão do Tatu. Toda tela usa estes valores; nada de números
+/// soltos de margem, raio ou altura nas telas.
+class TatuMedidas {
+  TatuMedidas._();
+
+  // Margens laterais
+  static const margem = 20.0; // telas internas, Home, Perfil, folhas
+  static const margemCadastro = 24.0; // entrada e cadastro (guia de design)
+
+  // Respiro vertical das telas
+  static const topo = 20.0; // acima do botão de voltar / topo
+  static const base = 24.0; // abaixo do último botão
+
+  // Espaços entre blocos
+  static const entreItens = 12.0; // campos e cartões seguidos
+  static const entreSecoes = 24.0; // seções (ex.: lista → botão tracejado)
+  static const tituloSecao = 8.0; // título em maiúsculas → cartão
+
+  // Raios
+  static const raioCartao = 18.0; // cartões, listas agrupadas, caixas
+  static const raioCampo = 16.0; // campos de texto e busca
+  static const raioOpcao = 22.0; // cartões grandes de escolha (Boas-vindas)
+  static const raioFolha = 30.0; // topo das folhas
+  static const raioCodigo = 14.0; // caixinhas do código
+
+  // Alturas
+  static const alturaBotao = 56.0;
+  static const alturaCampo = 62.0;
+  static const alturaBusca = 48.0;
+  static const alturaChip = 38.0;
+  static const alturaLinha = 52.0;
+
+  /// Largura máxima do conteúdo (no computador a tela não estica).
+  static const larguraMax = 430.0;
+}

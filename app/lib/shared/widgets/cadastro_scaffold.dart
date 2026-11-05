@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../core/theme/tatu_medidas.dart';
+import '../../core/theme/tatu_theme.dart';
 import 'back_circle_button.dart';
 
 /// Esqueleto das telas de cadastro: voltar, título, subtítulo, conteúdo
@@ -35,9 +37,14 @@ class CadastroScaffold extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 430),
+            constraints: const BoxConstraints(maxWidth: TatuMedidas.larguraMax),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+              padding: const EdgeInsets.fromLTRB(
+                TatuMedidas.margemCadastro,
+                TatuMedidas.topo,
+                TatuMedidas.margemCadastro,
+                TatuMedidas.base,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -81,10 +88,7 @@ class CadastroScaffold extends StatelessWidget {
                     const SizedBox(height: 10),
                     FilledButton(
                       onPressed: onSecundario,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: TatuColors.fill,
-                        foregroundColor: TatuColors.textPrimary,
-                      ),
+                      style: tatuBotaoSecundario(),
                       child: Text(botaoSecundario!),
                     ),
                   ],

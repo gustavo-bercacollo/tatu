@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../core/theme/tatu_medidas.dart';
 
 /// Campo de busca cinza com lupa e botão de limpar. Com [onTap] e sem
 /// [controller], vira só um atalho que abre a tela de busca.
@@ -27,11 +28,11 @@ class CampoBusca extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 48,
+        height: TatuMedidas.alturaBusca,
         padding: const EdgeInsets.only(left: 14, right: 10),
         decoration: BoxDecoration(
           color: TatuColors.fill,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
         ),
         child: Row(
           children: [

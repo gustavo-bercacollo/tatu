@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../core/theme/tatu_medidas.dart';
+import '../../core/theme/tatu_texto.dart';
 import '../../shared/widgets/cadastro_scaffold.dart';
 import '../../shared/widgets/tatu_field.dart';
 import 'codigo_page.dart';
@@ -76,11 +78,11 @@ class _CelularPageState extends State<CelularPage> {
           children: [
             Container(
               width: 86,
-              height: 62,
+              height: TatuMedidas.alturaCampo,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: TatuColors.fill,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
               ),
               child: const Text(
                 'BR +55',
@@ -123,10 +125,7 @@ class _CelularPageState extends State<CelularPage> {
               ],
             ),
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 15,
-              color: TatuColors.textSecondary,
-            ),
+            style: TatuTexto.detalhe,
           ),
         ] else ...[
           const SizedBox(height: 14),

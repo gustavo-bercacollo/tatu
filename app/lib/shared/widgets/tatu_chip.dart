@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../core/theme/tatu_medidas.dart';
 
 /// Chip em pílula (38 px): cinza; selecionado fica preto, com ícone opcional.
 class TatuChip extends StatelessWidget {
@@ -32,7 +33,7 @@ class TatuChip extends StatelessWidget {
           onTap: onTap,
           customBorder: const StadiumBorder(),
           child: Container(
-            height: 38,
+            height: TatuMedidas.alturaChip,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               mainAxisSize: MainAxisSize.min,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../core/theme/tatu_medidas.dart';
+import '../../core/theme/tatu_texto.dart';
 
 /// Grupo da lista agrupada (estilo Ajustes do iPhone): título opcional em
 /// maiúsculas e um cartão branco com as linhas separadas por divisores.
@@ -18,20 +20,17 @@ class GrupoLista extends StatelessWidget {
       children: [
         if (titulo != null)
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Text(
-              titulo!.toUpperCase(),
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.4,
-                color: TatuColors.textSecondary,
-              ),
+            padding: const EdgeInsets.fromLTRB(
+              16,
+              0,
+              16,
+              TatuMedidas.tituloSecao,
             ),
+            child: Text(titulo!.toUpperCase(), style: TatuTexto.secao),
           ),
         Material(
           color: TatuColors.bg,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
           clipBehavior: Clip.antiAlias,
           child: Column(
             children: [
@@ -78,7 +77,7 @@ class ItemLista extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: SizedBox(
-        height: 52,
+        height: TatuMedidas.alturaLinha,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(

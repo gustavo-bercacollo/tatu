@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tatu_colors.dart';
+import '../../../core/theme/tatu_medidas.dart';
 import '../../../data/enderecos.dart';
 import '../../../shared/widgets/tatu_chip.dart';
 import '../../../shared/widgets/tatu_field.dart';
-import '../../../shared/widgets/topo_tela.dart';
+import '../../../shared/widgets/tela_interna.dart';
 
 /// Editar endereço: nome, complemento e tipo; salvar ou excluir.
 class EditarEnderecoPage extends StatefulWidget {
@@ -53,85 +54,59 @@ class _EditarEnderecoPageState extends State<EditarEnderecoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 430),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TopoTela(
-                    titulo: 'Editar endereço',
-                    acao: 'Salvar',
-                    onAcao: _salvar,
-                  ),
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.fromLTRB(4, 36, 4, 0),
-                      children: [
-                        TatuField(
-                          label: 'Nome',
-                          controller: _nome,
-                          textCapitalization: TextCapitalization.sentences,
-                          textInputAction: TextInputAction.next,
-                        ),
-                        const SizedBox(height: 12),
-                        TatuField(
-                          label: 'Endereço',
-                          controller: _rua,
-                          readOnly: true,
-                        ),
-                        const SizedBox(height: 12),
-                        TatuField(
-                          label: 'Complemento',
-                          controller: _complemento,
-                          textCapitalization: TextCapitalization.sentences,
-                          textInputAction: TextInputAction.done,
-                          onSubmitted: (_) => _salvar(),
-                        ),
-                        const SizedBox(height: 30),
-                        const Text(
-                          'Tipo',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: TatuColors.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Wrap(
-                          spacing: 8,
-                          children: [
-                            for (final t in TipoEndereco.values)
-                              TatuChip(
-                                label: t.rotulo,
-                                selecionado: _tipo == t,
-                                onTap: () => setState(() => _tipo = t),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: _excluir,
-                    style: TextButton.styleFrom(
-                      foregroundColor: TatuColors.danger,
-                      minimumSize: const Size.fromHeight(48),
-                    ),
-                    child: const Text(
-                      'Excluir endereço',
-                      style: TextStyle(fontSize: 17),
-                    ),
-                  ),
-                ],
-              ),
+    return TelaInterna(
+      titulo: 'Editar endereço',
+      acao: 'Salvar',
+      onAcao: _salvar,
+      corpo: ListView(
+        padding: const EdgeInsets.only(top: 36),
+        children: [
+          TatuField(
+            label: 'Nome',
+            controller: _nome,
+            textCapitalization: TextCapitalization.sentences,
+            textInputAction: TextInputAction.next,
+          ),
+          const SizedBox(height: TatuMedidas.entreItens),
+          TatuField(label: 'Endereço', controller: _rua, readOnly: true),
+          const SizedBox(height: TatuMedidas.entreItens),
+          TatuField(
+            label: 'Complemento',
+            controller: _complemento,
+            textCapitalization: TextCapitalization.sentences,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _salvar(),
+          ),
+          const SizedBox(height: 30),
+          const Text(
+            'Tipo',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: TatuColors.textSecondary,
             ),
           ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            children: [
+              for (final t in TipoEndereco.values)
+                TatuChip(
+                  label: t.rotulo,
+                  selecionado: _tipo == t,
+                  onTap: () => setState(() => _tipo = t),
+                ),
+            ],
+          ),
+        ],
+      ),
+      rodape: TextButton(
+        onPressed: _excluir,
+        style: TextButton.styleFrom(
+          foregroundColor: TatuColors.danger,
+          minimumSize: const Size.fromHeight(48),
         ),
+        child: const Text('Excluir endereço', style: TextStyle(fontSize: 17)),
       ),
     );
   }

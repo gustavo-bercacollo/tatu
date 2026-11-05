@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../core/theme/tatu_medidas.dart';
 
 /// Campo de texto do guia: fundo cinza, rótulo pequeno dentro e valor
-/// embaixo; contorno preto no foco e vermelho com [errorText].
+/// embaixo; contorno preto no foco e vermelho com [errorText] (texto vazio
+/// marca só a borda).
 /// Sem [label], mostra só o valor (ou o [hintText]) no meio do campo.
 class TatuField extends StatefulWidget {
   const TatuField({
@@ -20,6 +22,7 @@ class TatuField extends StatefulWidget {
     this.inputFormatters,
     this.autofocus = false,
     this.readOnly = false,
+    this.obscureText = false,
     this.onChanged,
     this.onSubmitted,
   });
@@ -37,6 +40,9 @@ class TatuField extends StatefulWidget {
 
   /// Só leitura: mostra o valor sem abrir o teclado nem ganhar contorno.
   final bool readOnly;
+
+  /// Esconde o que foi digitado (ex.: CVV).
+  final bool obscureText;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
 
@@ -74,11 +80,11 @@ class _TatuFieldState extends State<TatuField> {
         GestureDetector(
           onTap: _focus.requestFocus,
           child: Container(
-            height: 62,
+            height: TatuMedidas.alturaCampo,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: TatuColors.fill,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
               border: Border.all(color: borderColor, width: 1.5),
             ),
             child: Column(
@@ -101,6 +107,8 @@ class _TatuFieldState extends State<TatuField> {
                   focusNode: _focus,
                   autofocus: widget.autofocus,
                   readOnly: widget.readOnly,
+                  obscureText: widget.obscureText,
+                  obscuringCharacter: '•',
                   showCursor: !widget.readOnly,
                   keyboardType: widget.keyboardType,
                   textInputAction: widget.textInputAction,
@@ -126,7 +134,7 @@ class _TatuFieldState extends State<TatuField> {
             ),
           ),
         ),
-        if (widget.errorText != null) ...[
+        if (widget.errorText?.isNotEmpty ?? false) ...[
           const SizedBox(height: 8),
           Text(
             widget.errorText!,

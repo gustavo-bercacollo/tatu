@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../core/theme/tatu_medidas.dart';
+import '../../core/theme/tatu_texto.dart';
+import '../../data/enderecos.dart';
+import '../../data/pagamentos.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import '../../shared/widgets/lista_agrupada.dart';
-import '../../data/enderecos.dart';
 import '../entrada/boas_vindas_page.dart';
 import 'endereco/enderecos_page.dart';
+import 'pagamento/pagamento_page.dart';
 
 /// Perfil do cliente: dados, troca de modo e atalhos da conta.
 class PerfilClientePage extends StatelessWidget {
@@ -35,7 +39,7 @@ class PerfilClientePage extends StatelessWidget {
       ..showSnackBar(SnackBar(content: Text('$o: em breve')));
 
     return ListenableBuilder(
-      listenable: enderecos,
+      listenable: Listenable.merge([enderecos, pagamentos]),
       builder: (context, _) => _tela(context, emBreve),
     );
   }
@@ -50,9 +54,14 @@ class PerfilClientePage extends StatelessWidget {
         bottom: false,
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 430),
+            constraints: const BoxConstraints(maxWidth: TatuMedidas.larguraMax),
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 26, 20, 24),
+              padding: const EdgeInsets.fromLTRB(
+                TatuMedidas.margem,
+                26,
+                TatuMedidas.margem,
+                TatuMedidas.base,
+              ),
               children: [
                 Center(
                   child: Container(
@@ -106,13 +115,7 @@ class PerfilClientePage extends StatelessWidget {
                       color: TatuColors.warning,
                     ),
                     const SizedBox(width: 6),
-                    Text(
-                      '$nota · $pedidos pedidos',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: TatuColors.textSecondary,
-                      ),
-                    ),
+                    Text('$nota · $pedidos pedidos', style: TatuTexto.detalhe),
                   ],
                 ),
                 const SizedBox(height: 26),
@@ -145,8 +148,12 @@ class PerfilClientePage extends StatelessWidget {
                     ItemLista(
                       icone: TablerIcons.credit_card,
                       texto: 'Pagamento',
-                      valor: 'Visa 4242',
-                      onTap: () => emBreve('Pagamento'),
+                      valor: pagamentos.padrao?.curto ?? 'Adicionar',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const PagamentoPage(),
+                        ),
+                      ),
                     ),
                   ],
                 ),

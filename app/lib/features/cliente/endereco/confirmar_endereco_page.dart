@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_colors.dart';
+import '../../../core/theme/tatu_medidas.dart';
 import '../../../data/enderecos.dart';
+import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/tatu_chip.dart';
 import '../../../shared/widgets/tatu_field.dart';
 
@@ -61,8 +63,8 @@ class _ConfirmarEnderecoPageState extends State<ConfirmarEnderecoPage> {
                 ),
                 const Center(child: _Pino()),
                 Positioned(
-                  left: 20,
-                  top: topo + 20,
+                  left: TatuMedidas.margem,
+                  top: topo + TatuMedidas.topo,
                   child: Semantics(
                     button: true,
                     label: 'Voltar',
@@ -89,26 +91,24 @@ class _ConfirmarEnderecoPageState extends State<ConfirmarEnderecoPage> {
           DecoratedBox(
             decoration: const BoxDecoration(
               color: TatuColors.bg,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(TatuMedidas.raioFolha),
+              ),
             ),
             child: SafeArea(
               top: false,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                padding: const EdgeInsets.fromLTRB(
+                  TatuMedidas.margem,
+                  10,
+                  TatuMedidas.margem,
+                  TatuMedidas.margem,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Center(
-                      child: Container(
-                        width: 36,
-                        height: 5,
-                        decoration: BoxDecoration(
-                          color: TatuColors.fillStrong,
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                      ),
-                    ),
+                    const AlcaFolha(),
                     const SizedBox(height: 20),
                     const Text(
                       'Confirme o endereço',

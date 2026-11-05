@@ -2,34 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_colors.dart';
+import '../../../core/theme/tatu_medidas.dart';
+import '../../../core/theme/tatu_texto.dart';
 import '../../../data/enderecos.dart';
 import '../../../shared/widgets/botao_tracejado.dart';
 import '../../../shared/widgets/campo_busca.dart';
+import '../../../shared/widgets/folha.dart';
+import '../../../shared/widgets/linha_icone.dart';
 import 'buscar_endereco_page.dart';
-import 'linha_endereco.dart';
+import 'icone_endereco.dart';
 import 'localizacao_desativada_page.dart';
 
 /// Folha "Onde é o serviço?", aberta pelo endereço no topo da Home.
 Future<void> abrirOndeServico(BuildContext context) {
   final nav = Navigator.of(context);
-  return showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    backgroundColor: TatuColors.bg,
-    barrierColor: TatuColors.scrim,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-    ),
-    builder: (ctx) => FractionallySizedBox(
-      heightFactor: 0.9,
-      child: _OndeServico(
-        // Fecha a folha e abre a próxima tela na pilha da Home.
-        ir: (tela) {
-          Navigator.of(ctx).pop();
-          nav.push(MaterialPageRoute(builder: (_) => tela));
-        },
-      ),
+  return mostrarFolha<void>(
+    context,
+    alturaRelativa: 0.9,
+    builder: (ctx) => _OndeServico(
+      // Fecha a folha e abre a próxima tela na pilha da Home.
+      ir: (tela) {
+        Navigator.of(ctx).pop();
+        nav.push(MaterialPageRoute(builder: (_) => tela));
+      },
     ),
   );
 }
@@ -50,18 +45,14 @@ class _OndeServico extends StatelessWidget {
         final atual = enderecos.atual;
         const local = EnderecosRepo.localAtual;
         return ListView(
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+          padding: const EdgeInsets.fromLTRB(
+            TatuMedidas.margem,
+            10,
+            TatuMedidas.margem,
+            TatuMedidas.base,
+          ),
           children: [
-            Center(
-              child: Container(
-                width: 36,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: TatuColors.fillStrong,
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-            ),
+            const AlcaFolha(),
             const SizedBox(height: 20),
             Row(
               children: [
@@ -101,9 +92,9 @@ class _OndeServico extends StatelessWidget {
             const SizedBox(height: 16),
             Material(
               color: TatuColors.fill,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
               clipBehavior: Clip.antiAlias,
-              child: LinhaEndereco(
+              child: LinhaIcone(
                 icone: TablerIcons.navigation,
                 titulo: 'Usar minha localização atual',
                 detalhe: '${local.rua} · ${local.bairro}',
@@ -120,26 +111,23 @@ class _OndeServico extends StatelessWidget {
             ),
             if (salvos.isNotEmpty) ...[
               const Padding(
-                padding: EdgeInsets.fromLTRB(16, 24, 16, 8),
-                child: Text(
-                  'SALVOS',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.4,
-                    color: TatuColors.textSecondary,
-                  ),
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  TatuMedidas.entreSecoes,
+                  16,
+                  TatuMedidas.tituloSecao,
                 ),
+                child: Text('SALVOS', style: TatuTexto.secao),
               ),
               Material(
                 color: TatuColors.fill,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
                 clipBehavior: Clip.antiAlias,
                 child: Column(
                   children: [
                     for (var i = 0; i < salvos.length; i++) ...[
-                      if (i > 0) const DivisorEndereco(),
-                      LinhaEndereco(
+                      if (i > 0) const DivisorLinha(),
+                      LinhaIcone(
                         icone: iconeDoTipo(salvos[i].tipo),
                         titulo: salvos[i].nome,
                         detalhe: salvos[i].rua,
@@ -190,11 +178,7 @@ class _OndeServico extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'O profissional só vê o endereço exato\ndepois que você confirma o valor.',
-                      style: TextStyle(
-                        fontSize: 15,
-                        height: 1.3,
-                        color: TatuColors.textSecondary,
-                      ),
+                      style: TatuTexto.nota,
                     ),
                   ),
                 ],

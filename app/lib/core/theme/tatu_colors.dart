@@ -21,6 +21,9 @@ class TatuColors {
   static const verified = Color(0xFF007AFF);
   static const warning = Color(0xFFFF9F0A);
   static const danger = Color(0xFFFF3B30);
+
+  /// Fundo de erro e do botão de remover.
+  static const dangerSoft = Color(0xFFFFE5E5);
   static const hairline = Color(0x4A3C3C43);
   static const scrim = Color(0x61000000);
 }
