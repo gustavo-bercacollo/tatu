@@ -9,6 +9,7 @@ import '../../data/pagamentos.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import '../../shared/widgets/lista_agrupada.dart';
 import '../entrada/boas_vindas_page.dart';
+import 'avaliacoes/minhas_avaliacoes_page.dart';
 import 'endereco/enderecos_page.dart';
 import 'pagamento/pagamento_page.dart';
 
@@ -164,7 +165,11 @@ class PerfilClientePage extends StatelessWidget {
                     ItemLista(
                       icone: TablerIcons.star,
                       texto: 'Minhas avaliações',
-                      onTap: () => emBreve('Minhas avaliações'),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const MinhasAvaliacoesPage(),
+                        ),
+                      ),
                     ),
                     ItemLista(
                       icone: TablerIcons.bell,

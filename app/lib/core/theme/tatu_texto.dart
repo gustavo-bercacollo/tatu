@@ -27,6 +27,9 @@ class TatuTexto {
     color: TatuColors.textSecondary,
   );
 
+  /// Comentário de avaliação nos cartões.
+  static const comentario = TextStyle(fontSize: 16, height: 1.35);
+
   /// Avisos e dicas pequenas (cadeado, "Toque para editar"…).
   static const nota = TextStyle(
     fontSize: 13,

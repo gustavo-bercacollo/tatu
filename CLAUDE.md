@@ -62,7 +62,7 @@ Publicado em https://claude.ai/artifact/UbvPYpEqyP5sWj9cbtvT7B. Fonte: `docs/flu
   - `core/theme/tatu_medidas.dart` (`TatuMedidas`): margem 20 (telas internas, Home, Perfil, folhas) · margemCadastro 24 (entrada/cadastro) · topo 20 · base 24 · entreItens 12 · entreSecoes 24 · raioCartao 18 · raioCampo 16 · raioOpcao 22 · raioFolha 30 · alturaBotao 56 · alturaCampo 62 · alturaBusca 48 · alturaChip 38 · alturaLinha 52.
   - `core/theme/tatu_texto.dart` (`TatuTexto`): tituloFolha 22 · corpo 15 (folhas, estados vazios) · detalhe 15 cinza (linhas, "Oi, Ana") · nota 13 cinza (avisos/dicas) · secao 13 maiúsculas.
   - Botão secundário: `tatuBotaoSecundario()`.
-- **Componentes únicos** (`shared/widgets/`): `TelaInterna` (topo + margens de toda tela interna), `CadastroScaffold` (telas de cadastro), `EstadoVazio`, `mostrarFolha`/`AlcaFolha`/`confirmar` (folhas), `LinhaIcone`/`DivisorLinha`, `GrupoLista`/`ItemLista`, `TatuField`, `TatuChip`, `CampoBusca`, `BotaoTracejado`, `TopoTela`, `AbasCliente`. Tela nova reaproveita esses; se precisar de algo novo que se repete, vira componente aqui.
+- **Componentes únicos** (`shared/widgets/`): `TelaInterna` (topo + margens de toda tela interna), `CadastroScaffold` (telas de cadastro), `EstadoVazio`, `mostrarFolha`/`AlcaFolha`/`confirmar` (folhas), `LinhaIcone`/`DivisorLinha`, `GrupoLista`/`ItemLista`, `TatuField`, `TatuChip`, `CampoBusca`, `BotaoTracejado`, `TopoTela`, `AbasCliente`, `Segmento`, `Estrelas`, `AvatarIniciais`. Tela nova reaproveita esses; se precisar de algo novo que se repete, vira componente aqui.
 - Valor novo só entra no arquivo de medidas/textos, nunca direto na tela.
 
 ## Como trabalhar

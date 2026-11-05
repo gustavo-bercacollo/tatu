@@ -7,7 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
+import 'package:tatu/data/avaliacoes.dart';
 import 'package:tatu/data/enderecos.dart';
+import 'package:tatu/features/cliente/avaliacoes/avaliacao_page.dart';
+import 'package:tatu/features/cliente/avaliacoes/minhas_avaliacoes_page.dart';
 import 'package:tatu/data/pagamentos.dart';
 import 'package:tatu/features/cliente/pagamento/cartao_page.dart';
 import 'package:tatu/features/cliente/pagamento/novo_cartao_page.dart';
@@ -54,6 +57,7 @@ Future<void> _capturar(
   tester.view.devicePixelRatio = 2;
   enderecos.restaurar();
   pagamentos.restaurar();
+  avaliacoes.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -288,6 +292,38 @@ void main() {
         await t.tap(find.text('Remover cartão'));
         await t.pumpAndSettle();
       },
+    );
+  });
+
+  testWidgets('avaliacoes-recebidas', (t) async {
+    await _capturar(t, 'avaliacoes-recebidas', const MinhasAvaliacoesPage());
+  });
+
+  testWidgets('avaliacoes-enviadas', (t) async {
+    await _capturar(
+      t,
+      'avaliacoes-enviadas',
+      const MinhasAvaliacoesPage(aba: 1),
+    );
+  });
+
+  testWidgets('avaliacoes-vazio', (t) async {
+    await _capturar(
+      t,
+      'avaliacoes-vazio',
+      const MinhasAvaliacoesPage(),
+      preparar: () async {
+        avaliacoes.limpar();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('avaliacao-detalhe', (t) async {
+    await _capturar(
+      t,
+      'avaliacao-detalhe',
+      AvaliacaoPage(avaliacao: AvaliacoesRepo().recebidas.first),
     );
   });
 

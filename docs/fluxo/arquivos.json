@@ -79,5 +79,9 @@
  "app/novo-cartao-recusado.png": "docs/fluxo/app/novo-cartao-recusado.png",
  "app/novo-cartao.png": "docs/fluxo/app/novo-cartao.png",
  "app/pagamento-vazio.png": "docs/fluxo/app/pagamento-vazio.png",
- "app/pagamento.png": "docs/fluxo/app/pagamento.png"
+ "app/pagamento.png": "docs/fluxo/app/pagamento.png",
+ "app/avaliacao-detalhe.png": "docs/fluxo/app/avaliacao-detalhe.png",
+ "app/avaliacoes-enviadas.png": "docs/fluxo/app/avaliacoes-enviadas.png",
+ "app/avaliacoes-recebidas.png": "docs/fluxo/app/avaliacoes-recebidas.png",
+ "app/avaliacoes-vazio.png": "docs/fluxo/app/avaliacoes-vazio.png"
 }

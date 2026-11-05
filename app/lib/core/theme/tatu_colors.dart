@@ -19,7 +19,8 @@ class TatuColors {
   static const onAction = Color(0xFFFFFFFF);
   static const online = Color(0xFF34C759);
   static const verified = Color(0xFF007AFF);
-  static const warning = Color(0xFFFF9F0A);
+  static const warning = Color(0xFFFF9F0A); // também as estrelas
+  static const trilho = Color(0xFFE5E5EA); // fundo de seletor e de barras
   static const danger = Color(0xFFFF3B30);
 
   /// Fundo de erro e do botão de remover.

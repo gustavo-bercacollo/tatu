@@ -22,6 +22,7 @@ class TatuMedidas {
   static const raioOpcao = 22.0; // cartões grandes de escolha (Boas-vindas)
   static const raioFolha = 30.0; // topo das folhas
   static const raioCodigo = 14.0; // caixinhas do código
+  static const raioSegmento = 12.0; // seletor Recebidas/Enviadas
 
   // Alturas
   static const alturaBotao = 56.0;
@@ -29,6 +30,7 @@ class TatuMedidas {
   static const alturaBusca = 48.0;
   static const alturaChip = 38.0;
   static const alturaLinha = 52.0;
+  static const alturaSegmento = 36.0;
 
   /// Largura máxima do conteúdo (no computador a tela não estica).
   static const larguraMax = 430.0;
