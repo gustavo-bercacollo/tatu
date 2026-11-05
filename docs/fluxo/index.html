@@ -25,6 +25,8 @@
   --sync: #007AFF;
   --sync-soft: #E2EEFF;
   --lane: rgb(255 255 255 / .55);
+  --e-entrada: #5B57C9; --e-pedir: #8A2E5E; --e-procurar: #A55B1E; --e-combinar: #2E7D3E; --e-contaC: #2F6AA8;
+  --e-cadastro: #6B45B3; --e-chamados: #A3482A; --e-servico: #23786E; --e-contaP: #52657A;
   --lane-line: #D2D2DA;
   --font-ui: "Inter", -apple-system, "Segoe UI", system-ui, sans-serif;
   --font-code: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -33,12 +35,12 @@
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0F0F11; --grid: #24242A; --surface: #19191C; --surface-2: #232328; --ink: #F2F2F5; --muted: #9C9CA6;
   --line: #34343B; --edge: #D8D8DE; --edge-auto: #6E6E78; --app: #4CD07A; --app-dot: #34C759; --app-soft: #12301D;
-  --wip: #FFB547; --wip-dot: #FF9F0A; --wip-soft: #33240C; --sync: #4DA3FF; --sync-soft: #10243F; --lane: rgb(255 255 255 / .03); --lane-line: #3A3A42;
+  --wip: #FFB547; --wip-dot: #FF9F0A; --wip-soft: #33240C; --sync: #4DA3FF; --sync-soft: #10243F; --lane: rgb(255 255 255 / .03); --lane-line: #3A3A42; --e-entrada: #9C98F2; --e-pedir: #E07AAE; --e-procurar: #F0A05E; --e-combinar: #6CCB7F; --e-contaC: #78ACEB; --e-cadastro: #B394F0; --e-chamados: #F08D6C; --e-servico: #5FCDBF; --e-contaP: #A3B4C6;
   --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px rgb(0 0 0 / .35); color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0F0F11; --grid: #24242A; --surface: #19191C; --surface-2: #232328; --ink: #F2F2F5; --muted: #9C9CA6;
   --line: #34343B; --edge: #D8D8DE; --edge-auto: #6E6E78; --app: #4CD07A; --app-dot: #34C759; --app-soft: #12301D;
-  --wip: #FFB547; --wip-dot: #FF9F0A; --wip-soft: #33240C; --sync: #4DA3FF; --sync-soft: #10243F; --lane: rgb(255 255 255 / .03); --lane-line: #3A3A42;
+  --wip: #FFB547; --wip-dot: #FF9F0A; --wip-soft: #33240C; --sync: #4DA3FF; --sync-soft: #10243F; --lane: rgb(255 255 255 / .03); --lane-line: #3A3A42; --e-entrada: #9C98F2; --e-pedir: #E07AAE; --e-procurar: #F0A05E; --e-combinar: #6CCB7F; --e-contaC: #78ACEB; --e-cadastro: #B394F0; --e-chamados: #F08D6C; --e-servico: #5FCDBF; --e-contaP: #A3B4C6;
   --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px rgb(0 0 0 / .35); color-scheme: dark }
 
 [hidden] { display: none !important; }
@@ -79,6 +81,21 @@ button, input { font: inherit; color: inherit; }
 .cluster { position: absolute; border: 1.5px solid var(--lane-line); background: var(--lane); border-radius: 26px; }
 .cluster span { position: absolute; left: 22px; top: 16px; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
 path.entre { opacity: .5; }
+/* Árvore deitada: cartões com a cor da etapa, galhos curvos, rótulo do toque junto da seta. */
+.node { border: 1.5px solid var(--c, var(--line)); }
+.node .lado { align-self: flex-start; font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; border-radius: 6px; background: var(--surface-2); color: var(--muted); }
+.node .lado.profissional { color: var(--e-chamados); }
+.node .lado.cliente { color: var(--e-contaC); }
+.node.andamento { border: 1.5px dashed var(--wip-dot); }
+.node.ref { flex-direction: row; align-items: center; gap: 10px; padding: 6px 12px; border: 1.5px dashed var(--c); border-radius: 14px; background: var(--surface); box-shadow: none; }
+.node.ref .seta { font-size: 18px; color: var(--c); font-weight: 700; line-height: 1; }
+.node.ref .rt { display: flex; flex-direction: column; min-width: 0; }
+.node.ref .d { font-size: 10.5px; color: var(--muted); }
+.node.ref .nm { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.node.ref[data-vista] { border-style: solid; background: var(--surface-2); }
+.elabel { transform: translate(-100%, -130%); border-color: var(--c, var(--line)); color: var(--c, var(--ink)); font-weight: 600; max-width: 200px; white-space: normal; text-align: right; }
+.elabel.auto { color: var(--muted); }
+
 .cluster.lado-profissional span::before { content: "Profissional · "; color: var(--ink); }
 .cluster.lado-cliente span::before { content: "Cliente · "; color: var(--ink); }
 
@@ -143,7 +160,7 @@ path.entre { opacity: .5; }
 <header class="top">
   <div class="brand">
     <h1>Fluxo do Tatu</h1>
-    <p>Todas as telas e o que cada toque abre · atualizado em <time id="data">04/11/2026</time></p>
+    <p><span id="sub"></span> · atualizado em <time id="data">04/11/2026</time></p>
   </div>
   <div class="tabs" role="tablist" aria-label="Lado do app">
     <button role="tab" id="tab-cliente" data-v="cliente">Cliente</button>
@@ -169,7 +186,6 @@ path.entre { opacity: .5; }
   <aside class="panel" id="panel" hidden aria-live="polite"></aside>
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
 <script>
 /* ===== DADOS =====
    status: app (já no app, imagem real) · desenho (desenho pronto, ainda não no app) · andamento (tela ainda não desenhada)
@@ -476,10 +492,14 @@ const POR_ID = Object.fromEntries(TELAS.map(t => [t.id, t]));
 LIGACOES.forEach(([de, para]) => { if (!POR_ID[de] || !POR_ID[para]) console.error('Ligação inválida', de, para); });
 
 const STATUS = { app: 'No app', desenho: 'Desenhada', andamento: 'Em andamento' };
+// Cada vista é uma árvore: começa na raiz e abre um galho por toque.
 const VISTAS = {
-  cliente: { lados: ['ambos', 'cliente'], extra: ['p01'] },
-  profissional: { lados: ['ambos', 'profissional'], extra: [], tirar: ['e03', 'e04', 'e05', 'c03'] },
-  ambos: { lados: ['ambos', 'cliente', 'profissional'], extra: [] },
+  cliente: { raiz: 'e01', etapas: ['entrada', 'pedir', 'procurar', 'combinar', 'contaC'], tirar: [],
+    titulo: 'Do primeiro acesso até o serviço pago e avaliado, pelo lado de quem pede.' },
+  profissional: { raiz: 'e01', etapas: ['entrada', 'cadastro', 'chamados', 'servico', 'contaP'], tirar: ['e03', 'e04', 'e05'],
+    titulo: 'Do cadastro até receber pelo serviço, pelo lado de quem trabalha.' },
+  ambos: { raiz: 'c10', etapas: ['procurar', 'combinar', 'chamados', 'servico'], tirar: [], sincronia: true,
+    titulo: 'Um pedido do começo ao fim: o que cada lado vê no mesmo momento.' },
 };
 
 const $ = s => document.querySelector(s);
@@ -489,15 +509,17 @@ let vista = 'cliente', view = { x: 0, y: 0, k: 1 }, layout = null, selecionada =
 
 function telasDaVista(v) {
   const cfg = VISTAS[v];
-  return TELAS.filter(t => (cfg.lados.includes(t.lado) || cfg.extra.includes(t.id)) && !(cfg.tirar || []).includes(t.id));
+  return TELAS.filter(t => cfg.etapas.includes(t.etapa) && !cfg.tirar.includes(t.id));
+}
+function vistaDe(id) {
+  return Object.keys(VISTAS).find(v => telasDaVista(v).some(t => t.id === id));
 }
 
-function ligacoesDaVista(v, ids) {
-  const set = new Set(ids);
+// Ligações com as duas pontas conhecidas; toques repetidos entre as mesmas telas viram um só rótulo.
+function ligacoesDaVista(v) {
   const grupos = new Map();
   for (const [de, para, toque, tipo] of LIGACOES) {
-    if (!set.has(de) || !set.has(para)) continue;
-    if (tipo === 's' && v !== 'ambos') continue;
+    if (tipo === 's' && !VISTAS[v].sincronia) continue;
     const k = de + '>' + para + '>' + tipo;
     if (!grupos.has(k)) grupos.set(k, { de, para, tipo, toques: [] });
     if (!grupos.get(k).toques.includes(toque)) grupos.get(k).toques.push(toque);
@@ -505,110 +527,149 @@ function ligacoesDaVista(v, ids) {
   return [...grupos.values()].map(g => ({ ...g, rotulo: g.toques.join(' · ') }));
 }
 
-function medir(texto, px = 11) { return Math.ceil(texto.length * px * 0.56) + 20; }
-
-/* Cada etapa vira uma faixa: layout da esquerda para a direita dentro da faixa;
-   as faixas ficam empilhadas e as setas entre faixas são curvas desenhadas à parte. */
-const PAD = { lado: 34, topo: 54, base: 34, entre: 90, margem: 60 };
-function tamanho(t) {
-  if (t.status === 'andamento') return { width: 170, height: 78 + (t.nome.length > 22 ? 16 : 0) };
-  return { width: 168, height: Math.round(76 + 146 * 852 / 393 + t.notas.reduce((a, n) => a + (n.length > 30 ? 30 : 16), 0)) };
+/* Árvore: busca em largura a partir da raiz. Cada tela abre seus galhos uma vez só,
+   no primeiro lugar em que aparece; nas outras vezes vira uma folha de atalho (↪). */
+const CARD = { w: 150, shot: 130 };
+const GAP = { x: 230, y: 18 };
+function altura(item) {
+  if (item.tipo === 'tela') {
+    const t = POR_ID[item.id];
+    if (t.status === 'andamento') return 70 + (t.nome.length > 24 ? 16 : 0);
+    return 64 + Math.round(CARD.shot * 852 / 393) + (VISTAS[vista].sincronia ? 22 : 0) + (t.nome.length > 22 ? 16 : 0);
+  }
+  return 44;
 }
 function montar() {
-  const telas = telasDaVista(vista);
-  const ligs = ligacoesDaVista(vista, telas.map(t => t.id));
-  const etapaDe = Object.fromEntries(telas.map(t => [t.id, t.etapa]));
-  const etapas = Object.keys(ETAPAS).filter(e => telas.some(t => t.etapa === e));
-  const nos = {}, arestas = [], faixas = [];
-  let y = PAD.margem, largura = 0;
-  for (const e of etapas) {
-    const g = new dagre.graphlib.Graph({ multigraph: true });
-    g.setGraph({ rankdir: 'LR', nodesep: 28, ranksep: 120, edgesep: 16, marginx: 0, marginy: 0 });
-    g.setDefaultEdgeLabel(() => ({}));
-    telas.filter(t => t.etapa === e).forEach(t => g.setNode(t.id, tamanho(t)));
-    ligs.forEach((l, i) => {
-      if (etapaDe[l.de] !== e || etapaDe[l.para] !== e) return;
-      const w = Math.min(medir(l.rotulo), 220);
-      g.setEdge(l.de, l.para, { l, width: w, height: medir(l.rotulo) > 220 ? 36 : 22, labelpos: 'c' }, 'e' + i);
-    });
-    dagre.layout(g);
-    const gr = g.graph(), ox = PAD.margem + PAD.lado, oy = y + PAD.topo;
-    g.nodes().forEach(id => { const n = g.node(id); nos[id] = { x: n.x + ox, y: n.y + oy, w: n.width, h: n.height }; });
-    g.edges().forEach(k => {
-      const d = g.edge(k);
-      arestas.push({ ...d.l, d: caminho(d.points.map(p => ({ x: p.x + ox, y: p.y + oy }))), lx: d.x + ox, ly: d.y + oy, lw: d.width, alto: d.height > 22 });
-    });
-    const w = gr.width + PAD.lado * 2, h = gr.height + PAD.topo + PAD.base;
-    faixas.push({ etapa: e, x: PAD.margem, y, w, h });
-    largura = Math.max(largura, w);
-    y += h + PAD.entre;
+  const cfg = VISTAS[vista];
+  const telas = telasDaVista(vista), dentro = new Set(telas.map(t => t.id));
+  const todas = ligacoesDaVista(vista);
+  const ligs = todas.filter(l => dentro.has(l.de) && dentro.has(l.para));
+  const saindo = id => todas.filter(l => l.de === id);
+
+  const raiz = { tipo: 'tela', id: cfg.raiz, filhos: [], prof: 0 };
+  const visto = new Set([cfg.raiz]), fila = [raiz], ocorrencia = { [cfg.raiz]: raiz };
+  while (fila.length) {
+    const no = fila.shift();
+    for (const l of saindo(no.id)) {
+      let filho;
+      if (!dentro.has(l.para)) filho = { tipo: 'fora', id: l.para, vista: vistaDe(l.para) };
+      else if (visto.has(l.para)) filho = { tipo: 'atalho', id: l.para };
+      else {
+        visto.add(l.para);
+        filho = { tipo: 'tela', id: l.para, filhos: [] };
+        ocorrencia[l.para] = filho;
+        fila.push(filho);
+      }
+      filho.lig = l; filho.prof = no.prof + 1; filho.pai = no;
+      no.filhos.push(filho);
+    }
   }
-  // Setas entre faixas: saem por baixo/cima do cartão e entram pelo outro lado.
-  const saidas = {};
-  ligs.forEach(l => {
-    if (etapaDe[l.de] === etapaDe[l.para]) return;
-    const a = nos[l.de], b = nos[l.para];
-    const desce = b.y > a.y;
-    const k = l.de + (desce ? 'v' : '^');
-    const n = (saidas[k] = (saidas[k] || 0) + 1);
-    const off = ((n % 5) - 2) * 14;
-    const p0 = { x: a.x + off, y: a.y + (desce ? a.h / 2 : -a.h / 2) };
-    const p3 = { x: b.x, y: b.y + (desce ? -b.h / 2 : b.h / 2) };
-    const dy = Math.max(80, Math.abs(p3.y - p0.y) * 0.45) * (desce ? 1 : -1);
-    const p1 = { x: p0.x, y: p0.y + dy }, p2 = { x: p3.x, y: p3.y - dy };
-    const t = 0.5, m = (a1, a2, a3, a4) => (1 - t) ** 3 * a1 + 3 * (1 - t) ** 2 * t * a2 + 3 * (1 - t) * t * t * a3 + t ** 3 * a4;
-    arestas.push({ ...l, entre: true, d: `M${p0.x},${p0.y} C${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`,
-      lx: m(p0.x, p1.x, p2.x, p3.x), ly: m(p0.y, p1.y, p2.y, p3.y), lw: Math.min(medir(l.rotulo), 220), alto: medir(l.rotulo) > 220 });
-  });
-  layout = { telas, ligs, nos, arestas, faixas, w: largura + PAD.margem * 2, h: y - PAD.entre + PAD.margem };
+  // Galhos curtos no meio (perto da tela que os abre), galhos grandes nas pontas.
+  function ordenar(n) {
+    if (n.tipo !== 'tela' || !n.filhos.length) return 1;
+    const tam = new Map(n.filhos.map(f => [f, ordenar(f)]));
+    const asc = [...n.filhos].sort((a, b) => tam.get(a) - tam.get(b));
+    const meio = [];
+    asc.forEach((f, i) => (i % 2 ? meio.push(f) : meio.unshift(f)));
+    n.filhos = meio;
+    return 1 + [...tam.values()].reduce((a, b) => a + b, 0);
+  }
+  ordenar(raiz);
+  // Telas da vista que a raiz não alcança entram como raízes extras, embaixo.
+  const raizes = [raiz];
+  for (const t of telas) if (!visto.has(t.id)) {
+    const r = { tipo: 'tela', id: t.id, filhos: [], prof: 0 }; visto.add(t.id); raizes.push(r); ocorrencia[t.id] = r;
+  }
+
+  /* Posição por contorno: cada galho guarda, coluna por coluna, até onde vai em cima e embaixo.
+     Os irmãos são empilhados o mais perto possível sem se encostar em nenhuma coluna,
+     e o pai fica no meio do primeiro e do último filho. */
+  const itens = [];
+  function contorno(n) {
+    n.h = altura(n);
+    const meu = [[-n.h / 2, n.h / 2]];
+    if (n.tipo !== 'tela' || !n.filhos.length) return meu;
+    const juntos = [];
+    n.filhos.forEach((f, i) => {
+      const c = contorno(f);
+      let off = 0;
+      if (i > 0) {
+        off = -Infinity;
+        for (let d = 0; d < c.length && d < juntos.length; d++) off = Math.max(off, juntos[d][1] - c[d][0] + GAP.y);
+      }
+      f.off = off;
+      c.forEach(([a, b], d) => {
+        if (!juntos[d]) juntos[d] = [a + off, b + off];
+        else juntos[d] = [Math.min(juntos[d][0], a + off), Math.max(juntos[d][1], b + off)];
+      });
+    });
+    const meio = (n.filhos[0].off + n.filhos[n.filhos.length - 1].off) / 2;
+    n.filhos.forEach(f => (f.off -= meio));
+    juntos.forEach(([a, b]) => meu.push([a - meio, b - meio]));
+    return meu;
+  }
+  function posicionar(n, y) {
+    n.x = 60 + n.prof * (CARD.w + GAP.x);
+    n.y = y;
+    itens.push(n);
+    if (n.tipo === 'tela') n.filhos.forEach(f => posicionar(f, y + f.off));
+  }
+  let topo = 70;
+  for (const r of raizes) {
+    const c = contorno(r);
+    const cima = Math.min(...c.map(p => p[0])), baixo = Math.max(...c.map(p => p[1]));
+    posicionar(r, topo - cima);
+    topo += baixo - cima + 120;
+  }
+  const prof = Math.max(...itens.map(i => i.prof));
+  layout = { telas, ligs: todas.filter(l => dentro.has(l.de)), itens, ocorrencia,
+    w: 60 * 2 + (prof + 1) * CARD.w + prof * GAP.x + 40, h: topo - 120 + 70 };
   desenhar();
 }
 
-function caminho(pts) {
-  if (pts.length < 2) return '';
-  let d = `M${pts[0].x},${pts[0].y}`;
-  for (let i = 1; i < pts.length - 1; i++) {
-    const m = { x: (pts[i].x + pts[i + 1].x) / 2, y: (pts[i].y + pts[i + 1].y) / 2 };
-    d += ` Q${pts[i].x},${pts[i].y} ${m.x},${m.y}`;
-  }
-  const u = pts[pts.length - 1];
-  return d + ` L${u.x},${u.y}`;
-}
+function corDe(id) { return `var(--e-${POR_ID[id].etapa})`; }
 
 function desenhar() {
-  const { telas, nos, arestas, faixas, w, h } = layout;
-  let html = '';
-  for (const f of faixas) {
-    const e = ETAPAS[f.etapa];
-    html += `<div class="cluster lado-${e.lado}" style="left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px"><span>${esc(e.nome)}</span></div>`;
+  const { itens, w, h } = layout;
+  const sinc = VISTAS[vista].sincronia;
+  let svg = `<svg width="${w}" height="${h}" aria-hidden="true"><defs>`;
+  for (const e of Object.keys(ETAPAS).concat('sync')) {
+    const c = e === 'sync' ? 'var(--sync)' : `var(--e-${e})`;
+    svg += `<marker id="m-${e}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1L9 5L1 9z" fill="${c}"/></marker>`;
   }
-  let svg = `<svg width="${w}" height="${h}" aria-hidden="true"><defs>
-    <marker id="m-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" fill="var(--edge)"/></marker>
-    <marker id="m-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" fill="var(--edge-auto)"/></marker>
-    <marker id="m-s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" fill="var(--sync)"/></marker></defs>`;
-  let rotulos = '';
-  for (const l of arestas) {
-    const cls = l.tipo === 's' ? 's' : (l.tipo === 't' ? 't' : 'a');
-    const cor = cls === 's' ? 'var(--sync)' : cls === 't' ? 'var(--edge)' : 'var(--edge-auto)';
-    const dash = cls === 't' ? '' : (l.tipo === 'e' || l.tipo === 'alt' ? '2 5' : '7 6');
-    svg += `<path class="${l.entre && cls !== 's' ? 'entre' : ''}" data-de="${l.de}" data-para="${l.para}" d="${l.d}" fill="none" stroke="${cor}" stroke-width="${cls === 's' ? 2 : 1.6}" ${dash ? `stroke-dasharray="${dash}"` : ''} stroke-linecap="round" marker-end="url(#m-${cls})"/>`;
-    rotulos += `<div class="elabel ${cls === 't' ? '' : cls === 's' ? 'sync' : 'auto'}" data-de="${l.de}" data-para="${l.para}" style="left:${l.lx}px;top:${l.ly}px;max-width:${l.lw}px;white-space:${l.alto ? 'normal' : 'nowrap'};text-align:center">${esc(l.rotulo)}</div>`;
-  }
-  svg += '</svg>';
-  for (const t of telas) {
-    const n = nos[t.id];
-    const pos = `left:${n.x - n.w / 2}px;top:${n.y - n.h / 2}px;width:${n.w}px;height:${n.h}px`;
-    if (t.status === 'andamento') {
+  svg += '</defs>';
+  let html = '', rotulos = '';
+  for (const n of itens) {
+    const t = POR_ID[n.id];
+    const largura = n.tipo === 'tela' ? CARD.w : 230;
+    const pos = `left:${n.x}px;top:${n.y - n.h / 2}px;width:${largura}px;height:${n.h}px;--c:${corDe(n.id)}`;
+    if (n.pai) {
+      const l = n.lig, p = n.pai;
+      const x0 = p.x + CARD.w, y0 = p.y, x1 = n.x - 3, y1 = n.y;
+      const sync = l.tipo === 's', etapa = sync ? 'sync' : t.etapa;
+      const cor = sync ? 'var(--sync)' : `var(--e-${t.etapa})`;
+      const dash = l.tipo === 't' ? '' : l.tipo === 'e' || l.tipo === 'alt' ? '2 5' : '7 6';
+      const mx = x0 + (x1 - x0) * 0.42;
+      svg += `<path data-de="${l.de}" data-para="${l.para}" d="M${x0},${y0} C${mx},${y0} ${mx},${y1} ${x1},${y1}" fill="none" stroke="${cor}" stroke-width="1.8" ${dash ? `stroke-dasharray="${dash}"` : ''} stroke-linecap="round" marker-end="url(#m-${etapa})"/>`;
+      rotulos += `<div class="elabel ${sync ? 'sync' : l.tipo === 't' ? '' : 'auto'}" data-de="${l.de}" data-para="${l.para}" style="left:${x1 - 14}px;top:${y1}px;--c:${cor}">${esc(l.rotulo)}</div>`;
+    }
+    if (n.tipo === 'atalho' || n.tipo === 'fora') {
+      const fora = n.tipo === 'fora';
+      const txt = fora ? `Abre o fluxo do ${n.vista === 'profissional' ? 'profissional' : 'cliente'}` : 'Volta para';
+      html += `<div class="node ref" data-alvo="${n.id}" ${fora ? `data-vista="${n.vista}"` : ''} style="${pos}" role="button" tabindex="0">
+        <span class="seta">${fora ? '⇢' : '↪'}</span><span class="rt"><span class="d">${txt}</span><span class="nm">${t.cod !== '—' ? `<span class="code">${t.cod}</span> ` : ''}${esc(t.nome)}</span></span></div>`;
+    } else if (t.status === 'andamento') {
       html += `<div class="node andamento" data-id="${t.id}" style="${pos}" role="button" tabindex="0" aria-label="${esc(t.nome)}, em andamento">
         <span class="pill andamento"><span class="dot andamento"></span>Em andamento</span><div class="nm">${esc(t.nome)}</div></div>`;
     } else {
       html += `<div class="node" data-id="${t.id}" style="${pos}" role="button" tabindex="0" aria-label="${esc(t.cod + ' ' + t.nome)}">
         <div class="hd"><span class="code">${t.cod}</span><span class="pill ${t.status}" style="margin-left:auto"><span class="dot ${t.status}"></span>${STATUS[t.status]}</span></div>
+        ${sinc ? `<span class="lado ${t.lado}">${t.lado === 'cliente' ? 'Cliente' : 'Profissional'}</span>` : ''}
         <div class="nm">${esc(t.nome)}</div>
-        <div class="shot"><img alt="" decoding="async" src="${esc(t.img)}" data-repo="${esc(t.repo)}"></div>
-        ${t.notas.length ? `<ul class="notes">${t.notas.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</div>`;
+        <div class="shot"><img alt="" decoding="async" src="${esc(t.img)}" data-repo="${esc(t.repo)}"></div></div>`;
     }
   }
+  svg += '</svg>';
   world.style.width = w + 'px';
   world.style.height = h + 'px';
   world.innerHTML = svg + html + rotulos;
@@ -616,8 +677,9 @@ function desenhar() {
     if (img.dataset.tried) return; img.dataset.tried = 1;
     img.src = '../../' + img.dataset.repo.split('/').map(encodeURIComponent).join('/');
   }));
-  legenda(telas);
-  if (selecionada && !nos[selecionada]) selecionada = null;
+  $('#sub').textContent = VISTAS[vista].titulo;
+  legenda(layout.telas);
+  if (selecionada && !layout.ocorrencia[selecionada]) selecionada = null;
   realcar();
 }
 
@@ -630,7 +692,8 @@ function legenda(telas) {
     <span class="k"><span class="dot andamento"></span>Em andamento <b>${c.andamento}</b></span>
     <span class="k"><span class="lk"></span>toque</span>
     <span class="k"><span class="lk auto"></span>automático</span>
-    ${vista === 'ambos' ? '<span class="k"><span class="lk sync"></span>entre os dois apps</span>' : ''}`;
+    <span class="k">↪ volta para uma tela que já apareceu</span>
+    ${VISTAS[vista].sincronia ? '<span class="k"><span class="lk sync"></span>o outro lado recebe</span>' : ''}`;
 }
 
 /* ===== PAN / ZOOM ===== */
@@ -639,37 +702,40 @@ function aplicar() {
   $('#zval').textContent = Math.round(view.k * 100) + '%';
 }
 function zoomEm(k, cx, cy) {
-  k = Math.min(2.5, Math.max(0.08, k));
+  k = Math.min(2.5, Math.max(0.06, k));
   view.x = cx - (cx - view.x) * (k / view.k);
   view.y = cy - (cy - view.y) * (k / view.k);
   view.k = k; aplicar();
 }
 function ajustar() {
-  const gr = { width: layout.w, height: layout.h }, r = stage.getBoundingClientRect();
-  const k = Math.min(r.width / gr.width, r.height / gr.height) * 0.96;
-  view.k = Math.max(0.08, Math.min(1, k));
-  view.x = (r.width - gr.width * view.k) / 2;
-  view.y = (r.height - gr.height * view.k) / 2;
+  const r = stage.getBoundingClientRect();
+  view.k = Math.max(0.06, Math.min(1, Math.min(r.width / layout.w, r.height / layout.h) * 0.96));
+  view.x = (r.width - layout.w * view.k) / 2;
+  view.y = (r.height - layout.h * view.k) / 2;
   aplicar();
 }
-// Abertura: começa pela primeira etapa, num tamanho em que dá para ler.
+// Abertura: a raiz à esquerda, na altura do meio da tela, num tamanho legível.
 function inicio() {
-  const r = stage.getBoundingClientRect(), f = layout.faixas[0];
-  view.k = Math.max(0.3, Math.min(0.75, (r.width - 40) / (f.w + 40)));
-  view.x = 20 - f.x * view.k + Math.max(0, (r.width - 40 - f.w * view.k) / 2);
-  view.y = 24 - f.y * view.k;
+  const r = stage.getBoundingClientRect(), raiz = layout.itens[0];
+  view.k = r.width < 640 ? 0.42 : 0.6;
+  view.x = 24 - raiz.x * view.k;
+  view.y = r.height / 2 - raiz.y * view.k;
   aplicar();
 }
 function centrar(id) {
-  const n = layout.nos[id]; if (!n) return;
+  const n = layout.ocorrencia[id]; if (!n) return;
   const r = stage.getBoundingClientRect();
-  const k = Math.max(view.k, 0.55);
+  view.k = Math.max(view.k, 0.55);
   const larguraUtil = panel.hidden || r.width < 640 ? r.width : r.width - 400;
   const alturaUtil = r.width < 640 && !panel.hidden ? r.height * 0.32 : r.height;
-  view.k = k;
-  view.x = larguraUtil / 2 - n.x * k;
-  view.y = alturaUtil / 2 - n.y * k;
+  view.x = larguraUtil / 2 - (n.x + CARD.w / 2) * view.k;
+  view.y = alturaUtil / 2 - n.y * view.k;
   aplicar();
+}
+function irPara(id, v) {
+  if (v && v !== vista) trocar(v);
+  if (!layout.ocorrencia[id]) { const outra = vistaDe(id); if (outra && outra !== vista) trocar(outra); }
+  abrir(id); centrar(id);
 }
 
 const toques = new Map();
@@ -697,9 +763,13 @@ stage.addEventListener('pointermove', e => {
     view.x = arrasto.vx + dx; view.y = arrasto.vy + dy; aplicar();
   }
 });
+function tocarNo(no) {
+  if (no.dataset.alvo) irPara(no.dataset.alvo, no.dataset.vista);
+  else abrir(no.dataset.id);
+}
 function soltar(e) {
   if (arrasto && !arrasto.moveu) {
-    if (arrasto.alvo) abrir(arrasto.alvo.dataset.id);
+    if (arrasto.alvo) tocarNo(arrasto.alvo);
     else fechar();
   }
   toques.delete(e.pointerId);
@@ -713,28 +783,29 @@ stage.addEventListener('wheel', e => {
   if (e.target.closest('.panel')) return;
   e.preventDefault();
   const r = stage.getBoundingClientRect();
-  if (e.ctrlKey || Math.abs(e.deltaY) > 40 && !e.deltaX && e.deltaMode === 0 && Number.isInteger(e.deltaY)) {
-    zoomEm(view.k * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015)), e.clientX - r.left, e.clientY - r.top);
-  } else { view.x -= e.deltaX; view.y -= e.deltaY; aplicar(); }
+  const mouse = e.deltaMode === 1 || (!e.deltaX && Math.abs(e.deltaY) >= 50 && Number.isInteger(e.deltaY));
+  if (e.ctrlKey || mouse) zoomEm(view.k * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015)), e.clientX - r.left, e.clientY - r.top);
+  else { view.x -= e.deltaX; view.y -= e.deltaY; aplicar(); }
 }, { passive: false });
 $('#zin').onclick = () => { const r = stage.getBoundingClientRect(); zoomEm(view.k * 1.25, r.width / 2, r.height / 2); };
 $('#zout').onclick = () => { const r = stage.getBoundingClientRect(); zoomEm(view.k / 1.25, r.width / 2, r.height / 2); };
 $('#zfit').onclick = ajustar;
 world.addEventListener('keydown', e => {
   const n = e.target.closest('.node');
-  if (n && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); abrir(n.dataset.id); }
+  if (n && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); tocarNo(n); }
 });
 
 /* ===== PAINEL ===== */
 function itemLig(id, rotulo, tipo, sentido) {
   const t = POR_ID[id];
-  const tipoTxt = { a: 'automático', e: 'outro estado', alt: 'alternativa', s: 'no outro app', t: '' }[tipo];
+  const tipoTxt = { a: 'automático', e: 'outro estado', alt: 'alternativa', s: 'no outro lado', t: '' }[tipo];
   return `<li><button data-ir="${id}"><span class="t">${esc(rotulo)}</span><span class="d">${sentido} ${t.cod !== '—' ? t.cod + ' · ' : ''}${esc(t.nome)}${tipoTxt ? ' · ' + tipoTxt : ''}</span><span class="arrow">›</span></button></li>`;
 }
 function abrir(id) {
   const t = POR_ID[id]; if (!t) return;
   selecionada = id;
-  const sai = layout.ligs.filter(l => l.de === id), entra = layout.ligs.filter(l => l.para === id);
+  const todas = ligacoesDaVista(vista);
+  const sai = todas.filter(l => l.de === id), entra = todas.filter(l => l.para === id);
   panel.innerHTML = `
     <div class="ph"><div><span class="code">${t.cod}</span>
       <h2>${esc(t.nome)}</h2>
@@ -753,7 +824,7 @@ function abrir(id) {
   const big = panel.querySelector('.big img');
   if (big) big.addEventListener('error', () => { if (!big.dataset.tried) { big.dataset.tried = 1; big.src = '../../' + big.dataset.repo.split('/').map(encodeURIComponent).join('/'); } });
   $('#fechar').onclick = fechar;
-  panel.querySelectorAll('[data-ir]').forEach(b => b.onclick = () => { abrir(b.dataset.ir); centrar(b.dataset.ir); });
+  panel.querySelectorAll('[data-ir]').forEach(b => b.onclick = () => irPara(b.dataset.ir));
   realcar();
 }
 function fechar() { panel.hidden = true; selecionada = null; realcar(); }
@@ -761,14 +832,15 @@ function realcar() {
   const viz = new Set();
   if (selecionada) {
     viz.add(selecionada);
-    layout.ligs.forEach(l => { if (l.de === selecionada) viz.add(l.para); if (l.para === selecionada) viz.add(l.de); });
+    ligacoesDaVista(vista).forEach(l => { if (l.de === selecionada) viz.add(l.para); if (l.para === selecionada) viz.add(l.de); });
   }
   world.querySelectorAll('.node').forEach(n => {
-    n.classList.toggle('sel', n.dataset.id === selecionada);
-    n.classList.toggle('dim', !!selecionada && !viz.has(n.dataset.id));
+    const id = n.dataset.id || n.dataset.alvo;
+    n.classList.toggle('sel', !!n.dataset.id && id === selecionada);
+    n.classList.toggle('dim', !!selecionada && !viz.has(id));
   });
   world.querySelectorAll('path[data-de]').forEach(p => {
-    const on = !selecionada || p.dataset.de === selecionada || p.dataset.para === selecionada;
+    const on = p.dataset.de === selecionada || p.dataset.para === selecionada;
     p.style.opacity = !selecionada ? '' : on ? 1 : 0.12;
   });
   world.querySelectorAll('.elabel').forEach(l => {
@@ -778,14 +850,14 @@ function realcar() {
 
 /* ===== BUSCA ===== */
 const busca = $('#busca'), res = $('#resultados');
+const sem = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 busca.addEventListener('input', () => {
-  const q = busca.value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const q = sem(busca.value.trim());
   if (!q) { res.hidden = true; return; }
-  const ids = new Set(layout.telas.map(t => t.id));
-  const achados = TELAS.filter(t => ids.has(t.id) && (t.nome + ' ' + t.cod).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q)).slice(0, 12);
-  res.innerHTML = achados.length ? achados.map(t => `<li><button data-id="${t.id}"><span class="dot ${t.status}"></span><span class="code">${t.cod}</span>${esc(t.nome)}</button></li>`).join('') : '<li class="note" style="padding:8px">Nada nesta vista.</li>';
+  const achados = TELAS.filter(t => sem(t.nome + ' ' + t.cod).includes(q)).slice(0, 12);
+  res.innerHTML = achados.length ? achados.map(t => `<li><button data-id="${t.id}"><span class="dot ${t.status}"></span><span class="code">${t.cod}</span>${esc(t.nome)}</button></li>`).join('') : '<li class="note" style="padding:8px">Nenhuma tela com esse nome.</li>';
   res.hidden = false;
-  res.querySelectorAll('button').forEach(b => b.onclick = () => { res.hidden = true; busca.value = ''; abrir(b.dataset.id); centrar(b.dataset.id); });
+  res.querySelectorAll('button').forEach(b => b.onclick = () => { res.hidden = true; busca.value = ''; irPara(b.dataset.id); });
 });
 busca.addEventListener('keydown', e => { if (e.key === 'Escape') { busca.value = ''; res.hidden = true; } if (e.key === 'Enter') res.querySelector('button')?.click(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !panel.hidden) fechar(); });
@@ -801,7 +873,7 @@ function trocar(v, primeira) {
   if (!primeira && location.hash !== '#' + v) history.replaceState(null, '', '#' + v);
 }
 document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => trocar(b.dataset.v));
-window.addEventListener('hashchange', () => trocar(location.hash.slice(1)));
+window.addEventListener('hashchange', () => { if (location.hash.slice(1) !== vista) trocar(location.hash.slice(1)); });
 window.addEventListener('resize', () => { if (layout) aplicar(); });
 $('#data').textContent = ATUALIZADO;
 trocar(location.hash.slice(1) || 'cliente', true);
