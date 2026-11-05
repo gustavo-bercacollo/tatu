@@ -27,6 +27,7 @@ Minimalista, iPhone/Mac. Fundo branco, cinzas translúcidos, texto preto, botão
 - Pagar pelo app é opcional (cartão até 6x ou Pix). "Por fora" exige confirmação da outra parte. Comissão só no pagamento pelo app.
 - Profissional: até 3 profissões × 3 especialidades; Pix no nome do CPF; verificação (documento só por câmera + selfie), reprovação corrigível ou definitiva. App sempre abre **offline**.
 - Avaliação mútua; perfil mostra 3 avaliações em carrossel + "Ver todas".
+- "Trocar para modo profissional" (Perfil do cliente) e "Trocar para modo cliente" (Perfil do profissional) **nunca saem do app**, mesmo que um desenho novo não mostre.
 
 ## Stack
 - **App:** Flutter / Dart, um app só com modo cliente e modo profissional (decidido). Se precisar separar depois: dois entrypoints no mesmo projeto.
