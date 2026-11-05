@@ -15,6 +15,7 @@ SVG e guia divergem → regras do guia, visual do SVG. Dúvida real → pergunta
 Figma: https://www.figma.com/design/zprQlhIOqkpKJ5esa3zean/Tatu (telas originais; as novas só existem nos SVGs).
 
 ## Estilo (resumo)
+**Marca: só o nome "tatu" centralizado** (Inter 700, 44 px). Nunca usar ícone/quadrado com ponto verde nem frase junto do nome.
 Minimalista, iPhone/Mac. Fundo branco, cinzas translúcidos, texto preto, botão principal preto em pílula (56 px), sem cor de marca. Verde `#34C759` online/pago; azul `#007AFF` verificado/links; vermelho `#FF3B30` erro. Fonte Inter (SF Pro no iOS). Margem 20 px (24 no cadastro). Ícones de traço fino. Avatares só com iniciais.
 
 ## Regras que não podem ser quebradas

@@ -126,7 +126,7 @@ ThemeData tatuTheme() => ThemeData(
 
 | # | Tela | Estados / observações |
 |---|---|---|
-| C1 | Abertura | Logo "tatu" |
+| C1 | Abertura | Só o nome "tatu" centralizado (sem ícone, sem frase) |
 | C2 | Boas-vindas | "Como você quer usar o Tatu?": Preciso de um serviço / Quero trabalhar / Entrar (app único) |
 | C3 | **Home** | Descrição é o centro. Chips de serviço únicos. Botão "Escolha um serviço" (desabilitado) → "Chamar [serviço]". Estados: IA marcou (✦ + "Sugerido pela descrição"); conflito (folha "Isso parece serviço de X", só se o cliente escolheu primeiro); Outros (folha com busca e "Não sei qual serviço"); serviço de Outros escolhido (chip com seta) |
 | C4 | Endereço | Busca + mapa de confirmação (telas já existentes no Figma) |
