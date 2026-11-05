@@ -9,6 +9,7 @@ import '../../core/theme/tatu_texto.dart';
 import '../../data/enderecos.dart';
 import '../../data/sugestao_servico.dart';
 import '../../shared/widgets/abas_cliente.dart';
+import '../../shared/widgets/avatar_usuario.dart';
 import '../../shared/widgets/tatu_chip.dart';
 import 'endereco/onde_sheet.dart';
 import 'perfil_page.dart';
@@ -64,14 +65,6 @@ class _HomeClientePageState extends State<HomeClientePage> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text('$o: em breve')));
-  }
-
-  String get _iniciais {
-    final partes = widget.nome.trim().split(RegExp(r'\s+'));
-    return partes
-        .take(2)
-        .map((p) => p.isEmpty ? '' : p[0].toUpperCase())
-        .join();
   }
 
   @override
@@ -277,22 +270,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
                 builder: (_) => PerfilClientePage(nome: widget.nome),
               ),
             ),
-            child: Container(
-              width: 36,
-              height: 36,
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: TatuColors.circle,
-                shape: BoxShape.circle,
-              ),
-              child: Text(
-                _iniciais,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+            child: AvatarUsuario(nome: widget.nome),
           ),
         ),
       ],

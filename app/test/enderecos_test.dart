@@ -85,7 +85,7 @@ void main() {
 
   testWidgets('Perfil → Endereços: editar, excluir até ficar vazio', (t) async {
     await _abrirHome(t);
-    await t.tap(find.text('AM'));
+    await t.tap(find.bySemanticsLabel(RegExp('^Perfil')));
     await t.pumpAndSettle();
     await t.tap(find.text('Endereços'));
     await t.pumpAndSettle();

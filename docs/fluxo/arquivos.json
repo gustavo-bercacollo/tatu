@@ -86,5 +86,10 @@
  "app/avaliacoes-vazio.png": "docs/fluxo/app/avaliacoes-vazio.png",
  "app/notificacoes.png": "docs/fluxo/app/notificacoes.png",
  "app/notificacoes-desativadas.png": "docs/fluxo/app/notificacoes-desativadas.png",
- "app/notificacoes-desligar.png": "docs/fluxo/app/notificacoes-desligar.png"
+ "app/notificacoes-desligar.png": "docs/fluxo/app/notificacoes-desligar.png",
+ "app/foto-perfil.png": "docs/fluxo/app/foto-perfil.png",
+ "app/escolher-avatar.png": "docs/fluxo/app/escolher-avatar.png",
+ "app/ajustar-foto.png": "docs/fluxo/app/ajustar-foto.png",
+ "app/foto-atualizada.png": "docs/fluxo/app/foto-atualizada.png",
+ "app/camera-desativada.png": "docs/fluxo/app/camera-desativada.png"
 }

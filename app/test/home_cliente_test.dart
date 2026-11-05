@@ -21,7 +21,7 @@ void main() {
   testWidgets('Home vazia: saudação, iniciais e botão desabilitado', (t) async {
     await _abrir(t);
     expect(find.text('Oi, Ana'), findsOneWidget);
-    expect(find.text('AM'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('^Perfil')), findsOneWidget);
     expect(find.text('Profissionais ativos perto de você'), findsOneWidget);
     expect(find.text('Escolha um serviço'), findsOneWidget);
     expect(_botao(t).onPressed, isNull);
@@ -60,7 +60,7 @@ void main() {
     t,
   ) async {
     await _abrir(t);
-    await t.tap(find.text('AM'));
+    await t.tap(find.bySemanticsLabel(RegExp('^Perfil')));
     await t.pumpAndSettle();
     expect(find.text('Ana Martins'), findsOneWidget);
     expect(find.text('Trocar para modo profissional'), findsOneWidget);
@@ -70,7 +70,7 @@ void main() {
     await t.pumpAndSettle();
     expect(find.text('Do que você precisa?'), findsOneWidget);
 
-    await t.tap(find.text('AM'));
+    await t.tap(find.bySemanticsLabel(RegExp('^Perfil')));
     await t.pumpAndSettle();
     await t.scrollUntilVisible(find.text('Sair da conta'), 200);
     await t.tap(find.text('Sair da conta'));

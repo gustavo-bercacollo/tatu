@@ -11,6 +11,10 @@ import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/avaliacoes.dart';
 import 'package:tatu/data/enderecos.dart';
 import 'package:tatu/data/notificacoes.dart';
+import 'package:tatu/data/perfil.dart';
+import 'package:tatu/features/cliente/foto/ajustar_foto_page.dart';
+import 'package:tatu/features/cliente/foto/camera_desativada_page.dart';
+import 'package:tatu/features/cliente/foto/escolher_avatar_page.dart';
 import 'package:tatu/features/cliente/notificacoes/notificacoes_page.dart';
 import 'package:tatu/features/cliente/avaliacoes/avaliacao_page.dart';
 import 'package:tatu/features/cliente/avaliacoes/minhas_avaliacoes_page.dart';
@@ -62,6 +66,7 @@ Future<void> _capturar(
   pagamentos.restaurar();
   avaliacoes.restaurar();
   notificacoes.restaurar();
+  perfil.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -72,6 +77,13 @@ Future<void> _capturar(
   await tester.pump();
   if (preparar != null) await preparar();
   await tester.pump(const Duration(milliseconds: 600)); // fim das animações
+  // Carrega de verdade as imagens (avatares) antes de capturar.
+  await tester.runAsync(() async {
+    for (final e in find.byType(Image).evaluate()) {
+      await precacheImage((e.widget as Image).image, e);
+    }
+  });
+  await tester.pump();
   // A tela inteira do app (inclui folhas abertas por cima da página).
   await expectLater(
     find.byType(MaterialApp),
@@ -365,6 +377,57 @@ void main() {
       'perfil-cliente',
       const PerfilClientePage(nome: 'Ana Martins'),
     );
+  });
+
+  testWidgets('foto-perfil', (t) async {
+    await _capturar(
+      t,
+      'foto-perfil',
+      const PerfilClientePage(nome: 'Ana Martins'),
+      preparar: () async {
+        await t.tap(find.bySemanticsLabel(RegExp('^Foto do perfil')));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('escolher-avatar', (t) async {
+    await _capturar(t, 'escolher-avatar', const EscolherAvatarPage());
+  });
+
+  testWidgets('ajustar-foto', (t) async {
+    final bytes = File('assets/avatares/avatar-1.png').readAsBytesSync();
+    await _capturar(
+      t,
+      'ajustar-foto',
+      AjustarFotoPage(imagem: bytes),
+      preparar: () async {
+        await t.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 300)),
+        );
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('foto-atualizada', (t) async {
+    await _capturar(
+      t,
+      'foto-atualizada',
+      const PerfilClientePage(nome: 'Ana Martins'),
+      preparar: () async {
+        await t.tap(find.bySemanticsLabel(RegExp('^Foto do perfil')));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Escolher um avatar'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Salvar avatar'));
+        await t.pump(const Duration(milliseconds: 600));
+      },
+    );
+  });
+
+  testWidgets('camera-desativada', (t) async {
+    await _capturar(t, 'camera-desativada', const CameraDesativadaPage());
   });
 
   testWidgets('home-vazia', (t) async {

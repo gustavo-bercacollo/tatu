@@ -8,10 +8,12 @@ import '../../data/enderecos.dart';
 import '../../data/notificacoes.dart';
 import '../../data/pagamentos.dart';
 import '../../shared/widgets/abas_cliente.dart';
+import '../../shared/widgets/avatar_usuario.dart';
 import '../../shared/widgets/lista_agrupada.dart';
 import '../entrada/boas_vindas_page.dart';
 import 'avaliacoes/minhas_avaliacoes_page.dart';
 import 'endereco/enderecos_page.dart';
+import 'foto/foto_perfil_sheet.dart';
 import 'notificacoes/notificacoes_page.dart';
 import 'pagamento/pagamento_page.dart';
 
@@ -27,13 +29,6 @@ class PerfilClientePage extends StatelessWidget {
   final String nome;
   final String nota;
   final int pedidos;
-
-  String get _iniciais => nome
-      .trim()
-      .split(RegExp(r'\s+'))
-      .take(2)
-      .map((p) => p.isEmpty ? '' : p[0].toUpperCase())
-      .join();
 
   @override
   Widget build(BuildContext context) {
@@ -67,24 +62,20 @@ class PerfilClientePage extends StatelessWidget {
               ),
               children: [
                 Center(
-                  child: Container(
-                    width: 76,
-                    height: 76,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                      color: TatuColors.circle,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(
-                      _iniciais,
-                      style: const TextStyle(
-                        fontSize: 23,
-                        fontWeight: FontWeight.w700,
+                  child: Semantics(
+                    button: true,
+                    label: 'Foto do perfil',
+                    child: GestureDetector(
+                      onTap: () => trocarFotoDoPerfil(context),
+                      child: AvatarUsuario(
+                        nome: nome,
+                        tamanho: TatuMedidas.avatarPerfil,
+                        camera: true,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -206,21 +197,28 @@ class PerfilClientePage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                GrupoLista(
-                  itens: [
-                    ItemLista(
-                      icone: TablerIcons.logout,
-                      texto: 'Sair da conta',
-                      cor: TatuColors.danger,
-                      seta: false,
-                      onTap: () => Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (_) => const BoasVindasPage(),
+                Material(
+                  color: TatuColors.bg,
+                  borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: () => Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const BoasVindasPage()),
+                      (_) => false,
+                    ),
+                    child: const SizedBox(
+                      height: TatuMedidas.alturaLinha,
+                      child: Center(
+                        child: Text(
+                          'Sair da conta',
+                          style: TextStyle(
+                            fontSize: 17,
+                            color: TatuColors.danger,
+                          ),
                         ),
-                        (_) => false,
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),

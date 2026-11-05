@@ -16,7 +16,7 @@ Figma: https://www.figma.com/design/zprQlhIOqkpKJ5esa3zean/Tatu (telas originais
 
 ## Estilo (resumo)
 **Marca: só o nome "tatu" centralizado** (Inter 700, 44 px). Nunca usar ícone/quadrado com ponto verde nem frase junto do nome.
-Minimalista, iPhone/Mac. Fundo branco, cinzas translúcidos, texto preto, botão principal preto em pílula (56 px), sem cor de marca. Verde `#34C759` online/pago; azul `#007AFF` verificado/links; vermelho `#FF3B30` erro. Fonte Inter (SF Pro no iOS). Margem 20 px (24 no cadastro). Ícones de traço fino. Avatares só com iniciais.
+Minimalista, iPhone/Mac. Fundo branco, cinzas translúcidos, texto preto, botão principal preto em pílula (56 px), sem cor de marca. Verde `#34C759` online/pago; azul `#007AFF` verificado/links; vermelho `#FF3B30` erro. Fonte Inter (SF Pro no iOS). Margem 20 px (24 no cadastro). Ícones de traço fino. Perfil com foto (câmera/galeria) ou avatar 3D pronto (`assets/avatares/`); sem nenhum, iniciais. Outras pessoas (avaliações etc.) ainda com iniciais.
 
 ## Regras que não podem ser quebradas
 - Pedido enviado **ao mesmo tempo** a todos os profissionais ativos; raio expande sozinho em 60–90 s ("Expandindo a busca para sua região…"); sem ninguém ativo, a busca continua em segundo plano e avisa quando alguém **aceita**. Nunca tela parada.
@@ -62,7 +62,7 @@ Publicado em https://claude.ai/artifact/UbvPYpEqyP5sWj9cbtvT7B. Fonte: `docs/flu
   - `core/theme/tatu_medidas.dart` (`TatuMedidas`): margem 20 (telas internas, Home, Perfil, folhas) · margemCadastro 24 (entrada/cadastro) · topo 20 · base 24 · entreItens 12 · entreSecoes 24 · raioCartao 18 · raioCampo 16 · raioOpcao 22 · raioFolha 30 · alturaBotao 56 · alturaCampo 62 · alturaBusca 48 · alturaChip 38 · alturaLinha 52.
   - `core/theme/tatu_texto.dart` (`TatuTexto`): tituloFolha 22 · corpo 15 (folhas, estados vazios) · detalhe 15 cinza (linhas, "Oi, Ana") · nota 13 cinza (avisos/dicas) · secao 13 maiúsculas.
   - Botão secundário: `tatuBotaoSecundario()`.
-- **Componentes únicos** (`shared/widgets/`): `TelaInterna` (topo + margens de toda tela interna), `CadastroScaffold` (telas de cadastro), `EstadoVazio`, `mostrarFolha`/`AlcaFolha`/`confirmar` (folhas; com ícone de atenção e `destacarCancelar` para a opção segura em cima), `LinhaIcone`/`DivisorLinha`, `GrupoLista`/`ItemLista`, `GrupoCartao`/`LinhaInterruptor` (cartão agrupado com interruptores), `TatuField`, `TatuChip`, `CampoBusca`, `BotaoTracejado`, `TopoTela`, `AbasCliente`, `Segmento`, `Estrelas`, `AvatarIniciais`. Tela nova reaproveita esses; se precisar de algo novo que se repete, vira componente aqui.
+- **Componentes únicos** (`shared/widgets/`): `TelaInterna` (topo + margens de toda tela interna), `CadastroScaffold` (telas de cadastro), `EstadoVazio`, `mostrarFolha`/`AlcaFolha`/`confirmar` (folhas; com ícone de atenção e `destacarCancelar` para a opção segura em cima), `LinhaIcone`/`DivisorLinha`, `GrupoLista`/`ItemLista`, `GrupoCartao`/`LinhaInterruptor` (cartão agrupado com interruptores), `TatuField`, `TatuChip`, `CampoBusca`, `BotaoTracejado`, `TopoTela`, `AbasCliente`, `Segmento`, `Estrelas`, `AvatarIniciais`, `AvatarUsuario`/`AvatarComAro` (foto ou avatar da pessoa logada), `mostrarAvisoTopo` (aviso escuro de sucesso no topo), `TelaPermissao`/`IconePermissao` (câmera/localização negadas). Tela nova reaproveita esses; se precisar de algo novo que se repete, vira componente aqui.
 - Valor novo só entra no arquivo de medidas/textos, nunca direto na tela.
 
 ## Como trabalhar
@@ -79,4 +79,4 @@ Publicado em https://claude.ai/artifact/UbvPYpEqyP5sWj9cbtvT7B. Fonte: `docs/flu
 - Tarefas: GitHub Project "Tatu – MVP" (https://github.com/users/gustavo-bercacollo/projects/3), colunas Backlog / A fazer / Fazendo / Feito.
 
 ## Decisões em aberto (perguntar antes de travar)
-Login por SMS ou e-mail+senha · verificação obrigatória para ficar online · comissão e freemium · prazo de repasse · prazos (validade do pedido, confirmação do cliente, contagem do chamado, tentativas de verificação) · avatar com iniciais ou foto · barra de navegação do Android · nome oficial.
+Login por SMS ou e-mail+senha · verificação obrigatória para ficar online · comissão e freemium · prazo de repasse · prazos (validade do pedido, confirmação do cliente, contagem do chamado, tentativas de verificação) · barra de navegação do Android · nome oficial.

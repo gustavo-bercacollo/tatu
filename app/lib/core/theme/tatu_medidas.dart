@@ -34,4 +34,11 @@ class TatuMedidas {
 
   /// Largura máxima do conteúdo (no computador a tela não estica).
   static const larguraMax = 430.0;
+
+  // Avatares e foto do perfil
+  static const avatarPerfil = 76.0; // topo do Perfil
+  static const avatarGrande = 124.0; // prévia em "Escolha um avatar"
+  static const avatarOpcao = 68.0; // cada avatar para escolher
+  static const aroAvatar = 3.0; // aro preto do avatar escolhido
+  static const circuloRecorte = 300.0; // círculo de "Ajustar foto"
 }

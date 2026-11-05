@@ -8,10 +8,18 @@ import '../../core/theme/tatu_texto.dart';
 /// Grupo da lista agrupada (estilo Ajustes do iPhone): título opcional em
 /// maiúsculas e um cartão branco com as linhas separadas por divisores.
 class GrupoLista extends StatelessWidget {
-  const GrupoLista({super.key, this.titulo, required this.itens});
+  const GrupoLista({
+    super.key,
+    this.titulo,
+    required this.itens,
+    this.fundo = TatuColors.bg,
+  });
 
   final String? titulo;
   final List<ItemLista> itens;
+
+  /// Cor do cartão (cinza dentro de folhas brancas).
+  final Color fundo;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +37,7 @@ class GrupoLista extends StatelessWidget {
             child: Text(titulo!.toUpperCase(), style: TatuTexto.secao),
           ),
         Material(
-          color: TatuColors.bg,
+          color: fundo,
           borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
           clipBehavior: Clip.antiAlias,
           child: Column(
