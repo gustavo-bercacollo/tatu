@@ -64,5 +64,7 @@
  "app/nome.png": "docs/fluxo/app/nome.png",
  "app/email.png": "docs/fluxo/app/email.png",
  "app/codigo-email.png": "docs/fluxo/app/codigo-email.png",
- "app/entrar.png": "docs/fluxo/app/entrar.png"
+ "app/entrar.png": "docs/fluxo/app/entrar.png",
+ "app/home-vazia.png": "docs/fluxo/app/home-vazia.png",
+ "app/home-ia.png": "docs/fluxo/app/home-ia.png"
 }

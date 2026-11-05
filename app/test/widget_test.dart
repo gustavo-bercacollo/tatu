@@ -105,6 +105,11 @@ void main() {
     await tester.enterText(find.byType(TextField).first, 'Ana');
     await tester.pump();
     expect(botao().onPressed, isNotNull);
+
+    await tester.tap(find.text('Continuar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Oi, Ana'), findsOneWidget);
+    expect(find.text('Do que você precisa?'), findsOneWidget);
   });
 
   testWidgets(

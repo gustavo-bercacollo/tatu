@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
+import 'package:tatu/features/cliente/home_page.dart';
 import 'package:tatu/features/entrada/boas_vindas_page.dart';
 import 'package:tatu/features/entrada/celular_page.dart';
 import 'package:tatu/features/entrada/codigo_page.dart';
@@ -120,6 +121,29 @@ void main() {
       preparar: () async {
         await t.enterText(find.byType(TextField), '4827');
         await t.pump(const Duration(seconds: 18));
+      },
+    );
+  });
+
+  testWidgets('home-vazia', (t) async {
+    await _capturar(
+      t,
+      'home-vazia',
+      const HomeClientePage(nome: 'Ana Martins'),
+    );
+  });
+
+  testWidgets('home-ia', (t) async {
+    await _capturar(
+      t,
+      'home-ia',
+      const HomeClientePage(nome: 'Ana Martins'),
+      preparar: () async {
+        await t.enterText(
+          find.byType(TextField),
+          'o cano da pia da cozinha está vazando e a água não para',
+        );
+        await t.pump(const Duration(milliseconds: 600));
       },
     );
   });

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../shared/widgets/cadastro_scaffold.dart';
+import '../cliente/home_page.dart';
 import '../../shared/widgets/tatu_field.dart';
 
 /// Cadastro · seu nome: como o profissional vai chamar o cliente.
@@ -26,10 +27,12 @@ class _NomePageState extends State<NomePage> {
 
   void _continuar() {
     if (!_valido) return;
-    // A próxima tela ainda não existe.
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text('Próxima tela: em breve')));
+    final nome = '${_nome.text.trim()} ${_sobrenome.text.trim()}'.trim();
+    // Cadastro concluído: a Home vira a única tela da pilha.
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => HomeClientePage(nome: nome)),
+      (_) => false,
+    );
   }
 
   @override

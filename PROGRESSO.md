@@ -2,6 +2,9 @@
 
 Atualizar a cada tela ou componente pronto. Ao abrir uma sessão nova: ler `CLAUDE.md` e este arquivo e continuar do "Próximo passo".
 
+## Fluxo de entrada no app
+Boas-vindas → Preciso de um serviço → Celular (ou Usar e-mail → E-mail) → Código → Nome → Home. Entrar → Celular/E-mail → Código → Home.
+
 ## Próximo passo
 Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto com ele** (não adiantar outras telas). Hoje: "Preciso de um serviço" → Celular → Código SMS → Nome. "Quero trabalhar", "Entrar" e o Continuar do Nome mostram "em breve". Sem backend: qualquer código de 6 dígitos é aceito e "Reenviar" só reinicia a contagem.
 
@@ -26,6 +29,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Nome ("Como podemos te chamar?", sobrenome opcional, Continuar só com nome) — `features/entrada/nome_page.dart`
 
 ## Telas do cliente (C1–C13)
+- [x] C3 Home vazia + C4 IA marcou — `features/cliente/home_page.dart` (referências `tatu-home-cliente.html` e `tatu-home-ia-marcou.html`; verdinho "Profissionais ativos" embaixo, junto do botão). IA simulada em `data/sugestao_servico.dart`. Falta: conflito (C5), Outros (C6/C7), endereço, perfil, abas, Chamar → Procurando
 - [ ] C1 Abertura
 - [ ] C3 Home (vazia, IA marcou, conflito, Outros)
 - [ ] C4 Endereço

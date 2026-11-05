@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../../core/theme/tatu_colors.dart';
 import '../../shared/widgets/cadastro_scaffold.dart';
+import '../cliente/home_page.dart';
 import 'nome_page.dart';
 
 /// Cadastro · código de 6 dígitos, enviado por SMS ou por e-mail.
@@ -74,14 +75,17 @@ class _CodigoPageState extends State<CodigoPage> {
 
   void _continuar() {
     if (!_completo) return;
-    if (widget.porEmail || widget.entrar) {
-      // Ainda não desenhadas: o celular depois do e-mail e a tela depois de entrar.
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('Próxima tela: em breve')));
+    // Sem backend ainda: qualquer código de 6 dígitos é aceito.
+    if (widget.entrar) {
+      // Conta que já existe: vai direto para a Home (nome de exemplo).
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => const HomeClientePage(nome: 'Ana Martins'),
+        ),
+        (_) => false,
+      );
       return;
     }
-    // Sem backend ainda: qualquer código de 6 dígitos é aceito.
     Navigator.of(context)
         .pushReplacement(MaterialPageRoute(builder: (_) => const NomePage()));
   }
