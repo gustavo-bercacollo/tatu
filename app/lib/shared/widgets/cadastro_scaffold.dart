@@ -18,6 +18,7 @@ class CadastroScaffold extends StatelessWidget {
     this.botaoSecundario,
     this.onSecundario,
     this.perigo = false,
+    this.botaoCinza = false,
   });
 
   final String titulo;
@@ -34,6 +35,9 @@ class CadastroScaffold extends StatelessWidget {
 
   /// Botão principal vermelho claro (ex.: "Excluir minha conta").
   final bool perigo;
+
+  /// Botão principal cinza (secundário), ex.: "Falar com o suporte".
+  final bool botaoCinza;
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +93,11 @@ class CadastroScaffold extends StatelessWidget {
                   const SizedBox(height: 16),
                   FilledButton(
                     onPressed: onBotao,
-                    style: perigo ? tatuBotaoPerigo() : null,
+                    style: perigo
+                        ? tatuBotaoPerigo()
+                        : botaoCinza
+                        ? tatuBotaoSecundario()
+                        : null,
                     child: Text(botao),
                   ),
                   if (botaoSecundario != null) ...[

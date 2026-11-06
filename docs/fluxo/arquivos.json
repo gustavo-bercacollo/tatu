@@ -100,5 +100,13 @@
  "app/celular-atualizado.png": "docs/fluxo/app/celular-atualizado.png",
  "app/excluir-conta.png": "docs/fluxo/app/excluir-conta.png",
  "app/excluir-confirmar.png": "docs/fluxo/app/excluir-confirmar.png",
- "app/excluir-bloqueado.png": "docs/fluxo/app/excluir-bloqueado.png"
+ "app/excluir-bloqueado.png": "docs/fluxo/app/excluir-bloqueado.png",
+ "app/ajuda.png": "docs/fluxo/app/ajuda.png",
+ "app/ajuda-assunto.png": "docs/fluxo/app/ajuda-assunto.png",
+ "app/ajuda-artigo.png": "docs/fluxo/app/ajuda-artigo.png",
+ "app/ajuda-busca.png": "docs/fluxo/app/ajuda-busca.png",
+ "app/ajuda-busca-vazia.png": "docs/fluxo/app/ajuda-busca-vazia.png",
+ "app/suporte-assunto.png": "docs/fluxo/app/suporte-assunto.png",
+ "app/suporte-pedido.png": "docs/fluxo/app/suporte-pedido.png",
+ "app/chat-suporte.png": "docs/fluxo/app/chat-suporte.png"
 }

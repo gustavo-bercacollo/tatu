@@ -13,6 +13,7 @@ import '../../shared/widgets/avatar_usuario.dart';
 import '../../shared/widgets/grupo_cartao.dart';
 import '../../shared/widgets/lista_agrupada.dart';
 import '../entrada/boas_vindas_page.dart';
+import 'ajuda/ajuda_page.dart';
 import 'avaliacoes/minhas_avaliacoes_page.dart';
 import 'conta/dados_conta_page.dart';
 import 'endereco/enderecos_page.dart';
@@ -192,7 +193,9 @@ class PerfilClientePage extends StatelessWidget {
                     ItemLista(
                       icone: TablerIcons.help_circle,
                       texto: 'Ajuda',
-                      onTap: () => emBreve('Ajuda'),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const AjudaPage()),
+                      ),
                     ),
                     ItemLista(
                       icone: TablerIcons.lock,

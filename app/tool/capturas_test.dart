@@ -8,7 +8,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
+import 'package:tatu/data/ajuda.dart';
 import 'package:tatu/data/avaliacoes.dart';
+import 'package:tatu/features/cliente/ajuda/ajuda_page.dart';
+import 'package:tatu/features/cliente/ajuda/artigo_page.dart';
+import 'package:tatu/features/cliente/ajuda/assunto_page.dart';
+import 'package:tatu/features/cliente/ajuda/busca_ajuda_page.dart';
+import 'package:tatu/features/cliente/ajuda/chat_suporte_page.dart';
+import 'package:tatu/features/cliente/ajuda/escolher_pedido_page.dart';
+import 'package:tatu/features/cliente/ajuda/suporte_assunto_page.dart';
 import 'package:tatu/data/conta.dart';
 import 'package:tatu/features/cliente/conta/dados_conta_page.dart';
 import 'package:tatu/features/cliente/conta/editar_nome_page.dart';
@@ -517,6 +525,60 @@ void main() {
 
   testWidgets('excluir-bloqueado', (t) async {
     await _capturar(t, 'excluir-bloqueado', const ExcluirBloqueadoPage());
+  });
+
+  testWidgets('ajuda', (t) async {
+    await _capturar(t, 'ajuda', const AjudaPage());
+  });
+
+  testWidgets('ajuda-assunto', (t) async {
+    await _capturar(t, 'ajuda-assunto', AssuntoPage(assunto: assuntosAjuda[1]));
+  });
+
+  testWidgets('ajuda-artigo', (t) async {
+    await _capturar(
+      t,
+      'ajuda-artigo',
+      const ArtigoPage(artigo: artigoPagamento),
+    );
+  });
+
+  testWidgets('ajuda-busca', (t) async {
+    await _capturar(t, 'ajuda-busca', const BuscaAjudaPage(termo: 'pix'));
+  });
+
+  testWidgets('ajuda-busca-vazia', (t) async {
+    await _capturar(
+      t,
+      'ajuda-busca-vazia',
+      const BuscaAjudaPage(termo: 'reembolso de cripto'),
+    );
+  });
+
+  testWidgets('suporte-assunto', (t) async {
+    await _capturar(t, 'suporte-assunto', const SuporteAssuntoPage());
+  });
+
+  testWidgets('suporte-pedido', (t) async {
+    await _capturar(t, 'suporte-pedido', const EscolherPedidoPage());
+  });
+
+  testWidgets('chat-suporte', (t) async {
+    await _capturar(
+      t,
+      'chat-suporte',
+      ChatSuportePage(pedido: pedidosRecentes.first),
+      preparar: () async {
+        await t.enterText(
+          find.byType(TextField),
+          'Cobraram duas vezes no cartão.',
+        );
+        await t.testTextInput.receiveAction(TextInputAction.send);
+        await t.pump(const Duration(seconds: 2));
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.pump();
+      },
+    );
   });
 
   testWidgets('home-vazia', (t) async {

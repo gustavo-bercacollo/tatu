@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
@@ -155,6 +156,43 @@ class CartaoBotao extends StatelessWidget {
           height: TatuMedidas.alturaLinha,
           child: Center(
             child: Text(texto, style: TextStyle(fontSize: 17, color: cor)),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Linha de lista só com texto e seta (perguntas, artigos, resultados).
+class LinhaSimples extends StatelessWidget {
+  const LinhaSimples({super.key, required this.texto, required this.onTap});
+
+  final String texto;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: SizedBox(
+        height: TatuMedidas.alturaLinha,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 16, right: 12),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  texto,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 17),
+                ),
+              ),
+              const Icon(
+                TablerIcons.chevron_right,
+                size: 18,
+                color: TatuColors.chevron,
+              ),
+            ],
           ),
         ),
       ),

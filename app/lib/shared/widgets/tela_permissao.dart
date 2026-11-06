@@ -55,36 +55,14 @@ class TelaPermissao extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: BackCircleButton(),
                   ),
-                  const Spacer(),
-                  Center(
-                    child: Container(
-                      width: 112,
-                      height: 112,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: aviso ? TatuColors.warningSoft : TatuColors.fill,
-                        shape: BoxShape.circle,
-                      ),
-                      child: icone,
+                  Expanded(
+                    child: TelaPermissaoCorpo(
+                      icone: icone,
+                      titulo: titulo,
+                      texto: texto,
+                      aviso: aviso,
                     ),
                   ),
-                  const SizedBox(height: 40),
-                  Text(
-                    titulo,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    texto,
-                    textAlign: TextAlign.center,
-                    style: TatuTexto.corpo,
-                  ),
-                  const Spacer(flex: 2),
                   FilledButton(
                     onPressed:
                         onPrincipal ??
@@ -107,6 +85,59 @@ class TelaPermissao extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Miolo centralizado da tela de permissão/aviso: ícone num círculo,
+/// título e texto. Também usado em estados vazios de tela cheia
+/// (ex.: "Nada encontrado").
+class TelaPermissaoCorpo extends StatelessWidget {
+  const TelaPermissaoCorpo({
+    super.key,
+    required this.icone,
+    required this.titulo,
+    required this.texto,
+    this.aviso = false,
+  });
+
+  final Widget icone;
+  final String titulo;
+  final String texto;
+  final bool aviso;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Spacer(),
+        Center(
+          child: Container(
+            width: 112,
+            height: 112,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: aviso ? TatuColors.warningSoft : TatuColors.fill,
+              shape: BoxShape.circle,
+            ),
+            child: icone,
+          ),
+        ),
+        const SizedBox(height: 40),
+        Text(
+          titulo,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(texto, textAlign: TextAlign.center, style: TatuTexto.corpo),
+        const Spacer(flex: 2),
+      ],
     );
   }
 }
