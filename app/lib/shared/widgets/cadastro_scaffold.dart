@@ -17,6 +17,7 @@ class CadastroScaffold extends StatelessWidget {
     required this.onBotao,
     this.botaoSecundario,
     this.onSecundario,
+    this.perigo = false,
   });
 
   final String titulo;
@@ -30,6 +31,9 @@ class CadastroScaffold extends StatelessWidget {
   /// Botão cinza abaixo do principal (ex.: "Usar e-mail").
   final String? botaoSecundario;
   final VoidCallback? onSecundario;
+
+  /// Botão principal vermelho claro (ex.: "Excluir minha conta").
+  final bool perigo;
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +87,11 @@ class CadastroScaffold extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  FilledButton(onPressed: onBotao, child: Text(botao)),
+                  FilledButton(
+                    onPressed: onBotao,
+                    style: perigo ? tatuBotaoPerigo() : null,
+                    child: Text(botao),
+                  ),
                   if (botaoSecundario != null) ...[
                     const SizedBox(height: 10),
                     FilledButton(

@@ -4,14 +4,17 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
 import '../../core/theme/tatu_texto.dart';
+import '../../data/conta.dart';
 import '../../data/enderecos.dart';
 import '../../data/notificacoes.dart';
 import '../../data/pagamentos.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import '../../shared/widgets/avatar_usuario.dart';
+import '../../shared/widgets/grupo_cartao.dart';
 import '../../shared/widgets/lista_agrupada.dart';
 import '../entrada/boas_vindas_page.dart';
 import 'avaliacoes/minhas_avaliacoes_page.dart';
+import 'conta/dados_conta_page.dart';
 import 'endereco/enderecos_page.dart';
 import 'foto/foto_perfil_sheet.dart';
 import 'notificacoes/notificacoes_page.dart';
@@ -19,14 +22,8 @@ import 'pagamento/pagamento_page.dart';
 
 /// Perfil do cliente: dados, troca de modo e atalhos da conta.
 class PerfilClientePage extends StatelessWidget {
-  const PerfilClientePage({
-    super.key,
-    required this.nome,
-    this.nota = '4,8',
-    this.pedidos = 23,
-  });
+  const PerfilClientePage({super.key, this.nota = '4,8', this.pedidos = 23});
 
-  final String nome;
   final String nota;
   final int pedidos;
 
@@ -37,7 +34,12 @@ class PerfilClientePage extends StatelessWidget {
       ..showSnackBar(SnackBar(content: Text('$o: em breve')));
 
     return ListenableBuilder(
-      listenable: Listenable.merge([enderecos, pagamentos, notificacoes]),
+      listenable: Listenable.merge([
+        conta,
+        enderecos,
+        pagamentos,
+        notificacoes,
+      ]),
       builder: (context, _) => _tela(context, emBreve),
     );
   }
@@ -68,7 +70,6 @@ class PerfilClientePage extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () => trocarFotoDoPerfil(context),
                       child: AvatarUsuario(
-                        nome: nome,
                         tamanho: TatuMedidas.avatarPerfil,
                         camera: true,
                       ),
@@ -81,7 +82,7 @@ class PerfilClientePage extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        nome,
+                        conta.nomeCompleto,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 24,
@@ -177,7 +178,11 @@ class PerfilClientePage extends StatelessWidget {
                     ItemLista(
                       icone: TablerIcons.user,
                       texto: 'Dados da conta',
-                      onTap: () => emBreve('Dados da conta'),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const DadosContaPage(),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -197,27 +202,11 @@ class PerfilClientePage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Material(
-                  color: TatuColors.bg,
-                  borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
-                  clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    onTap: () => Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const BoasVindasPage()),
-                      (_) => false,
-                    ),
-                    child: const SizedBox(
-                      height: TatuMedidas.alturaLinha,
-                      child: Center(
-                        child: Text(
-                          'Sair da conta',
-                          style: TextStyle(
-                            fontSize: 17,
-                            color: TatuColors.danger,
-                          ),
-                        ),
-                      ),
-                    ),
+                CartaoBotao(
+                  texto: 'Sair da conta',
+                  onTap: () => Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const BoasVindasPage()),
+                    (_) => false,
                   ),
                 ),
               ],

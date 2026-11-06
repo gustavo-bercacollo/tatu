@@ -12,14 +12,21 @@ import 'nome_page.dart';
 /// Cadastro · código de 6 dígitos, enviado por SMS ou por e-mail.
 class CodigoPage extends StatefulWidget {
   /// Código por SMS. [destino] é o número formatado, ex.: (11) 98888-7777.
-  const CodigoPage({super.key, required this.destino, this.entrar = false})
-    : porEmail = false;
+  const CodigoPage({
+    super.key,
+    required this.destino,
+    this.entrar = false,
+    this.botao = 'Continuar',
+    this.onConfirmado,
+  }) : porEmail = false;
 
   /// Código por e-mail. [destino] é o e-mail informado.
   const CodigoPage.email({
     super.key,
     required this.destino,
     this.entrar = false,
+    this.botao = 'Continuar',
+    this.onConfirmado,
   }) : porEmail = true;
 
   final String destino;
@@ -27,6 +34,13 @@ class CodigoPage extends StatefulWidget {
 
   /// Veio da tela Entrar (conta que já existe), não do cadastro.
   final bool entrar;
+
+  /// Texto do botão (ex.: "Confirmar" ao trocar celular ou e-mail).
+  final String botao;
+
+  /// Fora do cadastro (trocar celular/e-mail): o que fazer com o código
+  /// confirmado, em vez de seguir para o Nome ou a Home.
+  final void Function(BuildContext context)? onConfirmado;
 
   @override
   State<CodigoPage> createState() => _CodigoPageState();
@@ -77,12 +91,14 @@ class _CodigoPageState extends State<CodigoPage> {
   void _continuar() {
     if (!_completo) return;
     // Sem backend ainda: qualquer código de 6 dígitos é aceito.
+    if (widget.onConfirmado != null) {
+      widget.onConfirmado!(context);
+      return;
+    }
     if (widget.entrar) {
       // Conta que já existe: vai direto para a Home (nome de exemplo).
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (_) => const HomeClientePage(nome: 'Ana Martins'),
-        ),
+        MaterialPageRoute(builder: (_) => const HomeClientePage()),
         (_) => false,
       );
       return;
@@ -101,7 +117,7 @@ class _CodigoPageState extends State<CodigoPage> {
       subtitulo: widget.porEmail
           ? 'Enviamos um e-mail para\n${widget.destino}'
           : 'Enviamos um SMS para\n+55 ${widget.destino}',
-      botao: 'Continuar',
+      botao: widget.botao,
       onBotao: _completo ? _continuar : null,
       children: [
         const SizedBox(height: 18),

@@ -9,6 +9,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/avaliacoes.dart';
+import 'package:tatu/data/conta.dart';
+import 'package:tatu/features/cliente/conta/dados_conta_page.dart';
+import 'package:tatu/features/cliente/conta/editar_nome_page.dart';
+import 'package:tatu/features/cliente/conta/excluir_bloqueado_page.dart';
+import 'package:tatu/features/cliente/conta/excluir_conta_page.dart';
+import 'package:tatu/features/cliente/conta/novo_celular_page.dart';
+import 'package:tatu/features/cliente/conta/novo_email_page.dart';
 import 'package:tatu/data/enderecos.dart';
 import 'package:tatu/data/notificacoes.dart';
 import 'package:tatu/data/perfil.dart';
@@ -67,6 +74,7 @@ Future<void> _capturar(
   avaliacoes.restaurar();
   notificacoes.restaurar();
   perfil.restaurar();
+  conta.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -163,7 +171,7 @@ void main() {
     await _capturar(
       t,
       'endereco-folha',
-      const HomeClientePage(nome: 'Ana Martins'),
+      const HomeClientePage(),
       preparar: () async {
         await t.tap(find.text('Rua Bruno Lobo, 29'));
         await t.pumpAndSettle();
@@ -372,18 +380,14 @@ void main() {
   });
 
   testWidgets('perfil-cliente', (t) async {
-    await _capturar(
-      t,
-      'perfil-cliente',
-      const PerfilClientePage(nome: 'Ana Martins'),
-    );
+    await _capturar(t, 'perfil-cliente', const PerfilClientePage());
   });
 
   testWidgets('foto-perfil', (t) async {
     await _capturar(
       t,
       'foto-perfil',
-      const PerfilClientePage(nome: 'Ana Martins'),
+      const PerfilClientePage(),
       preparar: () async {
         await t.tap(find.bySemanticsLabel(RegExp('^Foto do perfil')));
         await t.pumpAndSettle();
@@ -414,7 +418,7 @@ void main() {
     await _capturar(
       t,
       'foto-atualizada',
-      const PerfilClientePage(nome: 'Ana Martins'),
+      const PerfilClientePage(),
       preparar: () async {
         await t.tap(find.bySemanticsLabel(RegExp('^Foto do perfil')));
         await t.pumpAndSettle();
@@ -430,19 +434,100 @@ void main() {
     await _capturar(t, 'camera-desativada', const CameraDesativadaPage());
   });
 
-  testWidgets('home-vazia', (t) async {
+  testWidgets('dados-conta', (t) async {
+    await _capturar(t, 'dados-conta', const DadosContaPage());
+  });
+
+  testWidgets('editar-nome', (t) async {
+    await _capturar(t, 'editar-nome', const EditarNomePage());
+  });
+
+  testWidgets('novo-celular', (t) async {
     await _capturar(
       t,
-      'home-vazia',
-      const HomeClientePage(nome: 'Ana Martins'),
+      'novo-celular',
+      const NovoCelularPage(),
+      preparar: () async {
+        await t.enterText(find.byType(TextField), '11977776666');
+        await t.pump();
+      },
     );
+  });
+
+  testWidgets('codigo-celular', (t) async {
+    await _capturar(
+      t,
+      'codigo-celular',
+      const NovoCelularPage(),
+      preparar: () async {
+        await t.enterText(find.byType(TextField), '11977776666');
+        await t.pump();
+        await t.tap(find.text('Enviar código'));
+        await t.pumpAndSettle();
+        await t.enterText(find.byType(TextField), '4827');
+        await t.pump(const Duration(seconds: 18));
+      },
+    );
+  });
+
+  testWidgets('novo-email', (t) async {
+    await _capturar(t, 'novo-email', const NovoEmailPage());
+  });
+
+  testWidgets('celular-atualizado', (t) async {
+    await _capturar(
+      t,
+      'celular-atualizado',
+      const DadosContaPage(),
+      preparar: () async {
+        await t.tap(find.text('+55 (11) 98888-7777'));
+        await t.pumpAndSettle();
+        await t.enterText(find.byType(TextField), '11977776666');
+        await t.pump();
+        await t.tap(find.text('Enviar código'));
+        await t.pumpAndSettle();
+        await t.enterText(find.byType(TextField), '482719');
+        await t.pump();
+        if (find.text('Confirmar').evaluate().isNotEmpty) {
+          await t.tap(find.text('Confirmar'));
+        }
+        await t.pump(const Duration(milliseconds: 600));
+        await t.pump(const Duration(milliseconds: 600));
+      },
+    );
+  });
+
+  testWidgets('excluir-conta', (t) async {
+    await _capturar(t, 'excluir-conta', const ExcluirContaPage());
+  });
+
+  testWidgets('excluir-confirmar', (t) async {
+    await _capturar(
+      t,
+      'excluir-confirmar',
+      const DadosContaPage(),
+      preparar: () async {
+        await t.tap(find.text('Excluir conta'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Excluir minha conta'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('excluir-bloqueado', (t) async {
+    await _capturar(t, 'excluir-bloqueado', const ExcluirBloqueadoPage());
+  });
+
+  testWidgets('home-vazia', (t) async {
+    await _capturar(t, 'home-vazia', const HomeClientePage());
   });
 
   testWidgets('home-ia', (t) async {
     await _capturar(
       t,
       'home-ia',
-      const HomeClientePage(nome: 'Ana Martins'),
+      const HomeClientePage(),
       preparar: () async {
         await t.enterText(
           find.byType(TextField),

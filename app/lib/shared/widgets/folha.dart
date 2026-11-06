@@ -70,10 +70,7 @@ Future<bool> confirmar(
     builder: (ctx) {
       final botaoConfirmar = FilledButton(
         style: perigo
-            ? FilledButton.styleFrom(
-                backgroundColor: TatuColors.dangerSoft,
-                foregroundColor: TatuColors.danger,
-              )
+            ? tatuBotaoPerigo()
             : destacarCancelar
             ? tatuBotaoSecundario()
             : null,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../data/conta.dart';
 import '../../shared/widgets/cadastro_scaffold.dart';
 import '../../shared/widgets/tatu_field.dart';
 import '../cliente/home_page.dart';
@@ -27,10 +28,10 @@ class _NomePageState extends State<NomePage> {
 
   void _continuar() {
     if (!_valido) return;
-    final nome = '${_nome.text.trim()} ${_sobrenome.text.trim()}'.trim();
+    conta.definirNome(_nome.text, _sobrenome.text);
     // Cadastro concluído: a Home vira a única tela da pilha.
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => HomeClientePage(nome: nome)),
+      MaterialPageRoute(builder: (_) => const HomeClientePage()),
       (_) => false,
     );
   }

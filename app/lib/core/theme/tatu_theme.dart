@@ -8,6 +8,12 @@ ButtonStyle tatuBotaoSecundario() => FilledButton.styleFrom(
   foregroundColor: TatuColors.textPrimary,
 );
 
+/// Botão de ação destrutiva: vermelho claro com texto vermelho.
+ButtonStyle tatuBotaoPerigo() => FilledButton.styleFrom(
+  backgroundColor: TatuColors.dangerSoft,
+  foregroundColor: TatuColors.danger,
+);
+
 ThemeData tatuTheme() => ThemeData(
   useMaterial3: true,
   fontFamily: 'Inter',

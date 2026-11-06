@@ -6,6 +6,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
 import '../../core/theme/tatu_texto.dart';
+import '../../data/conta.dart';
 import '../../data/enderecos.dart';
 import '../../data/sugestao_servico.dart';
 import '../../shared/widgets/abas_cliente.dart';
@@ -16,13 +17,8 @@ import 'perfil_page.dart';
 
 /// Home do cliente: descreve o problema, escolhe (ou a IA marca) o serviço e chama.
 class HomeClientePage extends StatefulWidget {
-  const HomeClientePage({
-    super.key,
-    required this.nome,
-    this.ia = const SugestaoServicoMock(),
-  });
+  const HomeClientePage({super.key, this.ia = const SugestaoServicoMock()});
 
-  final String nome;
   final SugestaoServico ia;
 
   @override
@@ -93,9 +89,12 @@ class _HomeClientePageState extends State<HomeClientePage> {
                       children: [
                         _cabecalho(),
                         const SizedBox(height: 40),
-                        Text(
-                          'Oi, ${widget.nome.split(' ').first}',
-                          style: TatuTexto.detalhe,
+                        ListenableBuilder(
+                          listenable: conta,
+                          builder: (_, _) => Text(
+                            'Oi, ${conta.nome}',
+                            style: TatuTexto.detalhe,
+                          ),
                         ),
                         const SizedBox(height: 10),
                         const Text(
@@ -266,11 +265,9 @@ class _HomeClientePageState extends State<HomeClientePage> {
           label: 'Perfil',
           child: GestureDetector(
             onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => PerfilClientePage(nome: widget.nome),
-              ),
+              MaterialPageRoute(builder: (_) => const PerfilClientePage()),
             ),
-            child: AvatarUsuario(nome: widget.nome),
+            child: const AvatarUsuario(),
           ),
         ),
       ],

@@ -28,7 +28,7 @@ FilledButton _botao(WidgetTester t, String texto) =>
 
 void main() {
   testWidgets('Perfil → Pagamento mostra os cartões e o padrão', (t) async {
-    await _abrir(t, const PerfilClientePage(nome: 'Ana Martins'));
+    await _abrir(t, const PerfilClientePage());
     expect(find.text('Visa 4242'), findsOneWidget);
     await t.tap(find.text('Pagamento'));
     await t.pumpAndSettle();
@@ -73,7 +73,7 @@ void main() {
   testWidgets('Detalhe: remover pede confirmação; sem cartões fica vazio', (
     t,
   ) async {
-    await _abrir(t, const PerfilClientePage(nome: 'Ana Martins'));
+    await _abrir(t, const PerfilClientePage());
     await t.tap(find.text('Pagamento'));
     await t.pumpAndSettle();
 

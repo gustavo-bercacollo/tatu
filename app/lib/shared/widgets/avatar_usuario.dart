@@ -3,6 +3,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
+import '../../data/conta.dart';
 import '../../data/perfil.dart';
 import 'avatar_iniciais.dart';
 
@@ -36,14 +37,8 @@ ImageProvider? imagemDoPerfil() {
 /// Avatar da pessoa logada: foto ou avatar escolhido; sem nenhum, as
 /// iniciais. Atualiza sozinho quando a foto muda.
 class AvatarUsuario extends StatelessWidget {
-  const AvatarUsuario({
-    super.key,
-    required this.nome,
-    this.tamanho = 36,
-    this.camera = false,
-  });
+  const AvatarUsuario({super.key, this.tamanho = 36, this.camera = false});
 
-  final String nome;
   final double tamanho;
 
   /// Mostra o selo de câmera (Perfil: toque para trocar a foto).
@@ -52,11 +47,11 @@ class AvatarUsuario extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: perfil,
+      listenable: Listenable.merge([perfil, conta]),
       builder: (context, _) {
         final imagem = imagemDoPerfil();
         final base = imagem == null
-            ? AvatarIniciais(nome: nome, tamanho: tamanho)
+            ? AvatarIniciais(nome: conta.nomeCompleto, tamanho: tamanho)
             : AvatarImagem(imagem: imagem, tamanho: tamanho);
         if (!camera) return base;
         return SizedBox(

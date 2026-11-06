@@ -9,10 +9,7 @@ Future<void> _abrirAvaliacoes(WidgetTester t) async {
   t.view.devicePixelRatio = 3;
   addTearDown(t.view.reset);
   await t.pumpWidget(
-    MaterialApp(
-      theme: tatuTheme(),
-      home: const PerfilClientePage(nome: 'Ana Martins'),
-    ),
+    MaterialApp(theme: tatuTheme(), home: const PerfilClientePage()),
   );
   await t.tap(find.text('Minhas avaliações'));
   await t.pumpAndSettle();

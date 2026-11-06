@@ -1,12 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../core/theme/tatu_colors.dart';
-import '../../core/theme/tatu_medidas.dart';
 import '../../core/theme/tatu_texto.dart';
 import '../../shared/widgets/cadastro_scaffold.dart';
-import '../../shared/widgets/tatu_field.dart';
+import '../../shared/widgets/campo_celular.dart';
 import 'codigo_page.dart';
 import 'email_page.dart';
 
@@ -29,8 +27,7 @@ class _CelularPageState extends State<CelularPage> {
   final _criarConta = TapGestureRecognizer();
 
   // Celular com DDD: 11 dígitos.
-  bool get _valido =>
-      _controller.text.replaceAll(RegExp(r'\D'), '').length == 11;
+  bool get _valido => CampoCelular.completo(_controller.text);
 
   @override
   void initState() {
@@ -74,39 +71,10 @@ class _CelularPageState extends State<CelularPage> {
       botaoSecundario: 'Usar e-mail',
       onSecundario: _usarEmail,
       children: [
-        Row(
-          children: [
-            Container(
-              width: 86,
-              height: TatuMedidas.alturaCampo,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: TatuColors.fill,
-                borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
-              ),
-              child: const Text(
-                'BR +55',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: TatuField(
-                label: 'Celular',
-                hintText: '(11) 98888-7777',
-                controller: _controller,
-                autofocus: true,
-                keyboardType: TextInputType.phone,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(11),
-                  _CelularFormatter(),
-                ],
-                onChanged: (_) => setState(() {}),
-                onSubmitted: (_) => _continuar(),
-              ),
-            ),
-          ],
+        CampoCelular(
+          controller: _controller,
+          onChanged: (_) => setState(() {}),
+          onSubmitted: (_) => _continuar(),
         ),
         if (widget.entrar) ...[
           const SizedBox(height: 26),
@@ -134,29 +102,6 @@ class _CelularPageState extends State<CelularPage> {
           ),
         ],
       ],
-    );
-  }
-}
-
-/// Formata os dígitos como (11) 98888-7777 enquanto a pessoa digita.
-class _CelularFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    final d = newValue.text;
-    final b = StringBuffer();
-    for (var i = 0; i < d.length; i++) {
-      if (i == 0) b.write('(');
-      if (i == 2) b.write(') ');
-      if (i == 7) b.write('-');
-      b.write(d[i]);
-    }
-    final texto = b.toString();
-    return TextEditingValue(
-      text: texto,
-      selection: TextSelection.collapsed(offset: texto.length),
     );
   }
 }

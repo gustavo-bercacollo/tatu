@@ -36,3 +36,18 @@ class MascaraFormatter extends TextInputFormatter {
 }
 
 String soDigitos(String s) => s.replaceAll(RegExp(r'\D'), '');
+
+/// Molde do celular brasileiro com DDD: (11) 98888-7777.
+const moldeCelular = '(##) #####-####';
+
+/// Formata 11 dígitos como (11) 98888-7777.
+String formatarCelular(String digitos) => MascaraFormatter(moldeCelular)
+    .formatEditUpdate(
+      TextEditingValue.empty,
+      TextEditingValue(text: soDigitos(digitos)),
+    )
+    .text;
+
+/// E-mail com cara de válido (algo@algo.algo).
+bool emailValido(String e) =>
+    RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(e.trim());

@@ -16,6 +16,9 @@ class TelaPermissao extends StatelessWidget {
     required this.texto,
     required this.alternativa,
     required this.onAlternativa,
+    this.principal = 'Abrir Ajustes',
+    this.onPrincipal,
+    this.aviso = false,
   });
 
   final Widget icone;
@@ -23,6 +26,13 @@ class TelaPermissao extends StatelessWidget {
   final String texto;
   final String alternativa;
   final VoidCallback onAlternativa;
+
+  /// Botão preto; sem [onPrincipal] mostra "em breve" (Ajustes do celular).
+  final String principal;
+  final VoidCallback? onPrincipal;
+
+  /// Círculo laranja claro de atenção em vez do cinza.
+  final bool aviso;
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +61,8 @@ class TelaPermissao extends StatelessWidget {
                       width: 112,
                       height: 112,
                       alignment: Alignment.center,
-                      decoration: const BoxDecoration(
-                        color: TatuColors.fill,
+                      decoration: BoxDecoration(
+                        color: aviso ? TatuColors.warningSoft : TatuColors.fill,
                         shape: BoxShape.circle,
                       ),
                       child: icone,
@@ -76,14 +86,14 @@ class TelaPermissao extends StatelessWidget {
                   ),
                   const Spacer(flex: 2),
                   FilledButton(
-                    onPressed: () => ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(
-                        const SnackBar(
-                          content: Text('Abrir Ajustes: em breve'),
-                        ),
-                      ),
-                    child: const Text('Abrir Ajustes'),
+                    onPressed:
+                        onPrincipal ??
+                        () => ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(
+                            SnackBar(content: Text('$principal: em breve')),
+                          ),
+                    child: Text(principal),
                   ),
                   const SizedBox(height: 10),
                   FilledButton(
@@ -103,14 +113,20 @@ class TelaPermissao extends StatelessWidget {
 
 /// Ícone cinza da tela de permissão (44 px), com risco vermelho opcional.
 class IconePermissao extends StatelessWidget {
-  const IconePermissao(this.icone, {super.key, this.riscado = false});
+  const IconePermissao(
+    this.icone, {
+    super.key,
+    this.riscado = false,
+    this.cor = TatuColors.textSecondary,
+  });
 
   final IconData icone;
   final bool riscado;
+  final Color cor;
 
   @override
   Widget build(BuildContext context) {
-    final i = Icon(icone, size: 44, color: TatuColors.textSecondary);
+    final i = Icon(icone, size: 44, color: cor);
     if (!riscado) return i;
     return SizedBox(
       width: 66,

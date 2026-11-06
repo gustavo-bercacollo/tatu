@@ -91,5 +91,14 @@
  "app/escolher-avatar.png": "docs/fluxo/app/escolher-avatar.png",
  "app/ajustar-foto.png": "docs/fluxo/app/ajustar-foto.png",
  "app/foto-atualizada.png": "docs/fluxo/app/foto-atualizada.png",
- "app/camera-desativada.png": "docs/fluxo/app/camera-desativada.png"
+ "app/camera-desativada.png": "docs/fluxo/app/camera-desativada.png",
+ "app/dados-conta.png": "docs/fluxo/app/dados-conta.png",
+ "app/editar-nome.png": "docs/fluxo/app/editar-nome.png",
+ "app/novo-celular.png": "docs/fluxo/app/novo-celular.png",
+ "app/codigo-celular.png": "docs/fluxo/app/codigo-celular.png",
+ "app/novo-email.png": "docs/fluxo/app/novo-email.png",
+ "app/celular-atualizado.png": "docs/fluxo/app/celular-atualizado.png",
+ "app/excluir-conta.png": "docs/fluxo/app/excluir-conta.png",
+ "app/excluir-confirmar.png": "docs/fluxo/app/excluir-confirmar.png",
+ "app/excluir-bloqueado.png": "docs/fluxo/app/excluir-bloqueado.png"
 }

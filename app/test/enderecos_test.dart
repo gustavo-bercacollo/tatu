@@ -11,10 +11,7 @@ Future<void> _abrirHome(WidgetTester t) async {
   t.view.devicePixelRatio = 3;
   addTearDown(t.view.reset);
   await t.pumpWidget(
-    MaterialApp(
-      theme: tatuTheme(),
-      home: const HomeClientePage(nome: 'Ana Martins'),
-    ),
+    MaterialApp(theme: tatuTheme(), home: const HomeClientePage()),
   );
 }
 

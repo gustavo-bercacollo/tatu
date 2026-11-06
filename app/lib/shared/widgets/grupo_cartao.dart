@@ -57,7 +57,7 @@ class GrupoCartao extends StatelessWidget {
         ),
         if (nota != null)
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            padding: const EdgeInsets.fromLTRB(16, 8, 0, 0),
             child: Text(nota!, style: TatuTexto.nota),
           ),
       ],
@@ -123,6 +123,39 @@ class LinhaInterruptor extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Cartão branco com uma ação centralizada (ex.: "Sair da conta",
+/// "Excluir conta" em vermelho).
+class CartaoBotao extends StatelessWidget {
+  const CartaoBotao({
+    super.key,
+    required this.texto,
+    required this.onTap,
+    this.cor = TatuColors.danger,
+  });
+
+  final String texto;
+  final VoidCallback onTap;
+  final Color cor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: TatuColors.bg,
+      borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox(
+          height: TatuMedidas.alturaLinha,
+          child: Center(
+            child: Text(texto, style: TextStyle(fontSize: 17, color: cor)),
+          ),
         ),
       ),
     );
