@@ -10,6 +10,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/ajuda.dart';
 import 'package:tatu/data/avaliacoes.dart';
+import 'package:tatu/data/conversas.dart';
+import 'package:tatu/features/cliente/mensagens/chat_page.dart';
+import 'package:tatu/features/cliente/mensagens/denunciar_page.dart';
+import 'package:tatu/features/cliente/mensagens/mensagens_page.dart';
 import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/features/cliente/atividade/atividade_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_andamento_page.dart';
@@ -95,6 +99,7 @@ Future<void> _capturar(
   perfil.restaurar();
   conta.restaurar();
   pedidos.restaurar();
+  conversas.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -714,6 +719,112 @@ void main() {
       'pedido-concluido',
       PedidoConcluidoPage(pedido: PedidosRepo().concluidos.first),
     );
+  });
+
+  testWidgets('mensagens', (t) async {
+    await _capturar(
+      t,
+      'mensagens',
+      const MensagensPage(),
+      preparar: () async {
+        conversas.definirCobranca(true);
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('mensagens-lista', (t) async {
+    await _capturar(t, 'mensagens-lista', const MensagensPage());
+  });
+
+  testWidgets('mensagens-vazio', (t) async {
+    await _capturar(
+      t,
+      'mensagens-vazio',
+      const MensagensPage(),
+      preparar: () async {
+        conversas.limpar();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('chat', (t) async {
+    await _capturar(
+      t,
+      'chat',
+      ChatPage(conversa: ConversasRepo().conversas.first),
+    );
+  });
+
+  testWidgets('chat-anexar', (t) async {
+    await _capturar(
+      t,
+      'chat-anexar',
+      ChatPage(conversa: ConversasRepo().conversas.first),
+      preparar: () async {
+        await t.tap(find.bySemanticsLabel('Enviar foto'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('chat-foto', (t) async {
+    final c = ConversasRepo().conversas.first
+      ..mensagens.add(MensagemChat(minha: true, foto: true, hora: '14:32'));
+    await _capturar(t, 'chat-foto', ChatPage(conversa: c));
+  });
+
+  testWidgets('chat-nao-enviada', (t) async {
+    final c = ConversasRepo().conversas.first
+      ..mensagens.add(
+        MensagemChat(
+          texto: 'Pode ser às 15h?',
+          minha: true,
+          envio: EnvioMensagem.falhou,
+        ),
+      );
+    await _capturar(t, 'chat-nao-enviada', ChatPage(conversa: c));
+  });
+
+  testWidgets('chat-encerrado', (t) async {
+    final l = ConversasRepo().conversas.first;
+    final c = Conversa(
+      nome: l.nome,
+      profissao: l.profissao,
+      feminino: l.feminino,
+      servico: l.servico,
+      descricao: l.descricao,
+      rua: l.rua,
+      quando: '04 nov',
+      concluidoEm: '04 nov',
+      mensagens: l.mensagens,
+    );
+    await _capturar(t, 'chat-encerrado', ChatPage(conversa: c));
+  });
+
+  testWidgets('chat-menu', (t) async {
+    await _capturar(
+      t,
+      'chat-menu',
+      ChatPage(conversa: ConversasRepo().conversas.first),
+      preparar: () async {
+        await t.tap(find.bySemanticsLabel(RegExp('^Opções da conversa')));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('chat-denunciar', (t) async {
+    await _capturar(
+      t,
+      'chat-denunciar',
+      DenunciarPage(conversa: ConversasRepo().conversas.first, motivo: 1),
+    );
+  });
+
+  testWidgets('chat-denuncia-enviada', (t) async {
+    await _capturar(t, 'chat-denuncia-enviada', const DenunciaEnviadaPage());
   });
 
   testWidgets('home-vazia', (t) async {

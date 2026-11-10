@@ -37,6 +37,13 @@ class TatuTexto {
   /// Comentário de avaliação nos cartões.
   static const comentario = TextStyle(fontSize: 16, height: 1.35);
 
+  /// Título de grupo numa lista (ex.: "Novembro", "Em andamento").
+  static const grupo = TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.w600,
+    color: TatuColors.textSecondary,
+  );
+
   /// Avisos e dicas pequenas (cadeado, "Toque para editar"…).
   static const nota = TextStyle(
     fontSize: 13,

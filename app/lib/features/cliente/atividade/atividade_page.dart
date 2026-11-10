@@ -365,10 +365,7 @@ class _Concluidos extends StatelessWidget {
               top: TatuMedidas.entreSecoes,
               bottom: TatuMedidas.entreItens,
             ),
-            child: Text(
-              p.mes,
-              style: TatuTexto.detalhe.copyWith(fontWeight: FontWeight.w600),
-            ),
+            child: Text(p.mes, style: TatuTexto.grupo),
           ),
         );
       } else {

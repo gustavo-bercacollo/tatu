@@ -124,5 +124,16 @@
  "app/pedido-andamento.png": "docs/fluxo/app/pedido-andamento.png",
  "app/pedido-cancelar.png": "docs/fluxo/app/pedido-cancelar.png",
  "app/pedido-cancelado.png": "docs/fluxo/app/pedido-cancelado.png",
- "app/pedido-concluido.png": "docs/fluxo/app/pedido-concluido.png"
+ "app/pedido-concluido.png": "docs/fluxo/app/pedido-concluido.png",
+ "app/mensagens.png": "docs/fluxo/app/mensagens.png",
+ "app/mensagens-lista.png": "docs/fluxo/app/mensagens-lista.png",
+ "app/mensagens-vazio.png": "docs/fluxo/app/mensagens-vazio.png",
+ "app/chat.png": "docs/fluxo/app/chat.png",
+ "app/chat-anexar.png": "docs/fluxo/app/chat-anexar.png",
+ "app/chat-foto.png": "docs/fluxo/app/chat-foto.png",
+ "app/chat-nao-enviada.png": "docs/fluxo/app/chat-nao-enviada.png",
+ "app/chat-encerrado.png": "docs/fluxo/app/chat-encerrado.png",
+ "app/chat-menu.png": "docs/fluxo/app/chat-menu.png",
+ "app/chat-denunciar.png": "docs/fluxo/app/chat-denunciar.png",
+ "app/chat-denuncia-enviada.png": "docs/fluxo/app/chat-denuncia-enviada.png"
 }

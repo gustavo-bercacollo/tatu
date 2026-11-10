@@ -4,12 +4,14 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
+import '../../../data/conversas.dart';
 import '../../../data/pedidos.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/tela_interna.dart';
+import '../mensagens/chat_page.dart';
 import 'pedido_cancelado_page.dart';
 
 /// Pedido em andamento: profissional, etapas, dados e "Cancelar pedido".
@@ -101,7 +103,16 @@ class PedidoAndamentoPage extends StatelessWidget {
                             child: _BotaoContato(
                               icone: TablerIcons.message_circle,
                               texto: 'Mensagem',
-                              onTap: () => emBreve('Mensagem'),
+                              onTap: () {
+                                final c = conversas.emAndamento.firstOrNull;
+                                if (c == null) return emBreve('Mensagem');
+                                conversas.marcarLida(c);
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => ChatPage(conversa: c),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           const SizedBox(width: 8),

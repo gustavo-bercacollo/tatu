@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../shared/widgets/abas_cliente.dart';
 import 'atividade/atividade_page.dart';
+import 'mensagens/mensagens_page.dart';
 
 /// Troca de aba do cliente. Início é a primeira tela da pilha (a Home);
 /// as outras abas abrem por cima dela, sem animação.
@@ -20,9 +21,13 @@ void irParaAba(BuildContext context, AbaCliente aba) {
         ),
       );
     case AbaCliente.mensagens:
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('Mensagens: em breve')));
+      nav.push(
+        PageRouteBuilder(
+          pageBuilder: (_, _, _) => const MensagensPage(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      );
   }
 }
 
