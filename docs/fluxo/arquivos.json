@@ -145,5 +145,11 @@
  "app/chamar-outro.png": "docs/fluxo/app/chamar-outro.png",
  "app/procurando.png": "docs/fluxo/app/procurando.png",
  "app/procurando-expandindo.png": "docs/fluxo/app/procurando-expandindo.png",
- "app/procurando-ninguem.png": "docs/fluxo/app/procurando-ninguem.png"
+ "app/procurando-ninguem.png": "docs/fluxo/app/procurando-ninguem.png",
+ "app/outros-lista.png": "docs/fluxo/app/outros-lista.png",
+ "app/outros-busca.png": "docs/fluxo/app/outros-busca.png",
+ "app/outros-busca-vazia.png": "docs/fluxo/app/outros-busca-vazia.png",
+ "app/outros-escolhido.png": "docs/fluxo/app/outros-escolhido.png",
+ "app/outros-nao-sei.png": "docs/fluxo/app/outros-nao-sei.png",
+ "app/outros-nao-sei-sem-descricao.png": "docs/fluxo/app/outros-nao-sei-sem-descricao.png"
 }

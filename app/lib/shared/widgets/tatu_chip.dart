@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
@@ -11,6 +12,7 @@ class TatuChip extends StatelessWidget {
     required this.onTap,
     this.selecionado = false,
     this.icone,
+    this.seta = false,
   });
 
   final String label;
@@ -19,6 +21,9 @@ class TatuChip extends StatelessWidget {
 
   /// Ícone antes do texto quando selecionado (ex.: ✦ da IA).
   final IconData? icone;
+
+  /// Setinha para baixo: o chip abre uma lista (ex.: "Outros").
+  final bool seta;
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +55,10 @@ class TatuChip extends StatelessWidget {
                     color: cor,
                   ),
                 ),
+                if (seta) ...[
+                  const SizedBox(width: 6),
+                  Icon(TablerIcons.chevron_down, size: 16, color: cor),
+                ],
               ],
             ),
           ),

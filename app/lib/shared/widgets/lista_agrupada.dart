@@ -77,10 +77,14 @@ class ItemLista extends StatelessWidget {
     this.valor,
     this.cor,
     this.seta = true,
+    this.detalhe,
   });
 
   final IconData icone;
   final String texto;
+
+  /// Linha cinza embaixo do texto (a linha fica mais alta).
+  final String? detalhe;
   final String? valor;
   final VoidCallback onTap;
 
@@ -93,19 +97,32 @@ class ItemLista extends StatelessWidget {
     final c = cor ?? TatuColors.textPrimary;
     return InkWell(
       onTap: onTap,
-      child: SizedBox(
-        height: TatuMedidas.alturaLinha,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: TatuMedidas.alturaLinha),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: detalhe == null ? 0 : 12,
+          ),
           child: Row(
             children: [
               Icon(icone, size: 22, color: c),
               const SizedBox(width: 16),
               Expanded(
-                child: Text(
-                  texto,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 17, color: c),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      texto,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 17, color: c),
+                    ),
+                    if (detalhe != null) ...[
+                      const SizedBox(height: 2),
+                      Text(detalhe!, style: TatuTexto.nota),
+                    ],
+                  ],
                 ),
               ),
               if (valor != null) ...[

@@ -956,6 +956,94 @@ void main() {
     );
   });
 
+  Future<void> abrirOutros(WidgetTester t) async {
+    await t.tap(find.text('Outros'));
+    await t.pumpAndSettle();
+  }
+
+  testWidgets('outros-lista', (t) async {
+    await _capturar(
+      t,
+      'outros-lista',
+      const HomeClientePage(),
+      preparar: () => abrirOutros(t),
+    );
+  });
+
+  testWidgets('outros-busca', (t) async {
+    await _capturar(
+      t,
+      'outros-busca',
+      const HomeClientePage(),
+      preparar: () async {
+        await abrirOutros(t);
+        await t.enterText(find.byType(TextField).last, 'desent');
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('outros-busca-vazia', (t) async {
+    await _capturar(
+      t,
+      'outros-busca-vazia',
+      const HomeClientePage(),
+      preparar: () async {
+        await abrirOutros(t);
+        await t.enterText(find.byType(TextField).last, 'afinador de piano');
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('outros-escolhido', (t) async {
+    await _capturar(
+      t,
+      'outros-escolhido',
+      const HomeClientePage(),
+      preparar: () async {
+        await t.enterText(
+          find.byType(TextField),
+          'a fechadura da porta emperrou',
+        );
+        await t.pump(const Duration(milliseconds: 600));
+        FocusManager.instance.primaryFocus?.unfocus();
+        await abrirOutros(t);
+        await t.tap(find.text('Chaveiro').last);
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('outros-nao-sei', (t) async {
+    await _capturar(
+      t,
+      'outros-nao-sei',
+      const HomeClientePage(),
+      preparar: () async {
+        await t.enterText(find.byType(TextField), 'meu piano está desafinado');
+        await t.pump(const Duration(milliseconds: 600));
+        FocusManager.instance.primaryFocus?.unfocus();
+        await abrirOutros(t);
+        await t.tap(find.text('Não sei qual serviço'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('outros-nao-sei-sem-descricao', (t) async {
+    await _capturar(
+      t,
+      'outros-nao-sei-sem-descricao',
+      const HomeClientePage(),
+      preparar: () async {
+        await abrirOutros(t);
+        await t.tap(find.text('Não sei qual serviço'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
   testWidgets('home-vazia', (t) async {
     await _capturar(t, 'home-vazia', const HomeClientePage());
   });

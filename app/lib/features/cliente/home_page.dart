@@ -11,6 +11,7 @@ import '../../data/conta.dart';
 import '../../data/chamado.dart';
 import '../../data/enderecos.dart';
 import '../../data/perfil.dart';
+import '../../data/servicos.dart';
 import '../../data/sugestao_servico.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import '../../shared/widgets/avatar_usuario.dart';
@@ -20,6 +21,7 @@ import '../../shared/widgets/tatu_chip.dart';
 import 'abas.dart';
 import 'chamar/chamar.dart';
 import 'foto/camera_desativada_page.dart';
+import 'outros/outros_servicos_sheet.dart';
 import 'endereco/onde_sheet.dart';
 import 'perfil_page.dart';
 
@@ -35,6 +37,7 @@ class HomeClientePage extends StatefulWidget {
 
 class _HomeClientePageState extends State<HomeClientePage> {
   final _descricao = TextEditingController();
+  final _focoDescricao = FocusNode();
 
   /// Fotos do problema (até [maxFotosChamado]).
   final _fotos = <Uint8List>[];
@@ -49,14 +52,30 @@ class _HomeClientePageState extends State<HomeClientePage> {
   String? get _servico => _manual ?? _sugerido;
   bool get _pelaIa => _manual == null && _sugerido != null;
 
+  /// "Não sei qual serviço": a gente descobre pela descrição.
+  bool get _naoSei => _manual == naoSeiServico;
+
+  /// Serviço escolhido em "Outros" (fica no lugar do chip "Outros").
+  String? get _outro =>
+      _manual != null && !servicosHome.contains(_manual) ? _manual : null;
+
+  @override
+  void initState() {
+    super.initState();
+    _focoDescricao.addListener(() => setState(() {}));
+  }
+
   @override
   void dispose() {
     _espera?.cancel();
     _descricao.dispose();
+    _focoDescricao.dispose();
     super.dispose();
   }
 
   void _descreveu(String texto) {
+    // "Não sei": o botão depende de ter descrição.
+    if (_naoSei) setState(() {});
     _espera?.cancel();
     _espera = Timer(const Duration(milliseconds: 500), () {
       if (mounted) setState(() => _sugerido = widget.ia.sugerir(texto));
@@ -68,10 +87,13 @@ class _HomeClientePageState extends State<HomeClientePage> {
     if (_manual == null && _sugerido == s) _sugerido = null;
   });
 
-  void _emBreve(String o) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('$o: em breve')));
+  Future<void> _outros() async {
+    final escolha = await escolherOutroServico(context);
+    if (escolha == null || !mounted) return;
+    setState(() => _manual = escolha);
+    if (escolha == naoSeiServico && _descricao.text.trim().isEmpty) {
+      _focoDescricao.requestFocus();
+    }
   }
 
   Future<void> _anexarFoto() async {
@@ -175,30 +197,36 @@ class _HomeClientePageState extends State<HomeClientePage> {
                                 onTap: () => _tocouServico(s),
                               ),
                             TatuChip(
-                              label: 'Outros',
-                              onTap: () => _emBreve('Outros serviços'),
+                              label: _outro ?? 'Outros',
+                              selecionado: _outro != null,
+                              seta: _outro != null,
+                              onTap: _outros,
                             ),
                           ],
                         ),
-                        if (_pelaIa) ...[
+                        if (_pelaIa || _naoSei) ...[
                           const SizedBox(height: 8),
-                          const Row(
+                          Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 TablerIcons.sparkles,
                                 size: 14,
                                 color: TatuColors.textSecondary,
                               ),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               // Uma linha só, como no desenho; encolhe em telas estreitas.
                               Expanded(
                                 child: FittedBox(
                                   fit: BoxFit.scaleDown,
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    'Sugerido pela descrição. Toque em outro para trocar.',
+                                    _pelaIa
+                                        ? 'Sugerido pela descrição. Toque em outro para trocar.'
+                                        : _descricao.text.trim().isEmpty
+                                        ? 'Descreva o problema para acharmos quem resolve.'
+                                        : 'Vamos achar o profissional pela sua descrição.',
                                     maxLines: 1,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 13,
                                       letterSpacing: -0.1,
                                       color: TatuColors.textSecondary,
@@ -252,11 +280,22 @@ class _HomeClientePageState extends State<HomeClientePage> {
                       ),
                       const SizedBox(height: 8),
                       FilledButton(
-                        onPressed: servico == null
+                        onPressed: _naoSei
+                            ? (_descricao.text.trim().isEmpty
+                                  ? null
+                                  : () => chamarProfissional(
+                                      context,
+                                      'Profissional',
+                                    ))
+                            : servico == null
                             ? null
                             : () => chamarProfissional(context, servico),
                         child: Text(
-                          servico == null
+                          _naoSei
+                              ? (_descricao.text.trim().isEmpty
+                                    ? 'Descreva o problema'
+                                    : 'Chamar profissional')
+                              : servico == null
                               ? 'Escolha um serviço'
                               : 'Chamar ${servico.toLowerCase()}',
                         ),
@@ -326,6 +365,12 @@ class _HomeClientePageState extends State<HomeClientePage> {
       decoration: BoxDecoration(
         color: TatuColors.fill,
         borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+        border: Border.all(
+          color: _focoDescricao.hasFocus
+              ? TatuColors.textPrimary
+              : Colors.transparent,
+          width: 1.5,
+        ),
       ),
       child: Stack(
         children: [
@@ -334,6 +379,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 52),
               child: TextField(
                 controller: _descricao,
+                focusNode: _focoDescricao,
                 onChanged: _descreveu,
                 maxLines: null,
                 expands: true,
