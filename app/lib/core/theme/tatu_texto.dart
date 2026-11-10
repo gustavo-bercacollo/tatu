@@ -7,6 +7,13 @@ import 'tatu_colors.dart';
 class TatuTexto {
   TatuTexto._();
 
+  /// Título grande de aba (ex.: "Atividade").
+  static const tituloGrande = TextStyle(
+    fontSize: 34,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -0.8,
+  );
+
   /// Título de folha e de estado vazio.
   static const tituloFolha = TextStyle(
     fontSize: 22,

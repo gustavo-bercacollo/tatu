@@ -12,6 +12,7 @@ import '../../data/sugestao_servico.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import '../../shared/widgets/avatar_usuario.dart';
 import '../../shared/widgets/tatu_chip.dart';
+import 'abas.dart';
 import 'endereco/onde_sheet.dart';
 import 'perfil_page.dart';
 
@@ -67,7 +68,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
   Widget build(BuildContext context) {
     final servico = _servico;
     return Scaffold(
-      bottomNavigationBar: const AbasCliente(),
+      bottomNavigationBar: const AbasDoCliente(ativa: AbaCliente.inicio),
       body: SafeArea(
         bottom: false,
         child: Center(

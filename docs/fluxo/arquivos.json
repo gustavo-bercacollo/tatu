@@ -115,5 +115,14 @@
  "app/permissoes.png": "docs/fluxo/app/permissoes.png",
  "app/seus-dados.png": "docs/fluxo/app/seus-dados.png",
  "app/baixar-dados.png": "docs/fluxo/app/baixar-dados.png",
- "app/baixar-dados-enviado.png": "docs/fluxo/app/baixar-dados-enviado.png"
+ "app/baixar-dados-enviado.png": "docs/fluxo/app/baixar-dados-enviado.png",
+ "app/atividade.png": "docs/fluxo/app/atividade.png",
+ "app/atividade-concluidos.png": "docs/fluxo/app/atividade-concluidos.png",
+ "app/atividade-vazio.png": "docs/fluxo/app/atividade-vazio.png",
+ "app/atividade-concluidos-vazio.png": "docs/fluxo/app/atividade-concluidos-vazio.png",
+ "app/atividade-ninguem-aceitou.png": "docs/fluxo/app/atividade-ninguem-aceitou.png",
+ "app/pedido-andamento.png": "docs/fluxo/app/pedido-andamento.png",
+ "app/pedido-cancelar.png": "docs/fluxo/app/pedido-cancelar.png",
+ "app/pedido-cancelado.png": "docs/fluxo/app/pedido-cancelado.png",
+ "app/pedido-concluido.png": "docs/fluxo/app/pedido-concluido.png"
 }

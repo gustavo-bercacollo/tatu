@@ -3,18 +3,22 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
 
+/// Abas do cliente.
+enum AbaCliente { inicio, atividade, mensagens }
+
 /// Barra de abas do cliente: Início · Atividade · Mensagens.
 class AbasCliente extends StatelessWidget {
-  const AbasCliente({super.key, this.onInicio});
+  const AbasCliente({super.key, this.ativa = AbaCliente.inicio, this.onTrocar});
 
-  /// Toque em "Início" (ex.: o Perfil volta para a Home).
-  final VoidCallback? onInicio;
+  final AbaCliente ativa;
+
+  /// Toque numa aba (a navegação fica em `features/cliente/abas.dart`).
+  final ValueChanged<AbaCliente>? onTrocar;
 
   @override
   Widget build(BuildContext context) {
-    void emBreve(String o) => ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('$o: em breve')));
+    VoidCallback? ir(AbaCliente a) =>
+        onTrocar == null ? null : () => onTrocar!(a);
 
     return DecoratedBox(
       decoration: const BoxDecoration(
@@ -32,18 +36,20 @@ class AbasCliente extends StatelessWidget {
               _Aba(
                 icone: TablerIcons.home,
                 texto: 'Início',
-                ativa: true,
-                onTap: onInicio,
+                ativa: ativa == AbaCliente.inicio,
+                onTap: ir(AbaCliente.inicio),
               ),
               _Aba(
                 icone: TablerIcons.clock,
                 texto: 'Atividade',
-                onTap: () => emBreve('Atividade'),
+                ativa: ativa == AbaCliente.atividade,
+                onTap: ir(AbaCliente.atividade),
               ),
               _Aba(
                 icone: TablerIcons.message_circle,
                 texto: 'Mensagens',
-                onTap: () => emBreve('Mensagens'),
+                ativa: ativa == AbaCliente.mensagens,
+                onTap: ir(AbaCliente.mensagens),
               ),
             ],
           ),

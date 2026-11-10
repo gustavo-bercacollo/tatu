@@ -286,3 +286,53 @@ class IconeCirculo extends StatelessWidget {
     );
   }
 }
+
+/// Linha de dado: rótulo cinza à esquerda e valor à direita; [destaque]
+/// deixa os dois em negrito (ex.: Total).
+class LinhaRotuloValor extends StatelessWidget {
+  const LinhaRotuloValor({
+    super.key,
+    required this.rotulo,
+    required this.valor,
+    this.destaque = false,
+  });
+
+  final String rotulo;
+  final String valor;
+  final bool destaque;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: TatuMedidas.alturaLinha,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            Text(
+              rotulo,
+              style: destaque
+                  ? const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)
+                  : const TextStyle(
+                      fontSize: 17,
+                      color: TatuColors.textSecondary,
+                    ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                valor,
+                textAlign: TextAlign.right,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: destaque ? 20 : 17,
+                  fontWeight: destaque ? FontWeight.w700 : FontWeight.w400,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -13,6 +13,7 @@ import '../../shared/widgets/avatar_usuario.dart';
 import '../../shared/widgets/grupo_cartao.dart';
 import '../../shared/widgets/lista_agrupada.dart';
 import '../entrada/boas_vindas_page.dart';
+import 'abas.dart';
 import 'ajuda/ajuda_page.dart';
 import 'avaliacoes/minhas_avaliacoes_page.dart';
 import 'conta/dados_conta_page.dart';
@@ -49,9 +50,7 @@ class PerfilClientePage extends StatelessWidget {
   Widget _tela(BuildContext context, void Function(String) emBreve) {
     return Scaffold(
       backgroundColor: TatuColors.surfaceGrouped,
-      bottomNavigationBar: AbasCliente(
-        onInicio: () => Navigator.of(context).maybePop(),
-      ),
+      bottomNavigationBar: const AbasDoCliente(ativa: AbaCliente.inicio),
       body: SafeArea(
         bottom: false,
         child: Center(

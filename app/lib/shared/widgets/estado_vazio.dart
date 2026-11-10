@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../core/theme/tatu_medidas.dart';
 import '../../core/theme/tatu_texto.dart';
 
 /// Estado vazio: ícone num círculo, título, texto e botão principal embaixo.
@@ -11,11 +12,15 @@ class EstadoVazio extends StatelessWidget {
     required this.icone,
     required this.titulo,
     required this.texto,
+    this.acao,
   });
 
   final IconData icone;
   final String titulo;
   final String texto;
+
+  /// Botão logo abaixo do texto (ex.: "Pedir um serviço").
+  final Widget? acao;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +43,10 @@ class EstadoVazio extends StatelessWidget {
         Text(titulo, textAlign: TextAlign.center, style: TatuTexto.tituloFolha),
         const SizedBox(height: 10),
         Text(texto, textAlign: TextAlign.center, style: TatuTexto.corpo),
+        if (acao != null) ...[
+          const SizedBox(height: TatuMedidas.entreSecoes),
+          Center(child: acao),
+        ],
         const Spacer(flex: 2),
       ],
     );

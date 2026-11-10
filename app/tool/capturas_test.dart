@@ -10,6 +10,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/ajuda.dart';
 import 'package:tatu/data/avaliacoes.dart';
+import 'package:tatu/data/pedidos.dart';
+import 'package:tatu/features/cliente/atividade/atividade_page.dart';
+import 'package:tatu/features/cliente/atividade/pedido_andamento_page.dart';
+import 'package:tatu/features/cliente/atividade/pedido_cancelado_page.dart';
+import 'package:tatu/features/cliente/atividade/pedido_concluido_page.dart';
 import 'package:tatu/data/documentos.dart';
 import 'package:tatu/features/cliente/privacidade/baixar_dados_page.dart';
 import 'package:tatu/features/cliente/privacidade/documento_page.dart';
@@ -89,6 +94,7 @@ Future<void> _capturar(
   notificacoes.restaurar();
   perfil.restaurar();
   conta.restaurar();
+  pedidos.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -632,6 +638,82 @@ void main() {
 
   testWidgets('baixar-dados-enviado', (t) async {
     await _capturar(t, 'baixar-dados-enviado', const DadosPedidosPage());
+  });
+
+  testWidgets('atividade', (t) async {
+    await _capturar(t, 'atividade', const AtividadePage());
+  });
+
+  testWidgets('atividade-concluidos', (t) async {
+    await _capturar(t, 'atividade-concluidos', const AtividadePage(aba: 1));
+  });
+
+  testWidgets('atividade-vazio', (t) async {
+    await _capturar(
+      t,
+      'atividade-vazio',
+      const AtividadePage(),
+      preparar: () async {
+        pedidos.limpar();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('atividade-concluidos-vazio', (t) async {
+    await _capturar(
+      t,
+      'atividade-concluidos-vazio',
+      const AtividadePage(aba: 1),
+      preparar: () async {
+        pedidos.limpar();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('atividade-ninguem-aceitou', (t) async {
+    await _capturar(
+      t,
+      'atividade-ninguem-aceitou',
+      const AtividadePage(),
+      preparar: () async {
+        pedidos.cancelarAndamento();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pedido-andamento', (t) async {
+    await _capturar(t, 'pedido-andamento', const PedidoAndamentoPage());
+  });
+
+  testWidgets('pedido-cancelar', (t) async {
+    await _capturar(
+      t,
+      'pedido-cancelar',
+      const PedidoAndamentoPage(),
+      preparar: () async {
+        await t.tap(find.text('Cancelar pedido'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pedido-cancelado', (t) async {
+    await _capturar(
+      t,
+      'pedido-cancelado',
+      const PedidoCanceladoPage(profissional: 'Luiza'),
+    );
+  });
+
+  testWidgets('pedido-concluido', (t) async {
+    await _capturar(
+      t,
+      'pedido-concluido',
+      PedidoConcluidoPage(pedido: PedidosRepo().concluidos.first),
+    );
   });
 
   testWidgets('home-vazia', (t) async {
