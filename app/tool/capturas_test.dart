@@ -10,6 +10,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/ajuda.dart';
 import 'package:tatu/data/avaliacoes.dart';
+import 'package:tatu/data/chamado.dart';
+import 'package:tatu/features/cliente/chamar/chamando_outro_page.dart';
+import 'package:tatu/features/cliente/chamar/fora_da_area_page.dart';
+import 'package:tatu/features/cliente/chamar/imprevisto_page.dart';
+import 'package:tatu/features/cliente/chamar/localizacao_chamar_page.dart';
 import 'package:tatu/data/conversas.dart';
 import 'package:tatu/features/cliente/mensagens/chat_page.dart';
 import 'package:tatu/features/cliente/mensagens/denunciar_page.dart';
@@ -100,6 +105,7 @@ Future<void> _capturar(
   conta.restaurar();
   pedidos.restaurar();
   conversas.restaurar();
+  chamado.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -825,6 +831,89 @@ void main() {
 
   testWidgets('chat-denuncia-enviada', (t) async {
     await _capturar(t, 'chat-denuncia-enviada', const DenunciaEnviadaPage());
+  });
+
+  Future<void> descrever(WidgetTester t) async {
+    await t.enterText(
+      find.byType(TextField),
+      'o cano da pia da cozinha está vazando e a água não para',
+    );
+    await t.pump(const Duration(milliseconds: 600));
+  }
+
+  testWidgets('home-fotos', (t) async {
+    final bytes = File('assets/avatares/avatar-2.png').readAsBytesSync();
+    await _capturar(
+      t,
+      'home-fotos',
+      const HomeClientePage(),
+      preparar: () async {
+        perfil.escolherImagem = (_) async => bytes;
+        await descrever(t);
+        for (var i = 0; i < 2; i++) {
+          await t.tap(find.bySemanticsLabel('Enviar foto'));
+          await t.pumpAndSettle();
+          await t.tap(find.text('Escolher da galeria'));
+          await t.pumpAndSettle();
+        }
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('chamar-celular', (t) async {
+    await _capturar(
+      t,
+      'chamar-celular',
+      const HomeClientePage(),
+      preparar: () async {
+        conta.cadastrou(email: 'ana@email.com');
+        await descrever(t);
+        await t.tap(find.text('Chamar encanador'));
+        await t.pumpAndSettle();
+        await t.enterText(find.byType(TextField).last, '11988887777');
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('chamar-ja-tem-pedido', (t) async {
+    await _capturar(
+      t,
+      'chamar-ja-tem-pedido',
+      const HomeClientePage(),
+      preparar: () async {
+        await descrever(t);
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.tap(find.text('Chamar encanador'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('chamar-localizacao', (t) async {
+    await _capturar(t, 'chamar-localizacao', const LocalizacaoChamarPage());
+  });
+
+  testWidgets('chamar-fora-da-area', (t) async {
+    await _capturar(t, 'chamar-fora-da-area', const ForaDaAreaPage());
+  });
+
+  testWidgets('chamar-imprevisto', (t) async {
+    await _capturar(
+      t,
+      'chamar-imprevisto',
+      ImprevistoPage(pedido: PedidosRepo().andamento!),
+    );
+  });
+
+  testWidgets('chamar-outro', (t) async {
+    await _capturar(
+      t,
+      'chamar-outro',
+      ChamandoOutroPage(pedido: PedidosRepo().andamento!, animar: false),
+    );
   });
 
   testWidgets('home-vazia', (t) async {

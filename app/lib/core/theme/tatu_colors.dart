@@ -32,6 +32,11 @@ class TatuColors {
   static const hairline = Color(0x4A3C3C43);
   static const scrim = Color(0x61000000);
 
+  /// Mapa ilustrativo (até termos o serviço de mapas).
+  static const mapaFundo = Color(0xFFE9E9EE);
+  static const mapaVerde = Color(0xFFDDEBD9);
+  static const radar = Color(0x1F34C759); // círculos da busca no mapa
+
   /// Editor de foto (tela escura).
   static const editorFundo = Color(0xFF2C2C2E);
   static const editorSombra = Color(0xBF2C2C2E); // fora do círculo

@@ -4,6 +4,7 @@ import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
 import '../../core/theme/tatu_theme.dart';
 import '../../core/theme/tatu_texto.dart';
+import 'lista_agrupada.dart';
 
 /// Alça cinza no topo das folhas.
 class AlcaFolha extends StatelessWidget {
@@ -64,8 +65,34 @@ Future<bool> confirmar(
   bool destacarCancelar = false,
   IconData? icone,
   bool iconeAviso = true,
+}) async =>
+    await perguntar(
+      context,
+      titulo: titulo,
+      texto: texto,
+      confirmar: confirmar,
+      cancelar: cancelar,
+      perigo: perigo,
+      destacarCancelar: destacarCancelar,
+      icone: icone,
+      iconeAviso: iconeAviso,
+    ) ??
+    false;
+
+/// Como [confirmar], mas devolve `null` se a pessoa fechar a folha sem
+/// escolher (para quando "cancelar" também é uma ação, ex.: "Ver pedido").
+Future<bool?> perguntar(
+  BuildContext context, {
+  required String titulo,
+  required String texto,
+  required String confirmar,
+  String cancelar = 'Cancelar',
+  bool perigo = false,
+  bool destacarCancelar = false,
+  IconData? icone,
+  bool iconeAviso = true,
 }) async {
-  final r = await mostrarFolha<bool>(
+  return mostrarFolha<bool>(
     context,
     builder: (ctx) {
       final botaoConfirmar = FilledButton(
@@ -136,5 +163,41 @@ Future<bool> confirmar(
       );
     },
   );
-  return r ?? false;
+}
+
+/// Folha com uma lista de opções (ícone + texto) e "Cancelar".
+class FolhaOpcoes extends StatelessWidget {
+  const FolhaOpcoes({super.key, required this.itens});
+
+  final List<ItemLista> itens;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          TatuMedidas.margem,
+          10,
+          TatuMedidas.margem,
+          TatuMedidas.base,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const AlcaFolha(),
+            const SizedBox(height: TatuMedidas.entreSecoes),
+            GrupoLista(fundo: TatuColors.fill, itens: itens),
+            const SizedBox(height: TatuMedidas.entreSecoes),
+            FilledButton(
+              style: tatuBotaoSecundario(),
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

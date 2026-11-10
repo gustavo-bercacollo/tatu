@@ -135,5 +135,12 @@
  "app/chat-encerrado.png": "docs/fluxo/app/chat-encerrado.png",
  "app/chat-menu.png": "docs/fluxo/app/chat-menu.png",
  "app/chat-denunciar.png": "docs/fluxo/app/chat-denunciar.png",
- "app/chat-denuncia-enviada.png": "docs/fluxo/app/chat-denuncia-enviada.png"
+ "app/chat-denuncia-enviada.png": "docs/fluxo/app/chat-denuncia-enviada.png",
+ "app/home-fotos.png": "docs/fluxo/app/home-fotos.png",
+ "app/chamar-celular.png": "docs/fluxo/app/chamar-celular.png",
+ "app/chamar-localizacao.png": "docs/fluxo/app/chamar-localizacao.png",
+ "app/chamar-fora-da-area.png": "docs/fluxo/app/chamar-fora-da-area.png",
+ "app/chamar-ja-tem-pedido.png": "docs/fluxo/app/chamar-ja-tem-pedido.png",
+ "app/chamar-imprevisto.png": "docs/fluxo/app/chamar-imprevisto.png",
+ "app/chamar-outro.png": "docs/fluxo/app/chamar-outro.png"
 }

@@ -74,14 +74,14 @@ class DadosContaPage extends StatelessWidget {
                 ),
                 _LinhaDado(
                   rotulo: 'Celular',
-                  valor: conta.celularFormatado,
-                  confirmado: true,
+                  valor: conta.celularFormatado ?? 'Adicionar',
+                  confirmado: conta.celular != null,
                   onTap: () => _trocarCelular(context),
                 ),
                 _LinhaDado(
                   rotulo: 'E-mail',
-                  valor: conta.email,
-                  confirmado: true,
+                  valor: conta.email ?? 'Adicionar',
+                  confirmado: conta.email != null,
                   onTap: () => _trocarEmail(context),
                 ),
               ],

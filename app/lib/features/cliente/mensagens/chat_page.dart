@@ -4,7 +4,6 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
-import '../../../core/theme/tatu_theme.dart';
 import '../../../data/ajuda.dart';
 import '../../../data/conversas.dart';
 import '../../../data/pedidos.dart';
@@ -16,6 +15,7 @@ import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/lista_agrupada.dart';
 import '../ajuda/chat_suporte_page.dart';
 import '../atividade/pedido_andamento_page.dart';
+import '../foto/camera_desativada_page.dart';
 import '../atividade/pedido_concluido_page.dart';
 import 'denunciar_page.dart';
 
@@ -54,7 +54,7 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> _anexar() async {
     final origem = await mostrarFolha<OrigemFoto>(
       context,
-      builder: (ctx) => _FolhaOpcoes(
+      builder: (ctx) => FolhaOpcoes(
         itens: [
           ItemLista(
             icone: TablerIcons.camera,
@@ -85,7 +85,12 @@ class _ChatPageState extends State<ChatPage> {
         ),
       );
     } on CameraNegada {
-      if (mounted) _emBreve(context, 'Câmera desativada · Abrir Ajustes');
+      if (!mounted) return;
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const CameraDesativadaPage(semAvatar: true),
+        ),
+      );
     }
   }
 
@@ -118,7 +123,7 @@ class _ChatPageState extends State<ChatPage> {
       context,
       builder: (ctx) {
         void ir(int i) => Navigator.of(ctx).pop(i);
-        return _FolhaOpcoes(
+        return FolhaOpcoes(
           itens: [
             ItemLista(
               icone: TablerIcons.phone,
@@ -352,43 +357,6 @@ class _ConversaEncerrada extends StatelessWidget {
         'Esta conversa foi encerrada',
         textAlign: TextAlign.center,
         style: TatuTexto.detalhe,
-      ),
-    );
-  }
-}
-
-/// Folha com uma lista de opções e "Cancelar".
-class _FolhaOpcoes extends StatelessWidget {
-  const _FolhaOpcoes({required this.itens});
-
-  final List<ItemLista> itens;
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          TatuMedidas.margem,
-          10,
-          TatuMedidas.margem,
-          TatuMedidas.base,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const AlcaFolha(),
-            const SizedBox(height: TatuMedidas.entreSecoes),
-            GrupoLista(fundo: TatuColors.fill, itens: itens),
-            const SizedBox(height: TatuMedidas.entreSecoes),
-            FilledButton(
-              style: tatuBotaoSecundario(),
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancelar'),
-            ),
-          ],
-        ),
       ),
     );
   }

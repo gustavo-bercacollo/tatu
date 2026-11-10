@@ -21,7 +21,11 @@ class PedidoAndamento {
     required this.valor,
     required this.pagamento,
     required this.etapasFeitas,
+    this.chegaEm = '12 min',
   });
+
+  /// Previsão de chegada (ex.: "12 min").
+  final String chegaEm;
 
   /// Serviço pedido ("Encanador").
   final String servico;

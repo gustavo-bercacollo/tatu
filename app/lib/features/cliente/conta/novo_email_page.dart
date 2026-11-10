@@ -16,7 +16,7 @@ class NovoEmailPage extends StatefulWidget {
 }
 
 class _NovoEmailPageState extends State<NovoEmailPage> {
-  late final _controller = TextEditingController(text: conta.email);
+  late final _controller = TextEditingController(text: conta.email ?? '');
 
   bool get _valido => emailValido(_controller.text);
 

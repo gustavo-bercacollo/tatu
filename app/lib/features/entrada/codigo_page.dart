@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
+import '../../data/conta.dart';
 import '../../shared/widgets/cadastro_scaffold.dart';
 import '../cliente/home_page.dart';
 import 'nome_page.dart';
@@ -103,6 +104,10 @@ class _CodigoPageState extends State<CodigoPage> {
       );
       return;
     }
+    conta.cadastrou(
+      celular: widget.porEmail ? null : widget.destino,
+      email: widget.porEmail ? widget.destino : null,
+    );
     Navigator.of(context)
         .pushReplacement(MaterialPageRoute(builder: (_) => const NomePage()));
   }

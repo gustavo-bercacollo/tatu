@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -7,12 +8,18 @@ import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
 import '../../core/theme/tatu_texto.dart';
 import '../../data/conta.dart';
+import '../../data/chamado.dart';
 import '../../data/enderecos.dart';
+import '../../data/perfil.dart';
 import '../../data/sugestao_servico.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import '../../shared/widgets/avatar_usuario.dart';
+import '../../shared/widgets/folha.dart';
+import '../../shared/widgets/lista_agrupada.dart';
 import '../../shared/widgets/tatu_chip.dart';
 import 'abas.dart';
+import 'chamar/chamar.dart';
+import 'foto/camera_desativada_page.dart';
 import 'endereco/onde_sheet.dart';
 import 'perfil_page.dart';
 
@@ -28,6 +35,9 @@ class HomeClientePage extends StatefulWidget {
 
 class _HomeClientePageState extends State<HomeClientePage> {
   final _descricao = TextEditingController();
+
+  /// Fotos do problema (até [maxFotosChamado]).
+  final _fotos = <Uint8List>[];
   Timer? _espera;
 
   /// Escolha da pessoa; nunca é trocada pela IA.
@@ -62,6 +72,41 @@ class _HomeClientePageState extends State<HomeClientePage> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text('$o: em breve')));
+  }
+
+  Future<void> _anexarFoto() async {
+    final origem = await mostrarFolha<OrigemFoto>(
+      context,
+      builder: (ctx) => FolhaOpcoes(
+        itens: [
+          ItemLista(
+            icone: TablerIcons.camera,
+            texto: 'Tirar foto',
+            seta: false,
+            onTap: () => Navigator.of(ctx).pop(OrigemFoto.camera),
+          ),
+          ItemLista(
+            icone: TablerIcons.photo,
+            texto: 'Escolher da galeria',
+            seta: false,
+            onTap: () => Navigator.of(ctx).pop(OrigemFoto.galeria),
+          ),
+        ],
+      ),
+    );
+    if (origem == null || !mounted) return;
+    try {
+      final imagem = await perfil.pedirImagem(origem);
+      if (imagem == null || !mounted) return;
+      setState(() => _fotos.add(imagem));
+    } on CameraNegada {
+      if (!mounted) return;
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const CameraDesativadaPage(semAvatar: true),
+        ),
+      );
+    }
   }
 
   @override
@@ -209,7 +254,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
                       FilledButton(
                         onPressed: servico == null
                             ? null
-                            : () => _emBreve('Procurar profissional'),
+                            : () => chamarProfissional(context, servico),
                         child: Text(
                           servico == null
                               ? 'Escolha um serviço'
@@ -307,20 +352,94 @@ class _HomeClientePageState extends State<HomeClientePage> {
           ),
           Positioned(
             left: 12,
+            right: 12,
             bottom: 12,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                if (_fotos.length < maxFotosChamado)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: Semantics(
+                      button: true,
+                      label: 'Enviar foto',
+                      child: GestureDetector(
+                        onTap: _anexarFoto,
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: const BoxDecoration(
+                            color: TatuColors.circle,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(TablerIcons.camera, size: 20),
+                        ),
+                      ),
+                    ),
+                  ),
+                for (final (i, f) in _fotos.indexed)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: _Miniatura(
+                      imagem: f,
+                      onRemover: () => setState(() => _fotos.removeAt(i)),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Miniatura de foto anexada, com o "x" para tirar.
+class _Miniatura extends StatelessWidget {
+  const _Miniatura({required this.imagem, required this.onRemover});
+
+  final Uint8List imagem;
+  final VoidCallback onRemover;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 50,
+      height: 50,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(TatuMedidas.raioCodigo),
+            child: Image.memory(
+              imagem,
+              width: 46,
+              height: 46,
+              fit: BoxFit.cover,
+              gaplessPlayback: true,
+            ),
+          ),
+          Positioned(
+            right: -4,
+            top: -8,
             child: Semantics(
               button: true,
-              label: 'Enviar foto',
+              label: 'Tirar foto',
               child: GestureDetector(
-                onTap: () => _emBreve('Foto'),
+                onTap: onRemover,
                 child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: const BoxDecoration(
-                    color: TatuColors.circle,
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    color: TatuColors.action,
                     shape: BoxShape.circle,
+                    border: Border.all(color: TatuColors.bg, width: 1.5),
                   ),
-                  child: const Icon(TablerIcons.camera, size: 20),
+                  child: const Icon(
+                    TablerIcons.x,
+                    size: 12,
+                    color: TatuColors.onAction,
+                  ),
                 ),
               ),
             ),

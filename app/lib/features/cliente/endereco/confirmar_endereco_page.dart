@@ -4,6 +4,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../data/enderecos.dart';
+import '../../../shared/widgets/mapa_falso.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/tatu_chip.dart';
 import '../../../shared/widgets/tatu_field.dart';
@@ -59,7 +60,7 @@ class _ConfirmarEnderecoPageState extends State<ConfirmarEnderecoPage> {
                   right: 0,
                   top: 0,
                   bottom: -30,
-                  child: CustomPaint(painter: _MapaFalso()),
+                  child: CustomPaint(painter: MapaFalso()),
                 ),
                 const Center(child: _Pino()),
                 Positioned(
@@ -166,53 +167,6 @@ class _ConfirmarEnderecoPageState extends State<ConfirmarEnderecoPage> {
       ),
     );
   }
-}
-
-/// Mapa ilustrativo (sem serviço de mapas ainda): quarteirões cinza,
-/// ruas brancas levemente inclinadas e duas praças verdes.
-class _MapaFalso extends CustomPainter {
-  const _MapaFalso();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(
-      Offset.zero & size,
-      Paint()..color = const Color(0xFFE9E9EE),
-    );
-    final verde = Paint()..color = const Color(0xFFDDEBD9);
-    canvas.drawRRect(
-      RRect.fromLTRBR(
-        size.width * .64,
-        50,
-        size.width * .86,
-        110,
-        const Radius.circular(10),
-      ),
-      verde,
-    );
-    canvas.drawRRect(
-      RRect.fromLTRBR(
-        size.width * .08,
-        size.height * .74,
-        size.width * .33,
-        size.height * .9,
-        const Radius.circular(10),
-      ),
-      verde,
-    );
-    final rua = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 9;
-    for (var x = -40.0; x < size.width + 40; x += 72) {
-      canvas.drawLine(Offset(x + 10, 0), Offset(x - 10, size.height), rua);
-    }
-    for (var y = 40.0; y < size.height + 40; y += 92) {
-      canvas.drawLine(Offset(0, y - 6), Offset(size.width, y + 6), rua);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_MapaFalso oldDelegate) => false;
 }
 
 /// Pino preto com ponto branco e haste, apontando o centro do mapa.
