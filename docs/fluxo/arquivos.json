@@ -108,5 +108,12 @@
  "app/ajuda-busca-vazia.png": "docs/fluxo/app/ajuda-busca-vazia.png",
  "app/suporte-assunto.png": "docs/fluxo/app/suporte-assunto.png",
  "app/suporte-pedido.png": "docs/fluxo/app/suporte-pedido.png",
- "app/chat-suporte.png": "docs/fluxo/app/chat-suporte.png"
+ "app/chat-suporte.png": "docs/fluxo/app/chat-suporte.png",
+ "app/privacidade.png": "docs/fluxo/app/privacidade.png",
+ "app/termos-de-uso.png": "docs/fluxo/app/termos-de-uso.png",
+ "app/politica-privacidade.png": "docs/fluxo/app/politica-privacidade.png",
+ "app/permissoes.png": "docs/fluxo/app/permissoes.png",
+ "app/seus-dados.png": "docs/fluxo/app/seus-dados.png",
+ "app/baixar-dados.png": "docs/fluxo/app/baixar-dados.png",
+ "app/baixar-dados-enviado.png": "docs/fluxo/app/baixar-dados-enviado.png"
 }

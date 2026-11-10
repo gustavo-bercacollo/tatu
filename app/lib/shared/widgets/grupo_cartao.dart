@@ -199,3 +199,90 @@ class LinhaSimples extends StatelessWidget {
     );
   }
 }
+
+/// Cartão branco de ação: ícone num círculo, título, detalhe e seta
+/// (ex.: "Falar com o suporte", "Baixar meus dados").
+class CartaoAcao extends StatelessWidget {
+  const CartaoAcao({
+    super.key,
+    required this.icone,
+    required this.titulo,
+    required this.detalhe,
+    required this.onTap,
+    this.corTitulo = TatuColors.textPrimary,
+  });
+
+  /// Normalmente um círculo de 40 px com o ícone.
+  final Widget icone;
+  final String titulo;
+  final String detalhe;
+  final VoidCallback onTap;
+  final Color corTitulo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: TatuColors.bg,
+      borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 12, 16),
+          child: Row(
+            children: [
+              icone,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      titulo,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: corTitulo,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(detalhe, style: TatuTexto.nota),
+                  ],
+                ),
+              ),
+              const Icon(
+                TablerIcons.chevron_right,
+                size: 18,
+                color: TatuColors.chevron,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Ícone de traço num círculo cinza de 40 px.
+class IconeCirculo extends StatelessWidget {
+  const IconeCirculo(
+    this.icone, {
+    super.key,
+    this.cor = TatuColors.textPrimary,
+    this.fundo = TatuColors.fill,
+  });
+
+  final IconData icone;
+  final Color cor;
+  final Color fundo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(color: fundo, shape: BoxShape.circle),
+      child: Icon(icone, size: 20, color: cor),
+    );
+  }
+}

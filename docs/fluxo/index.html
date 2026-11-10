@@ -193,7 +193,7 @@ path.entre { opacity: .5; }
 /* ===== DADOS =====
    status: app (já no app, imagem real) · desenho (desenho pronto, ainda não no app) · andamento (tela ainda não desenhada)
    Para atualizar: mudar o status/imagem da tela, ou acrescentar telas e ligações. */
-const ATUALIZADO = '05/11/2026';
+const ATUALIZADO = '10/11/2026';
 
 const ETAPAS = {
   entrada:   { nome: 'Entrada e cadastro', lado: 'ambos' },
@@ -298,7 +298,13 @@ const TELAS_RAW = [
   ['c59','C59','Suporte · qual pedido?','contaC','app','docs/fluxo/app/suporte-pedido.png'],
   ['c60','C60','Chat com o suporte','contaC','app','docs/fluxo/app/chat-suporte.png',["Com pedido escolhido, ele aparece no topo","Sem backend: o atendente responde sozinho à primeira mensagem"]],
   ['a-artigosC','—','Outros assuntos e artigos da ajuda','contaC','andamento'],
-  ['a-privC','—','Privacidade e termos','contaC','andamento'],
+  ['c61','C61','Privacidade e termos','contaC','app','docs/fluxo/app/privacidade.png'],
+  ['c62','C62','Termos de uso','contaC','app','docs/fluxo/app/termos-de-uso.png'],
+  ['c63','C63','Política de privacidade','contaC','app','docs/fluxo/app/politica-privacidade.png'],
+  ['c64','C64','Permissões','contaC','app','docs/fluxo/app/permissoes.png',["Mostra o estado real de cada permissão (simulado)","No app, “Abrir Ajustes” ainda mostra “em breve”"]],
+  ['c65','C65','Seus dados e direitos','contaC','app','docs/fluxo/app/seus-dados.png'],
+  ['c66','C66','Baixar meus dados','contaC','app','docs/fluxo/app/baixar-dados.png',["Sem backend: o pedido não envia nada de verdade"]],
+  ['c67','C67','Pedido de dados recebido','contaC','app','docs/fluxo/app/baixar-dados-enviado.png'],
 
   ['p01','P01','Boas-vindas do profissional','cadastro','desenho', W+'01 - Cadastro/01-boas-vindas.svg'],
   ['p02','P02','Passo 1 · Seus dados (celular + SMS)','cadastro','desenho', W+'01 - Cadastro/02-passo1-dados-sms.svg'],
@@ -512,7 +518,19 @@ const LIGACOES = [
   ['c58','c60','outro assunto · Continuar','t'],
   ['c59','c60','Continuar · Não é sobre um pedido','t'],
   ['c60','a-foto','Câmera','t'],
-  ['c27','a-privC','Privacidade e termos','t'],
+  ['c27','c61','Privacidade e termos','t'],
+  ['c61','c62','Termos de uso','t'],
+  ['c61','c63','Política de privacidade','t'],
+  ['c61','c64','Permissões','t'],
+  ['c61','c65','Seus dados e direitos','t'],
+  ['c63','c65','Ver seus dados e direitos','t'],
+  ['c64','a-ajustes','Abrir Ajustes','t'],
+  ['c65','c66','Baixar meus dados','t'],
+  ['c65','c44','Corrigir meus dados','t'],
+  ['c65','c50','Excluir minha conta','t'],
+  ['c65','c52','Excluir minha conta · com pedido em andamento','e'],
+  ['c66','c67','Pedir cópia','t'],
+  ['c67','c65','Concluir','t'],
   ['c27','e02','Sair da conta','t'],
   ['c27','p20','Trocar para modo profissional · já tem cadastro','t'],
   ['c27','p01','Trocar para modo profissional · sem cadastro','t'],

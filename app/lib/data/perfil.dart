@@ -33,6 +33,9 @@ class PerfilRepo extends ChangeNotifier {
   /// Permissão de câmera no celular (para simular "Câmera desativada").
   bool cameraPermitida = true;
 
+  /// Permissão de fotos (galeria) no celular, mostrada em Permissões.
+  bool fotosPermitidas = true;
+
   /// Abre a câmera ou a galeria e devolve a imagem (ou null se cancelar).
   /// Troque nos testes para não abrir o seletor de verdade.
   Future<Uint8List?> Function(OrigemFoto origem) escolherImagem =
@@ -44,7 +47,15 @@ class PerfilRepo extends ChangeNotifier {
     avatar = avataresProntos.first;
     foto = null;
     cameraPermitida = true;
+    fotosPermitidas = true;
     escolherImagem = _escolherComImagePicker;
+    notifyListeners();
+  }
+
+  /// Simula mudar permissões nos Ajustes do celular.
+  void definirPermissoes({bool? camera, bool? fotos}) {
+    cameraPermitida = camera ?? cameraPermitida;
+    fotosPermitidas = fotos ?? fotosPermitidas;
     notifyListeners();
   }
 

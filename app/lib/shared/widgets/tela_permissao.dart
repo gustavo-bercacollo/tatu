@@ -14,18 +14,22 @@ class TelaPermissao extends StatelessWidget {
     required this.icone,
     required this.titulo,
     required this.texto,
-    required this.alternativa,
-    required this.onAlternativa,
+    this.alternativa,
+    this.onAlternativa,
     this.principal = 'Abrir Ajustes',
     this.onPrincipal,
     this.aviso = false,
+    this.sucesso = false,
+    this.voltar = true,
   });
 
   final Widget icone;
   final String titulo;
   final String texto;
-  final String alternativa;
-  final VoidCallback onAlternativa;
+
+  /// Botão cinza embaixo do principal (opcional).
+  final String? alternativa;
+  final VoidCallback? onAlternativa;
 
   /// Botão preto; sem [onPrincipal] mostra "em breve" (Ajustes do celular).
   final String principal;
@@ -33,6 +37,12 @@ class TelaPermissao extends StatelessWidget {
 
   /// Círculo laranja claro de atenção em vez do cinza.
   final bool aviso;
+
+  /// Círculo verde claro de sucesso (ex.: "Pedido recebido").
+  final bool sucesso;
+
+  /// Mostra o botão de voltar no topo.
+  final bool voltar;
 
   @override
   Widget build(BuildContext context) {
@@ -51,16 +61,20 @@ class TelaPermissao extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: BackCircleButton(),
-                  ),
+                  if (voltar)
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: BackCircleButton(),
+                    )
+                  else
+                    const SizedBox(height: 36),
                   Expanded(
                     child: TelaPermissaoCorpo(
                       icone: icone,
                       titulo: titulo,
                       texto: texto,
                       aviso: aviso,
+                      sucesso: sucesso,
                     ),
                   ),
                   FilledButton(
@@ -73,12 +87,14 @@ class TelaPermissao extends StatelessWidget {
                           ),
                     child: Text(principal),
                   ),
-                  const SizedBox(height: 10),
-                  FilledButton(
-                    style: tatuBotaoSecundario(),
-                    onPressed: onAlternativa,
-                    child: Text(alternativa),
-                  ),
+                  if (alternativa != null) ...[
+                    const SizedBox(height: 10),
+                    FilledButton(
+                      style: tatuBotaoSecundario(),
+                      onPressed: onAlternativa,
+                      child: Text(alternativa!),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -99,12 +115,14 @@ class TelaPermissaoCorpo extends StatelessWidget {
     required this.titulo,
     required this.texto,
     this.aviso = false,
+    this.sucesso = false,
   });
 
   final Widget icone;
   final String titulo;
   final String texto;
   final bool aviso;
+  final bool sucesso;
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +136,11 @@ class TelaPermissaoCorpo extends StatelessWidget {
             height: 112,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: aviso ? TatuColors.warningSoft : TatuColors.fill,
+              color: aviso
+                  ? TatuColors.warningSoft
+                  : sucesso
+                  ? TatuColors.onlineSoft
+                  : TatuColors.fill,
               shape: BoxShape.circle,
             ),
             child: icone,

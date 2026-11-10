@@ -10,6 +10,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/ajuda.dart';
 import 'package:tatu/data/avaliacoes.dart';
+import 'package:tatu/data/documentos.dart';
+import 'package:tatu/features/cliente/privacidade/baixar_dados_page.dart';
+import 'package:tatu/features/cliente/privacidade/documento_page.dart';
+import 'package:tatu/features/cliente/privacidade/permissoes_page.dart';
+import 'package:tatu/features/cliente/privacidade/privacidade_page.dart';
+import 'package:tatu/features/cliente/privacidade/seus_dados_page.dart';
 import 'package:tatu/features/cliente/ajuda/ajuda_page.dart';
 import 'package:tatu/features/cliente/ajuda/artigo_page.dart';
 import 'package:tatu/features/cliente/ajuda/assunto_page.dart';
@@ -579,6 +585,53 @@ void main() {
         await t.pump();
       },
     );
+  });
+
+  testWidgets('privacidade', (t) async {
+    await _capturar(t, 'privacidade', const PrivacidadePage());
+  });
+
+  testWidgets('termos-de-uso', (t) async {
+    await _capturar(
+      t,
+      'termos-de-uso',
+      const DocumentoPage(documento: termosDeUso),
+    );
+  });
+
+  testWidgets('politica-privacidade', (t) async {
+    await _capturar(
+      t,
+      'politica-privacidade',
+      const DocumentoPage(
+        documento: politicaDePrivacidade,
+        linkSeusDados: true,
+      ),
+    );
+  });
+
+  testWidgets('permissoes', (t) async {
+    await _capturar(
+      t,
+      'permissoes',
+      const PermissoesPage(),
+      preparar: () async {
+        perfil.definirPermissoes(fotos: false); // como no desenho
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('seus-dados', (t) async {
+    await _capturar(t, 'seus-dados', const SeusDadosPage());
+  });
+
+  testWidgets('baixar-dados', (t) async {
+    await _capturar(t, 'baixar-dados', const BaixarDadosPage());
+  });
+
+  testWidgets('baixar-dados-enviado', (t) async {
+    await _capturar(t, 'baixar-dados-enviado', const DadosPedidosPage());
   });
 
   testWidgets('home-vazia', (t) async {

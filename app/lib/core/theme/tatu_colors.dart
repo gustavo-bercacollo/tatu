@@ -18,6 +18,7 @@ class TatuColors {
   static const action = Color(0xFF1C1C1E);
   static const onAction = Color(0xFFFFFFFF);
   static const online = Color(0xFF34C759);
+  static const onlineSoft = Color(0xFFE8F7EC); // fundo do ícone de sucesso
   static const verified = Color(0xFF007AFF);
   static const warning = Color(0xFFFF9F0A); // também as estrelas
   static const warningSoft = Color(0xFFFFF1DB); // fundo do ícone de atenção

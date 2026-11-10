@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
+import '../../core/theme/tatu_texto.dart';
 import '../../core/theme/tatu_theme.dart';
 import 'back_circle_button.dart';
 
@@ -13,18 +14,21 @@ class CadastroScaffold extends StatelessWidget {
     required this.titulo,
     required this.subtitulo,
     required this.children,
-    required this.botao,
-    required this.onBotao,
+    this.botao,
+    this.onBotao,
     this.botaoSecundario,
     this.onSecundario,
     this.perigo = false,
     this.botaoCinza = false,
+    this.subtituloNota = false,
   });
 
   final String titulo;
   final String subtitulo;
   final List<Widget> children;
-  final String botao;
+
+  /// Sem [botao], a tela não tem botão embaixo (ex.: documentos).
+  final String? botao;
 
   /// `null` deixa o botão desabilitado.
   final VoidCallback? onBotao;
@@ -38,6 +42,9 @@ class CadastroScaffold extends StatelessWidget {
 
   /// Botão principal cinza (secundário), ex.: "Falar com o suporte".
   final bool botaoCinza;
+
+  /// Subtítulo pequeno (13 cinza), ex.: "Atualizado em…".
+  final bool subtituloNota;
 
   @override
   Widget build(BuildContext context) {
@@ -78,11 +85,13 @@ class CadastroScaffold extends StatelessWidget {
                           const SizedBox(height: 10),
                           Text(
                             subtitulo,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              height: 22 / 16,
-                              color: TatuColors.textSecondary,
-                            ),
+                            style: subtituloNota
+                                ? TatuTexto.nota
+                                : const TextStyle(
+                                    fontSize: 16,
+                                    height: 22 / 16,
+                                    color: TatuColors.textSecondary,
+                                  ),
                           ),
                           const SizedBox(height: 32),
                           ...children,
@@ -90,16 +99,18 @@ class CadastroScaffold extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: onBotao,
-                    style: perigo
-                        ? tatuBotaoPerigo()
-                        : botaoCinza
-                        ? tatuBotaoSecundario()
-                        : null,
-                    child: Text(botao),
-                  ),
+                  if (botao != null) ...[
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: onBotao,
+                      style: perigo
+                          ? tatuBotaoPerigo()
+                          : botaoCinza
+                          ? tatuBotaoSecundario()
+                          : null,
+                      child: Text(botao!),
+                    ),
+                  ],
                   if (botaoSecundario != null) ...[
                     const SizedBox(height: 10),
                     FilledButton(

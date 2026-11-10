@@ -13,6 +13,7 @@ class GrupoLista extends StatelessWidget {
     this.titulo,
     required this.itens,
     this.fundo = TatuColors.bg,
+    this.nota,
   });
 
   final String? titulo;
@@ -20,6 +21,9 @@ class GrupoLista extends StatelessWidget {
 
   /// Cor do cartão (cinza dentro de folhas brancas).
   final Color fundo;
+
+  /// Texto cinza pequeno abaixo do cartão.
+  final String? nota;
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +57,11 @@ class GrupoLista extends StatelessWidget {
             ],
           ),
         ),
+        if (nota != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 0, 0),
+            child: Text(nota!, style: TatuTexto.nota),
+          ),
       ],
     );
   }

@@ -3,7 +3,6 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
-import '../../../core/theme/tatu_texto.dart';
 import '../../../data/ajuda.dart';
 import '../../../shared/widgets/campo_busca.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
@@ -31,7 +30,12 @@ class AjudaPage extends StatelessWidget {
             ).push(MaterialPageRoute(builder: (_) => const BuscaAjudaPage())),
           ),
           const SizedBox(height: TatuMedidas.entreItens + 4),
-          _FalarComSuporte(onTap: () => abrirSuporte(context)),
+          CartaoAcao(
+            icone: const IconeSuporte(),
+            titulo: 'Falar com o suporte',
+            detalhe: 'Respondemos em poucos minutos',
+            onTap: () => abrirSuporte(context),
+          ),
           const SizedBox(height: TatuMedidas.entreSecoes + 8),
           GrupoLista(
             titulo: 'Assuntos',
@@ -57,58 +61,6 @@ class AjudaPage extends StatelessWidget {
           ),
           const SizedBox(height: TatuMedidas.entreSecoes),
         ],
-      ),
-    );
-  }
-}
-
-/// Cartão "Falar com o suporte" com o ícone de conversa num círculo preto.
-class _FalarComSuporte extends StatelessWidget {
-  const _FalarComSuporte({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: TatuColors.bg,
-      borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 12, 16),
-          child: Row(
-            children: [
-              const IconeSuporte(),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Falar com o suporte',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      'Respondemos em poucos minutos',
-                      style: TatuTexto.nota,
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(
-                TablerIcons.chevron_right,
-                size: 18,
-                color: TatuColors.chevron,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

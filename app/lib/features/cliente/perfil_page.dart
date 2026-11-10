@@ -20,6 +20,7 @@ import 'endereco/enderecos_page.dart';
 import 'foto/foto_perfil_sheet.dart';
 import 'notificacoes/notificacoes_page.dart';
 import 'pagamento/pagamento_page.dart';
+import 'privacidade/privacidade_page.dart';
 
 /// Perfil do cliente: dados, troca de modo e atalhos da conta.
 class PerfilClientePage extends StatelessWidget {
@@ -200,7 +201,11 @@ class PerfilClientePage extends StatelessWidget {
                     ItemLista(
                       icone: TablerIcons.lock,
                       texto: 'Privacidade e termos',
-                      onTap: () => emBreve('Privacidade e termos'),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const PrivacidadePage(),
+                        ),
+                      ),
                     ),
                   ],
                 ),
