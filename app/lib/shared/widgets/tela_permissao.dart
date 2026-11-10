@@ -21,6 +21,8 @@ class TelaPermissao extends StatelessWidget {
     this.aviso = false,
     this.sucesso = false,
     this.voltar = true,
+    this.extra,
+    this.abas,
   });
 
   final Widget icone;
@@ -44,9 +46,16 @@ class TelaPermissao extends StatelessWidget {
   /// Mostra o botão de voltar no topo.
   final bool voltar;
 
+  /// Conteúdo abaixo do texto (ex.: cartão "Buscando em segundo plano").
+  final Widget? extra;
+
+  /// Barra de abas embaixo (telas que fazem parte de uma aba).
+  final Widget? abas;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: abas,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -75,6 +84,7 @@ class TelaPermissao extends StatelessWidget {
                       texto: texto,
                       aviso: aviso,
                       sucesso: sucesso,
+                      extra: extra,
                     ),
                   ),
                   FilledButton(
@@ -116,6 +126,7 @@ class TelaPermissaoCorpo extends StatelessWidget {
     required this.texto,
     this.aviso = false,
     this.sucesso = false,
+    this.extra,
   });
 
   final Widget icone;
@@ -123,6 +134,7 @@ class TelaPermissaoCorpo extends StatelessWidget {
   final String texto;
   final bool aviso;
   final bool sucesso;
+  final Widget? extra;
 
   @override
   Widget build(BuildContext context) {
@@ -147,17 +159,26 @@ class TelaPermissaoCorpo extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 40),
-        Text(
-          titulo,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.5,
+        // Uma linha só; diminui um pouco se não couber.
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            titulo,
+            maxLines: 1,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.5,
+            ),
           ),
         ),
         const SizedBox(height: 10),
         Text(texto, textAlign: TextAlign.center, style: TatuTexto.corpo),
+        if (extra != null) ...[
+          const SizedBox(height: TatuMedidas.entreSecoes + 8),
+          extra!,
+        ],
         const Spacer(flex: 2),
       ],
     );

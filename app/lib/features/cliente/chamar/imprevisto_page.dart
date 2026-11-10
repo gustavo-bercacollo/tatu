@@ -6,7 +6,7 @@ import '../../../data/pedidos.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../../shared/widgets/tela_permissao.dart';
 import '../abas.dart';
-import 'chamando_outro_page.dart';
+import 'procurando_page.dart';
 
 /// O profissional cancelou depois de aceitar: chamar outro ou cancelar.
 class ImprevistoPage extends StatelessWidget {
@@ -28,7 +28,13 @@ class ImprevistoPage extends StatelessWidget {
           '${ela ? 'Ela' : 'Ele'} cancelou o atendimento.\nNada foi cobrado.',
       principal: 'Chamar outro ${pedido.servico.toLowerCase()}',
       onPrincipal: () => Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => ChamandoOutroPage(pedido: pedido)),
+        MaterialPageRoute(
+          builder: (_) => ProcurandoPage(
+            servico: pedido.servico,
+            endereco: pedido.endereco,
+            anterior: pedido,
+          ),
+        ),
       ),
       alternativa: 'Cancelar pedido',
       onAlternativa: () {

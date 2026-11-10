@@ -12,6 +12,7 @@ import '../../../shared/widgets/estado_vazio.dart';
 import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/segmento.dart';
 import '../abas.dart';
+import '../chamar/procurando_page.dart';
 import 'pedido_andamento_page.dart';
 import 'pedido_concluido_page.dart';
 
@@ -297,7 +298,14 @@ class _NinguemAceitou extends StatelessWidget {
             children: [
               FilledButton(
                 style: pequeno,
-                onPressed: () => _emBreve(context, 'Tentar de novo'),
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ProcurandoPage(
+                      servico: busca.servico,
+                      endereco: busca.endereco,
+                    ),
+                  ),
+                ),
                 child: const Text('Tentar de novo'),
               ),
               FilledButton(

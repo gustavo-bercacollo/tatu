@@ -142,5 +142,8 @@
  "app/chamar-fora-da-area.png": "docs/fluxo/app/chamar-fora-da-area.png",
  "app/chamar-ja-tem-pedido.png": "docs/fluxo/app/chamar-ja-tem-pedido.png",
  "app/chamar-imprevisto.png": "docs/fluxo/app/chamar-imprevisto.png",
- "app/chamar-outro.png": "docs/fluxo/app/chamar-outro.png"
+ "app/chamar-outro.png": "docs/fluxo/app/chamar-outro.png",
+ "app/procurando.png": "docs/fluxo/app/procurando.png",
+ "app/procurando-expandindo.png": "docs/fluxo/app/procurando-expandindo.png",
+ "app/procurando-ninguem.png": "docs/fluxo/app/procurando-ninguem.png"
 }

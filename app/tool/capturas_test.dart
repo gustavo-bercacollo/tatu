@@ -11,10 +11,11 @@ import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/ajuda.dart';
 import 'package:tatu/data/avaliacoes.dart';
 import 'package:tatu/data/chamado.dart';
-import 'package:tatu/features/cliente/chamar/chamando_outro_page.dart';
 import 'package:tatu/features/cliente/chamar/fora_da_area_page.dart';
 import 'package:tatu/features/cliente/chamar/imprevisto_page.dart';
 import 'package:tatu/features/cliente/chamar/localizacao_chamar_page.dart';
+import 'package:tatu/features/cliente/chamar/ninguem_ativo_page.dart';
+import 'package:tatu/features/cliente/chamar/procurando_page.dart';
 import 'package:tatu/data/conversas.dart';
 import 'package:tatu/features/cliente/mensagens/chat_page.dart';
 import 'package:tatu/features/cliente/mensagens/denunciar_page.dart';
@@ -909,10 +910,49 @@ void main() {
   });
 
   testWidgets('chamar-outro', (t) async {
+    final p = PedidosRepo().andamento!;
     await _capturar(
       t,
       'chamar-outro',
-      ChamandoOutroPage(pedido: PedidosRepo().andamento!, animar: false),
+      ProcurandoPage(
+        servico: p.servico,
+        endereco: p.endereco,
+        anterior: p,
+        animar: false,
+      ),
+    );
+  });
+
+  testWidgets('procurando', (t) async {
+    await _capturar(
+      t,
+      'procurando',
+      const ProcurandoPage(
+        servico: 'Encanador',
+        endereco: 'Rua Bruno Lobo, 29',
+        animar: false,
+      ),
+    );
+  });
+
+  testWidgets('procurando-expandindo', (t) async {
+    await _capturar(
+      t,
+      'procurando-expandindo',
+      const ProcurandoPage(
+        servico: 'Encanador',
+        endereco: 'Rua Bruno Lobo, 29',
+        animar: false,
+        fase: FaseBusca.expandindo,
+      ),
+    );
+  });
+
+  testWidgets('procurando-ninguem', (t) async {
+    await _capturar(
+      t,
+      'procurando-ninguem',
+      const NinguemAtivoPage(servico: 'Encanador'),
     );
   });
 

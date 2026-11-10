@@ -10,6 +10,7 @@ import '../endereco/onde_sheet.dart';
 import 'confirmar_celular_sheet.dart';
 import 'fora_da_area_page.dart';
 import 'localizacao_chamar_page.dart';
+import 'procurando_page.dart';
 
 /// "Chamar (serviço)": antes de procurar, confere localização, região,
 /// celular para contato e se já há um pedido igual a caminho.
@@ -60,11 +61,11 @@ Future<void> chamarProfissional(BuildContext context, String servico) async {
     }
   }
 
-  // 5. Procurar profissional (telas Procurando ainda não feitas).
-  if (!context.mounted) return;
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      const SnackBar(content: Text('Procurando profissional: em breve')),
-    );
+  // 5. Procura: pedido vai a todos os ativos por perto.
+  nav.push(
+    MaterialPageRoute(
+      builder: (_) =>
+          ProcurandoPage(servico: servico, endereco: enderecos.atual.rua),
+    ),
+  );
 }

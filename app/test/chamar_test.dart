@@ -27,6 +27,18 @@ Future<void> _homePronta(WidgetTester t) async {
   await t.pump(const Duration(milliseconds: 600));
 }
 
+/// A busca abriu; fecha no "x" (a busca segue em segundo plano).
+Future<void> _abriuBusca(WidgetTester t) async {
+  await t.pump();
+  await t.pump(const Duration(milliseconds: 500));
+  await t.pump(const Duration(milliseconds: 500));
+  expect(find.text('Procurando um profissional'), findsOneWidget);
+  await t.tap(find.bySemanticsLabel('Fechar'));
+  await t.pump();
+  await t.pump(const Duration(milliseconds: 500));
+  expect(pedidos.busca, isNotNull);
+}
+
 Future<void> _chamar(WidgetTester t) async {
   await t.tap(find.text('Chamar encanador'));
   await t.pumpAndSettle();
@@ -49,15 +61,32 @@ void main() {
     expect(find.text('Já tem um encanador a caminho'), findsOneWidget);
     expect(find.textContaining('chega em 12 min'), findsOneWidget);
     await t.tap(find.text('Chamar outro'));
-    await t.pumpAndSettle();
-    expect(find.text('Procurando profissional: em breve'), findsOneWidget);
-    await t.pump(const Duration(seconds: 5)); // o aviso some
-    await t.pumpAndSettle();
+    await _abriuBusca(t);
 
     await _chamar(t);
     await t.tap(find.text('Ver pedido atual'));
     await t.pumpAndSettle();
     expect(find.text('Pedido'), findsOneWidget);
+  });
+
+  testWidgets('Busca: expande aos 60 s e vira "Ninguém ativo" aos 90 s', (
+    t,
+  ) async {
+    pedidos.limpar();
+    await _homePronta(t);
+    await t.tap(find.text('Chamar encanador'));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 500));
+    expect(find.text('Procurando um profissional'), findsOneWidget);
+    await t.pump(const Duration(seconds: 61));
+    expect(find.text('Expandindo a busca para sua região…'), findsOneWidget);
+    await t.pump(const Duration(seconds: 30));
+    await t.pump(const Duration(milliseconds: 500));
+    expect(find.text('Ninguém ativo nesse momento'), findsOneWidget);
+    expect(pedidos.busca?.servico, 'Encanador');
+    await t.tap(find.text('Voltar ao início'));
+    await t.pumpAndSettle();
+    expect(find.text('Do que você precisa?'), findsOneWidget);
   });
 
   testWidgets('Localização desativada → usar endereço salvo', (t) async {
@@ -99,12 +128,13 @@ void main() {
     await t.pumpAndSettle();
     await t.enterText(find.byType(TextField).last, '482719');
     await t.pump();
-    if (find.text('Confirmar').evaluate().isNotEmpty) {
-      await t.tap(find.text('Confirmar'));
+    await t.tap(find.text('Confirmar'));
+    // Sem pumpAndSettle: a busca anima sem parar.
+    for (var i = 0; i < 4; i++) {
+      await t.pump(const Duration(milliseconds: 300));
     }
-    await t.pumpAndSettle();
     expect(conta.celular, '11977776666');
-    expect(find.text('Procurando profissional: em breve'), findsOneWidget);
+    await _abriuBusca(t);
   });
 
   testWidgets('Fotos na descrição: anexa e tira', (t) async {

@@ -154,6 +154,12 @@ class PedidosRepo extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Ninguém aceitou ainda: o pedido segue buscando em segundo plano.
+  void buscarEmSegundoPlano(BuscaSegundoPlano b) {
+    busca = b;
+    notifyListeners();
+  }
+
   void cancelarBusca() {
     busca = null;
     notifyListeners();
