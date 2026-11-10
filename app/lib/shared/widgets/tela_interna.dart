@@ -13,6 +13,7 @@ class TelaInterna extends StatelessWidget {
     required this.corpo,
     this.acao,
     this.onAcao,
+    this.acaoIcone,
     this.rodape,
     this.fundoCinza = false,
   });
@@ -20,6 +21,7 @@ class TelaInterna extends StatelessWidget {
   final String titulo;
   final String? acao;
   final VoidCallback? onAcao;
+  final IconData? acaoIcone;
 
   /// Conteúdo abaixo do topo (normalmente uma lista).
   final Widget corpo;
@@ -48,7 +50,12 @@ class TelaInterna extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  TopoTela(titulo: titulo, acao: acao, onAcao: onAcao),
+                  TopoTela(
+                    titulo: titulo,
+                    acao: acao,
+                    onAcao: onAcao,
+                    acaoIcone: acaoIcone,
+                  ),
                   Expanded(child: corpo),
                   ?rodape,
                 ],

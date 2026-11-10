@@ -32,7 +32,16 @@ class ProcurandoPage extends StatefulWidget {
     this.anterior,
     this.animar = true,
     this.fase = FaseBusca.inicio,
+    this.direto,
+    this.diretoFeminino = true,
   });
+
+  /// "Pedir de novo" com o mesmo profissional: chama só ele por
+  /// [esperaDireto]; se não aceitar, chama todos os outros por perto.
+  final String? direto;
+  final bool diretoFeminino;
+
+  static const esperaDireto = Duration(minutes: 2);
 
   final String servico;
   final String endereco;
@@ -54,8 +63,14 @@ class _ProcurandoPageState extends State<ProcurandoPage>
     with TickerProviderStateMixin {
   late final _busca = AnimationController(
     vsync: this,
-    duration: ProcurandoPage.desisteEm,
-    value: widget.animar ? 0 : (widget.fase == FaseBusca.inicio ? 0.3 : 0.75),
+    duration: widget.direto == null
+        ? ProcurandoPage.desisteEm
+        : ProcurandoPage.esperaDireto,
+    value: widget.animar
+        ? 0
+        : widget.direto != null
+        ? 0.45
+        : (widget.fase == FaseBusca.inicio ? 0.3 : 0.75),
   );
   late final _pulso = AnimationController(
     vsync: this,
@@ -74,7 +89,9 @@ class _ProcurandoPageState extends State<ProcurandoPage>
     if (widget.animar) {
       _busca.forward();
       _pulso.repeat();
-      _fim = Timer(ProcurandoPage.desisteEm, _ninguemAtivo);
+      _fim = widget.direto == null
+          ? Timer(ProcurandoPage.desisteEm, _ninguemAtivo)
+          : Timer(ProcurandoPage.esperaDireto, _chamarOutros);
     }
   }
 
@@ -110,6 +127,21 @@ class _ProcurandoPageState extends State<ProcurandoPage>
     );
   }
 
+  /// O profissional chamado direto não aceitou: busca normal.
+  void _chamarOutros() {
+    if (!mounted) return;
+    _saiu = true;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) =>
+            ProcurandoPage(servico: widget.servico, endereco: widget.endereco),
+      ),
+    );
+  }
+
+  bool get _expandindo =>
+      widget.direto == null && _busca.value >= _limiteExpandir;
+
   void _cancelar() {
     _saiu = true;
     if (widget.anterior != null) pedidos.cancelarAndamento();
@@ -131,7 +163,8 @@ class _ProcurandoPageState extends State<ProcurandoPage>
                   builder: (_, _) => CustomPaint(
                     painter: _Radar(
                       pulso: _pulso.value,
-                      expandido: _busca.value >= _limiteExpandir,
+                      expandido: _expandindo,
+                      circulos: widget.direto == null,
                     ),
                   ),
                 ),
@@ -188,8 +221,7 @@ class _ProcurandoPageState extends State<ProcurandoPage>
                   ),
                   child: AnimatedBuilder(
                     animation: _busca,
-                    builder: (_, _) =>
-                        _painel(expandindo: _busca.value >= _limiteExpandir),
+                    builder: (_, _) => _painel(expandindo: _expandindo),
                   ),
                 ),
               ),
@@ -204,7 +236,12 @@ class _ProcurandoPageState extends State<ProcurandoPage>
     final a = widget.anterior;
     final String titulo;
     final String texto;
-    if (expandindo) {
+    if (widget.direto != null) {
+      final ela = widget.diretoFeminino;
+      titulo = 'Chamando ${ela ? 'a' : 'o'} ${widget.direto}';
+      texto =
+          'Se ${ela ? 'ela' : 'ele'} não aceitar em 2 min,\nchamamos outro ${widget.servico.toLowerCase()} perto de você.';
+    } else if (expandindo) {
       titulo = 'Procurando um profissional';
       texto = 'Ninguém aceitou ainda. Estamos chamando\nmais profissionais.';
     } else if (a != null) {
@@ -268,10 +305,17 @@ class _ProcurandoPageState extends State<ProcurandoPage>
 /// Círculos verdes em volta de quem pediu, profissionais por perto e o
 /// ponto preto no centro. [expandido] aumenta o raio.
 class _Radar extends CustomPainter {
-  const _Radar({required this.pulso, required this.expandido});
+  const _Radar({
+    required this.pulso,
+    required this.expandido,
+    this.circulos = true,
+  });
 
   final double pulso;
   final bool expandido;
+
+  /// Sem círculos quando chama um profissional só.
+  final bool circulos;
 
   static const _profissionais = [
     Offset(-86, -120),
@@ -285,7 +329,7 @@ class _Radar extends CustomPainter {
     final centro = Offset(size.width / 2, size.height * 0.34);
     final escala = expandido ? 1.25 : 1.0;
     final verde = Paint()..color = TatuColors.radar;
-    for (final r in [60.0, 115.0, 170.0]) {
+    for (final r in circulos ? [60.0, 115.0, 170.0] : const <double>[]) {
       canvas.drawCircle(centro, r * escala + 6 * pulso, verde);
     }
     final borda = Paint()..color = TatuColors.bg;

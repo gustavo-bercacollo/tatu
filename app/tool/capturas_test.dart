@@ -22,6 +22,8 @@ import 'package:tatu/features/cliente/mensagens/denunciar_page.dart';
 import 'package:tatu/features/cliente/mensagens/mensagens_page.dart';
 import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/features/cliente/atividade/atividade_page.dart';
+import 'package:tatu/features/cliente/atividade/avaliar_page.dart';
+import 'package:tatu/features/cliente/atividade/recibo_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_andamento_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_cancelado_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_concluido_page.dart';
@@ -1041,6 +1043,81 @@ void main() {
         await t.tap(find.text('Não sei qual serviço'));
         await t.pumpAndSettle();
       },
+    );
+  });
+
+  testWidgets('avaliar', (t) async {
+    await _capturar(
+      t,
+      'avaliar',
+      AvaliarPage(pedido: PedidosRepo().concluidos.first),
+      preparar: () async {
+        await t.tap(find.bySemanticsLabel('4 estrelas'));
+        await t.tap(find.text('Pontual'));
+        await t.tap(find.text('Educada'));
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('sua-avaliacao', (t) async {
+    await _capturar(
+      t,
+      'sua-avaliacao',
+      SuaAvaliacaoPage(pedido: PedidosRepo().concluidos[1]),
+    );
+  });
+
+  testWidgets('recibo', (t) async {
+    await _capturar(
+      t,
+      'recibo',
+      ReciboPage(pedido: PedidosRepo().concluidos.first),
+    );
+  });
+
+  testWidgets('comprovante', (t) async {
+    await _capturar(
+      t,
+      'comprovante',
+      ReciboPage(pedido: PedidosRepo().concluidos[1]),
+    );
+  });
+
+  testWidgets('pedir-de-novo', (t) async {
+    await _capturar(
+      t,
+      'pedir-de-novo',
+      const AtividadePage(aba: 1),
+      preparar: () async {
+        await t.tap(find.text('Pedir de novo').first);
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pedir-de-novo-offline', (t) async {
+    await _capturar(
+      t,
+      'pedir-de-novo-offline',
+      const AtividadePage(aba: 1),
+      preparar: () async {
+        await t.tap(find.text('Pedir de novo').at(1));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('chamando-mesmo', (t) async {
+    await _capturar(
+      t,
+      'chamando-mesmo',
+      const ProcurandoPage(
+        servico: 'Encanador',
+        endereco: 'Rua das Flores, 120',
+        direto: 'Luiza',
+        animar: false,
+      ),
     );
   });
 

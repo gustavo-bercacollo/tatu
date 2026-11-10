@@ -55,7 +55,7 @@ void main() {
     await t.tap(find.text('Luiza Souza'));
     await t.pumpAndSettle();
     expect(find.text('Pedido concluído'), findsOneWidget);
-    expect(find.text('Sua avaliação'), findsOneWidget);
+    expect(find.text('Sua avaliação'), findsNothing); // ainda não avaliou
     expect(find.text('Vazamento na pia'), findsOneWidget);
   });
 

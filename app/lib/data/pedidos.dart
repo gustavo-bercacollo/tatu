@@ -56,7 +56,21 @@ class BuscaSegundoPlano {
   final String endereco;
 }
 
-/// Pedido concluído e pago.
+/// Avaliação que a pessoa deu ao profissional.
+@immutable
+class AvaliacaoEnviada {
+  const AvaliacaoEnviada({
+    required this.nota,
+    this.tags = const [],
+    this.comentario = '',
+  });
+
+  final int nota;
+  final List<String> tags;
+  final String comentario;
+}
+
+/// Pedido concluído (pago) ou cancelado.
 @immutable
 class PedidoConcluido {
   const PedidoConcluido({
@@ -70,7 +84,14 @@ class PedidoConcluido {
     required this.dia,
     required this.hora,
     required this.mes,
-    this.avaliacao,
+    this.ano = '2026',
+    this.numero = '#TT-48213',
+    this.minhaAvaliacao,
+    this.editavelAte,
+    this.cancelado = false,
+    this.pagoPorFora = false,
+    this.online = false,
+    this.chegaEm = '~15 min',
   });
 
   final String servico;
@@ -84,12 +105,60 @@ class PedidoConcluido {
   /// "04 nov".
   final String dia;
   final String hora;
+  final String ano;
 
   /// Para agrupar a lista ("Novembro").
   final String mes;
 
+  /// Número do pedido no recibo ("#TT-48213").
+  final String numero;
+
+  /// O que a pessoa avaliou (null = ainda não avaliou).
+  final AvaliacaoEnviada? minhaAvaliacao;
+
+  /// Até quando dá para editar a avaliação ("09 nov").
+  final String? editavelAte;
+
+  /// Cancelado: sem valor, sem recibo e sem avaliação.
+  final bool cancelado;
+
+  /// Pago direto ao profissional: o recibo vira "Comprovante".
+  final bool pagoPorFora;
+
+  /// O profissional está online agora (para "Pedir de novo").
+  final bool online;
+
+  /// Previsão de chegada se chamar de novo.
+  final String chegaEm;
+
   /// Estrelas que a pessoa deu (null = ainda não avaliou).
-  final int? avaliacao;
+  int? get avaliacao => minhaAvaliacao?.nota;
+
+  String get primeiroNome => profissional.split(' ').first;
+
+  /// Profissional mulher (para "a Luiza", "Educada"…).
+  bool get feminino => profissao.endsWith('a');
+
+  PedidoConcluido avaliado(AvaliacaoEnviada a) => PedidoConcluido(
+    servico: servico,
+    profissao: profissao,
+    profissional: profissional,
+    descricao: descricao,
+    endereco: endereco,
+    pagamento: pagamento,
+    valor: valor,
+    dia: dia,
+    hora: hora,
+    mes: mes,
+    ano: ano,
+    numero: numero,
+    minhaAvaliacao: a,
+    editavelAte: editavelAte,
+    cancelado: cancelado,
+    pagoPorFora: pagoPorFora,
+    online: online,
+    chegaEm: chegaEm,
+  );
 }
 
 /// Pedidos do cliente. Versão simulada (sem backend).
@@ -129,9 +198,11 @@ class PedidosRepo extends ChangeNotifier {
         pagamento: 'Visa 4242',
         valor: r'R$ 150,00',
         dia: '04 nov',
-        hora: '14:20',
+        hora: '15:02',
         mes: 'Novembro',
-        avaliacao: 5,
+        numero: '#TT-48213',
+        editavelAte: '11 nov',
+        online: true,
       ),
       PedidoConcluido(
         servico: 'Eletricista',
@@ -139,12 +210,42 @@ class PedidosRepo extends ChangeNotifier {
         profissional: 'Rafael Lima',
         descricao: 'Tomada sem energia',
         endereco: 'Rua das Flores, 120',
-        pagamento: 'Pix',
+        pagamento: 'Pago direto',
         valor: r'R$ 220,00',
         dia: '02 nov',
         hora: '10:05',
         mes: 'Novembro',
+        numero: '#TT-47960',
+        pagoPorFora: true,
+        editavelAte: '09 nov',
+        minhaAvaliacao: AvaliacaoEnviada(
+          nota: 5,
+          tags: ['Pontual', 'Educado'],
+          comentario: 'Chegou no horário e explicou\ntudo direitinho.',
+        ),
       ),
+      PedidoConcluido(
+        servico: 'Pintor',
+        profissao: 'Pintor',
+        profissional: 'Marcos Dias',
+        descricao: 'Parede da sala',
+        endereco: 'Rua das Flores, 120',
+        pagamento: '',
+        valor: '',
+        dia: '28 out',
+        hora: '09:30',
+        mes: 'Novembro',
+        numero: '#TT-47710',
+        cancelado: true,
+      ),
+    ];
+    notifyListeners();
+  }
+
+  /// Guarda (ou troca) a avaliação de um pedido concluído.
+  void avaliar(PedidoConcluido p, AvaliacaoEnviada a) {
+    concluidos = [
+      for (final c in concluidos) c.numero == p.numero ? c.avaliado(a) : c,
     ];
     notifyListeners();
   }
@@ -164,6 +265,10 @@ class PedidosRepo extends ChangeNotifier {
     busca = null;
     notifyListeners();
   }
+
+  /// Versão atual de um pedido concluído (pelo número).
+  PedidoConcluido atual(PedidoConcluido p) =>
+      concluidos.firstWhere((c) => c.numero == p.numero, orElse: () => p);
 
   /// Para a demo dos estados vazios.
   void limpar() {

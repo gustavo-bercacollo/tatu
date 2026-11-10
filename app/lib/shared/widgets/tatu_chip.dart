@@ -47,12 +47,16 @@ class TatuChip extends StatelessWidget {
                   Icon(icone, size: 16, color: cor),
                   const SizedBox(width: 6),
                 ],
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: cor,
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: cor,
+                    ),
                   ),
                 ),
                 if (seta) ...[

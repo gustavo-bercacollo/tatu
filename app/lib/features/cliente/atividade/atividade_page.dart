@@ -9,16 +9,17 @@ import '../../../data/pedidos.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/estado_vazio.dart';
+import '../../../shared/widgets/estrelas.dart';
 import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/segmento.dart';
+import '../../../shared/widgets/tatu_chip.dart';
 import '../abas.dart';
 import '../chamar/procurando_page.dart';
 import 'pedido_andamento_page.dart';
+import 'avaliar_page.dart';
 import 'pedido_concluido_page.dart';
-
-void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
-  ..hideCurrentSnackBar()
-  ..showSnackBar(SnackBar(content: Text('$o: em breve')));
+import 'pedir_de_novo_sheet.dart';
+import 'recibo_page.dart';
 
 /// Volta para a Home ("Pedir um serviço", "Pedir de novo").
 void voltarParaHome(BuildContext context) =>
@@ -395,52 +396,33 @@ class _CartaoConcluido extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget link(String texto, VoidCallback onTap) => Padding(
-      padding: const EdgeInsets.only(right: 28),
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Text(
-          texto,
-          style: const TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-            color: TatuColors.verified,
-          ),
-        ),
-      ),
-    );
+    final p = pedido;
+    void abrir(Widget tela) =>
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => tela));
+    final nota = p.avaliacao;
     return _Cartao(
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => PedidoConcluidoPage(pedido: pedido)),
-      ),
+      onTap: p.cancelado ? null : () => abrir(PedidoConcluidoPage(pedido: p)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AvatarIniciais(
-                nome: pedido.profissional.split(' ').first,
-                tamanho: 40,
-              ),
+              AvatarIniciais(nome: p.profissional, tamanho: 40),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      pedido.profissional,
+                      p.profissional,
                       style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      '${pedido.servico} · ${pedido.dia}',
-                      style: TatuTexto.nota,
-                    ),
+                    Text('${p.profissao} · ${p.dia}', style: TatuTexto.nota),
                   ],
                 ),
               ),
@@ -448,14 +430,17 @@ class _CartaoConcluido extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    pedido.valor,
+                    p.cancelado ? '—' : p.valor,
                     style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 2),
-                  const _Pago(),
+                  if (p.cancelado)
+                    const Text('Cancelado', style: TatuTexto.detalhe)
+                  else
+                    const _Pago(),
                 ],
               ),
             ],
@@ -463,12 +448,41 @@ class _CartaoConcluido extends StatelessWidget {
           const SizedBox(height: TatuMedidas.entreItens),
           const Divider(height: 0.5),
           const SizedBox(height: TatuMedidas.entreItens),
-          Wrap(
-            runSpacing: 8,
+          Row(
             children: [
-              link('Pedir de novo', () => voltarParaHome(context)),
-              link('Recibo', () => _emBreve(context, 'Recibo')),
-              link('Avaliar', () => _emBreve(context, 'Avaliar')),
+              // Quebra de linha se não couber (telas estreitas).
+              Expanded(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    TatuChip(
+                      label: 'Pedir de novo',
+                      onTap: () => abrirPedirDeNovo(context, p),
+                    ),
+                    if (!p.cancelado)
+                      TatuChip(
+                        label: 'Recibo',
+                        onTap: () => abrir(ReciboPage(pedido: p)),
+                      ),
+                    if (!p.cancelado && nota == null)
+                      TatuChip(
+                        label: 'Avaliar',
+                        selecionado: true,
+                        onTap: () => abrir(AvaliarPage(pedido: p)),
+                      ),
+                  ],
+                ),
+              ),
+              if (!p.cancelado && nota != null)
+                Semantics(
+                  button: true,
+                  label: 'Sua avaliação',
+                  child: GestureDetector(
+                    onTap: () => abrir(SuaAvaliacaoPage(pedido: p)),
+                    child: Estrelas(nota: nota),
+                  ),
+                ),
             ],
           ),
         ],
