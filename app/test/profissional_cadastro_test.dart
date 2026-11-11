@@ -24,6 +24,7 @@ Future<void> _tocar(WidgetTester t, String texto) async {
 }
 
 void main() {
+  CameraVerificacaoPage.cameraAoVivo = false;
   setUp(profissional.restaurar);
 
   testWidgets('Cadastro completo: dados → serviços → Pix → verificação', (
@@ -85,8 +86,8 @@ void main() {
     await _tocar(t, 'Começar');
     for (final etapa in [
       'Frente do documento',
-      'Verso do documento',
-      'Selfie',
+      'Agora, o verso',
+      'Agora, uma selfie',
     ]) {
       expect(find.text(etapa), findsOneWidget);
       expect(find.text('Usar esta foto'), findsNothing);

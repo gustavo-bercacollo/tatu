@@ -159,6 +159,7 @@ Future<void> _capturar(
 }
 
 void main() {
+  CameraVerificacaoPage.cameraAoVivo = false;
   setUpAll(_carregarFontes);
 
   testWidgets('boas-vindas', (t) async {
