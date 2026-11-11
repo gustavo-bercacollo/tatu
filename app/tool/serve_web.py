@@ -53,36 +53,20 @@ def ip_local():
 PORTA_HTTPS = 8443
 
 
-class ParaHttps(http.server.BaseHTTPRequestHandler):
-    """No endereço http antigo, manda o navegador para o https."""
-
-    def do_GET(self):
-        host = (self.headers.get("Host") or ip_local()).split(":")[0]
-        self.send_response(301)
-        self.send_header("Location", f"https://{host}:{PORTA_HTTPS}{self.path}")
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-
-    do_HEAD = do_GET
-
-    def log_message(self, *args):
-        pass
-
-
 if __name__ == "__main__":
     handler = functools.partial(SemCache, directory=str(PASTA))
     ip = ip_local()
     if CERT.exists() and CHAVE.exists():
-        # HTTPS (a câmera ao vivo precisa) + o http antigo redirecionando.
+        # http de sempre (abre direto, sem aviso) + https (câmera ao vivo).
         https = http.server.ThreadingHTTPServer(("0.0.0.0", PORTA_HTTPS), handler)
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         ctx.load_cert_chain(CERT, CHAVE)
         https.socket = ctx.wrap_socket(https.socket, server_side=True)
-        redireciona = http.server.ThreadingHTTPServer(("0.0.0.0", PORTA), ParaHttps)
-        threading.Thread(target=redireciona.serve_forever, daemon=True).start()
+        http_simples = http.server.ThreadingHTTPServer(("0.0.0.0", PORTA), handler)
+        threading.Thread(target=http_simples.serve_forever, daemon=True).start()
         print(f"Servindo {PASTA}")
-        print(f"No celular (mesmo Wi-Fi): http://{ip}:{PORTA}  (vai sozinho para https://{ip}:{PORTA_HTTPS})")
-        print('Na 1a vez o celular avisa "nao seguro": Avancado > Continuar.')
+        print(f"No celular (mesmo Wi-Fi): http://{ip}:{PORTA}")
+        print(f"Com camera ao vivo: https://{ip}:{PORTA_HTTPS} (1a vez: Avancado > Continuar)")
         https.serve_forever()
     else:
         with http.server.ThreadingHTTPServer(("0.0.0.0", PORTA), handler) as srv:
