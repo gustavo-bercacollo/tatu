@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -9,12 +11,56 @@ import '../../../data/profissional.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import '../cadastro/pix_page.dart';
+import '../chamado/novo_chamado_page.dart';
 import '../perfil/perfil_profissional_page.dart';
 
 /// P19–P21 · Home do profissional: mapa e painel offline/online.
 /// O app sempre abre offline. Na primeira vez, mostra a dica do botão.
-class HomeProfissionalPage extends StatelessWidget {
-  const HomeProfissionalPage({super.key});
+class HomeProfissionalPage extends StatefulWidget {
+  const HomeProfissionalPage({
+    super.key,
+    this.chamadoEm = const Duration(seconds: 5),
+  });
+
+  /// Protótipo: tempo online até chegar um chamado de exemplo.
+  final Duration chamadoEm;
+
+  @override
+  State<HomeProfissionalPage> createState() => _HomeProfissionalPageState();
+}
+
+class _HomeProfissionalPageState extends State<HomeProfissionalPage> {
+  Timer? _chamado;
+  bool _online = false;
+
+  @override
+  void initState() {
+    super.initState();
+    profissional.addListener(_mudou);
+    _mudou();
+  }
+
+  @override
+  void dispose() {
+    profissional.removeListener(_mudou);
+    _chamado?.cancel();
+    super.dispose();
+  }
+
+  /// Ao ficar online, um chamado chega depois de alguns segundos
+  /// (uma vez por período online).
+  void _mudou() {
+    if (profissional.online == _online) return;
+    _online = profissional.online;
+    _chamado?.cancel();
+    if (!_online) return;
+    _chamado = Timer(widget.chamadoEm, () {
+      if (!mounted || !profissional.online) return;
+      if (ModalRoute.of(context)?.isCurrent != true) return;
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => const NovoChamadoPage()));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

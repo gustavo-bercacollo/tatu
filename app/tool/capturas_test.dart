@@ -9,6 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/data/profissional.dart';
 import 'package:tatu/features/profissional/cadastro/dados_page.dart';
+import 'package:tatu/features/profissional/chamado/chat_profissional_page.dart';
+import 'package:tatu/features/profissional/chamado/novo_chamado_page.dart';
 import 'package:tatu/features/profissional/cadastro/especialidades_page.dart';
 import 'package:tatu/features/profissional/cadastro/pix_page.dart';
 import 'package:tatu/features/profissional/cadastro/profissoes_page.dart';
@@ -1520,5 +1522,13 @@ void main() {
       'pro-em-andamento',
       EmAndamentoPage(inicio: DateTime(2026, 11, 10, 14, 32)),
     );
+  });
+
+  testWidgets('pro-novo-chamado', (t) async {
+    await _capturar(t, 'pro-novo-chamado', const NovoChamadoPage(restante: 22));
+  });
+
+  testWidgets('pro-chat', (t) async {
+    await _capturar(t, 'pro-chat', const ChatProfissionalPage());
   });
 }

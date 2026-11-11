@@ -193,7 +193,7 @@ path.entre { opacity: .5; }
 /* ===== DADOS =====
    status: app (já no app, imagem real) · desenho (desenho pronto, ainda não no app) · andamento (tela ainda não desenhada)
    Para atualizar: mudar o status/imagem da tela, ou acrescentar telas e ligações. */
-const ATUALIZADO = '10/11/2026';
+const ATUALIZADO = '11/11/2026';
 
 const ETAPAS = {
   entrada:   { nome: 'Entrada e cadastro', lado: 'ambos' },
@@ -367,10 +367,10 @@ const TELAS_RAW = [
   ['p19','P19','Primeira Home · dica','chamados','app','docs/fluxo/app/pro-home-dica.png',["“Pronta/Pronto para começar?” sobre o botão"]],
   ['p20','P20','Home · offline','chamados','app','docs/fluxo/app/pro-home-sem-pix.png',["O app sempre abre offline","Sem Pix: lembrete “Cadastre onde receber”","Avatar abre o Perfil (o desenho novo não tem abas)"]],
   ['p20b','P20b','Home · offline com Pix','chamados','app','docs/fluxo/app/pro-home-offline.png'],
-  ['p21','P21','Home · online','chamados','app','docs/fluxo/app/pro-home-online.png',["Chamados ainda não chegam: Novo chamado é o próximo desenho"]],
-  ['p22','P22','Novo chamado','chamados','desenho', W+'02 - Chamados/22-novo-chamado.svg',["Contagem para aceitar"]],
-  ['p23','P23','Chat do profissional','chamados','desenho', W+'02 - Chamados/23-chat.svg'],
-  ['p24','P24','A caminho','chamados','app','docs/fluxo/app/pro-a-caminho.png',["Endereço revelado (valor já confirmado)","“Cheguei” libera perto do local (protótipo: 5 s)","No app, “Abrir rota” e o chat ainda mostram “em breve”","No app, ainda não dá para chegar aqui: falta o Novo chamado (P22) e o chat"]],
+  ['p21','P21','Home · online','chamados','app','docs/fluxo/app/pro-home-online.png',["Protótipo: um chamado de exemplo chega 5 s depois de ficar online"]],
+  ['p22','P22','Novo chamado','chamados','app','docs/fluxo/app/pro-novo-chamado.png',["Contagem de 30 s para aceitar (prazo provisório)","Sem resposta, passa para outro profissional","Só o bairro: endereço depois do valor"]],
+  ['p23','P23','Chat do profissional','chamados','app','docs/fluxo/app/pro-chat.png',["Respostas prontas: “Estou a caminho”, “Posso hoje”","No app, “Enviar valor”, foto e Ligar ainda mostram “em breve”"]],
+  ['p24','P24','A caminho','chamados','app','docs/fluxo/app/pro-a-caminho.png',["Endereço revelado (valor já confirmado)","“Cheguei” libera perto do local (protótipo: 5 s)","No app, “Abrir rota” e o chat ainda mostram “em breve”","No app, ainda não dá para chegar aqui: falta a folha “Enviar valor”"]],
   ['p21b','P21b','Folha · ficar offline e trocar?','chamados','app','docs/fluxo/app/pro-trocar-online.png',["Aparece ao trocar para cliente estando online"]],
   ['pa-valor','—','Enviar valor (folha)','chamados','andamento'],
   ['pa-foto','—','Enviar foto no chat','chamados','andamento'],

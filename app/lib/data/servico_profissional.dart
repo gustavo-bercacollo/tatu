@@ -37,3 +37,48 @@ class ServicoAceito {
 
 /// Serviço de exemplo para a demonstração.
 const servicoExemplo = ServicoAceito();
+
+/// Chamado que chega para o profissional aceitar ou recusar.
+/// O endereço exato só aparece depois do valor confirmado.
+@immutable
+class ChamadoNovo {
+  const ChamadoNovo({
+    this.profissao = 'Encanador',
+    this.titulo = 'Vazamento na pia',
+    this.descricao = 'Cano da cozinha vazando, a água não para.',
+    this.resumo = 'Vazamento na pia da cozinha',
+    this.distanciaKm = 1.2,
+    this.minutos = 5,
+    this.urgente = true,
+    this.bairro = 'Jardim Primavera',
+    this.cliente = 'Ana',
+    this.notaCliente = 4.8,
+    this.estimativaMin = 80,
+    this.estimativaMax = 250,
+    this.temFoto = true,
+  });
+
+  final String profissao;
+  final String titulo;
+  final String descricao;
+
+  /// Uma linha, para o cartão do pedido no chat.
+  final String resumo;
+  final double distanciaKm;
+  final int minutos;
+  final bool urgente;
+  final String bairro;
+  final String cliente;
+  final double notaCliente;
+
+  /// Estimativa da plataforma (região + serviço), nunca o preço final.
+  final int estimativaMin;
+  final int estimativaMax;
+  final bool temFoto;
+}
+
+/// Chamado de exemplo para a demonstração.
+const chamadoExemplo = ChamadoNovo();
+
+/// Segundos para aceitar um chamado (provisório: prazo em aberto).
+const segundosParaAceitar = 30;
