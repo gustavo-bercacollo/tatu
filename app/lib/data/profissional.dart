@@ -171,7 +171,6 @@ class ProfissionalRepo extends ChangeNotifier {
   int raioKm = 10;
   double nota = 4.9;
   int servicosFeitos = 29;
-  int fotosTrabalhos = 4;
   int desdeAno = 2025;
   String sobre =
       'Encanadora com experiência em instalação, manutenção e reparo de '

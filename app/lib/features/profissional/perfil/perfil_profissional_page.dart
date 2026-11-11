@@ -4,6 +4,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
+import '../../../data/fotos_trabalho.dart';
 import '../../../data/profissional.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/back_circle_button.dart';
@@ -13,6 +14,7 @@ import '../cadastro/pix_page.dart';
 import '../cadastro/profissoes_page.dart';
 import '../cadastro/resultado_page.dart';
 import '../home/home_profissional_page.dart';
+import 'fotos_trabalho_page.dart';
 import 'previa_page.dart';
 import 'regiao_page.dart';
 import 'sobre_page.dart';
@@ -54,7 +56,7 @@ class PerfilProfissionalPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: profissional,
+      listenable: Listenable.merge([profissional, fotosTrabalho]),
       builder: (context, _) {
         final p = profissional;
         return Scaffold(
@@ -175,8 +177,9 @@ class PerfilProfissionalPage extends StatelessWidget {
                         ItemLista(
                           icone: TablerIcons.photo,
                           texto: 'Fotos de trabalhos',
-                          valor: '${p.fotosTrabalhos}',
-                          onTap: () => _emBreve(context, 'Fotos de trabalhos'),
+                          valor: '${fotosTrabalho.fotos.length}',
+                          onTap: () =>
+                              _abrir(context, const FotosTrabalhoPage()),
                         ),
                         ItemLista(
                           icone: TablerIcons.user,

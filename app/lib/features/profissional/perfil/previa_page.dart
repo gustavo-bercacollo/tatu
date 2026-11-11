@@ -4,12 +4,14 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
+import '../../../data/fotos_trabalho.dart';
 import '../../../data/profissional.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/back_circle_button.dart';
 import '../../../shared/widgets/estrelas.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import '../cadastro/resultado_page.dart';
+import 'fotos_trabalho_page.dart';
 
 /// P32 · Prévia: o perfil como o cliente vê.
 class PreviaPage extends StatefulWidget {
@@ -30,6 +32,7 @@ class _PreviaPageState extends State<PreviaPage> {
   Widget build(BuildContext context) {
     final p = profissional;
     final nota = p.nota.toStringAsFixed(1).replaceAll('.', ',');
+    final fotos = fotosTrabalho.aprovadas;
     final especialidades = [
       for (final prof in p.profissoes) ...prof.especialidades,
     ];
@@ -216,31 +219,44 @@ class _PreviaPageState extends State<PreviaPage> {
                           ),
                         ),
                       const SizedBox(height: TatuMedidas.entreSecoes + 4),
-                      _Titulo(
-                        'Fotos de trabalhos',
-                        acao: 'Ver todas',
-                        onAcao: () => _emBreve('Fotos de trabalhos'),
-                      ),
-                      const SizedBox(height: TatuMedidas.entreItens),
-                      SizedBox(
-                        height: 108,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: p.fotosTrabalhos,
-                          separatorBuilder: (_, _) => const SizedBox(width: 8),
-                          itemBuilder: (_, _) => Container(
-                            width: 108,
-                            decoration: BoxDecoration(
-                              color: TatuColors.fillStrong,
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: const Icon(
-                              TablerIcons.photo,
-                              color: TatuColors.textSecondary,
+                      if (fotos.isNotEmpty) ...[
+                        _Titulo(
+                          'Fotos de trabalhos',
+                          acao: 'Ver todas',
+                          onAcao: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const FotosTrabalhoPage(),
                             ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: TatuMedidas.entreItens),
+                        SizedBox(
+                          height: 108,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: fotos.length,
+                            separatorBuilder: (_, _) =>
+                                const SizedBox(width: 8),
+                            itemBuilder: (_, i) => Container(
+                              width: 108,
+                              clipBehavior: Clip.antiAlias,
+                              decoration: BoxDecoration(
+                                color: TatuColors.fillStrong,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: fotos[i].imagem != null
+                                  ? Image.memory(
+                                      fotos[i].imagem!,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : const Icon(
+                                      TablerIcons.photo,
+                                      color: TatuColors.textSecondary,
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: TatuMedidas.entreSecoes + 4),
                       const _Titulo('Medalhas'),
                       const SizedBox(height: TatuMedidas.entreItens),

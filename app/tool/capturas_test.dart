@@ -7,7 +7,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/fotos_trabalho.dart';
 import 'package:tatu/data/profissional.dart';
+import 'package:tatu/features/profissional/perfil/fotos_trabalho_page.dart';
 import 'package:tatu/features/profissional/atividade/atividade_profissional_page.dart';
 import 'package:tatu/features/profissional/atividade/ganhos_page.dart';
 import 'package:tatu/features/profissional/cadastro/dados_page.dart';
@@ -130,6 +132,7 @@ Future<void> _capturar(
   conversas.restaurar();
   chamado.restaurar();
   profissional.restaurar();
+  fotosTrabalho.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -1692,6 +1695,109 @@ void main() {
           'me chama no (11) 98888-7777',
         );
         await t.pump();
+      },
+    );
+  });
+
+  Uint8List fotoTeste() =>
+      File('assets/avatares/avatar-2.png').readAsBytesSync();
+
+  testWidgets('pro-fotos-vazio', (t) async {
+    await comDemo(
+      t,
+      'pro-fotos-vazio',
+      const FotosTrabalhoPage(),
+      depois: () async {
+        fotosTrabalho.limpar();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-fotos', (t) async {
+    await comDemo(t, 'pro-fotos', const FotosTrabalhoPage());
+  });
+
+  testWidgets('pro-fotos-adicionar', (t) async {
+    await comDemo(
+      t,
+      'pro-fotos-adicionar',
+      const FotosTrabalhoPage(),
+      depois: () async {
+        await t.tap(find.text('Adicionar'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-fotos-nova', (t) async {
+    final bytes = fotoTeste();
+    await _capturar(
+      t,
+      'pro-fotos-nova',
+      const SizedBox(),
+      preparar: () async {
+        profissional
+          ..demo()
+          ..definirProfissoes(const [
+            ProfissaoEscolhida('Encanador', ['Reparos']),
+            ProfissaoEscolhida('Eletricista', ['Reparos']),
+          ]);
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: NovaFotoPage(imagem: bytes),
+          ),
+        );
+        await t.enterText(find.byType(TextField), 'Troca de chuveiro');
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-fotos-analise', (t) async {
+    final bytes = fotoTeste();
+    await comDemo(
+      t,
+      'pro-fotos-analise',
+      const FotosTrabalhoPage(),
+      depois: () async {
+        fotosTrabalho.adicionar(
+          FotoTrabalho(imagem: bytes, legenda: 'Torneira'),
+          revisar: false,
+        );
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-fotos-recusada', (t) async {
+    final bytes = fotoTeste();
+    await comDemo(
+      t,
+      'pro-fotos-recusada',
+      const FotosTrabalhoPage(),
+      depois: () async {
+        final f = FotoTrabalho(imagem: bytes, legenda: 'Torneira');
+        fotosTrabalho
+          ..adicionar(f, revisar: false)
+          ..recusar(f, 'Aparece o rosto de uma pessoa.');
+        await t.pump();
+        await t.tap(find.text('Torneira'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-fotos-remover', (t) async {
+    await comDemo(
+      t,
+      'pro-fotos-remover',
+      const FotosTrabalhoPage(),
+      depois: () async {
+        await t.tap(find.bySemanticsLabel('Remover foto').first);
+        await t.pumpAndSettle();
       },
     );
   });
