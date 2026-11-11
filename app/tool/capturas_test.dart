@@ -1549,6 +1549,15 @@ void main() {
     await _capturar(t, 'pro-chat', const ChatProfissionalPage());
   });
 
+  Future<void> enviarValor(WidgetTester t, String centavos) async {
+    await t.tap(find.text('Enviar valor').last);
+    await t.pumpAndSettle();
+    await t.enterText(find.byType(TextField).last, centavos);
+    await t.pump();
+    await t.tap(find.text('Enviar para Ana'));
+    await t.pumpAndSettle();
+  }
+
   testWidgets('pro-enviar-valor', (t) async {
     await _capturar(
       t,
@@ -1557,7 +1566,7 @@ void main() {
       preparar: () async {
         await t.tap(find.text('Enviar valor'));
         await t.pumpAndSettle();
-        await t.enterText(find.byType(TextField).last, '150');
+        await t.enterText(find.byType(TextField).last, '15000');
         await t.pump();
       },
     );
@@ -1567,16 +1576,39 @@ void main() {
     await _capturar(
       t,
       'pro-chat-valor',
+      const ChatProfissionalPage(resposta: Duration(hours: 1)),
+      preparar: () => enviarValor(t, '15000'),
+    );
+  });
+
+  testWidgets('pro-chat-proposta', (t) async {
+    await _capturar(
+      t,
+      'pro-chat-proposta',
       const ChatProfissionalPage(),
       preparar: () async {
-        await t.tap(find.text('Enviar valor'));
-        await t.pumpAndSettle();
-        await t.enterText(find.byType(TextField).last, '150');
-        await t.pump();
-        await t.tap(find.text('Enviar valor').last);
-        await t.pumpAndSettle();
+        await enviarValor(t, '15000');
+        await t.pump(const Duration(seconds: 3));
       },
     );
+  });
+
+  testWidgets('pro-chat-combinado', (t) async {
+    await _capturar(
+      t,
+      'pro-chat-combinado',
+      const ChatProfissionalPage(),
+      preparar: () async {
+        await enviarValor(t, '15000');
+        await t.pump(const Duration(seconds: 3));
+        await t.tap(find.textContaining('Aceitar R'));
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-sem-acordo', (t) async {
+    await _capturar(t, 'pro-sem-acordo', const SemAcordoPage());
   });
 
   testWidgets('pro-atividade', (t) async {

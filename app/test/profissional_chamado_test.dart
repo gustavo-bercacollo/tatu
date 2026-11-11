@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/profissional.dart';
+import 'package:tatu/features/profissional/chamado/chat_profissional_page.dart';
 import 'package:tatu/features/profissional/home/home_profissional_page.dart';
 
 Future<void> _home(WidgetTester t) async {
@@ -18,45 +19,101 @@ Future<void> _home(WidgetTester t) async {
   await t.pump(const Duration(milliseconds: 500));
 }
 
+Future<void> _chat(WidgetTester t) async {
+  t.view.physicalSize = const Size(430, 1000);
+  t.view.devicePixelRatio = 1;
+  addTearDown(t.view.reset);
+  await t.pumpWidget(
+    MaterialApp(theme: tatuTheme(), home: const ChatProfissionalPage()),
+  );
+}
+
+/// Abre a folha, digita o valor em centavos e envia.
+Future<void> _valor(WidgetTester t, String centavos) async {
+  await t.tap(find.text('Enviar valor'));
+  await t.pumpAndSettle();
+  expect(find.text('Quanto vai custar?'), findsOneWidget);
+  await t.enterText(find.byType(TextField).last, centavos);
+  await t.pump();
+  await t.tap(find.text('Enviar para Ana'));
+  await t.pumpAndSettle();
+}
+
 void main() {
   testWidgets('Online: chega um chamado; aceitar abre o chat', (t) async {
     await _home(t);
     expect(find.text('NOVO CHAMADO'), findsOneWidget);
     expect(find.text('o cano da minha casa quebrou'), findsOneWidget);
-    expect(find.text('Butantã'), findsOneWidget);
+    expect(find.text('Vila Mariana'), findsOneWidget);
     expect(find.text('Estimativa na região: R\$ 80 a R\$ 250'), findsOneWidget);
     await t.tap(find.text('Aceitar chamado'));
     await t.pumpAndSettle();
-    expect(find.text('Combine o valor com a Ana'), findsOneWidget);
+    expect(find.text('Ana Martins'), findsOneWidget);
+    expect(find.text('Vila Mariana · 1,2 km'), findsOneWidget);
     await t.tap(find.text('Estou a caminho'));
     await t.pump();
     expect(find.text('Estou a caminho'), findsNWidgets(2));
-    await t.enterText(find.byType(TextField), 'Levo as peças');
-    await t.pump();
-    await t.tap(find.bySemanticsLabel('Enviar mensagem'));
-    await t.pump();
-    expect(find.text('Levo as peças'), findsOneWidget);
 
-    // Envia o valor; a cliente confirma e o endereço aparece.
-    await t.tap(find.text('Enviar valor'));
-    await t.pumpAndSettle();
-    await t.enterText(find.byType(TextField).last, '150');
+    // 1º valor: a cliente propõe outro.
+    await _valor(t, '15000');
+    expect(find.text('Seu valor · 1 de 3'), findsOneWidget);
+    expect(find.text('Aguardando a Ana'), findsOneWidget);
+    await t.pump(const Duration(seconds: 3));
+    expect(find.text('Ana propôs outro valor'), findsOneWidget);
+    expect(find.text('Proposta da Ana · 1 de 3'), findsOneWidget);
+    expect(find.text('Aceitar R\$ 120,00'), findsOneWidget);
+
+    // Aceita a proposta: valor combinado e endereço liberado.
+    await t.tap(find.text('Aceitar R\$ 120,00'));
     await t.pump();
-    await t.tap(find.text('Enviar valor').last);
-    await t.pumpAndSettle();
-    expect(find.text('Valor do serviço: R\$ 150,00'), findsOneWidget);
-    expect(find.text('Aguardando a Ana confirmar o valor…'), findsOneWidget);
-    await t.pump(const Duration(seconds: 2));
-    await t.pump(const Duration(seconds: 2));
+    expect(find.text('Valor combinado'), findsOneWidget);
+    expect(find.text('R\$ 120,00 · Material incluso'), findsOneWidget);
+    expect(find.text('Rua das Flores, 120 · apto 32'), findsOneWidget);
+    await t.tap(find.text('Estou a caminho').last);
+    await t.pump();
     await t.pump(const Duration(milliseconds: 500));
     expect(find.text('A caminho'), findsOneWidget);
-    expect(find.text('Rua Bruno Lobo, 29'), findsOneWidget);
+    expect(find.text('Rua das Flores, 120'), findsOneWidget);
     await t.pump(const Duration(seconds: 6)); // chega perto
     await t.tap(find.text('Cheguei'));
     await t.pump();
     await t.tap(find.text('Iniciar serviço'));
     await t.pumpAndSettle();
     expect(find.text('Serviço em andamento'), findsOneWidget);
+  });
+
+  testWidgets('Valor: 2º valor perto da proposta é aceito', (t) async {
+    await _chat(t);
+    await _valor(t, '15000');
+    await t.pump(const Duration(seconds: 3));
+    await t.tap(find.text('Enviar outro valor'));
+    await t.pumpAndSettle();
+    expect(find.text('Valor 2 de 3'), findsOneWidget);
+    await t.enterText(find.byType(TextField).last, '13000');
+    await t.pump();
+    expect(find.text('R\$ 117,00'), findsOneWidget); // pelo app, sem a taxa
+    await t.tap(find.text('Enviar para Ana'));
+    await t.pumpAndSettle();
+    await t.pump(const Duration(seconds: 3));
+    expect(find.text('R\$ 130,00 · Material incluso'), findsOneWidget);
+  });
+
+  testWidgets('Valor: 3 rodadas sem acordo encerram o chamado', (t) async {
+    await _chat(t);
+    await _valor(t, '15000');
+    await t.pump(const Duration(seconds: 3));
+    for (var i = 2; i <= 3; i++) {
+      await t.tap(find.text('Enviar outro valor'));
+      await t.pumpAndSettle();
+      await t.enterText(find.byType(TextField).last, '15000');
+      await t.pump();
+      await t.tap(find.text('Enviar para Ana'));
+      await t.pumpAndSettle();
+      await t.pump(const Duration(seconds: 3));
+    }
+    await t.pumpAndSettle();
+    expect(find.text('Sem acordo de valor'), findsOneWidget);
+    expect(find.text('Voltar para o início'), findsOneWidget);
   });
 
   testWidgets('Chamado: recusar ou deixar o tempo acabar volta à Home', (

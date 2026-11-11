@@ -66,9 +66,9 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Home do profissional (mapa, offline/online, dica da primeira vez, lembrete do Pix), Perfil do profissional (com "Trocar para modo cliente" e folha "Ficar offline e trocar?"), Região de atendimento e Prévia do perfil. "Trocar para modo profissional" abre a Home quando já há cadastro
 - [x] Serviço do profissional (`features/profissional/servico/andamento_page.dart`): A caminho (rota, “Cheguei” libera perto), Você chegou, Serviço em andamento.
 - [x] Novo chamado (P22, painel branco sobre o mapa com contagem de 30 s; chega 5 s depois de ficar online, simulado) e Chat do profissional (P23, respostas prontas) em `features/profissional/chamado/`
-- [x] Folha “Enviar valor” (simples, sem desenho próprio): o chat mostra o valor, a cliente confirma (simulado, 2 s) e abre o A caminho. Caminho completo no app: ficar online → chamado → chat → valor → A caminho → Cheguei → Serviço em andamento
+- [x] Combinar valor no chat do profissional: folha “Quanto vai custar?” (valor em centavos, material incluso, quanto recebe), cartão “Seu valor · 1 de 3”, proposta da cliente (aceitar ou enviar outro), valor combinado com endereço liberado → “Estou a caminho” abre o A caminho; 3 rodadas sem acordo → “Sem acordo de valor”. Cliente simulado em `chat_profissional_page.dart`
 - [x] Atividade do profissional (ganhos da semana no topo, Em andamento/Concluídos, selos Aguardando/Pago/Por fora) e Ganhos (Hoje/Semana/Mês, barras da semana, taxas) em `features/profissional/atividade/`, dados em `data/ganhos.dart`. Abas do profissional (`features/profissional/abas.dart`) na Home e na Atividade
-- Falta do profissional: Mensagens (aba), cobrar o cliente, avaliar o cliente; cliente pedir outro valor (até 3 rodadas)
+- Falta do profissional: Mensagens (aba), cobrar o cliente, avaliar o cliente
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado
 - [ ] P9 Chat

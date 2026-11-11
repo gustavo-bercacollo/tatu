@@ -98,8 +98,11 @@ class CartaoPedidoChat extends StatelessWidget {
     required this.servico,
     required this.descricao,
     required this.lado,
+    this.rotulo = 'Pedido',
   });
 
+  /// "Pedido" (cliente) ou "Chamado" (profissional).
+  final String rotulo;
   final String servico;
   final String descricao;
 
@@ -121,7 +124,7 @@ class CartaoPedidoChat extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Pedido · $servico',
+                  '$rotulo · $servico',
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,

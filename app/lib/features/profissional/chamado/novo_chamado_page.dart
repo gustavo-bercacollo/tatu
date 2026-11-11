@@ -179,7 +179,7 @@ class _NovoChamadoPageState extends State<NovoChamadoPage> {
                               indent: 12,
                               endIndent: 12,
                             ),
-                            _Dado(nota, 'cliente ${c.cliente}'),
+                            _Dado(nota, 'cliente ${c.primeiroNome}'),
                           ],
                         ),
                       ),

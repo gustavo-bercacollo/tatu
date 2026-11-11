@@ -46,12 +46,15 @@ class ChamadoNovo {
     this.profissao = 'Encanador',
     this.titulo = 'Vazamento na pia',
     this.descricao = 'o cano da minha casa quebrou',
-    this.resumo = 'O cano da minha casa quebrou',
+    this.resumo = 'Vazamento na pia da cozinha',
     this.distanciaKm = 1.2,
     this.minutos = 6,
     this.urgente = true,
-    this.bairro = 'Butantã',
-    this.cliente = 'Ana',
+    this.bairro = 'Vila Mariana',
+    this.cliente = 'Ana Martins',
+    this.rua = 'Rua das Flores, 120',
+    this.complemento = 'apto 32',
+    this.cidade = 'São Paulo',
     this.notaCliente = 4.8,
     this.estimativaMin = 80,
     this.estimativaMax = 250,
@@ -69,6 +72,13 @@ class ChamadoNovo {
   final bool urgente;
   final String bairro;
   final String cliente;
+
+  /// Endereço exato: só aparece depois do valor combinado.
+  final String rua;
+  final String complemento;
+  final String cidade;
+
+  String get primeiroNome => cliente.split(' ').first;
   final double notaCliente;
 
   /// Estimativa da plataforma (região + serviço), nunca o preço final.

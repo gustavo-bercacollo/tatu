@@ -3,26 +3,42 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
+import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/servico_profissional.dart';
+import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/back_circle_button.dart';
 import '../../../shared/widgets/chat.dart';
-import '../../../shared/formatadores.dart';
+import '../../../shared/widgets/opcao_selecionavel.dart';
 import '../../../shared/widgets/tatu_chip.dart';
+import '../../../shared/widgets/tela_permissao.dart';
 import '../servico/andamento_page.dart';
 import 'enviar_valor_sheet.dart';
 
-/// Respostas prontas do profissional.
-const respostasRapidas = ['Estou a caminho', 'Posso hoje'];
+/// Cada lado pode propor até 3 valores.
+const maxRodadas = 3;
 
-/// P23 · Chat do profissional com o cliente: combinar detalhes e enviar
-/// o valor. O endereço exato só aparece depois do valor confirmado.
+/// Em que ponto está a combinação do valor.
+enum EstadoValor { inicio, aguardando, contraproposta, combinado }
+
+/// P23 · Chat do profissional com o cliente: combinar o valor.
+/// O profissional envia um valor; o cliente aceita ou propõe outro
+/// (até 3 rodadas). O endereço exato só aparece com o valor combinado.
+///
+/// Protótipo: o cliente responde sozinho em [resposta]. Ele propõe 20%
+/// a menos no 1º valor e depois aceita qualquer valor até 15% acima da
+/// proposta dele.
 class ChatProfissionalPage extends StatefulWidget {
-  const ChatProfissionalPage({super.key, this.chamado = chamadoExemplo});
+  const ChatProfissionalPage({
+    super.key,
+    this.chamado = chamadoExemplo,
+    this.resposta = const Duration(seconds: 2),
+  });
 
   final ChamadoNovo chamado;
+  final Duration resposta;
 
   @override
   State<ChatProfissionalPage> createState() => _ChatProfissionalPageState();
@@ -30,54 +46,28 @@ class ChatProfissionalPage extends StatefulWidget {
 
 class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   final _campo = TextEditingController();
+  Timer? _timer;
 
   /// (texto, minha): conversa de exemplo.
   final _mensagens = <(String, bool)>[
-    ('Oi! Vi o vazamento, posso hoje.', true),
-    ('Ótimo, pode vir agora?', false),
-    ('Chego em 12 min.', true),
+    ('Oi! A pia não para de vazar.', false),
+    ('Posso ir agora. Já te mando o valor.', true),
   ];
 
-  /// Valor enviado, esperando o cliente confirmar.
-  double? _valorEnviado;
-  bool _confirmado = false;
-  Timer? _timer;
+  EstadoValor _estado = EstadoValor.inicio;
+  int _rodada = 0; // quantos valores o profissional já enviou
+  double _meuValor = 0;
+  bool _material = true;
+  double _proposta = 0; // proposta do cliente
+  double _combinado = 0;
+
+  String get _nome => widget.chamado.primeiroNome;
 
   @override
   void dispose() {
     _timer?.cancel();
     _campo.dispose();
     super.dispose();
-  }
-
-  /// Envia o valor; o cliente confirma (protótipo: sempre, em 2 s) e
-  /// só então o endereço aparece, na tela "A caminho".
-  Future<void> _enviarValor() async {
-    final valor = await pedirValor(context, cliente: widget.chamado.cliente);
-    if (valor == null || !mounted) return;
-    setState(() {
-      _valorEnviado = valor;
-      _mensagens.add(('Valor do serviço: ${reais(valor)}', true));
-    });
-    _timer = Timer(const Duration(seconds: 2), () {
-      if (!mounted) return;
-      setState(() => _confirmado = true);
-      _timer = Timer(const Duration(milliseconds: 1500), () {
-        if (!mounted) return;
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => ACaminhoPage(servico: ServicoAceito(valor: valor)),
-          ),
-        );
-      });
-    });
-  }
-
-  String get _notaValor {
-    final nome = widget.chamado.cliente;
-    if (_valorEnviado == null) return 'Combine o valor com a $nome';
-    if (!_confirmado) return 'Aguardando a $nome confirmar o valor…';
-    return '$nome confirmou ${reais(_valorEnviado!)}. Abrindo o endereço…';
   }
 
   void _emBreve(String o) => ScaffoldMessenger.of(context)
@@ -91,10 +81,77 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     if (pronto == null) _campo.clear();
   }
 
+  Future<void> _enviarValor() async {
+    final v = await pedirValor(
+      context,
+      cliente: _nome,
+      rodada: _rodada + 1,
+      materialIncluso: _material,
+    );
+    if (v == null || !mounted) return;
+    setState(() {
+      _rodada++;
+      _meuValor = v.valor;
+      _material = v.materialIncluso;
+      _estado = EstadoValor.aguardando;
+    });
+    _timer?.cancel();
+    _timer = Timer(widget.resposta, _clienteResponde);
+  }
+
+  /// Resposta simulada do cliente.
+  void _clienteResponde() {
+    if (!mounted) return;
+    final aceita = _rodada > 1 && _meuValor <= _proposta * 1.15;
+    if (aceita) {
+      setState(() {
+        _combinado = _meuValor;
+        _estado = EstadoValor.combinado;
+      });
+    } else if (_rodada >= maxRodadas) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const SemAcordoPage()),
+      );
+    } else {
+      setState(() {
+        _proposta = _rodada == 1
+            ? (_meuValor * 0.8 / 10).round() * 10.0
+            : _proposta + 10;
+        _estado = EstadoValor.contraproposta;
+      });
+    }
+  }
+
+  void _aceitarProposta() => setState(() {
+    _combinado = _proposta;
+    _estado = EstadoValor.combinado;
+  });
+
+  void _irAteOCliente() {
+    final c = widget.chamado;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => ACaminhoPage(
+          servico: ServicoAceito(
+            cliente: c.cliente,
+            notaCliente: c.notaCliente,
+            rua: c.rua,
+            referencia: c.complemento,
+            descricao: c.resumo,
+            valor: _combinado,
+            observacao: _material ? 'Material incluso' : 'Sem material',
+            distanciaKm: c.distanciaKm,
+            minutos: c.minutos,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = widget.chamado;
-    final nota = c.notaCliente.toStringAsFixed(1).replaceAll('.', ',');
+    final km = c.distanciaKm.toStringAsFixed(1).replaceAll('.', ',');
     return TelaChat(
       topo: Row(
         children: [
@@ -105,19 +162,22 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
               children: [
                 AvatarIniciais(nome: c.cliente),
                 const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      c.cliente,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        c.cliente,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                    Text('Cliente · $nota', style: TatuTexto.nota),
-                  ],
+                      const Text('Cliente', style: TatuTexto.nota),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -134,14 +194,13 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
       ),
       mensagens: [
         CartaoPedidoChat(
+          rotulo: 'Chamado',
           servico: c.profissao,
           descricao: c.resumo,
-          lado: c.bairro,
+          lado: '${c.bairro} · $km km',
         ),
         const SizedBox(height: TatuMedidas.entreSecoes),
-        const NotaChat(
-          'Você aceitou o chamado. Combinem os detalhes e o valor por aqui.',
-        ),
+        const NotaChat('Você aceitou o chamado. Combinem o valor por aqui.'),
         const SizedBox(height: TatuMedidas.entreItens + 4),
         for (final (i, m) in _mensagens.indexed)
           Padding(
@@ -153,38 +212,342 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
             ),
             child: BalaoChat(texto: m.$1, minha: m.$2),
           ),
-        const SizedBox(height: TatuMedidas.entreSecoes + 8),
-        NotaChat(_notaValor),
+        const SizedBox(height: TatuMedidas.entreSecoes),
+        ...switch (_estado) {
+          EstadoValor.inicio => const <Widget>[],
+          EstadoValor.aguardando => [
+            _MeuValor(
+              rodada: _rodada,
+              valor: _meuValor,
+              material: _material,
+              icone: TablerIcons.clock,
+              situacao: 'Aguardando a $_nome',
+            ),
+          ],
+          EstadoValor.contraproposta => [
+            _MeuValor(
+              rodada: _rodada,
+              valor: _meuValor,
+              material: _material,
+              icone: TablerIcons.refresh,
+              situacao: '$_nome propôs outro valor',
+            ),
+            const SizedBox(height: TatuMedidas.entreItens + 4),
+            _Proposta(
+              nome: _nome,
+              rodada: _rodada,
+              valor: _proposta,
+              onAceitar: _aceitarProposta,
+              onOutro: _enviarValor,
+            ),
+          ],
+          EstadoValor.combinado => [
+            _ValorCombinado(valor: _combinado, material: _material),
+            const SizedBox(height: TatuMedidas.entreItens),
+            _EnderecoLiberado(chamado: c),
+          ],
+        },
+        const SizedBox(height: TatuMedidas.entreItens),
       ],
       rodape: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              spacing: 8,
-              children: [
-                for (final r in respostasRapidas)
-                  TatuChip(label: r, onTap: () => _enviar(r)),
-              ],
+          if (_estado == EstadoValor.inicio) ...[
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                spacing: 8,
+                children: [
+                  TatuChip(
+                    label: 'Estou a caminho',
+                    onTap: () => _enviar('Estou a caminho'),
+                  ),
+                  TatuChip(
+                    label: 'Mandar foto',
+                    onTap: () => _emBreve('Mandar foto'),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: TatuMedidas.entreItens),
-          FilledButton(
-            onPressed: _valorEnviado == null ? _enviarValor : null,
-            child: Text(
-              _valorEnviado == null ? 'Enviar valor' : 'Valor enviado',
+            const SizedBox(height: TatuMedidas.entreItens),
+            FilledButton(
+              onPressed: _enviarValor,
+              child: const Text('Enviar valor'),
             ),
-          ),
-          const SizedBox(height: TatuMedidas.entreItens),
+            const SizedBox(height: TatuMedidas.entreItens),
+          ],
+          if (_estado == EstadoValor.combinado) ...[
+            FilledButton(
+              onPressed: _irAteOCliente,
+              child: const Text('Estou a caminho'),
+            ),
+            const SizedBox(height: TatuMedidas.entreItens),
+          ],
           BarraMensagem(
             controller: _campo,
             onEnviar: _enviar,
-            onCamera: () => _emBreve('Enviar foto'),
+            onCamera: () => _emBreve('Mandar foto'),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Cartão com contorno, à direita: o valor que o profissional enviou.
+class _MeuValor extends StatelessWidget {
+  const _MeuValor({
+    required this.rodada,
+    required this.valor,
+    required this.material,
+    required this.icone,
+    required this.situacao,
+  });
+
+  final int rodada;
+  final double valor;
+  final bool material;
+  final IconData icone;
+  final String situacao;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: FractionallySizedBox(
+        widthFactor: 0.74,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+            border: Border.all(color: TatuColors.textPrimary, width: 1.5),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Seu valor · $rodada de $maxRodadas', style: TatuTexto.nota),
+              const SizedBox(height: 2),
+              _Valor(valor),
+              if (material)
+                const Text('Material incluso', style: TatuTexto.nota),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Icon(icone, size: 15, color: TatuColors.textSecondary),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      situacao,
+                      style: TatuTexto.nota.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Cartão cinza, à esquerda: o valor que o cliente propôs.
+class _Proposta extends StatelessWidget {
+  const _Proposta({
+    required this.nome,
+    required this.rodada,
+    required this.valor,
+    required this.onAceitar,
+    required this.onOutro,
+  });
+
+  final String nome;
+  final int rodada;
+  final double valor;
+  final VoidCallback onAceitar;
+  final VoidCallback onOutro;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: FractionallySizedBox(
+        widthFactor: 0.85,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 8),
+          decoration: BoxDecoration(
+            color: TatuColors.fill,
+            borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Proposta da $nome · $rodada de $maxRodadas',
+                style: TatuTexto.nota,
+              ),
+              const SizedBox(height: 2),
+              _Valor(valor),
+              const SizedBox(height: TatuMedidas.entreItens),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(TatuMedidas.alturaBusca),
+                ),
+                onPressed: onAceitar,
+                child: Text('Aceitar ${reais(valor)}'),
+              ),
+              const SizedBox(height: 4),
+              Center(child: LinkAzul('Enviar outro valor', onTap: onOutro)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Valor extends StatelessWidget {
+  const _Valor(this.valor);
+
+  final double valor;
+
+  @override
+  Widget build(BuildContext context) => FittedBox(
+    fit: BoxFit.scaleDown,
+    alignment: Alignment.centerLeft,
+    child: Text(
+      reais(valor),
+      style: const TextStyle(
+        fontSize: 30,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.6,
+      ),
+    ),
+  );
+}
+
+/// Cartão verde: os dois lados fecharam o valor.
+class _ValorCombinado extends StatelessWidget {
+  const _ValorCombinado({required this.valor, required this.material});
+
+  final double valor;
+  final bool material;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: TatuColors.onlineSoft,
+        borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+      ),
+      child: Row(
+        children: [
+          const CircleAvatar(
+            radius: 16,
+            backgroundColor: TatuColors.online,
+            child: Icon(
+              TablerIcons.check,
+              size: 18,
+              color: TatuColors.onAction,
+            ),
+          ),
+          const SizedBox(width: TatuMedidas.entreItens),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Valor combinado',
+                  style: TatuTexto.nota.copyWith(color: TatuColors.onlineTexto),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  material
+                      ? '${reais(valor)} · Material incluso'
+                      : reais(valor),
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Cartão cinza: endereço exato, liberado só com o valor combinado.
+class _EnderecoLiberado extends StatelessWidget {
+  const _EnderecoLiberado({required this.chamado});
+
+  final ChamadoNovo chamado;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: TatuColors.surfaceGrouped,
+        borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 2),
+            child: Icon(TablerIcons.map_pin, size: 20),
+          ),
+          const SizedBox(width: TatuMedidas.entreItens),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Endereço liberado', style: TatuTexto.nota),
+                const SizedBox(height: 2),
+                Text(
+                  '${chamado.rua} · ${chamado.complemento}',
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${chamado.bairro}, ${chamado.cidade}',
+                  style: TatuTexto.nota,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// P28 · As 3 rodadas acabaram sem acordo: o chamado é encerrado.
+class SemAcordoPage extends StatelessWidget {
+  const SemAcordoPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return TelaPermissao(
+      voltar: false,
+      icone: const IconePermissao(TablerIcons.x, cor: TatuColors.textPrimary),
+      titulo: 'Sem acordo de valor',
+      texto:
+          'Vocês usaram as 3 rodadas.\n'
+          'O chamado foi encerrado e você\n'
+          'continua online para novos chamados.',
+      principal: 'Voltar para o início',
+      onPrincipal: () => Navigator.of(context).popUntil((r) => r.isFirst),
     );
   }
 }

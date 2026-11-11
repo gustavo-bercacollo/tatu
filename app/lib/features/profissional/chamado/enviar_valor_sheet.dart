@@ -1,89 +1,240 @@
+import 'package:flutter/cupertino.dart' show CupertinoSwitch;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
+import '../../../data/profissional.dart';
+import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/folha.dart';
-import '../../../shared/widgets/tatu_field.dart';
 
-/// Folha "Enviar valor": o profissional informa o valor do serviço.
-/// Devolve o valor em reais (null se fechar sem enviar).
-Future<double?> pedirValor(BuildContext context, {required String cliente}) =>
-    mostrarFolha<double>(
-      context,
-      builder: (_) => _FolhaValor(cliente: cliente),
+/// Valor que o profissional envia ao cliente.
+typedef ValorEnviado = ({double valor, bool materialIncluso});
+
+/// P24 · Folha "Quanto vai custar?". [rodada] é qual dos 3 valores
+/// possíveis este é. Devolve null se fechar sem enviar.
+Future<ValorEnviado?> pedirValor(
+  BuildContext context, {
+  required String cliente,
+  required int rodada,
+  bool materialIncluso = true,
+}) => mostrarFolha<ValorEnviado>(
+  context,
+  builder: (_) => _FolhaValor(
+    cliente: cliente,
+    rodada: rodada,
+    materialIncluso: materialIncluso,
+  ),
+);
+
+/// Digitação de dinheiro em centavos: "15000" vira "R$ 150,00".
+class ReaisFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    var d = soDigitos(newValue.text);
+    if (d.length > 7) d = d.substring(0, 7);
+    final centavos = int.tryParse(d) ?? 0;
+    final texto = centavos == 0 ? '' : reais(centavos / 100);
+    return TextEditingValue(
+      text: texto,
+      selection: TextSelection.collapsed(offset: texto.length),
     );
+  }
+}
 
 class _FolhaValor extends StatefulWidget {
-  const _FolhaValor({required this.cliente});
+  const _FolhaValor({
+    required this.cliente,
+    required this.rodada,
+    required this.materialIncluso,
+  });
 
   final String cliente;
+  final int rodada;
+  final bool materialIncluso;
 
   @override
   State<_FolhaValor> createState() => _FolhaValorState();
 }
 
 class _FolhaValorState extends State<_FolhaValor> {
-  final _valor = TextEditingController();
+  final _campo = TextEditingController();
+  final _foco = FocusNode();
+  late bool _material = widget.materialIncluso;
+
+  @override
+  void initState() {
+    super.initState();
+    _foco.addListener(() => setState(() {}));
+  }
 
   @override
   void dispose() {
-    _valor.dispose();
+    _campo.dispose();
+    _foco.dispose();
     super.dispose();
   }
 
-  int get _reais => int.tryParse(_valor.text) ?? 0;
+  double get _valor => (int.tryParse(soDigitos(_campo.text)) ?? 0) / 100;
 
   @override
   Widget build(BuildContext context) {
+    final v = _valor;
+    final pct = (taxaTatu * 100).round();
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SafeArea(
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
-            TatuMedidas.margem,
+            TatuMedidas.margemCadastro,
             10,
-            TatuMedidas.margem,
+            TatuMedidas.margemCadastro,
             TatuMedidas.base,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const AlcaFolha(),
-              const SizedBox(height: 22),
-              const Text('Enviar valor', style: TatuTexto.tituloFolha),
-              const SizedBox(height: 6),
-              Text(
-                '${widget.cliente} confirma ou pede outro valor. '
-                'O endereço aparece depois da confirmação.',
-                style: TatuTexto.corpo,
-              ),
-              const SizedBox(height: TatuMedidas.entreItens + 4),
-              TatuField(
-                label: 'Valor do serviço (R\$)',
-                hintText: '150',
-                controller: _valor,
-                autofocus: true,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(5),
-                ],
-                onChanged: (_) => setState(() {}),
-              ),
-              const SizedBox(height: TatuMedidas.entreSecoes),
-              FilledButton(
-                onPressed: _reais > 0
-                    ? () => Navigator.of(context).pop(_reais.toDouble())
-                    : null,
-                child: const Text('Enviar valor'),
-              ),
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const AlcaFolha(),
+                const SizedBox(height: 22),
+                const Text('Quanto vai custar?', style: TatuTexto.tituloFolha),
+                const SizedBox(height: 6),
+                Text(
+                  'A ${widget.cliente} pode aceitar ou propor outro valor.',
+                  style: TatuTexto.corpo,
+                ),
+                const SizedBox(height: TatuMedidas.entreItens + 4),
+                GestureDetector(
+                  onTap: _foco.requestFocus,
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                    decoration: BoxDecoration(
+                      color: TatuColors.fill,
+                      borderRadius: BorderRadius.circular(
+                        TatuMedidas.raioCampo,
+                      ),
+                      border: Border.all(
+                        color: _foco.hasFocus
+                            ? TatuColors.textPrimary
+                            : Colors.transparent,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Valor do serviço', style: TatuTexto.nota),
+                        TextField(
+                          controller: _campo,
+                          focusNode: _foco,
+                          autofocus: true,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [ReaisFormatter()],
+                          onChanged: (_) => setState(() {}),
+                          cursorColor: TatuColors.textPrimary,
+                          style: const TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.6,
+                          ),
+                          decoration: const InputDecoration.collapsed(
+                            hintText: 'R\$ 0,00',
+                            hintStyle: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w700,
+                              color: TatuColors.textDisabled,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: TatuMedidas.entreItens),
+                MergeSemantics(
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Material incluso',
+                          style: TextStyle(fontSize: 17),
+                        ),
+                      ),
+                      CupertinoSwitch(
+                        value: _material,
+                        activeTrackColor: TatuColors.online,
+                        onChanged: (b) => setState(() => _material = b),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: TatuMedidas.entreItens),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: TatuColors.surfaceGrouped,
+                    borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Você recebe',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      _Recebe(
+                        'Pelo app (taxa de $pct%)',
+                        reais(v * (1 - taxaTatu)),
+                      ),
+                      const SizedBox(height: 6),
+                      _Recebe('Pago por fora', reais(v)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: TatuMedidas.entreItens + 4),
+                Text('Valor ${widget.rodada} de 3', style: TatuTexto.detalhe),
+                const SizedBox(height: TatuMedidas.entreItens),
+                FilledButton(
+                  onPressed: v > 0
+                      ? () =>
+                            Navigator.of(context)
+                                .pop((valor: v, materialIncluso: _material))
+                      : null,
+                  child: Text('Enviar para ${widget.cliente}'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+class _Recebe extends StatelessWidget {
+  const _Recebe(this.rotulo, this.valor);
+
+  final String rotulo;
+  final String valor;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(child: Text(rotulo, style: TatuTexto.detalhe)),
+      Text(
+        valor,
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+      ),
+    ],
+  );
 }
