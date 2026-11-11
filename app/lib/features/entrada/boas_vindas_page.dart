@@ -5,18 +5,12 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
 import '../../shared/widgets/option_card.dart';
+import '../profissional/cadastro/boas_vindas_profissional_page.dart';
 import 'celular_page.dart';
 
 /// Boas-vindas: primeira tela, comum ao cliente e ao profissional.
 class BoasVindasPage extends StatelessWidget {
   const BoasVindasPage({super.key});
-
-  // Os próximos fluxos ainda não existem.
-  void _emBreve(BuildContext context, String destino) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('$destino: em breve')));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +75,11 @@ class BoasVindasPage extends StatelessWidget {
             icon: TablerIcons.tools,
             title: 'Quero trabalhar',
             subtitle: 'Receba chamados de clientes perto de você.',
-            onTap: () => _emBreve(context, 'Profissional'),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const BoasVindasProfissionalPage(),
+              ),
+            ),
           ),
           const Spacer(),
           Text.rich(

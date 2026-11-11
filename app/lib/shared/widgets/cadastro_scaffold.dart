@@ -21,6 +21,7 @@ class CadastroScaffold extends StatelessWidget {
     this.perigo = false,
     this.botaoCinza = false,
     this.subtituloNota = false,
+    this.notaBotao,
   });
 
   final String titulo;
@@ -45,6 +46,9 @@ class CadastroScaffold extends StatelessWidget {
 
   /// Subtítulo pequeno (13 cinza), ex.: "Atualizado em…".
   final bool subtituloNota;
+
+  /// Nota cinza centralizada abaixo dos botões (ex.: "Tenha em mãos…").
+  final String? notaBotao;
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +121,14 @@ class CadastroScaffold extends StatelessWidget {
                       onPressed: onSecundario,
                       style: tatuBotaoSecundario(),
                       child: Text(botaoSecundario!),
+                    ),
+                  ],
+                  if (notaBotao != null) ...[
+                    const SizedBox(height: 14),
+                    Text(
+                      notaBotao!,
+                      textAlign: TextAlign.center,
+                      style: TatuTexto.nota,
                     ),
                   ],
                 ],

@@ -68,6 +68,7 @@ import 'package:tatu/features/cliente/endereco/localizacao_desativada_page.dart'
 import 'package:tatu/features/cliente/home_page.dart';
 import 'package:tatu/features/cliente/perfil_page.dart';
 import 'package:tatu/features/entrada/boas_vindas_page.dart';
+import 'package:tatu/features/profissional/cadastro/boas_vindas_profissional_page.dart';
 import 'package:tatu/features/entrada/celular_page.dart';
 import 'package:tatu/features/entrada/codigo_page.dart';
 import 'package:tatu/features/entrada/email_page.dart';
@@ -139,6 +140,10 @@ void main() {
 
   testWidgets('boas-vindas', (t) async {
     await _capturar(t, 'boas-vindas', const BoasVindasPage());
+  });
+
+  testWidgets('pro-boas-vindas', (t) async {
+    await _capturar(t, 'pro-boas-vindas', const BoasVindasProfissionalPage());
   });
 
   testWidgets('celular', (t) async {

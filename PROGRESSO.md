@@ -62,7 +62,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [ ] C13 Perfil do cliente
 
 ## Telas do profissional (P1–P13)
-- [ ] P1–P5 Cadastro (dados, profissão, Pix, verificação)
+- [ ] P1–P5 Cadastro (dados, profissão, Pix, verificação) — feito: P01 Boas-vindas do profissional (`profissional/cadastro/boas_vindas_profissional_page.dart`, abre por "Quero trabalhar" e "Trocar para modo profissional"; `ProgressoCadastro` com Dados/Serviços/Receber/Verificação; `CadastroScaffold(notaBotao:)`)
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado
 - [ ] P9 Chat
