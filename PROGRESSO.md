@@ -67,7 +67,8 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Serviço do profissional (`features/profissional/servico/andamento_page.dart`): A caminho (rota, “Cheguei” libera perto), Você chegou, Serviço em andamento.
 - [x] Novo chamado (P22, painel branco sobre o mapa com contagem de 30 s; chega 5 s depois de ficar online, simulado) e Chat do profissional (P23, respostas prontas) em `features/profissional/chamado/`
 - [x] Folha “Enviar valor” (simples, sem desenho próprio): o chat mostra o valor, a cliente confirma (simulado, 2 s) e abre o A caminho. Caminho completo no app: ficar online → chamado → chat → valor → A caminho → Cheguei → Serviço em andamento
-- Falta do profissional: cobrar o cliente, avaliar o cliente, Atividade e ganhos; cliente pedir outro valor (até 3 rodadas)
+- [x] Atividade do profissional (ganhos da semana no topo, Em andamento/Concluídos, selos Aguardando/Pago/Por fora) e Ganhos (Hoje/Semana/Mês, barras da semana, taxas) em `features/profissional/atividade/`, dados em `data/ganhos.dart`. Abas do profissional (`features/profissional/abas.dart`) na Home e na Atividade
+- Falta do profissional: Mensagens (aba), cobrar o cliente, avaliar o cliente; cliente pedir outro valor (até 3 rodadas)
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado
 - [ ] P9 Chat

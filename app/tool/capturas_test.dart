@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/data/profissional.dart';
+import 'package:tatu/features/profissional/atividade/atividade_profissional_page.dart';
+import 'package:tatu/features/profissional/atividade/ganhos_page.dart';
 import 'package:tatu/features/profissional/cadastro/dados_page.dart';
 import 'package:tatu/features/profissional/chamado/chat_profissional_page.dart';
 import 'package:tatu/features/profissional/chamado/novo_chamado_page.dart';
@@ -1575,5 +1577,25 @@ void main() {
         await t.pumpAndSettle();
       },
     );
+  });
+
+  testWidgets('pro-atividade', (t) async {
+    await _capturar(t, 'pro-atividade', const AtividadeProfissionalPage());
+  });
+
+  testWidgets('pro-atividade-andamento', (t) async {
+    await _capturar(
+      t,
+      'pro-atividade-andamento',
+      const AtividadeProfissionalPage(aba: 0),
+    );
+  });
+
+  testWidgets('pro-ganhos', (t) async {
+    await _capturar(t, 'pro-ganhos', const GanhosPage());
+  });
+
+  testWidgets('pro-ganhos-mes', (t) async {
+    await _capturar(t, 'pro-ganhos-mes', const GanhosPage(periodo: 2));
   });
 }

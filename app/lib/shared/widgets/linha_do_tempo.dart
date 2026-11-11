@@ -93,9 +93,13 @@ class SeloVerde extends StatelessWidget {
     super.key,
     this.aviso = false,
     this.pequeno = false,
+    this.cinza = false,
   });
 
   final String texto;
+
+  /// Cinza neutro (ex.: "Por fora").
+  final bool cinza;
 
   /// Laranja de atenção (ex.: "Pago direto ao profissional").
   final bool aviso;
@@ -111,7 +115,11 @@ class SeloVerde extends StatelessWidget {
         vertical: pequeno ? 4 : 5,
       ),
       decoration: ShapeDecoration(
-        color: aviso ? TatuColors.warningSoft : TatuColors.onlineSoft,
+        color: cinza
+            ? TatuColors.fill
+            : aviso
+            ? TatuColors.warningSoft
+            : TatuColors.onlineSoft,
         shape: const StadiumBorder(),
       ),
       child: Text(
@@ -119,7 +127,11 @@ class SeloVerde extends StatelessWidget {
         style: TextStyle(
           fontSize: pequeno ? 13 : 15,
           fontWeight: FontWeight.w600,
-          color: aviso ? TatuColors.warningTexto : TatuColors.onlineTexto,
+          color: cinza
+              ? TatuColors.textSecondary
+              : aviso
+              ? TatuColors.warningTexto
+              : TatuColors.onlineTexto,
         ),
       ),
     );

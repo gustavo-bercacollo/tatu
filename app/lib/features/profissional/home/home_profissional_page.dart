@@ -8,8 +8,10 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/profissional.dart';
+import '../../../shared/widgets/abas_cliente.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
+import '../abas.dart';
 import '../cadastro/pix_page.dart';
 import '../chamado/novo_chamado_page.dart';
 import '../perfil/perfil_profissional_page.dart';
@@ -70,6 +72,9 @@ class _HomeProfissionalPageState extends State<HomeProfissionalPage> {
         final p = profissional;
         final dica = !p.dicaVista;
         return Scaffold(
+          bottomNavigationBar: const AbasDoProfissional(
+            ativa: AbaCliente.inicio,
+          ),
           body: Stack(
             children: [
               const Positioned.fill(child: CustomPaint(painter: MapaFalso())),
