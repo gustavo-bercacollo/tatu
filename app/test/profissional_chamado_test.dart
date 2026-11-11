@@ -21,12 +21,10 @@ Future<void> _home(WidgetTester t) async {
 void main() {
   testWidgets('Online: chega um chamado; aceitar abre o chat', (t) async {
     await _home(t);
-    expect(find.text('Novo chamado'), findsOneWidget);
-    expect(find.text('Vazamento na pia'), findsOneWidget);
-    expect(
-      find.text('Jardim Primavera · endereço depois do valor'),
-      findsOneWidget,
-    );
+    expect(find.text('NOVO CHAMADO'), findsOneWidget);
+    expect(find.text('o cano da minha casa quebrou'), findsOneWidget);
+    expect(find.text('Butantã'), findsOneWidget);
+    expect(find.text('Estimativa na região: R\$ 80 a R\$ 250'), findsOneWidget);
     await t.tap(find.text('Aceitar chamado'));
     await t.pumpAndSettle();
     expect(find.text('Combine o valor com a Ana'), findsOneWidget);
@@ -55,7 +53,7 @@ void main() {
     await t.pump();
     await t.pump(const Duration(seconds: 6));
     await t.pump(const Duration(milliseconds: 500));
-    expect(find.text('Novo chamado'), findsOneWidget);
+    expect(find.text('NOVO CHAMADO'), findsOneWidget);
     for (var i = 0; i < 31; i++) {
       await t.pump(const Duration(seconds: 1));
     }
