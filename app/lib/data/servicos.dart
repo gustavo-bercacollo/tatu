@@ -140,3 +140,21 @@ List<ServicoCatalogo> buscarServicos(String termo) {
         s,
   ];
 }
+
+/// Ícone de um serviço (principais da Home ou do catálogo).
+IconData iconeServico(String nome) {
+  const principais = {
+    'Encanador': TablerIcons.droplet,
+    'Eletricista': TablerIcons.bolt,
+    'Pedreiro': TablerIcons.wall,
+    'Pintor': TablerIcons.brush,
+  };
+  final p = principais[nome];
+  if (p != null) return p;
+  for (final (_, lista) in gruposServicos) {
+    for (final s in lista) {
+      if (s.nome == nome) return s.icone;
+    }
+  }
+  return TablerIcons.tool;
+}

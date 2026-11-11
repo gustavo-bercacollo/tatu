@@ -63,10 +63,29 @@ class PedidoAndamento {
 /// Pedido sem ninguém aceitar ainda: a busca continua em segundo plano.
 @immutable
 class BuscaSegundoPlano {
-  const BuscaSegundoPlano({required this.servico, required this.endereco});
+  BuscaSegundoPlano({
+    required this.servico,
+    required this.endereco,
+    this.descricao = '',
+    DateTime? desde,
+  }) : desde = desde ?? DateTime.now();
 
   final String servico;
   final String endereco;
+
+  /// O que a pessoa escreveu (ex.: "tomada da sala sem energia").
+  final String descricao;
+
+  /// Quando a busca começou.
+  final DateTime desde;
+
+  /// "há 12 min", "agora", "há 1 h".
+  String get haQuanto {
+    final m = DateTime.now().difference(desde).inMinutes;
+    if (m < 1) return 'agora';
+    if (m < 60) return 'há $m min';
+    return 'há ${m ~/ 60} h';
+  }
 }
 
 /// Avaliação que a pessoa deu ao profissional.
@@ -197,9 +216,11 @@ class PedidosRepo extends ChangeNotifier {
       pagamento: 'Visa 4242',
       etapasFeitas: 3,
     );
-    busca = const BuscaSegundoPlano(
+    busca = BuscaSegundoPlano(
       servico: 'Eletricista',
       endereco: 'Rua das Flores, 120',
+      descricao: 'tomada da sala sem energia',
+      desde: DateTime.now().subtract(const Duration(minutes: 12)),
     );
     concluidos = const [
       PedidoConcluido(

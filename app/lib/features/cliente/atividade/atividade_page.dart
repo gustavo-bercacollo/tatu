@@ -6,10 +6,12 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/pedidos.dart';
+import '../../../data/servicos.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/estado_vazio.dart';
 import '../../../shared/widgets/estrelas.dart';
+import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/segmento.dart';
 import '../../../shared/widgets/tatu_chip.dart';
@@ -201,50 +203,70 @@ class _BuscaCompacta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _Cartao(
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            width: 9,
-            height: 9,
-            decoration: const BoxDecoration(
-              color: TatuColors.warning,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Buscando em segundo plano',
-                    maxLines: 1,
-                    style: TatuTexto.comentario.copyWith(
-                      fontWeight: FontWeight.w600,
+          Row(
+            children: [
+              IconeCirculo(iconeServico(busca.servico)),
+              const SizedBox(width: TatuMedidas.entreItens),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      busca.servico,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 2),
+                    Text(
+                      busca.descricao.isEmpty
+                          ? busca.endereco
+                          : busca.descricao,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TatuTexto.nota,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 2),
-                Text('Outro pedido · ${busca.servico}', style: TatuTexto.nota),
-              ],
-            ),
-          ),
-          TextButton(
-            style: TextButton.styleFrom(
-              foregroundColor: TatuColors.danger,
-              padding: const EdgeInsets.only(left: 8),
-              minimumSize: Size.zero,
-              textStyle: const TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
               ),
+              const SizedBox(width: 8),
+              const SeloVerde('Buscando', aviso: true, pequeno: true),
+            ],
+          ),
+          const SizedBox(height: TatuMedidas.entreItens),
+          Row(
+            children: [
+              const Icon(
+                TablerIcons.loader_2,
+                size: 16,
+                color: TatuColors.textSecondary,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Procurando em segundo plano · ${busca.haQuanto}',
+                  style: TatuTexto.nota,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Center(
+            child: TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: TatuColors.textSecondary,
+                textStyle: TatuTexto.corpo.copyWith(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              onPressed: pedidos.cancelarBusca,
+              child: const Text('Cancelar pedido'),
             ),
-            onPressed: pedidos.cancelarBusca,
-            child: const Text('Cancelar'),
           ),
         ],
       ),

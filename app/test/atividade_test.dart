@@ -21,10 +21,14 @@ void main() {
   testWidgets('Em andamento: pedido e busca em segundo plano', (t) async {
     await _abrirAtividade(t);
     expect(find.text('Encanador · Vazamento na pia'), findsOneWidget);
-    expect(find.text('Buscando em segundo plano'), findsOneWidget);
-    await t.tap(find.text('Cancelar'));
+    expect(find.text('tomada da sala sem energia'), findsOneWidget);
+    expect(
+      find.text('Procurando em segundo plano · há 12 min'),
+      findsOneWidget,
+    );
+    await t.tap(find.text('Cancelar pedido'));
     await t.pump();
-    expect(find.text('Buscando em segundo plano'), findsNothing);
+    expect(find.text('tomada da sala sem energia'), findsNothing);
   });
 
   testWidgets('Cancelar pedido → Pedido cancelado → Ninguém aceitou', (

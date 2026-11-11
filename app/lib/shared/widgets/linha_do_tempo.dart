@@ -88,17 +88,28 @@ class _Bola extends StatelessWidget {
 
 /// Selo verde claro com a situação (ex.: "A caminho").
 class SeloVerde extends StatelessWidget {
-  const SeloVerde(this.texto, {super.key, this.aviso = false});
+  const SeloVerde(
+    this.texto, {
+    super.key,
+    this.aviso = false,
+    this.pequeno = false,
+  });
 
   final String texto;
 
   /// Laranja de atenção (ex.: "Pago direto ao profissional").
   final bool aviso;
 
+  /// Menor, para cartões de lista (ex.: "Buscando").
+  final bool pequeno;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      padding: EdgeInsets.symmetric(
+        horizontal: pequeno ? 10 : 12,
+        vertical: pequeno ? 4 : 5,
+      ),
       decoration: ShapeDecoration(
         color: aviso ? TatuColors.warningSoft : TatuColors.onlineSoft,
         shape: const StadiumBorder(),
@@ -106,7 +117,7 @@ class SeloVerde extends StatelessWidget {
       child: Text(
         texto,
         style: TextStyle(
-          fontSize: 15,
+          fontSize: pequeno ? 13 : 15,
           fontWeight: FontWeight.w600,
           color: aviso ? TatuColors.warningTexto : TatuColors.onlineTexto,
         ),
