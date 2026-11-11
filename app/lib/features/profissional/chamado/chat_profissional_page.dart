@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -7,7 +9,10 @@ import '../../../data/servico_profissional.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/back_circle_button.dart';
 import '../../../shared/widgets/chat.dart';
+import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/tatu_chip.dart';
+import '../servico/andamento_page.dart';
+import 'enviar_valor_sheet.dart';
 
 /// Respostas prontas do profissional.
 const respostasRapidas = ['Estou a caminho', 'Posso hoje'];
@@ -33,10 +38,46 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     ('Chego em 12 min.', true),
   ];
 
+  /// Valor enviado, esperando o cliente confirmar.
+  double? _valorEnviado;
+  bool _confirmado = false;
+  Timer? _timer;
+
   @override
   void dispose() {
+    _timer?.cancel();
     _campo.dispose();
     super.dispose();
+  }
+
+  /// Envia o valor; o cliente confirma (protótipo: sempre, em 2 s) e
+  /// só então o endereço aparece, na tela "A caminho".
+  Future<void> _enviarValor() async {
+    final valor = await pedirValor(context, cliente: widget.chamado.cliente);
+    if (valor == null || !mounted) return;
+    setState(() {
+      _valorEnviado = valor;
+      _mensagens.add(('Valor do serviço: ${reais(valor)}', true));
+    });
+    _timer = Timer(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      setState(() => _confirmado = true);
+      _timer = Timer(const Duration(milliseconds: 1500), () {
+        if (!mounted) return;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => ACaminhoPage(servico: ServicoAceito(valor: valor)),
+          ),
+        );
+      });
+    });
+  }
+
+  String get _notaValor {
+    final nome = widget.chamado.cliente;
+    if (_valorEnviado == null) return 'Combine o valor com a $nome';
+    if (!_confirmado) return 'Aguardando a $nome confirmar o valor…';
+    return '$nome confirmou ${reais(_valorEnviado!)}. Abrindo o endereço…';
   }
 
   void _emBreve(String o) => ScaffoldMessenger.of(context)
@@ -113,7 +154,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
             child: BalaoChat(texto: m.$1, minha: m.$2),
           ),
         const SizedBox(height: TatuMedidas.entreSecoes + 8),
-        NotaChat('Combine o valor com a ${c.cliente}'),
+        NotaChat(_notaValor),
       ],
       rodape: Column(
         mainAxisSize: MainAxisSize.min,
@@ -131,8 +172,10 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
           ),
           const SizedBox(height: TatuMedidas.entreItens),
           FilledButton(
-            onPressed: () => _emBreve('Enviar valor'),
-            child: const Text('Enviar valor'),
+            onPressed: _valorEnviado == null ? _enviarValor : null,
+            child: Text(
+              _valorEnviado == null ? 'Enviar valor' : 'Valor enviado',
+            ),
           ),
           const SizedBox(height: TatuMedidas.entreItens),
           BarraMensagem(

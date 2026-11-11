@@ -191,5 +191,7 @@
  "app/pro-em-andamento.png": "docs/fluxo/app/pro-em-andamento.png",
  "app/pro-novo-chamado.png": "docs/fluxo/app/pro-novo-chamado.png",
  "app/pro-chat.png": "docs/fluxo/app/pro-chat.png",
- "app/pro-foto-conferir.png": "docs/fluxo/app/pro-foto-conferir.png"
+ "app/pro-foto-conferir.png": "docs/fluxo/app/pro-foto-conferir.png",
+ "app/pro-enviar-valor.png": "docs/fluxo/app/pro-enviar-valor.png",
+ "app/pro-chat-valor.png": "docs/fluxo/app/pro-chat-valor.png"
 }

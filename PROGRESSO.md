@@ -64,9 +64,10 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 ## Telas do profissional (P1–P13)
 - [x] P1–P5 Cadastro do profissional (`features/profissional/cadastro/`, dados em `data/profissional.dart`): boas-vindas → Seus dados (CPF conferido, SMS com a tela de código do cliente) → Quais serviços (até 3; "Outros" usa a folha do cliente em modo profissão) → Especialidades por serviço ("Encanador · 1 de 2", "Próximo: Eletricista") → Suas profissões → Pix (CPF/celular/e-mail/aleatória; confirmando → ✓ chave salva; erro de chave de outra pessoa; Taxas do Tatu 10% provisório; Fazer isso depois) → Verificação (câmera de verdade do celular pelo `image_picker`: frente, verso e selfie, cada uma com conferência “Usar esta foto / Tirar outra”; fotos em `profissional.fotoFrente/fotoVerso/selfie`) → Em análise (Ativar avisos aprova em 3 s, simulado) / Refazer foto / Reprovado / Aprovado
 - [x] Home do profissional (mapa, offline/online, dica da primeira vez, lembrete do Pix), Perfil do profissional (com "Trocar para modo cliente" e folha "Ficar offline e trocar?"), Região de atendimento e Prévia do perfil. "Trocar para modo profissional" abre a Home quando já há cadastro
-- [x] Serviço do profissional (`features/profissional/servico/andamento_page.dart`): A caminho (rota, “Cheguei” libera perto), Você chegou, Serviço em andamento. Ainda sem entrada no app: falta a folha “Enviar valor”
+- [x] Serviço do profissional (`features/profissional/servico/andamento_page.dart`): A caminho (rota, “Cheguei” libera perto), Você chegou, Serviço em andamento.
 - [x] Novo chamado (P22, painel branco sobre o mapa com contagem de 30 s; chega 5 s depois de ficar online, simulado) e Chat do profissional (P23, respostas prontas) em `features/profissional/chamado/`
-- Falta do profissional: folha “Enviar valor” (liga o chat ao A caminho), cobrar o cliente, avaliar o cliente, Atividade e ganhos
+- [x] Folha “Enviar valor” (simples, sem desenho próprio): o chat mostra o valor, a cliente confirma (simulado, 2 s) e abre o A caminho. Caminho completo no app: ficar online → chamado → chat → valor → A caminho → Cheguei → Serviço em andamento
+- Falta do profissional: cobrar o cliente, avaliar o cliente, Atividade e ganhos; cliente pedir outro valor (até 3 rodadas)
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado
 - [ ] P9 Chat

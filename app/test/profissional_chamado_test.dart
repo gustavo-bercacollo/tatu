@@ -36,6 +36,27 @@ void main() {
     await t.tap(find.bySemanticsLabel('Enviar mensagem'));
     await t.pump();
     expect(find.text('Levo as peças'), findsOneWidget);
+
+    // Envia o valor; a cliente confirma e o endereço aparece.
+    await t.tap(find.text('Enviar valor'));
+    await t.pumpAndSettle();
+    await t.enterText(find.byType(TextField).last, '150');
+    await t.pump();
+    await t.tap(find.text('Enviar valor').last);
+    await t.pumpAndSettle();
+    expect(find.text('Valor do serviço: R\$ 150,00'), findsOneWidget);
+    expect(find.text('Aguardando a Ana confirmar o valor…'), findsOneWidget);
+    await t.pump(const Duration(seconds: 2));
+    await t.pump(const Duration(seconds: 2));
+    await t.pump(const Duration(milliseconds: 500));
+    expect(find.text('A caminho'), findsOneWidget);
+    expect(find.text('Rua Bruno Lobo, 29'), findsOneWidget);
+    await t.pump(const Duration(seconds: 6)); // chega perto
+    await t.tap(find.text('Cheguei'));
+    await t.pump();
+    await t.tap(find.text('Iniciar serviço'));
+    await t.pumpAndSettle();
+    expect(find.text('Serviço em andamento'), findsOneWidget);
   });
 
   testWidgets('Chamado: recusar ou deixar o tempo acabar volta à Home', (

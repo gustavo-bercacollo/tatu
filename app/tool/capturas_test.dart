@@ -1546,4 +1546,34 @@ void main() {
   testWidgets('pro-chat', (t) async {
     await _capturar(t, 'pro-chat', const ChatProfissionalPage());
   });
+
+  testWidgets('pro-enviar-valor', (t) async {
+    await _capturar(
+      t,
+      'pro-enviar-valor',
+      const ChatProfissionalPage(),
+      preparar: () async {
+        await t.tap(find.text('Enviar valor'));
+        await t.pumpAndSettle();
+        await t.enterText(find.byType(TextField).last, '150');
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-chat-valor', (t) async {
+    await _capturar(
+      t,
+      'pro-chat-valor',
+      const ChatProfissionalPage(),
+      preparar: () async {
+        await t.tap(find.text('Enviar valor'));
+        await t.pumpAndSettle();
+        await t.enterText(find.byType(TextField).last, '150');
+        await t.pump();
+        await t.tap(find.text('Enviar valor').last);
+        await t.pumpAndSettle();
+      },
+    );
+  });
 }
