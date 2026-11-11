@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -58,9 +58,9 @@ class VerificacaoIntroPage extends StatelessWidget {
 
 enum EtapaFoto { frente, verso, selfie }
 
-/// P13/P14 · Câmera da verificação (só câmera, sem galeria).
-/// Documento: a foto é tirada sozinha. Selfie: botão de tirar.
-/// Protótipo: a câmera é simulada.
+/// P13/P14 · Fotos da verificação (só câmera, sem galeria).
+/// O botão abre a câmera do celular; a foto tirada aparece no quadro
+/// para conferir ("Usar esta foto" ou "Tirar outra").
 /// Com [refazendo], tira só esta foto e volta para "Em análise".
 class CameraVerificacaoPage extends StatefulWidget {
   const CameraVerificacaoPage({
@@ -77,28 +77,42 @@ class CameraVerificacaoPage extends StatefulWidget {
 }
 
 class _CameraVerificacaoPageState extends State<CameraVerificacaoPage> {
-  Timer? _auto;
-  bool _tirou = false;
+  Uint8List? _foto;
+  bool _abrindo = false;
 
   bool get _selfie => widget.etapa == EtapaFoto.selfie;
 
-  @override
-  void initState() {
-    super.initState();
-    if (!_selfie) {
-      _auto = Timer(const Duration(milliseconds: 2500), _tirar);
+  Future<void> _tirar() async {
+    if (_abrindo) return;
+    setState(() => _abrindo = true);
+    try {
+      final foto = await profissional.tirarFoto(frontal: _selfie);
+      if (!mounted) return;
+      setState(() => _foto = foto ?? _foto);
+    } on CameraDoDocumentoNegada {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('Permita o uso da câmera nos ajustes do celular.'),
+          ),
+        );
+    } finally {
+      if (mounted) setState(() => _abrindo = false);
     }
   }
 
-  @override
-  void dispose() {
-    _auto?.cancel();
-    super.dispose();
-  }
-
-  void _tirar() {
-    if (!mounted || _tirou) return;
-    setState(() => _tirou = true);
+  void _usar() {
+    final foto = _foto!;
+    switch (widget.etapa) {
+      case EtapaFoto.frente:
+        profissional.fotoFrente = foto;
+      case EtapaFoto.verso:
+        profissional.fotoVerso = foto;
+      case EtapaFoto.selfie:
+        profissional.selfie = foto;
+    }
     final nav = Navigator.of(context);
     if (widget.refazendo || _selfie) {
       profissional.enviarVerificacao();
@@ -124,6 +138,22 @@ class _CameraVerificacaoPageState extends State<CameraVerificacaoPage> {
     EtapaFoto.verso => 'Verso do documento',
     EtapaFoto.selfie => 'Selfie',
   };
+
+  String get _titulo {
+    if (_foto != null) return 'Ficou boa?';
+    return _selfie ? 'Agora, uma selfie' : 'Fotografe o documento';
+  }
+
+  String get _texto {
+    if (_foto != null) {
+      return _selfie
+          ? 'Confira se o rosto aparece inteiro e nítido.'
+          : 'Confira se dá para ler todos os dados.';
+    }
+    return _selfie
+        ? 'Olhe para a câmera e fique parado.'
+        : 'O documento inteiro precisa aparecer na foto.';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -184,9 +214,7 @@ class _CameraVerificacaoPageState extends State<CameraVerificacaoPage> {
                   ),
                   const SizedBox(height: TatuMedidas.entreSecoes),
                   Text(
-                    _selfie
-                        ? 'Agora, uma selfie'
-                        : 'Encaixe o documento no quadro',
+                    _titulo,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 26,
@@ -196,9 +224,7 @@ class _CameraVerificacaoPageState extends State<CameraVerificacaoPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _selfie
-                        ? 'Olhe para a câmera e fique parado.'
-                        : 'A foto é tirada sozinha quando estiver nítida.',
+                    _texto,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 15, color: cinzaClaro),
                   ),
@@ -206,21 +232,45 @@ class _CameraVerificacaoPageState extends State<CameraVerificacaoPage> {
                   Expanded(
                     child: Center(
                       child: _selfie
-                          ? const _MolduraRosto()
-                          : const _MolduraDocumento(),
+                          ? _MolduraRosto(foto: _foto)
+                          : _MolduraDocumento(foto: _foto),
                     ),
                   ),
-                  if (_selfie) ...[
-                    const SizedBox(height: TatuMedidas.entreSecoes),
+                  const SizedBox(height: TatuMedidas.entreSecoes),
+                  if (_foto != null) ...[
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: branco,
+                        foregroundColor: TatuColors.textPrimary,
+                      ),
+                      onPressed: _usar,
+                      child: const Text('Usar esta foto'),
+                    ),
+                    const SizedBox(height: 10),
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: TatuColors.editorFundo,
+                        foregroundColor: branco,
+                      ),
+                      onPressed: _tirar,
+                      child: const Text('Tirar outra'),
+                    ),
+                  ] else ...[
                     NotaIcone(
-                      icone: TablerIcons.eyeglass_off,
-                      texto: 'Sem óculos escuros ou boné.',
+                      icone: _selfie
+                          ? TablerIcons.eyeglass_off
+                          : TablerIcons.sun,
+                      texto: _selfie
+                          ? 'Sem óculos escuros ou boné.'
+                          : 'Lugar claro, sem reflexo no documento.',
                       cor: cinzaClaro,
                     ),
                     const SizedBox(height: 10),
                     NotaIcone(
-                      icone: TablerIcons.sun,
-                      texto: 'Boa luz no rosto, sem sombras.',
+                      icone: _selfie ? TablerIcons.sun : TablerIcons.id,
+                      texto: _selfie
+                          ? 'Boa luz no rosto, sem sombras.'
+                          : 'Tire o documento da capinha.',
                       cor: cinzaClaro,
                     ),
                     const SizedBox(height: 28),
@@ -248,15 +298,6 @@ class _CameraVerificacaoPageState extends State<CameraVerificacaoPage> {
                         ),
                       ),
                     ),
-                  ] else ...[
-                    const SizedBox(height: TatuMedidas.entreSecoes),
-                    Center(
-                      child: Text(
-                        _tirou ? 'Foto tirada' : 'Procurando o documento…',
-                        style: TextStyle(fontSize: 15, color: cinzaClaro),
-                      ),
-                    ),
-                    const SizedBox(height: TatuMedidas.entreSecoes),
                   ],
                 ],
               ),
@@ -269,37 +310,43 @@ class _CameraVerificacaoPageState extends State<CameraVerificacaoPage> {
 }
 
 class _MolduraRosto extends StatelessWidget {
-  const _MolduraRosto();
+  const _MolduraRosto({this.foto});
+
+  final Uint8List? foto;
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: 0.78,
       child: Container(
-        decoration: ShapeDecoration(
+        decoration: const ShapeDecoration(
           color: TatuColors.editorFundo,
           shape: OvalBorder(
-            side: const BorderSide(color: TatuColors.onAction, width: 4),
+            side: BorderSide(color: TatuColors.onAction, width: 4),
           ),
         ),
         clipBehavior: Clip.antiAlias,
-        child: const FractionallySizedBox(
-          widthFactor: 0.7,
-          child: FittedBox(
-            alignment: Alignment.bottomCenter,
-            child: Icon(
-              TablerIcons.user_filled,
-              color: TatuColors.editorTrilho,
-            ),
-          ),
-        ),
+        child: foto != null
+            ? Image.memory(foto!, fit: BoxFit.cover)
+            : const FractionallySizedBox(
+                widthFactor: 0.7,
+                child: FittedBox(
+                  alignment: Alignment.bottomCenter,
+                  child: Icon(
+                    TablerIcons.user_filled,
+                    color: TatuColors.editorTrilho,
+                  ),
+                ),
+              ),
       ),
     );
   }
 }
 
 class _MolduraDocumento extends StatelessWidget {
-  const _MolduraDocumento();
+  const _MolduraDocumento({this.foto});
+
+  final Uint8List? foto;
 
   @override
   Widget build(BuildContext context) {
@@ -311,11 +358,14 @@ class _MolduraDocumento extends StatelessWidget {
           borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
           border: Border.all(color: TatuColors.onAction, width: 3),
         ),
-        child: const Icon(
-          TablerIcons.id,
-          size: 64,
-          color: TatuColors.editorTrilho,
-        ),
+        clipBehavior: Clip.antiAlias,
+        child: foto != null
+            ? Image.memory(foto!, fit: BoxFit.cover)
+            : const Icon(
+                TablerIcons.id,
+                size: 64,
+                color: TatuColors.editorTrilho,
+              ),
       ),
     );
   }

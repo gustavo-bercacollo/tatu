@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../shared/formatadores.dart';
 
@@ -151,6 +152,16 @@ class ProfissionalRepo extends ChangeNotifier {
   String? pixChave;
   Verificacao verificacao = Verificacao.naoEnviada;
 
+  /// Fotos da verificação (só câmera, nunca galeria).
+  Uint8List? fotoFrente;
+  Uint8List? fotoVerso;
+  Uint8List? selfie;
+
+  /// Abre a câmera do celular e devolve a foto (null se a pessoa
+  /// desistir). Trocável nos testes.
+  Future<Uint8List?> Function({required bool frontal}) tirarFoto =
+      _tirarComCamera;
+
   /// O app sempre abre offline.
   bool online = false;
 
@@ -214,6 +225,10 @@ class ProfissionalRepo extends ChangeNotifier {
     pixTipo = null;
     pixChave = null;
     verificacao = Verificacao.naoEnviada;
+    fotoFrente = null;
+    fotoVerso = null;
+    selfie = null;
+    tirarFoto = _tirarComCamera;
     online = false;
     dicaVista = false;
     raioKm = 10;
@@ -315,6 +330,23 @@ class ProfissionalRepo extends ChangeNotifier {
   void definirRaio(int km) {
     raioKm = km;
     notifyListeners();
+  }
+}
+
+/// A câmera foi negada nas permissões do celular.
+class CameraDoDocumentoNegada implements Exception {}
+
+Future<Uint8List?> _tirarComCamera({required bool frontal}) async {
+  try {
+    final arquivo = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+      preferredCameraDevice: frontal ? CameraDevice.front : CameraDevice.rear,
+      maxWidth: 1600,
+    );
+    return await arquivo?.readAsBytes();
+  } on Exception catch (e) {
+    if ('$e'.contains('access_denied')) throw CameraDoDocumentoNegada();
+    rethrow;
   }
 }
 

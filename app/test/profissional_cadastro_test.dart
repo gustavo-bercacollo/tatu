@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/profissional.dart';
 import 'package:tatu/features/profissional/cadastro/dados_page.dart';
 import 'package:tatu/features/profissional/cadastro/pix_page.dart';
+import 'package:tatu/features/profissional/cadastro/verificacao_page.dart';
 import 'package:tatu/features/profissional/home/home_profissional_page.dart';
 import 'package:tatu/features/profissional/perfil/perfil_profissional_page.dart';
 
@@ -75,17 +78,27 @@ void main() {
     await t.pump(const Duration(seconds: 1));
     await t.pumpAndSettle();
 
-    // Passo 4: documento (sozinho) e selfie.
+    // Passo 4: câmera de verdade (aqui, trocada por uma foto pronta).
+    final bytes = File('assets/avatares/avatar-2.png').readAsBytesSync();
+    profissional.tirarFoto = ({required bool frontal}) async => bytes;
     expect(find.text('Vamos confirmar que é você'), findsOneWidget);
     await _tocar(t, 'Começar');
-    expect(find.text('Frente do documento'), findsOneWidget);
-    await t.pump(const Duration(seconds: 3));
-    await t.pumpAndSettle();
-    expect(find.text('Verso do documento'), findsOneWidget);
-    await t.pump(const Duration(seconds: 3));
-    await t.pumpAndSettle();
-    await t.tap(find.bySemanticsLabel('Tirar foto'));
-    await t.pumpAndSettle();
+    for (final etapa in [
+      'Frente do documento',
+      'Verso do documento',
+      'Selfie',
+    ]) {
+      expect(find.text(etapa), findsOneWidget);
+      expect(find.text('Usar esta foto'), findsNothing);
+      await t.tap(find.bySemanticsLabel('Tirar foto'));
+      await t.pump();
+      await t.pump();
+      expect(find.text('Ficou boa?'), findsOneWidget);
+      await _tocar(t, 'Usar esta foto');
+    }
+    expect(profissional.fotoFrente, isNotNull);
+    expect(profissional.fotoVerso, isNotNull);
+    expect(profissional.selfie, isNotNull);
     expect(find.text('Recebemos seus dados'), findsOneWidget);
     expect(profissional.verificacao, Verificacao.emAnalise);
     expect(profissional.pixTipo, TipoPix.cpf);
@@ -101,6 +114,28 @@ void main() {
     expect(find.text('Pronto para começar?'), findsOneWidget);
     await _tocar(t, 'Entendi');
     expect(find.text('Você está offline'), findsOneWidget);
+  });
+
+  testWidgets('Câmera: desistir não avança; dá para tirar outra', (t) async {
+    final bytes = File('assets/avatares/avatar-2.png').readAsBytesSync();
+    var vezes = 0;
+    profissional.tirarFoto = ({required bool frontal}) async {
+      vezes++;
+      return vezes == 1 ? null : bytes; // na 1ª vez a pessoa desiste
+    };
+    await _abrir(t, const CameraVerificacaoPage(etapa: EtapaFoto.frente));
+    await t.tap(find.bySemanticsLabel('Tirar foto'));
+    await t.pump();
+    await t.pump();
+    expect(find.text('Usar esta foto'), findsNothing);
+    await t.tap(find.bySemanticsLabel('Tirar foto'));
+    await t.pump();
+    await t.pump();
+    expect(find.text('Usar esta foto'), findsOneWidget);
+    await t.tap(find.text('Tirar outra'));
+    await t.pump();
+    await t.pump();
+    expect(vezes, 3);
   });
 
   testWidgets('Pix: chave em nome de outra pessoa e fazer depois', (t) async {

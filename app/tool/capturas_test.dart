@@ -1353,6 +1353,21 @@ void main() {
     );
   });
 
+  testWidgets('pro-foto-conferir', (t) async {
+    final bytes = File('assets/avatares/avatar-2.png').readAsBytesSync();
+    await _capturar(
+      t,
+      'pro-foto-conferir',
+      const CameraVerificacaoPage(etapa: EtapaFoto.selfie),
+      preparar: () async {
+        profissional.tirarFoto = ({required bool frontal}) async => bytes;
+        await t.tap(find.bySemanticsLabel('Tirar foto'));
+        await t.pump();
+        await t.pump();
+      },
+    );
+  });
+
   testWidgets('pro-selfie', (t) async {
     await _capturar(
       t,
