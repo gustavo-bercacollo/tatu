@@ -149,6 +149,17 @@ class PerfilProfissionalPage extends StatelessWidget {
                     ),
                     const SizedBox(height: TatuMedidas.entreSecoes),
                     GrupoLista(
+                      titulo: 'Modo',
+                      itens: [
+                        ItemLista(
+                          icone: TablerIcons.refresh,
+                          texto: 'Trocar para modo cliente',
+                          onTap: () => _trocarParaCliente(context),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: TatuMedidas.entreSecoes),
+                    GrupoLista(
                       titulo: 'Seu perfil',
                       itens: [
                         ItemLista(
@@ -229,17 +240,6 @@ class PerfilProfissionalPage extends StatelessWidget {
                           texto: 'Privacidade e termos',
                           onTap: () =>
                               _emBreve(context, 'Privacidade e termos'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: TatuMedidas.entreSecoes),
-                    GrupoLista(
-                      titulo: 'Modo',
-                      itens: [
-                        ItemLista(
-                          icone: TablerIcons.refresh,
-                          texto: 'Trocar para modo cliente',
-                          onTap: () => _trocarParaCliente(context),
                         ),
                       ],
                     ),
