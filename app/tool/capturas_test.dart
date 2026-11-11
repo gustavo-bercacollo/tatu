@@ -7,7 +7,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/conversas_profissional.dart';
 import 'package:tatu/data/fotos_trabalho.dart';
+import 'package:tatu/features/cliente/mensagens/denunciar_page.dart'
+    show DenunciarPage, DenunciaEnviadaPage;
+import 'package:tatu/features/profissional/mensagens/mensagens_profissional_page.dart';
 import 'package:tatu/data/profissional.dart';
 import 'package:tatu/features/profissional/perfil/fotos_trabalho_page.dart';
 import 'package:tatu/features/profissional/atividade/atividade_profissional_page.dart';
@@ -133,6 +137,7 @@ Future<void> _capturar(
   chamado.restaurar();
   profissional.restaurar();
   fotosTrabalho.restaurar();
+  conversasProfissional.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -1800,6 +1805,84 @@ void main() {
         await t.tap(find.bySemanticsLabel('Remover foto').first);
         await t.pumpAndSettle();
       },
+    );
+  });
+
+  testWidgets('pro-mensagens', (t) async {
+    await comDemo(t, 'pro-mensagens', const MensagensProfissionalPage());
+  });
+
+  testWidgets('pro-mensagens-vazio', (t) async {
+    await comDemo(
+      t,
+      'pro-mensagens-vazio',
+      const MensagensProfissionalPage(),
+      depois: () async {
+        conversasProfissional.limpar();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-chat-opcoes', (t) async {
+    await comDemo(
+      t,
+      'pro-chat-opcoes',
+      const ChatProfissionalPage(),
+      depois: () async {
+        await t.tap(find.bySemanticsLabel(RegExp('Opções da conversa')));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-chat-cancelar', (t) async {
+    await comDemo(
+      t,
+      'pro-chat-cancelar',
+      const ChatProfissionalPage(),
+      depois: () async {
+        await t.tap(find.bySemanticsLabel(RegExp('Opções da conversa')));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Cancelar atendimento'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-chat-encerrado', (t) async {
+    await comDemo(
+      t,
+      'pro-chat-encerrado',
+      const ChatProfissionalPage(concluidoPor: 150),
+    );
+  });
+
+  testWidgets('pro-denunciar', (t) async {
+    await comDemo(
+      t,
+      'pro-denunciar',
+      const DenunciarPage.pessoa(
+        nome: 'Ana',
+        feminino: true,
+        motivo: 2,
+        motivos: [
+          'Comportamento inadequado',
+          'Não estava no endereço',
+          'Não quis pagar',
+          'Outro motivo',
+        ],
+      ),
+    );
+  });
+
+  testWidgets('pro-denuncia-enviada', (t) async {
+    await comDemo(
+      t,
+      'pro-denuncia-enviada',
+      const DenunciaEnviadaPage(
+        texto: 'Nossa equipe vai analisar e pode\nfalar com você pelo app.',
+      ),
     );
   });
 }

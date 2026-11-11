@@ -10,9 +10,24 @@ import '../../../shared/widgets/tela_permissao.dart';
 
 /// Denunciar o profissional: escolhe o motivo e envia (anônimo).
 class DenunciarPage extends StatefulWidget {
-  const DenunciarPage({super.key, required this.conversa, this.motivo});
+  const DenunciarPage({super.key, required this.conversa, this.motivo})
+    : nome = null,
+      feminino = null,
+      motivos = null;
 
-  final Conversa conversa;
+  /// Profissional denunciando o cliente.
+  const DenunciarPage.pessoa({
+    super.key,
+    required String this.nome,
+    required bool this.feminino,
+    required List<String> this.motivos,
+    this.motivo,
+  }) : conversa = null;
+
+  final Conversa? conversa;
+  final String? nome;
+  final bool? feminino;
+  final List<String>? motivos;
 
   /// Motivo já escolhido (para abrir a tela preenchida).
   final int? motivo;
@@ -33,20 +48,28 @@ class _DenunciarPageState extends State<DenunciarPage> {
 
   @override
   Widget build(BuildContext context) {
-    final c = widget.conversa;
+    final nome = widget.nome ?? widget.conversa!.primeiroNome;
+    final feminino = widget.feminino ?? widget.conversa!.feminino;
+    final motivos = widget.motivos ?? _motivos;
     return CadastroScaffold(
-      titulo: 'Denunciar ${c.primeiroNome}',
+      titulo: 'Denunciar $nome',
       subtitulo:
-          'O que aconteceu?\n${c.feminino ? 'Ela' : 'Ele'} não vê que foi você.',
+          'O que aconteceu?\n${feminino ? 'Ela' : 'Ele'} não vê que foi você.',
       botao: 'Enviar denúncia',
       // Sem backend ainda: só confirma o envio.
       onBotao: _escolhido == null
           ? null
           : () => Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const DenunciaEnviadaPage()),
+              MaterialPageRoute(
+                builder: (_) => DenunciaEnviadaPage(
+                  texto: widget.conversa == null
+                      ? 'Nossa equipe vai analisar e pode\nfalar com você pelo app.'
+                      : null,
+                ),
+              ),
             ),
       children: [
-        for (final (i, m) in _motivos.indexed) ...[
+        for (final (i, m) in motivos.indexed) ...[
           OpcaoSelecionavel(
             selecionado: i == _escolhido,
             rotulo: m,
@@ -76,7 +99,9 @@ class _DenunciarPageState extends State<DenunciarPage> {
 
 /// Denúncia enviada: a equipe analisa; volta para a conversa.
 class DenunciaEnviadaPage extends StatelessWidget {
-  const DenunciaEnviadaPage({super.key});
+  const DenunciaEnviadaPage({super.key, this.texto});
+
+  final String? texto;
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +110,9 @@ class DenunciaEnviadaPage extends StatelessWidget {
       sucesso: true,
       icone: const IconePermissao(TablerIcons.check, cor: TatuColors.online),
       titulo: 'Denúncia enviada',
-      texto: 'Nossa equipe vai analisar.\nVocê não precisa fazer mais nada.',
+      texto:
+          texto ??
+          'Nossa equipe vai analisar.\nVocê não precisa fazer mais nada.',
       principal: 'Voltar para a conversa',
       onPrincipal: () => Navigator.of(context).pop(),
     );

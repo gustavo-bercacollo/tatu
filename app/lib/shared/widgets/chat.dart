@@ -6,6 +6,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
 import '../../core/theme/tatu_texto.dart';
+import 'avatar_iniciais.dart';
 
 /// Esqueleto das telas de chat: topo, lista de mensagens e rodapé
 /// (barra de mensagem, aviso de conversa encerrada…).
@@ -345,6 +346,166 @@ class BarraMensagem extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+}
+
+/// Rodapé de largura total: "Esta conversa foi encerrada".
+class ConversaEncerrada extends StatelessWidget {
+  const ConversaEncerrada({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: TatuMedidas.entreItens),
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: TatuColors.trilho)),
+      ),
+      child: const Text(
+        'Esta conversa foi encerrada',
+        textAlign: TextAlign.center,
+        style: TatuTexto.detalhe,
+      ),
+    );
+  }
+}
+
+/// Linha da lista de Mensagens: avatar, nome, última mensagem, hora,
+/// contador de não lidas e um selo opcional (ex.: "Proposta 2 de 3").
+class LinhaConversa extends StatelessWidget {
+  const LinhaConversa({
+    super.key,
+    required this.nome,
+    required this.iniciais,
+    required this.ultima,
+    required this.quando,
+    required this.onTap,
+    this.naoLidas = 0,
+    this.online = false,
+    this.selo,
+  });
+
+  final String nome;
+
+  /// Nome usado para as iniciais do avatar.
+  final String iniciais;
+  final String ultima;
+  final String quando;
+  final int naoLidas;
+  final bool online;
+  final Widget? selo;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final naoLida = naoLidas > 0;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.only(left: TatuMedidas.margem),
+        child: Row(
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                AvatarIniciais(nome: iniciais, tamanho: 48),
+                if (online)
+                  Positioned(
+                    right: 0,
+                    bottom: 2,
+                    child: Container(
+                      width: 13,
+                      height: 13,
+                      decoration: BoxDecoration(
+                        color: TatuColors.online,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: TatuColors.bg, width: 2),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(
+                  0,
+                  14,
+                  TatuMedidas.margem,
+                  14,
+                ),
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: TatuColors.trilho, width: 1),
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            nome,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            ultima,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TatuTexto.detalhe.copyWith(
+                              color: naoLida
+                                  ? TatuColors.textPrimary
+                                  : TatuColors.textSecondary,
+                            ),
+                          ),
+                          if (selo != null) ...[
+                            const SizedBox(height: 6),
+                            selo!,
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(quando, style: TatuTexto.nota),
+                        const SizedBox(height: 6),
+                        if (naoLida)
+                          Container(
+                            width: 20,
+                            height: 20,
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              color: TatuColors.action,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              '$naoLidas',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: TatuColors.onAction,
+                              ),
+                            ),
+                          )
+                        else
+                          const SizedBox(height: 20),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

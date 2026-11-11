@@ -11,6 +11,7 @@ void irParaAba(BuildContext context, AbaCliente aba) {
   nav.popUntil((r) => r.isFirst);
   switch (aba) {
     case AbaCliente.inicio:
+    case AbaCliente.perfil:
       return;
     case AbaCliente.atividade:
       nav.push(

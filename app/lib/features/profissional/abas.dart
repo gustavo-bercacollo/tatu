@@ -2,32 +2,31 @@ import 'package:flutter/material.dart';
 
 import '../../shared/widgets/abas_cliente.dart';
 import 'atividade/atividade_profissional_page.dart';
+import 'mensagens/mensagens_profissional_page.dart';
+import 'perfil/perfil_profissional_page.dart';
 
 /// Troca de aba do profissional. Início é a primeira tela da pilha (a
-/// Home); Atividade abre por cima dela, sem animação. Mensagens ainda
-/// não tem desenho.
+/// Home); as outras abrem por cima dela, sem animação.
 void irParaAbaProfissional(BuildContext context, AbaCliente aba) {
   final nav = Navigator.of(context);
-  switch (aba) {
-    case AbaCliente.inicio:
-      nav.popUntil((r) => r.isFirst);
-    case AbaCliente.atividade:
-      nav.popUntil((r) => r.isFirst);
-      nav.push(
-        PageRouteBuilder(
-          pageBuilder: (_, _, _) => const AtividadeProfissionalPage(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
-    case AbaCliente.mensagens:
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('Mensagens: em breve')));
-  }
+  nav.popUntil((r) => r.isFirst);
+  final Widget? tela = switch (aba) {
+    AbaCliente.inicio => null,
+    AbaCliente.atividade => const AtividadeProfissionalPage(),
+    AbaCliente.mensagens => const MensagensProfissionalPage(),
+    AbaCliente.perfil => const PerfilProfissionalPage(),
+  };
+  if (tela == null) return;
+  nav.push(
+    PageRouteBuilder(
+      pageBuilder: (_, _, _) => tela,
+      transitionDuration: Duration.zero,
+      reverseTransitionDuration: Duration.zero,
+    ),
+  );
 }
 
-/// Barra de abas do profissional (Início · Atividade · Mensagens).
+/// Barra de abas do profissional: Início · Atividade · Mensagens · Perfil.
 class AbasDoProfissional extends StatelessWidget {
   const AbasDoProfissional({super.key, required this.ativa});
 
@@ -36,6 +35,7 @@ class AbasDoProfissional extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AbasCliente(
     ativa: ativa,
+    comPerfil: true,
     onTrocar: (a) {
       if (a == ativa) return;
       irParaAbaProfissional(context, a);

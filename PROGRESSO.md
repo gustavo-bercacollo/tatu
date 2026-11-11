@@ -70,7 +70,8 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Atividade do profissional (ganhos da semana no topo, Em andamento/Concluídos, selos Aguardando/Pago/Por fora) e Ganhos (Hoje/Semana/Mês, barras da semana, taxas) em `features/profissional/atividade/`, dados em `data/ganhos.dart`. Abas do profissional (`features/profissional/abas.dart`) na Home e na Atividade
 - [x] Sobre você (`features/profissional/perfil/sobre_page.dart`): até 300 caracteres, “Melhorar com IA” com folha de sugestão (`MelhoriaTexto` simulada em `data/sobre_ia.dart`), bloqueio de telefone, e-mail e redes sociais (`contatoProibido`)
 - [x] Fotos de trabalhos (`perfil/fotos_trabalho_page.dart`, dados em `data/fotos_trabalho.dart`): vazio, grade 3×, até 12, adicionar (câmera/galeria) → Nova foto (legenda, serviço) → em análise (aprovada em 4 s, simulado), recusada (enviar outra/remover), remover, arrastar para reordenar. A prévia mostra só as aprovadas
-- Falta do profissional: Mensagens (aba), cobrar o cliente, avaliar o cliente
+- [x] Mensagens do profissional (`profissional/mensagens/`, dados em `data/conversas_profissional.dart`): lista com busca, selos e vazio; chat com opções (toque no nome), cancelar atendimento (com aviso de posição), denunciar cliente, conversa encerrada. Abas do profissional com Perfil (4 abas)
+- Falta do profissional: cobrar o cliente, avaliar o cliente
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado
 - [ ] P9 Chat

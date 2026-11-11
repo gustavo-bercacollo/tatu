@@ -59,7 +59,10 @@ class ChamadoNovo {
     this.estimativaMin = 80,
     this.estimativaMax = 250,
     this.temFoto = true,
+    this.feminino = true,
   });
+
+  final bool feminino;
 
   final String profissao;
   final String titulo;

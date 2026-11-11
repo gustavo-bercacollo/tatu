@@ -7,7 +7,11 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/servico_profissional.dart';
+import '../../../data/conversas_profissional.dart';
 import '../../../shared/formatadores.dart';
+import '../../../shared/widgets/folha.dart';
+import '../../../shared/widgets/lista_agrupada.dart';
+import '../../cliente/mensagens/denunciar_page.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/back_circle_button.dart';
 import '../../../shared/widgets/chat.dart';
@@ -35,10 +39,14 @@ class ChatProfissionalPage extends StatefulWidget {
     super.key,
     this.chamado = chamadoExemplo,
     this.resposta = const Duration(seconds: 2),
+    this.concluidoPor,
   });
 
   final ChamadoNovo chamado;
   final Duration resposta;
+
+  /// Serviço já concluído por esse valor: conversa encerrada.
+  final double? concluidoPor;
 
   @override
   State<ChatProfissionalPage> createState() => _ChatProfissionalPageState();
@@ -68,6 +76,78 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     _timer?.cancel();
     _campo.dispose();
     super.dispose();
+  }
+
+  bool get _encerrada => widget.concluidoPor != null;
+
+  /// Toque no nome: ligar, ver chamado, ajuda, cancelar e denunciar.
+  Future<void> _menu() async {
+    final c = widget.chamado;
+    final escolha = await mostrarFolha<String>(
+      context,
+      builder: (ctx) {
+        ItemLista item(IconData i, String t, {bool perigo = false}) =>
+            ItemLista(
+              icone: i,
+              texto: t,
+              seta: false,
+              cor: perigo ? TatuColors.danger : null,
+              onTap: () => Navigator.of(ctx).pop(t),
+            );
+        return FolhaOpcoes(
+          fechar: 'Fechar',
+          itens: [
+            item(TablerIcons.phone, 'Ligar para $_nome'),
+            item(TablerIcons.file_text, 'Ver chamado'),
+            item(TablerIcons.help_circle, 'Ajuda'),
+            if (!_encerrada)
+              item(TablerIcons.x, 'Cancelar atendimento', perigo: true),
+            item(TablerIcons.alert_triangle, 'Denunciar cliente', perigo: true),
+          ],
+        );
+      },
+    );
+    if (escolha == null || !mounted) return;
+    switch (escolha) {
+      case 'Cancelar atendimento':
+        return _cancelar();
+      case 'Denunciar cliente':
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => DenunciarPage.pessoa(
+              nome: _nome,
+              feminino: c.feminino,
+              motivos: const [
+                'Comportamento inadequado',
+                'Não estava no endereço',
+                'Não quis pagar',
+                'Outro motivo',
+              ],
+            ),
+          ),
+        );
+      default:
+        _emBreve(escolha.startsWith('Ligar') ? 'Ligar' : escolha);
+    }
+  }
+
+  Future<void> _cancelar() async {
+    final c = widget.chamado;
+    final sim = await confirmar(
+      context,
+      titulo: 'Cancelar atendimento?',
+      texto:
+          'A $_nome será avisada e vamos buscar\n'
+          'outro profissional para ${c.feminino ? 'ela' : 'ele'}.',
+      aviso: 'Cancelar muito baixa sua posição.',
+      confirmar: 'Cancelar atendimento',
+      cancelar: 'Continuar atendimento',
+      perigo: true,
+    );
+    if (!sim || !mounted) return;
+    _timer?.cancel();
+    conversasProfissional.cancelar(c);
+    Navigator.of(context).pop();
   }
 
   void _emBreve(String o) => ScaffoldMessenger.of(context)
@@ -157,29 +237,38 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
         children: [
           const BackCircleButton(),
           Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AvatarIniciais(nome: c.cliente),
-                const SizedBox(width: 10),
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        c.cliente,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                        ),
+            child: Semantics(
+              container: true,
+              button: true,
+              label: 'Opções da conversa',
+              child: GestureDetector(
+                onTap: _menu,
+                behavior: HitTestBehavior.opaque,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AvatarIniciais(nome: c.cliente),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            c.cliente,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const Text('Cliente', style: TatuTexto.nota),
+                        ],
                       ),
-                      const Text('Cliente', style: TatuTexto.nota),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
           Semantics(
@@ -213,84 +302,89 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
             child: BalaoChat(texto: m.$1, minha: m.$2),
           ),
         const SizedBox(height: TatuMedidas.entreSecoes),
-        ...switch (_estado) {
-          EstadoValor.inicio => const <Widget>[],
-          EstadoValor.aguardando => [
-            _MeuValor(
-              rodada: _rodada,
-              valor: _meuValor,
-              material: _material,
-              icone: TablerIcons.clock,
-              situacao: 'Aguardando a $_nome',
-            ),
-          ],
-          EstadoValor.contraproposta => [
-            _MeuValor(
-              rodada: _rodada,
-              valor: _meuValor,
-              material: _material,
-              icone: TablerIcons.refresh,
-              situacao: '$_nome propôs outro valor',
-            ),
-            const SizedBox(height: TatuMedidas.entreItens + 4),
-            _Proposta(
-              nome: _nome,
-              rodada: _rodada,
-              valor: _proposta,
-              onAceitar: _aceitarProposta,
-              onOutro: _enviarValor,
-            ),
-          ],
-          EstadoValor.combinado => [
-            _ValorCombinado(valor: _combinado, material: _material),
-            const SizedBox(height: TatuMedidas.entreItens),
-            _EnderecoLiberado(chamado: c),
-          ],
-        },
+        if (_encerrada) _Concluido(valor: widget.concluidoPor!),
+        if (!_encerrada)
+          ...switch (_estado) {
+            EstadoValor.inicio => const <Widget>[],
+            EstadoValor.aguardando => [
+              _MeuValor(
+                rodada: _rodada,
+                valor: _meuValor,
+                material: _material,
+                icone: TablerIcons.clock,
+                situacao: 'Aguardando a $_nome',
+              ),
+            ],
+            EstadoValor.contraproposta => [
+              _MeuValor(
+                rodada: _rodada,
+                valor: _meuValor,
+                material: _material,
+                icone: TablerIcons.refresh,
+                situacao: '$_nome propôs outro valor',
+              ),
+              const SizedBox(height: TatuMedidas.entreItens + 4),
+              _Proposta(
+                nome: _nome,
+                rodada: _rodada,
+                valor: _proposta,
+                onAceitar: _aceitarProposta,
+                onOutro: _enviarValor,
+              ),
+            ],
+            EstadoValor.combinado => [
+              _ValorCombinado(valor: _combinado, material: _material),
+              const SizedBox(height: TatuMedidas.entreItens),
+              _EnderecoLiberado(chamado: c),
+            ],
+          },
         const SizedBox(height: TatuMedidas.entreItens),
       ],
-      rodape: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (_estado == EstadoValor.inicio) ...[
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                spacing: 8,
-                children: [
-                  TatuChip(
-                    label: 'Estou a caminho',
-                    onTap: () => _enviar('Estou a caminho'),
+      rodapeColado: _encerrada,
+      rodape: _encerrada
+          ? const ConversaEncerrada()
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (_estado == EstadoValor.inicio) ...[
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      spacing: 8,
+                      children: [
+                        TatuChip(
+                          label: 'Estou a caminho',
+                          onTap: () => _enviar('Estou a caminho'),
+                        ),
+                        TatuChip(
+                          label: 'Mandar foto',
+                          onTap: () => _emBreve('Mandar foto'),
+                        ),
+                      ],
+                    ),
                   ),
-                  TatuChip(
-                    label: 'Mandar foto',
-                    onTap: () => _emBreve('Mandar foto'),
+                  const SizedBox(height: TatuMedidas.entreItens),
+                  FilledButton(
+                    onPressed: _enviarValor,
+                    child: const Text('Enviar valor'),
                   ),
+                  const SizedBox(height: TatuMedidas.entreItens),
                 ],
-              ),
+                if (_estado == EstadoValor.combinado) ...[
+                  FilledButton(
+                    onPressed: _irAteOCliente,
+                    child: const Text('Estou a caminho'),
+                  ),
+                  const SizedBox(height: TatuMedidas.entreItens),
+                ],
+                BarraMensagem(
+                  controller: _campo,
+                  onEnviar: _enviar,
+                  onCamera: () => _emBreve('Mandar foto'),
+                ),
+              ],
             ),
-            const SizedBox(height: TatuMedidas.entreItens),
-            FilledButton(
-              onPressed: _enviarValor,
-              child: const Text('Enviar valor'),
-            ),
-            const SizedBox(height: TatuMedidas.entreItens),
-          ],
-          if (_estado == EstadoValor.combinado) ...[
-            FilledButton(
-              onPressed: _irAteOCliente,
-              child: const Text('Estou a caminho'),
-            ),
-            const SizedBox(height: TatuMedidas.entreItens),
-          ],
-          BarraMensagem(
-            controller: _campo,
-            onEnviar: _enviar,
-            onCamera: () => _emBreve('Mandar foto'),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -427,6 +521,44 @@ class _Valor extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// Faixa verde: o serviço foi concluído (conversa encerrada).
+class _Concluido extends StatelessWidget {
+  const _Concluido({required this.valor});
+
+  final double valor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      decoration: BoxDecoration(
+        color: TatuColors.onlineSoft,
+        borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            TablerIcons.check,
+            size: 20,
+            color: TatuColors.onlineTexto,
+          ),
+          const SizedBox(width: TatuMedidas.entreItens),
+          Expanded(
+            child: Text(
+              'Serviço concluído · ${reais(valor)}',
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+                color: TatuColors.onlineTexto,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// Cartão verde: os dois lados fecharam o valor.

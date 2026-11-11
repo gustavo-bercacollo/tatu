@@ -4,11 +4,19 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../core/theme/tatu_colors.dart';
 
 /// Abas do cliente.
-enum AbaCliente { inicio, atividade, mensagens }
+enum AbaCliente { inicio, atividade, mensagens, perfil }
 
 /// Barra de abas do cliente: Início · Atividade · Mensagens.
 class AbasCliente extends StatelessWidget {
-  const AbasCliente({super.key, this.ativa = AbaCliente.inicio, this.onTrocar});
+  const AbasCliente({
+    super.key,
+    this.ativa = AbaCliente.inicio,
+    this.onTrocar,
+    this.comPerfil = false,
+  });
+
+  /// Profissional: Perfil como 4ª aba.
+  final bool comPerfil;
 
   final AbaCliente ativa;
 
@@ -51,6 +59,13 @@ class AbasCliente extends StatelessWidget {
                 ativa: ativa == AbaCliente.mensagens,
                 onTap: ir(AbaCliente.mensagens),
               ),
+              if (comPerfil)
+                _Aba(
+                  icone: TablerIcons.user,
+                  texto: 'Perfil',
+                  ativa: ativa == AbaCliente.perfil,
+                  onTap: ir(AbaCliente.perfil),
+                ),
             ],
           ),
         ),

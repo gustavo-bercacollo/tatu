@@ -223,7 +223,7 @@ class _ChatPageState extends State<ChatPage> {
           ],
           rodapeColado: _c.encerrada,
           rodape: _c.encerrada
-              ? const _ConversaEncerrada()
+              ? const ConversaEncerrada()
               : Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -338,25 +338,6 @@ class _SemInternet extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ConversaEncerrada extends StatelessWidget {
-  const _ConversaEncerrada();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: TatuMedidas.entreItens),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: TatuColors.trilho)),
-      ),
-      child: const Text(
-        'Esta conversa foi encerrada',
-        textAlign: TextAlign.center,
-        style: TatuTexto.detalhe,
       ),
     );
   }

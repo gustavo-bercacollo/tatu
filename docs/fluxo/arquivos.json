@@ -211,5 +211,12 @@
  "app/pro-fotos-nova.png": "docs/fluxo/app/pro-fotos-nova.png",
  "app/pro-fotos-analise.png": "docs/fluxo/app/pro-fotos-analise.png",
  "app/pro-fotos-recusada.png": "docs/fluxo/app/pro-fotos-recusada.png",
- "app/pro-fotos-remover.png": "docs/fluxo/app/pro-fotos-remover.png"
+ "app/pro-fotos-remover.png": "docs/fluxo/app/pro-fotos-remover.png",
+ "app/pro-mensagens.png": "docs/fluxo/app/pro-mensagens.png",
+ "app/pro-mensagens-vazio.png": "docs/fluxo/app/pro-mensagens-vazio.png",
+ "app/pro-chat-opcoes.png": "docs/fluxo/app/pro-chat-opcoes.png",
+ "app/pro-chat-cancelar.png": "docs/fluxo/app/pro-chat-cancelar.png",
+ "app/pro-denunciar.png": "docs/fluxo/app/pro-denunciar.png",
+ "app/pro-denuncia-enviada.png": "docs/fluxo/app/pro-denuncia-enviada.png",
+ "app/pro-chat-encerrado.png": "docs/fluxo/app/pro-chat-encerrado.png"
 }

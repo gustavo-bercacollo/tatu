@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
@@ -68,6 +69,7 @@ Future<bool> confirmar(
   bool iconeAviso = true,
   bool esquerda = false,
   String? nota,
+  String? aviso,
 }) async =>
     await perguntar(
       context,
@@ -81,6 +83,7 @@ Future<bool> confirmar(
       iconeAviso: iconeAviso,
       esquerda: esquerda,
       nota: nota,
+      aviso: aviso,
     ) ??
     false;
 
@@ -100,6 +103,7 @@ Future<bool?> perguntar(
   bool iconeAviso = true,
   bool esquerda = false,
   String? nota,
+  String? aviso,
 }) async {
   final alinhar = esquerda ? TextAlign.left : TextAlign.center;
   return mostrarFolha<bool>(
@@ -165,6 +169,39 @@ Future<bool?> perguntar(
                 Text(nota, textAlign: alinhar, style: TatuTexto.nota),
               ],
               const SizedBox(height: TatuMedidas.entreSecoes),
+              if (aviso != null) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  decoration: BoxDecoration(
+                    color: TatuColors.warningSoft,
+                    borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        TablerIcons.alert_triangle,
+                        size: 20,
+                        color: TatuColors.warningTexto,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          aviso,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: TatuColors.warningTexto,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: TatuMedidas.entreItens + 4),
+              ],
               if (destacarCancelar) botaoCancelar else botaoConfirmar,
               const SizedBox(height: 10),
               if (destacarCancelar) botaoConfirmar else botaoCancelar,
@@ -178,9 +215,12 @@ Future<bool?> perguntar(
 
 /// Folha com uma lista de opções (ícone + texto) e "Cancelar".
 class FolhaOpcoes extends StatelessWidget {
-  const FolhaOpcoes({super.key, required this.itens});
+  const FolhaOpcoes({super.key, required this.itens, this.fechar = 'Cancelar'});
 
   final List<ItemLista> itens;
+
+  /// Botão cinza embaixo ("Cancelar" ou "Fechar").
+  final String fechar;
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +244,7 @@ class FolhaOpcoes extends StatelessWidget {
             FilledButton(
               style: tatuBotaoSecundario(),
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancelar'),
+              child: Text(fechar),
             ),
           ],
         ),

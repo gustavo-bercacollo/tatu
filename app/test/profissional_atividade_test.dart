@@ -47,7 +47,10 @@ void main() {
     await t.pumpAndSettle();
     expect(find.text('Você está offline'), findsOneWidget);
     await t.tap(find.text('Mensagens'));
-    await t.pump();
-    expect(find.text('Mensagens: em breve'), findsOneWidget);
+    await t.pumpAndSettle();
+    expect(find.text('Buscar conversa'), findsOneWidget);
+    await t.tap(find.text('Perfil'));
+    await t.pumpAndSettle();
+    expect(find.text('Trocar para modo cliente'), findsOneWidget);
   });
 }
