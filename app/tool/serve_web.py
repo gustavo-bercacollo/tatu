@@ -17,6 +17,7 @@ import functools
 import http.server
 import socket
 import ssl
+import threading
 from pathlib import Path
 
 PORTA = 8080
@@ -49,15 +50,42 @@ def ip_local():
         s.close()
 
 
+PORTA_HTTPS = 8443
+
+
+class ParaHttps(http.server.BaseHTTPRequestHandler):
+    """No endereço http antigo, manda o navegador para o https."""
+
+    def do_GET(self):
+        host = (self.headers.get("Host") or ip_local()).split(":")[0]
+        self.send_response(301)
+        self.send_header("Location", f"https://{host}:{PORTA_HTTPS}{self.path}")
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+
+    do_HEAD = do_GET
+
+    def log_message(self, *args):
+        pass
+
+
 if __name__ == "__main__":
     handler = functools.partial(SemCache, directory=str(PASTA))
-    with http.server.ThreadingHTTPServer(("0.0.0.0", PORTA), handler) as srv:
-        protocolo = "http"
-        if CERT.exists() and CHAVE.exists():
-            ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-            ctx.load_cert_chain(CERT, CHAVE)
-            srv.socket = ctx.wrap_socket(srv.socket, server_side=True)
-            protocolo = "https"
+    ip = ip_local()
+    if CERT.exists() and CHAVE.exists():
+        # HTTPS (a câmera ao vivo precisa) + o http antigo redirecionando.
+        https = http.server.ThreadingHTTPServer(("0.0.0.0", PORTA_HTTPS), handler)
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ctx.load_cert_chain(CERT, CHAVE)
+        https.socket = ctx.wrap_socket(https.socket, server_side=True)
+        redireciona = http.server.ThreadingHTTPServer(("0.0.0.0", PORTA), ParaHttps)
+        threading.Thread(target=redireciona.serve_forever, daemon=True).start()
         print(f"Servindo {PASTA}")
-        print(f"No celular (mesmo Wi-Fi): {protocolo}://{ip_local()}:{PORTA}")
-        srv.serve_forever()
+        print(f"No celular (mesmo Wi-Fi): http://{ip}:{PORTA}  (vai sozinho para https://{ip}:{PORTA_HTTPS})")
+        print('Na 1a vez o celular avisa "nao seguro": Avancado > Continuar.')
+        https.serve_forever()
+    else:
+        with http.server.ThreadingHTTPServer(("0.0.0.0", PORTA), handler) as srv:
+            print(f"Servindo {PASTA}")
+            print(f"No celular (mesmo Wi-Fi): http://{ip}:{PORTA}")
+            srv.serve_forever()
