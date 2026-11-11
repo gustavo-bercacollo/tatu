@@ -15,6 +15,7 @@ class TatuChip extends StatelessWidget {
     this.seta = false,
     this.iconeFixo,
     this.pequeno = false,
+    this.desabilitado = false,
   });
 
   final String label;
@@ -33,14 +34,25 @@ class TatuChip extends StatelessWidget {
   /// Versão menor, para botões dentro de cartões.
   final bool pequeno;
 
+  /// Apagado (ex.: já tem 3 escolhidos). Ainda recebe o toque.
+  final bool desabilitado;
+
   @override
   Widget build(BuildContext context) {
-    final cor = selecionado ? TatuColors.onAction : TatuColors.textPrimary;
+    final cor = selecionado
+        ? TatuColors.onAction
+        : desabilitado
+        ? TatuColors.textDisabled
+        : TatuColors.textPrimary;
     return Semantics(
       selected: selecionado,
       button: true,
       child: Material(
-        color: selecionado ? TatuColors.action : TatuColors.fill,
+        color: selecionado
+            ? TatuColors.action
+            : desabilitado
+            ? TatuColors.surfaceGrouped
+            : TatuColors.fill,
         shape: const StadiumBorder(),
         child: InkWell(
           onTap: onTap,

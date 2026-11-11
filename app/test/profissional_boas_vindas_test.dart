@@ -17,7 +17,7 @@ void main() {
     expect(find.text('O cadastro leva uns 5 minutos'), findsOneWidget);
     expect(find.text('Verificação'), findsOneWidget);
     await t.tap(find.text('Começar cadastro'));
-    await t.pump();
-    expect(find.text('Cadastro: em breve'), findsOneWidget);
+    await t.pumpAndSettle();
+    expect(find.text('Seus dados'), findsOneWidget);
   });
 }

@@ -5,6 +5,8 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
+import '../../../shared/widgets/nota_icone.dart';
+import 'dados_page.dart';
 
 /// Passos do cadastro do profissional (barra de progresso).
 const passosCadastro = ['Dados', 'Serviços', 'Receber', 'Verificação'];
@@ -20,22 +22,22 @@ class BoasVindasProfissionalPage extends StatelessWidget {
       titulo: 'Trabalhe com o que você sabe fazer',
       subtitulo: 'Receba chamados de clientes perto de você, quando quiser.',
       botao: 'Começar cadastro',
-      onBotao: () => ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('Cadastro: em breve'))),
+      onBotao: () => Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => const DadosProfissionalPage())),
       notaBotao: 'Tenha em mãos um documento com foto.',
       children: const [
-        _Vantagem(
+        ItemVantagem(
           icone: TablerIcons.map_pin,
           titulo: 'Clientes perto de você',
           texto: 'Só chamados da sua região, sem sair procurando.',
         ),
-        _Vantagem(
+        ItemVantagem(
           icone: TablerIcons.wallet,
           titulo: 'Receba pelo app',
           texto: 'Sem maquininha e sem troco.',
         ),
-        _Vantagem(
+        ItemVantagem(
           icone: TablerIcons.clock,
           titulo: 'Você escolhe quando',
           texto: 'Fique online só nos horários que quiser.',
@@ -45,53 +47,6 @@ class BoasVindasProfissionalPage extends StatelessWidget {
         SizedBox(height: TatuMedidas.entreItens),
         ProgressoCadastro(feitos: 0),
       ],
-    );
-  }
-}
-
-class _Vantagem extends StatelessWidget {
-  const _Vantagem({
-    required this.icone,
-    required this.titulo,
-    required this.texto,
-  });
-
-  final IconData icone;
-  final String titulo;
-  final String texto;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: TatuMedidas.entreSecoes),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 46,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: Icon(icone, size: 24),
-            ),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  titulo,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(texto, style: TatuTexto.detalhe),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

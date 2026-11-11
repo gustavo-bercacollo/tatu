@@ -14,15 +14,21 @@ import '../../../shared/widgets/tatu_chip.dart';
 
 /// Folha "Outros serviços": lista por grupos, busca e "Não sei qual
 /// serviço". Devolve o nome escolhido ou [naoSeiServico].
-Future<String?> escolherOutroServico(BuildContext context) =>
-    mostrarFolha<String>(
-      context,
-      alturaRelativa: 0.93,
-      builder: (_) => const _FolhaOutros(),
-    );
+/// Com [profissional], é a lista "Outras profissões" do cadastro do
+/// profissional (sem "Não sei qual serviço").
+Future<String?> escolherOutroServico(
+  BuildContext context, {
+  bool profissional = false,
+}) => mostrarFolha<String>(
+  context,
+  alturaRelativa: 0.93,
+  builder: (_) => _FolhaOutros(profissional: profissional),
+);
 
 class _FolhaOutros extends StatefulWidget {
-  const _FolhaOutros();
+  const _FolhaOutros({this.profissional = false});
+
+  final bool profissional;
 
   @override
   State<_FolhaOutros> createState() => _FolhaOutrosState();
@@ -59,9 +65,11 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
             const SizedBox(height: TatuMedidas.entreItens + 4),
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Outros serviços',
+                    widget.profissional
+                        ? 'Outras profissões'
+                        : 'Outros serviços',
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w700,
@@ -90,7 +98,7 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
             ),
             const SizedBox(height: TatuMedidas.entreItens + 4),
             CampoBusca(
-              hint: 'Buscar serviço',
+              hint: widget.profissional ? 'Buscar profissão' : 'Buscar serviço',
               controller: _busca,
               onChanged: (_) => setState(() {}),
             ),
@@ -157,10 +165,12 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
             ],
           ),
         ),
-        const Divider(height: 1),
-        const SizedBox(height: TatuMedidas.entreItens + 4),
-        _NaoSei(onTap: () => _escolher(naoSeiServico)),
-        const SizedBox(height: TatuMedidas.base),
+        if (!widget.profissional) ...[
+          const Divider(height: 1),
+          const SizedBox(height: TatuMedidas.entreItens + 4),
+          _NaoSei(onTap: () => _escolher(naoSeiServico)),
+          const SizedBox(height: TatuMedidas.base),
+        ],
       ],
     );
   }
@@ -183,8 +193,10 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
               ),
           ],
         ),
-        const SizedBox(height: TatuMedidas.entreSecoes),
-        _NaoSei(onTap: () => _escolher(naoSeiServico)),
+        if (!widget.profissional) ...[
+          const SizedBox(height: TatuMedidas.entreSecoes),
+          _NaoSei(onTap: () => _escolher(naoSeiServico)),
+        ],
       ],
     );
   }
@@ -209,23 +221,30 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
           ),
         ),
         const SizedBox(height: TatuMedidas.entreSecoes),
-        const Text(
-          'Não achamos esse serviço',
+        Text(
+          widget.profissional
+              ? 'Não achamos essa profissão'
+              : 'Não achamos esse serviço',
           textAlign: TextAlign.center,
           style: TatuTexto.tituloFolha,
         ),
         const SizedBox(height: 8),
-        const Text(
-          'Toque abaixo e a gente procura quem\nresolve pela sua descrição.',
+        Text(
+          widget.profissional
+              ? 'Sugira essa profissão e avisamos\nquando ela entrar no Tatu.'
+              : 'Toque abaixo e a gente procura quem\nresolve pela sua descrição.',
           textAlign: TextAlign.center,
           style: TatuTexto.corpo,
         ),
         const SizedBox(height: TatuMedidas.entreSecoes + 8),
-        _NaoSei(onTap: () => _escolher(naoSeiServico)),
+        if (!widget.profissional)
+          _NaoSei(onTap: () => _escolher(naoSeiServico)),
         const SizedBox(height: TatuMedidas.entreItens),
         Center(
           child: LinkAzul(
-            'Sugerir esse serviço ao Tatu',
+            widget.profissional
+                ? 'Sugerir essa profissão ao Tatu'
+                : 'Sugerir esse serviço ao Tatu',
             onTap: () => mostrarAvisoTopo(
               context,
               titulo: 'Sugestão enviada',

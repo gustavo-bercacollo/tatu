@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'tatu_colors.dart';
+import 'tatu_medidas.dart';
 
 /// Botão secundário: cinza claro com texto preto (ex.: "Usar e-mail").
 ButtonStyle tatuBotaoSecundario() => FilledButton.styleFrom(
@@ -44,5 +45,20 @@ ThemeData tatuTheme() => ThemeData(
   dividerTheme: const DividerThemeData(
     thickness: 0.5,
     color: TatuColors.hairline,
+  ),
+);
+
+/// Botão com contorno cinza (ex.: "Adicionar outra profissão").
+ButtonStyle tatuBotaoContorno() => OutlinedButton.styleFrom(
+  foregroundColor: TatuColors.textPrimary,
+  minimumSize: const Size.fromHeight(TatuMedidas.alturaBotao),
+  side: const BorderSide(color: TatuColors.chevron),
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+  ),
+  textStyle: const TextStyle(
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
   ),
 );

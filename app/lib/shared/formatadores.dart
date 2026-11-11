@@ -51,3 +51,16 @@ String formatarCelular(String digitos) => MascaraFormatter(moldeCelular)
 /// E-mail com cara de válido (algo@algo.algo).
 bool emailValido(String e) =>
     RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(e.trim());
+
+/// 150 → "R$ 150,00"; 1234.5 → "R$ 1.234,50".
+String reais(num valor) {
+  final centavos = (valor * 100).round();
+  final inteiro = (centavos ~/ 100).toString();
+  final b = StringBuffer();
+  for (var i = 0; i < inteiro.length; i++) {
+    if (i > 0 && (inteiro.length - i) % 3 == 0) b.write('.');
+    b.write(inteiro[i]);
+  }
+  final cent = (centavos % 100).toString().padLeft(2, '0');
+  return 'R\$ $b,$cent';
+}

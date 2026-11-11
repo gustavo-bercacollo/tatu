@@ -7,6 +7,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/profissional.dart';
+import 'package:tatu/features/profissional/cadastro/dados_page.dart';
+import 'package:tatu/features/profissional/cadastro/especialidades_page.dart';
+import 'package:tatu/features/profissional/cadastro/pix_page.dart';
+import 'package:tatu/features/profissional/cadastro/profissoes_page.dart';
+import 'package:tatu/features/profissional/cadastro/resultado_page.dart';
+import 'package:tatu/features/profissional/cadastro/servicos_page.dart';
+import 'package:tatu/features/profissional/cadastro/verificacao_page.dart';
+import 'package:tatu/features/profissional/home/home_profissional_page.dart';
+import 'package:tatu/features/profissional/perfil/perfil_profissional_page.dart';
+import 'package:tatu/features/profissional/perfil/previa_page.dart';
+import 'package:tatu/features/profissional/perfil/regiao_page.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/ajuda.dart';
 import 'package:tatu/data/avaliacoes.dart';
@@ -110,6 +122,7 @@ Future<void> _capturar(
   pedidos.restaurar();
   conversas.restaurar();
   chamado.restaurar();
+  profissional.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -154,6 +167,7 @@ void main() {
       preparar: () async {
         await t.enterText(find.byType(TextField), '11988887777');
         await t.pump();
+        await t.pump();
       },
     );
   });
@@ -177,6 +191,7 @@ void main() {
       const CelularPage.entrar(),
       preparar: () async {
         await t.enterText(find.byType(TextField), '11988887777');
+        await t.pump();
         await t.pump();
       },
     );
@@ -1153,6 +1168,334 @@ void main() {
       preparar: () async {
         await t.enterText(find.byType(TextField).first, 'Ana');
         await t.enterText(find.byType(TextField).last, 'Martins');
+        await t.pump();
+      },
+    );
+  });
+
+  // ── Profissional ──────────────────────────────────────────────
+  void cadastroEmCurso() {
+    profissional.salvarDados(
+      nome: 'Luiza Vilela',
+      cpf: '12345678909',
+      celular: '11977776666',
+    );
+    profissional.feminino = true;
+  }
+
+  testWidgets('pro-dados', (t) async {
+    await _capturar(t, 'pro-dados', const DadosProfissionalPage());
+  });
+
+  testWidgets('pro-servicos', (t) async {
+    await _capturar(
+      t,
+      'pro-servicos',
+      const ServicosProfissionalPage(),
+      preparar: () async {
+        await t.tap(find.text('Encanador'));
+        await t.tap(find.text('Eletricista'));
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-outras', (t) async {
+    await _capturar(
+      t,
+      'pro-outras',
+      const ServicosProfissionalPage(),
+      preparar: () async {
+        await t.tap(find.text('Outros'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-especialidades', (t) async {
+    await _capturar(
+      t,
+      'pro-especialidades',
+      const SizedBox(),
+      preparar: () async {
+        profissional.definirProfissoes(const [
+          ProfissaoEscolhida('Encanador'),
+          ProfissaoEscolhida('Eletricista'),
+        ]);
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: const EspecialidadesPage(indice: 0),
+          ),
+        );
+        await t.tap(find.text('Reparos'));
+        await t.tap(find.text('Instalações'));
+        await t.tap(find.text('Esgoto'));
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-profissoes', (t) async {
+    await _capturar(
+      t,
+      'pro-profissoes',
+      const ProfissoesPage(),
+      preparar: () async {
+        profissional.definirProfissoes(const [
+          ProfissaoEscolhida('Encanador', ['Reparos', 'Instalações', 'Esgoto']),
+        ]);
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-pix', (t) async {
+    cadastroEmCurso();
+    await _capturar(
+      t,
+      'pro-pix',
+      const PixPage(),
+      preparar: () async {
+        cadastroEmCurso();
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: const PixPage(),
+          ),
+        );
+      },
+    );
+  });
+
+  testWidgets('pro-pix-erro', (t) async {
+    await _capturar(
+      t,
+      'pro-pix-erro',
+      const SizedBox(),
+      preparar: () async {
+        cadastroEmCurso();
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: const PixPage(),
+          ),
+        );
+        await t.tap(find.text('Celular'));
+        await t.pump();
+        await t.enterText(find.byType(TextField), '11988887777');
+        await t.pump();
+        await t.tap(find.text('Salvar e continuar'));
+        await t.pump(const Duration(seconds: 2));
+      },
+    );
+  });
+
+  testWidgets('pro-pix-confirmando', (t) async {
+    await _capturar(
+      t,
+      'pro-pix-confirmando',
+      const SizedBox(),
+      preparar: () async {
+        cadastroEmCurso();
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: const PixPage(),
+          ),
+        );
+        await t.tap(find.text('Salvar e continuar'));
+        await t.pump(const Duration(milliseconds: 300));
+      },
+    );
+  });
+
+  testWidgets('pro-taxas', (t) async {
+    await _capturar(
+      t,
+      'pro-taxas',
+      const PixPage(),
+      preparar: () async {
+        await t.tap(find.text('Ver taxas do Tatu'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-pix-depois', (t) async {
+    await _capturar(
+      t,
+      'pro-pix-depois',
+      const PixPage(),
+      preparar: () async {
+        await t.tap(find.text('Fazer isso depois'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-verificacao', (t) async {
+    await _capturar(t, 'pro-verificacao', const VerificacaoIntroPage());
+  });
+
+  testWidgets('pro-camera-documento', (t) async {
+    await _capturar(
+      t,
+      'pro-camera-documento',
+      const CameraVerificacaoPage(etapa: EtapaFoto.frente),
+    );
+  });
+
+  testWidgets('pro-selfie', (t) async {
+    await _capturar(
+      t,
+      'pro-selfie',
+      const CameraVerificacaoPage(etapa: EtapaFoto.selfie),
+    );
+  });
+
+  testWidgets('pro-em-analise', (t) async {
+    await _capturar(
+      t,
+      'pro-em-analise',
+      const SizedBox(),
+      preparar: () async {
+        profissional.demo(aprovada: false);
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: const EmAnalisePage(),
+          ),
+        );
+      },
+    );
+  });
+
+  testWidgets('pro-refazer', (t) async {
+    await _capturar(
+      t,
+      'pro-refazer',
+      const SizedBox(),
+      preparar: () async {
+        profissional.demo(aprovada: false);
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: const RefazerFotoPage(),
+          ),
+        );
+      },
+    );
+  });
+
+  testWidgets('pro-reprovado', (t) async {
+    await _capturar(t, 'pro-reprovado', const ReprovadoPage());
+  });
+
+  Future<void> comDemo(
+    WidgetTester t,
+    String nome,
+    Widget tela, {
+    bool comPix = true,
+    bool dica = false,
+    Future<void> Function()? depois,
+  }) => _capturar(
+    t,
+    nome,
+    const SizedBox(),
+    preparar: () async {
+      profissional.demo(comPix: comPix);
+      if (dica) profissional.dicaVista = false;
+      await t.pumpWidget(
+        MaterialApp(
+          theme: tatuTheme(),
+          debugShowCheckedModeBanner: false,
+          home: tela,
+        ),
+      );
+      if (depois != null) await depois();
+    },
+  );
+
+  testWidgets('pro-aprovado', (t) async {
+    await comDemo(t, 'pro-aprovado', const AprovadoPage());
+  });
+
+  testWidgets('pro-home-dica', (t) async {
+    await comDemo(
+      t,
+      'pro-home-dica',
+      const HomeProfissionalPage(),
+      comPix: false,
+      dica: true,
+    );
+  });
+
+  testWidgets('pro-home-sem-pix', (t) async {
+    await comDemo(
+      t,
+      'pro-home-sem-pix',
+      const HomeProfissionalPage(),
+      comPix: false,
+    );
+  });
+
+  testWidgets('pro-home-offline', (t) async {
+    await comDemo(t, 'pro-home-offline', const HomeProfissionalPage());
+  });
+
+  testWidgets('pro-home-online', (t) async {
+    await comDemo(
+      t,
+      'pro-home-online',
+      const HomeProfissionalPage(),
+      depois: () async {
+        await t.tap(find.text('Ficar online'));
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-perfil', (t) async {
+    await comDemo(t, 'pro-perfil', const PerfilProfissionalPage());
+  });
+
+  testWidgets('pro-trocar-online', (t) async {
+    await comDemo(
+      t,
+      'pro-trocar-online',
+      const PerfilProfissionalPage(),
+      depois: () async {
+        profissional.ficarOnline(true);
+        await t.pump();
+        await t.scrollUntilVisible(find.text('Trocar para modo cliente'), 200);
+        await t.tap(find.text('Trocar para modo cliente'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-regiao', (t) async {
+    await comDemo(t, 'pro-regiao', const RegiaoPage());
+  });
+
+  testWidgets('pro-previa', (t) async {
+    await comDemo(t, 'pro-previa', const PreviaPage());
+  });
+
+  testWidgets('pro-previa-avaliacoes', (t) async {
+    await comDemo(
+      t,
+      'pro-previa-avaliacoes',
+      const PreviaPage(),
+      depois: () async {
+        await t.drag(find.byType(ListView).first, const Offset(0, -700));
         await t.pump();
       },
     );

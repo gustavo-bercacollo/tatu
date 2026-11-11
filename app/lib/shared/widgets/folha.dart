@@ -28,12 +28,13 @@ Future<T?> mostrarFolha<T>(
   BuildContext context, {
   required WidgetBuilder builder,
   double? alturaRelativa,
+  Color fundo = TatuColors.bg,
 }) {
   return showModalBottomSheet<T>(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    backgroundColor: TatuColors.bg,
+    backgroundColor: fundo,
     barrierColor: TatuColors.scrim,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(
@@ -65,6 +66,8 @@ Future<bool> confirmar(
   bool destacarCancelar = false,
   IconData? icone,
   bool iconeAviso = true,
+  bool esquerda = false,
+  String? nota,
 }) async =>
     await perguntar(
       context,
@@ -76,11 +79,15 @@ Future<bool> confirmar(
       destacarCancelar: destacarCancelar,
       icone: icone,
       iconeAviso: iconeAviso,
+      esquerda: esquerda,
+      nota: nota,
     ) ??
     false;
 
 /// Como [confirmar], mas devolve `null` se a pessoa fechar a folha sem
 /// escolher (para quando "cancelar" também é uma ação, ex.: "Ver pedido").
+/// [esquerda] alinha ícone e textos à esquerda; [nota] é uma linha pequena
+/// abaixo do texto (ex.: "Você cadastra quando quiser, em Perfil.").
 Future<bool?> perguntar(
   BuildContext context, {
   required String titulo,
@@ -91,7 +98,10 @@ Future<bool?> perguntar(
   bool destacarCancelar = false,
   IconData? icone,
   bool iconeAviso = true,
+  bool esquerda = false,
+  String? nota,
 }) async {
+  final alinhar = esquerda ? TextAlign.left : TextAlign.center;
   return mostrarFolha<bool>(
     context,
     builder: (ctx) {
@@ -125,7 +135,8 @@ Future<bool?> perguntar(
               const AlcaFolha(),
               const SizedBox(height: 26),
               if (icone != null) ...[
-                Center(
+                Align(
+                  alignment: esquerda ? Alignment.centerLeft : Alignment.center,
                   child: Container(
                     width: 52,
                     height: 52,
@@ -146,13 +157,13 @@ Future<bool?> perguntar(
                 ),
                 const SizedBox(height: 16),
               ],
-              Text(
-                titulo,
-                textAlign: TextAlign.center,
-                style: TatuTexto.tituloFolha,
-              ),
+              Text(titulo, textAlign: alinhar, style: TatuTexto.tituloFolha),
               const SizedBox(height: 8),
-              Text(texto, textAlign: TextAlign.center, style: TatuTexto.corpo),
+              Text(texto, textAlign: alinhar, style: TatuTexto.corpo),
+              if (nota != null) ...[
+                const SizedBox(height: 10),
+                Text(nota, textAlign: alinhar, style: TatuTexto.nota),
+              ],
               const SizedBox(height: TatuMedidas.entreSecoes),
               if (destacarCancelar) botaoCancelar else botaoConfirmar,
               const SizedBox(height: 10),
