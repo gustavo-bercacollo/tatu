@@ -327,6 +327,11 @@ class ProfissionalRepo extends ChangeNotifier {
     notifyListeners();
   }
 
+  void definirSobre(String texto) {
+    sobre = texto.trim();
+    notifyListeners();
+  }
+
   void definirRaio(int km) {
     raioKm = km;
     notifyListeners();

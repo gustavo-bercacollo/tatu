@@ -200,5 +200,9 @@
  "app/pro-ganhos-mes.png": "docs/fluxo/app/pro-ganhos-mes.png",
  "app/pro-chat-proposta.png": "docs/fluxo/app/pro-chat-proposta.png",
  "app/pro-chat-combinado.png": "docs/fluxo/app/pro-chat-combinado.png",
- "app/pro-sem-acordo.png": "docs/fluxo/app/pro-sem-acordo.png"
+ "app/pro-sem-acordo.png": "docs/fluxo/app/pro-sem-acordo.png",
+ "app/pro-sobre.png": "docs/fluxo/app/pro-sobre.png",
+ "app/pro-sobre-sugestao.png": "docs/fluxo/app/pro-sobre-sugestao.png",
+ "app/pro-sobre-melhorado.png": "docs/fluxo/app/pro-sobre-melhorado.png",
+ "app/pro-sobre-contato.png": "docs/fluxo/app/pro-sobre-contato.png"
 }

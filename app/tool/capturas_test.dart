@@ -23,6 +23,8 @@ import 'package:tatu/features/profissional/home/home_profissional_page.dart';
 import 'package:tatu/features/profissional/perfil/perfil_profissional_page.dart';
 import 'package:tatu/features/profissional/perfil/previa_page.dart';
 import 'package:tatu/features/profissional/perfil/regiao_page.dart';
+import 'package:tatu/features/profissional/perfil/sobre_page.dart';
+import 'package:tatu/data/sobre_ia.dart';
 import 'package:tatu/features/profissional/servico/andamento_page.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/ajuda.dart';
@@ -1629,5 +1631,68 @@ void main() {
 
   testWidgets('pro-ganhos-mes', (t) async {
     await _capturar(t, 'pro-ganhos-mes', const GanhosPage(periodo: 2));
+  });
+
+  const rascunho =
+      'sou encanadora faz 9 anos, faço vazamento chuveiro e parte eletrica '
+      'atendo zona sul sabado tbm';
+  const ia = MelhoriaTextoMock(espera: Duration.zero);
+
+  testWidgets('pro-sobre', (t) async {
+    await _capturar(
+      t,
+      'pro-sobre',
+      const SobrePage(ia: ia),
+      preparar: () async {
+        await t.enterText(find.byType(TextField), rascunho);
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-sobre-sugestao', (t) async {
+    await _capturar(
+      t,
+      'pro-sobre-sugestao',
+      const SobrePage(ia: ia),
+      preparar: () async {
+        await t.enterText(find.byType(TextField), rascunho);
+        await t.pump();
+        await t.tap(find.text('Melhorar com IA'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-sobre-melhorado', (t) async {
+    await _capturar(
+      t,
+      'pro-sobre-melhorado',
+      const SobrePage(ia: ia),
+      preparar: () async {
+        await t.enterText(find.byType(TextField), rascunho);
+        await t.pump();
+        await t.tap(find.text('Melhorar com IA'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Usar este texto'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-sobre-contato', (t) async {
+    await _capturar(
+      t,
+      'pro-sobre-contato',
+      const SobrePage(ia: ia),
+      preparar: () async {
+        await t.enterText(
+          find.byType(TextField),
+          'Encanadora há 9 anos. Atendo a zona sul. Orçamento rápido, '
+          'me chama no (11) 98888-7777',
+        );
+        await t.pump();
+      },
+    );
   });
 }

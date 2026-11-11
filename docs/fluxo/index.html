@@ -193,7 +193,7 @@ path.entre { opacity: .5; }
 /* ===== DADOS =====
    status: app (já no app, imagem real) · desenho (desenho pronto, ainda não no app) · andamento (tela ainda não desenhada)
    Para atualizar: mudar o status/imagem da tela, ou acrescentar telas e ligações. */
-const ATUALIZADO = '11/11/2026';
+const ATUALIZADO = '12/11/2026';
 
 const ETAPAS = {
   entrada:   { nome: 'Entrada e cadastro', lado: 'ambos' },
@@ -393,11 +393,14 @@ const TELAS_RAW = [
   ['p29b','P29b','Atividade · em andamento (vazio)','contaP','app','docs/fluxo/app/pro-atividade-andamento.png'],
   ['p30','P30','Ganhos','contaP','app','docs/fluxo/app/pro-ganhos.png',["Hoje · Semana · Mês; barras só na semana","“A receber” não entra no total"]],
   ['p30b','P30b','Ganhos · mês','contaP','app','docs/fluxo/app/pro-ganhos-mes.png'],
-  ['p31','P31','Perfil do profissional','contaP','app','docs/fluxo/app/pro-perfil.png',["Inclui “Trocar para modo cliente”","No app, Fotos, Sobre, Notificações, Dados da conta, Ajuda e Privacidade ainda mostram “em breve”"]],
+  ['p31','P31','Perfil do profissional','contaP','app','docs/fluxo/app/pro-perfil.png',["Inclui “Trocar para modo cliente”","No app, Fotos, Notificações, Dados da conta, Ajuda e Privacidade ainda mostram “em breve”"]],
   ['p32','P32','Prévia: como o cliente vê','contaP','app','docs/fluxo/app/pro-previa.png'],
   ['p32b','P32b','Prévia · fotos, medalhas e avaliações','contaP','app','docs/fluxo/app/pro-previa-avaliacoes.png'],
   ['pa-fotos','—','Fotos de trabalhos','contaP','andamento'],
-  ['pa-sobre','—','Sobre você','contaP','andamento'],
+  ['pa-sobre','—','Sobre você','contaP','app','docs/fluxo/app/pro-sobre.png',["Até 300 caracteres; aparece no perfil","“Melhorar com IA” (protótipo: IA simulada)"]],
+  ['pa-sobre2','—','Sobre você · sugestão de texto','contaP','app','docs/fluxo/app/pro-sobre-sugestao.png'],
+  ['pa-sobre3','—','Sobre você · texto melhorado','contaP','app','docs/fluxo/app/pro-sobre-melhorado.png'],
+  ['pa-sobre4','—','Sobre você · contato bloqueado','contaP','app','docs/fluxo/app/pro-sobre-contato.png',["Telefone, e-mail, @usuário, links e redes sociais não passam","Salvar fica desligado"]],
   ['pa-regiao','—','Região de atendimento','contaP','app','docs/fluxo/app/pro-regiao.png',["2 a 20 km; só o profissional configura raio"]],
   ['pa-verif','—','Verificação','contaP','andamento'],
   ['pa-notif','—','Notificações','contaP','andamento'],
@@ -731,6 +734,11 @@ const LIGACOES = [
   ['p31','p08','Onde receber','t'],
   ['p31','pa-fotos','Fotos de trabalhos','t'],
   ['p31','pa-sobre','Sobre você','t'],
+  ['pa-sobre','pa-sobre2','Melhorar com IA','t'],
+  ['pa-sobre2','pa-sobre3','Usar este texto','t'],
+  ['pa-sobre2','pa-sobre','Manter o meu','t'],
+  ['pa-sobre','pa-sobre4','texto com telefone, e-mail ou rede social','e'],
+  ['pa-sobre3','p31','Salvar','t'],
   ['p31','pa-regiao','Região de atendimento','t'],
   ['p31','pa-verif','Verificação','t'],
   ['p31','pa-notif','Notificações','t'],

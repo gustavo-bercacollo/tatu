@@ -15,6 +15,7 @@ import '../cadastro/resultado_page.dart';
 import '../home/home_profissional_page.dart';
 import 'previa_page.dart';
 import 'regiao_page.dart';
+import 'sobre_page.dart';
 
 /// P31 · Perfil do profissional.
 class PerfilProfissionalPage extends StatelessWidget {
@@ -180,7 +181,7 @@ class PerfilProfissionalPage extends StatelessWidget {
                         ItemLista(
                           icone: TablerIcons.user,
                           texto: 'Sobre você',
-                          onTap: () => _emBreve(context, 'Sobre você'),
+                          onTap: () => _abrir(context, const SobrePage()),
                         ),
                         ItemLista(
                           icone: TablerIcons.map_pin,
