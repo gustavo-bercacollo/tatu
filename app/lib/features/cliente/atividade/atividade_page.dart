@@ -164,22 +164,29 @@ class _CartaoAndamento extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${pedido.servico} · ${pedido.primeiroNome}',
+                      pedido.profissional,
                       style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(pedido.endereco, style: TatuTexto.nota),
+                    Text(
+                      '${pedido.servico} · ${pedido.descricao}',
+                      style: TatuTexto.nota,
+                    ),
                   ],
                 ),
               ),
-              SeloVerde(pedido.situacao),
+              const SizedBox(width: 8),
+              SeloPreto(pedido.chegaEm),
             ],
           ),
-          const SizedBox(height: TatuMedidas.entreItens),
-          LinhaDoTempo(etapas: etapasPedido, feitas: pedido.etapasFeitas),
+          const SizedBox(height: TatuMedidas.entreSecoes),
+          LinhaDoTempoHorizontal(
+            etapas: etapasCurtas,
+            feitas: pedido.etapasFeitas,
+          ),
         ],
       ),
     );
@@ -450,30 +457,40 @@ class _CartaoConcluido extends StatelessWidget {
           const SizedBox(height: TatuMedidas.entreItens),
           Row(
             children: [
-              // Quebra de linha se não couber (telas estreitas).
+              // Uma linha só; em telas estreitas os botões encolhem um pouco.
               Expanded(
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    TatuChip(
-                      label: 'Pedir de novo',
-                      onTap: () => abrirPedirDeNovo(context, p),
-                    ),
-                    if (!p.cancelado)
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    spacing: 8,
+                    children: [
                       TatuChip(
-                        label: 'Recibo',
-                        onTap: () => abrir(ReciboPage(pedido: p)),
-                      ),
-                    if (!p.cancelado && nota == null)
-                      TatuChip(
-                        label: 'Avaliar',
+                        label: 'Pedir de novo',
+                        iconeFixo: TablerIcons.refresh,
                         selecionado: true,
-                        onTap: () => abrir(AvaliarPage(pedido: p)),
+                        pequeno: true,
+                        onTap: () => abrirPedirDeNovo(context, p),
                       ),
-                  ],
+                      if (!p.cancelado)
+                        TatuChip(
+                          label: 'Recibo',
+                          iconeFixo: TablerIcons.receipt,
+                          pequeno: true,
+                          onTap: () => abrir(ReciboPage(pedido: p)),
+                        ),
+                      if (!p.cancelado && nota == null)
+                        TatuChip(
+                          label: 'Avaliar',
+                          iconeFixo: TablerIcons.star,
+                          pequeno: true,
+                          onTap: () => abrir(AvaliarPage(pedido: p)),
+                        ),
+                    ],
+                  ),
                 ),
               ),
+              if (!p.cancelado && nota != null) const SizedBox(width: 8),
               if (!p.cancelado && nota != null)
                 Semantics(
                   button: true,

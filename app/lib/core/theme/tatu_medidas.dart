@@ -29,6 +29,7 @@ class TatuMedidas {
   static const alturaCampo = 62.0;
   static const alturaBusca = 48.0;
   static const alturaChip = 38.0;
+  static const alturaChipPequeno = 34.0; // botões dentro de cartões
   static const alturaLinha = 52.0;
   static const alturaSegmento = 36.0;
 

@@ -13,6 +13,8 @@ class TatuChip extends StatelessWidget {
     this.selecionado = false,
     this.icone,
     this.seta = false,
+    this.iconeFixo,
+    this.pequeno = false,
   });
 
   final String label;
@@ -24,6 +26,12 @@ class TatuChip extends StatelessWidget {
 
   /// Setinha para baixo: o chip abre uma lista (ex.: "Outros").
   final bool seta;
+
+  /// Ícone sempre visível antes do texto (ex.: botões da Atividade).
+  final IconData? iconeFixo;
+
+  /// Versão menor, para botões dentro de cartões.
+  final bool pequeno;
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +46,10 @@ class TatuChip extends StatelessWidget {
           onTap: onTap,
           customBorder: const StadiumBorder(),
           child: Container(
-            height: TatuMedidas.alturaChip,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            height: pequeno
+                ? TatuMedidas.alturaChipPequeno
+                : TatuMedidas.alturaChip,
+            padding: EdgeInsets.symmetric(horizontal: pequeno ? 12 : 16),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -47,13 +57,17 @@ class TatuChip extends StatelessWidget {
                   Icon(icone, size: 16, color: cor),
                   const SizedBox(width: 6),
                 ],
+                if (iconeFixo != null) ...[
+                  Icon(iconeFixo, size: pequeno ? 16 : 18, color: cor),
+                  SizedBox(width: pequeno ? 6 : 8),
+                ],
                 Flexible(
                   child: Text(
                     label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: pequeno ? 14 : 15,
                       fontWeight: FontWeight.w600,
                       color: cor,
                     ),

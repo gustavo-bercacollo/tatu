@@ -310,6 +310,37 @@ class BarraMensagem extends StatelessWidget {
             ),
           ),
         ),
+        const SizedBox(width: 8),
+        // Enviar (como no WhatsApp): preto quando há texto.
+        ListenableBuilder(
+          listenable: controller,
+          builder: (context, _) {
+            final temTexto = controller.text.trim().isNotEmpty;
+            return Semantics(
+              button: true,
+              label: 'Enviar mensagem',
+              child: Material(
+                color: temTexto ? TatuColors.action : TatuColors.fill,
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: temTexto ? onEnviar : null,
+                  child: SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: Icon(
+                      TablerIcons.send,
+                      size: 18,
+                      color: temTexto
+                          ? TatuColors.onAction
+                          : TatuColors.textSecondary,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ],
     );
   }

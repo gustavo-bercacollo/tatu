@@ -20,7 +20,7 @@ void main() {
 
   testWidgets('Em andamento: pedido e busca em segundo plano', (t) async {
     await _abrirAtividade(t);
-    expect(find.text('Encanador · Luiza'), findsOneWidget);
+    expect(find.text('Encanador · Vazamento na pia'), findsOneWidget);
     expect(find.text('Buscando em segundo plano'), findsOneWidget);
     await t.tap(find.text('Cancelar'));
     await t.pump();
@@ -31,7 +31,7 @@ void main() {
     t,
   ) async {
     await _abrirAtividade(t);
-    await t.tap(find.text('Encanador · Luiza'));
+    await t.tap(find.text('Encanador · Vazamento na pia'));
     await t.pumpAndSettle();
     expect(find.text('Pedido'), findsOneWidget);
     await t.tap(find.text('Cancelar pedido'));

@@ -9,6 +9,15 @@ const etapasPedido = [
   'Pagamento',
 ];
 
+/// Nomes curtos das etapas (linha do tempo na horizontal).
+const etapasCurtas = [
+  'Pedido',
+  'Combinado',
+  'A caminho',
+  'Serviço',
+  'Pagamento',
+];
+
 /// Pedido com profissional, ainda não concluído.
 @immutable
 class PedidoAndamento {
@@ -22,7 +31,11 @@ class PedidoAndamento {
     required this.pagamento,
     required this.etapasFeitas,
     this.chegaEm = '12 min',
+    this.descricao = 'Vazamento na pia',
   });
+
+  /// O que a pessoa pediu (ex.: "Vazamento na pia").
+  final String descricao;
 
   /// Previsão de chegada (ex.: "12 min").
   final String chegaEm;
