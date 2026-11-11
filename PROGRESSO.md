@@ -64,7 +64,8 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 ## Telas do profissional (P1–P13)
 - [x] P1–P5 Cadastro do profissional (`features/profissional/cadastro/`, dados em `data/profissional.dart`): boas-vindas → Seus dados (CPF conferido, SMS com a tela de código do cliente) → Quais serviços (até 3; "Outros" usa a folha do cliente em modo profissão) → Especialidades por serviço ("Encanador · 1 de 2", "Próximo: Eletricista") → Suas profissões → Pix (CPF/celular/e-mail/aleatória; confirmando → ✓ chave salva; erro de chave de outra pessoa; Taxas do Tatu 10% provisório; Fazer isso depois) → Verificação (câmera simulada: frente e verso sozinhos, selfie) → Em análise (Ativar avisos aprova em 3 s, simulado) / Refazer foto / Reprovado / Aprovado
 - [x] Home do profissional (mapa, offline/online, dica da primeira vez, lembrete do Pix), Perfil do profissional (com "Trocar para modo cliente" e folha "Ficar offline e trocar?"), Região de atendimento e Prévia do perfil. "Trocar para modo profissional" abre a Home quando já há cadastro
-- Falta do profissional: Novo chamado (P22) e telas do serviço (a caminho, chegou, em andamento) — os desenhos chegaram, mas dependem do Novo chamado
+- [x] Serviço do profissional (`features/profissional/servico/andamento_page.dart`): A caminho (rota, “Cheguei” libera perto), Você chegou, Serviço em andamento. Ainda sem entrada no app: falta Novo chamado (P22) e chat (P23)
+- Falta do profissional: Novo chamado, chat, cobrar o cliente, avaliar o cliente, Atividade e ganhos
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado
 - [ ] P9 Chat

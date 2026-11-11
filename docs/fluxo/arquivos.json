@@ -185,5 +185,8 @@
  "app/pro-servicos.png": "docs/fluxo/app/pro-servicos.png",
  "app/pro-taxas.png": "docs/fluxo/app/pro-taxas.png",
  "app/pro-trocar-online.png": "docs/fluxo/app/pro-trocar-online.png",
- "app/pro-verificacao.png": "docs/fluxo/app/pro-verificacao.png"
+ "app/pro-verificacao.png": "docs/fluxo/app/pro-verificacao.png",
+ "app/pro-a-caminho.png": "docs/fluxo/app/pro-a-caminho.png",
+ "app/pro-chegou.png": "docs/fluxo/app/pro-chegou.png",
+ "app/pro-em-andamento.png": "docs/fluxo/app/pro-em-andamento.png"
 }

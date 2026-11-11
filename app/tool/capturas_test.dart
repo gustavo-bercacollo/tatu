@@ -19,6 +19,7 @@ import 'package:tatu/features/profissional/home/home_profissional_page.dart';
 import 'package:tatu/features/profissional/perfil/perfil_profissional_page.dart';
 import 'package:tatu/features/profissional/perfil/previa_page.dart';
 import 'package:tatu/features/profissional/perfil/regiao_page.dart';
+import 'package:tatu/features/profissional/servico/andamento_page.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/ajuda.dart';
 import 'package:tatu/data/avaliacoes.dart';
@@ -1498,6 +1499,26 @@ void main() {
         await t.drag(find.byType(ListView).first, const Offset(0, -700));
         await t.pump();
       },
+    );
+  });
+
+  testWidgets('pro-a-caminho', (t) async {
+    await _capturar(
+      t,
+      'pro-a-caminho',
+      const ACaminhoPage(chegaEm: Duration(hours: 1)),
+    );
+  });
+
+  testWidgets('pro-chegou', (t) async {
+    await _capturar(t, 'pro-chegou', const ACaminhoPage(chegou: true));
+  });
+
+  testWidgets('pro-em-andamento', (t) async {
+    await _capturar(
+      t,
+      'pro-em-andamento',
+      EmAndamentoPage(inicio: DateTime(2026, 11, 10, 14, 32)),
     );
   });
 }
