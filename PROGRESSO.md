@@ -73,6 +73,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Mensagens do profissional (`profissional/mensagens/`, dados em `data/conversas_profissional.dart`): lista com busca, selos e vazio; chat com opções (toque no nome), cancelar atendimento (com aviso de posição), denunciar cliente, conversa encerrada. Abas do profissional com Perfil (4 abas)
 - [x] Perfil do profissional com o topo igual ao do cliente: foto ou avatar (mesma foto do modo cliente, `AvatarUsuario(nome:)`), nome com selo e nota; também na Home e na Prévia. 
 - [x] Toque do chamado (`assets/sons/chamado.wav`, marimba gerada aqui; `ToqueChamado` com `audioplayers`, em loop no Novo chamado). Abas do profissional voltaram a 3; o Perfil abre pela foto da Home
+- [x] Ajuda do profissional: as telas da Ajuda do cliente recebem um `ConteudoAjuda` (`conteudoCliente` / `conteudoProfissional` em `data/ajuda.dart`): assuntos, perguntas, artigos (Quando recebo, Taxa), “Ver meus ganhos” abre Ganhos, Sobre o que é?, Qual chamado?, chat com o suporte. Abre pelo Perfil e pelas opções do chat
 - Falta do profissional: cobrar o cliente, avaliar o cliente
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado

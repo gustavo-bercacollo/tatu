@@ -219,5 +219,11 @@
  "app/pro-denunciar.png": "docs/fluxo/app/pro-denunciar.png",
  "app/pro-denuncia-enviada.png": "docs/fluxo/app/pro-denuncia-enviada.png",
  "app/pro-chat-encerrado.png": "docs/fluxo/app/pro-chat-encerrado.png",
- "app/pro-perfil-foto.png": "docs/fluxo/app/pro-perfil-foto.png"
+ "app/pro-perfil-foto.png": "docs/fluxo/app/pro-perfil-foto.png",
+ "app/pro-ajuda.png": "docs/fluxo/app/pro-ajuda.png",
+ "app/pro-ajuda-ganhos.png": "docs/fluxo/app/pro-ajuda-ganhos.png",
+ "app/pro-ajuda-artigo.png": "docs/fluxo/app/pro-ajuda-artigo.png",
+ "app/pro-suporte-assunto.png": "docs/fluxo/app/pro-suporte-assunto.png",
+ "app/pro-suporte-chamado.png": "docs/fluxo/app/pro-suporte-chamado.png",
+ "app/pro-suporte-chat.png": "docs/fluxo/app/pro-suporte-chat.png"
 }

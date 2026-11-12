@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
+import '../../../data/ajuda.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import 'chat_suporte_page.dart';
@@ -9,21 +10,15 @@ import 'escolher_pedido_page.dart';
 
 /// Falar com o suporte · "Sobre o que é?": escolhe o assunto.
 class SuporteAssuntoPage extends StatefulWidget {
-  const SuporteAssuntoPage({super.key});
+  const SuporteAssuntoPage({super.key, this.conteudo = conteudoCliente});
+
+  final ConteudoAjuda conteudo;
 
   @override
   State<SuporteAssuntoPage> createState() => _SuporteAssuntoPageState();
 }
 
 class _SuporteAssuntoPageState extends State<SuporteAssuntoPage> {
-  static const _opcoes = [
-    ('Um pedido recente', 'Escolha qual'),
-    ('Pagamento ou cobrança', null),
-    ('Minha conta', null),
-    ('Segurança ou denúncia', null),
-    ('Outro assunto', null),
-  ];
-
   int _escolhida = 0;
 
   void _continuar() {
@@ -31,8 +26,8 @@ class _SuporteAssuntoPageState extends State<SuporteAssuntoPage> {
     nav.push(
       MaterialPageRoute(
         builder: (_) => _escolhida == 0
-            ? const EscolherPedidoPage()
-            : const ChatSuportePage(),
+            ? EscolherPedidoPage(conteudo: widget.conteudo)
+            : ChatSuportePage(conteudo: widget.conteudo),
       ),
     );
   }
@@ -45,7 +40,8 @@ class _SuporteAssuntoPageState extends State<SuporteAssuntoPage> {
       botao: 'Continuar',
       onBotao: _continuar,
       children: [
-        for (final (i, (titulo, detalhe)) in _opcoes.indexed) ...[
+        for (final (i, (titulo, detalhe))
+            in widget.conteudo.opcoesSuporte.indexed) ...[
           OpcaoSelecionavel(
             selecionado: i == _escolhida,
             rotulo: titulo,

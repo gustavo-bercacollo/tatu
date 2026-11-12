@@ -13,7 +13,9 @@ import 'busca_ajuda_page.dart';
 
 /// Ajuda: busca, "Falar com o suporte", assuntos e perguntas frequentes.
 class AjudaPage extends StatelessWidget {
-  const AjudaPage({super.key});
+  const AjudaPage({super.key, this.conteudo = conteudoCliente});
+
+  final ConteudoAjuda conteudo;
 
   @override
   Widget build(BuildContext context) {
@@ -25,26 +27,28 @@ class AjudaPage extends StatelessWidget {
         children: [
           CampoBusca(
             hint: 'Buscar na ajuda',
-            onTap: () => Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: (_) => const BuscaAjudaPage())),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => BuscaAjudaPage(conteudo: conteudo),
+              ),
+            ),
           ),
           const SizedBox(height: TatuMedidas.entreItens + 4),
           CartaoAcao(
             icone: const IconeSuporte(),
             titulo: 'Falar com o suporte',
             detalhe: 'Respondemos em poucos minutos',
-            onTap: () => abrirSuporte(context),
+            onTap: () => abrirSuporte(context, conteudo),
           ),
           const SizedBox(height: TatuMedidas.entreSecoes + 8),
           GrupoLista(
             titulo: 'Assuntos',
             itens: [
-              for (final a in assuntosAjuda)
+              for (final a in conteudo.assuntos)
                 ItemLista(
                   icone: a.icone,
                   texto: a.titulo,
-                  onTap: () => abrirAssunto(context, a),
+                  onTap: () => abrirAssunto(context, a, conteudo),
                 ),
             ],
           ),
@@ -52,10 +56,10 @@ class AjudaPage extends StatelessWidget {
           GrupoCartao(
             titulo: 'Perguntas frequentes',
             linhas: [
-              for (final p in perguntasFrequentes)
+              for (final p in conteudo.perguntas)
                 LinhaSimples(
                   texto: p.titulo,
-                  onTap: () => abrirArtigo(context, p),
+                  onTap: () => abrirArtigo(context, p, conteudo),
                 ),
             ],
           ),

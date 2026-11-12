@@ -8,9 +8,14 @@ import 'abrir_ajuda.dart';
 
 /// Assunto da ajuda: lista dos artigos (ex.: Pagamento e valores).
 class AssuntoPage extends StatelessWidget {
-  const AssuntoPage({super.key, required this.assunto});
+  const AssuntoPage({
+    super.key,
+    required this.assunto,
+    this.conteudo = conteudoCliente,
+  });
 
   final AssuntoAjuda assunto;
+  final ConteudoAjuda conteudo;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +30,7 @@ class AssuntoPage extends StatelessWidget {
               for (final a in assunto.artigos)
                 LinhaSimples(
                   texto: a.titulo,
-                  onTap: () => abrirArtigo(context, a),
+                  onTap: () => abrirArtigo(context, a, conteudo),
                 ),
             ],
           ),

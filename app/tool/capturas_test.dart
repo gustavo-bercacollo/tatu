@@ -1899,4 +1899,71 @@ void main() {
       },
     );
   });
+
+  testWidgets('pro-ajuda', (t) async {
+    await comDemo(
+      t,
+      'pro-ajuda',
+      const AjudaPage(conteudo: conteudoProfissional),
+    );
+  });
+
+  testWidgets('pro-ajuda-ganhos', (t) async {
+    await comDemo(
+      t,
+      'pro-ajuda-ganhos',
+      AssuntoPage(
+        assunto: assuntosAjudaProfissional[1],
+        conteudo: conteudoProfissional,
+      ),
+    );
+  });
+
+  testWidgets('pro-ajuda-artigo', (t) async {
+    await comDemo(
+      t,
+      'pro-ajuda-artigo',
+      ArtigoPage(
+        artigo: assuntosAjudaProfissional[1].artigos.first,
+        conteudo: conteudoProfissional,
+      ),
+    );
+  });
+
+  testWidgets('pro-suporte-assunto', (t) async {
+    await comDemo(
+      t,
+      'pro-suporte-assunto',
+      const SuporteAssuntoPage(conteudo: conteudoProfissional),
+    );
+  });
+
+  testWidgets('pro-suporte-chamado', (t) async {
+    await comDemo(
+      t,
+      'pro-suporte-chamado',
+      const EscolherPedidoPage(conteudo: conteudoProfissional),
+    );
+  });
+
+  testWidgets('pro-suporte-chat', (t) async {
+    await comDemo(
+      t,
+      'pro-suporte-chat',
+      ChatSuportePage(
+        pedido: chamadosRecentes.first,
+        conteudo: conteudoProfissional,
+      ),
+      depois: () async {
+        await t.enterText(
+          find.byType(TextField),
+          'O Pix desse serviço ainda não caiu.',
+        );
+        await t.pump();
+        await t.tap(find.bySemanticsLabel('Enviar mensagem'));
+        await t.pump();
+        await t.pump(const Duration(seconds: 3));
+      },
+    );
+  });
 }

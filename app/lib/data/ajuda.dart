@@ -4,14 +4,20 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 /// Artigo da central de ajuda. Sem [secoes] o texto ainda não foi escrito.
 @immutable
 class Artigo {
-  const Artigo(this.titulo, {this.resumo, this.secoes = const []});
+  const Artigo(this.titulo, {this.resumo, this.secoes = const [], this.atalho});
 
   final String titulo;
   final String? resumo;
   final List<(String titulo, String texto)> secoes;
 
+  /// Em vez de texto, leva a uma tela do app (ex.: Ganhos).
+  final AtalhoAjuda? atalho;
+
   bool get temTexto => secoes.isNotEmpty;
 }
+
+/// Telas do app que um artigo pode abrir direto.
+enum AtalhoAjuda { ganhos }
 
 /// Assunto da ajuda com seus artigos.
 @immutable
@@ -74,10 +80,10 @@ const assuntosAjuda = [
 ];
 
 /// Perguntas frequentes da tela Ajuda.
-final perguntasFrequentes = [
+const perguntasFrequentes = [
   artigoPagamento,
-  assuntosAjuda[0].artigos[0],
-  assuntosAjuda[0].artigos[1],
+  Artigo('O profissional não apareceu'),
+  Artigo('Como cancelar um pedido?'),
 ];
 
 String _semAcento(String s) {
@@ -92,12 +98,15 @@ String _semAcento(String s) {
 }
 
 /// Busca nos títulos dos artigos (sem diferenciar acentos e maiúsculas).
-List<Artigo> buscarAjuda(String termo) {
+List<Artigo> buscarAjuda(
+  String termo, [
+  List<AssuntoAjuda> assuntos = assuntosAjuda,
+]) {
   final t = _semAcento(termo.trim());
   if (t.isEmpty) return const [];
   final vistos = <Artigo>{};
   return [
-    for (final a in assuntosAjuda)
+    for (final a in assuntos)
       for (final artigo in [...a.artigos, ...a.soNaBusca])
         if (_semAcento(artigo.titulo).contains(t) && vistos.add(artigo)) artigo,
   ];
@@ -113,10 +122,28 @@ class PedidoRecente {
     required this.descricao,
     required this.quando,
     required this.icone,
+    this.rotulo = 'Pedido',
+    this.titulo,
+    this.iniciais,
+    this.saudacao,
   });
 
   final String servico;
   final String profissional;
+
+  /// "Pedido" (cliente) ou "Chamado" (profissional), no cartão do chat.
+  final String rotulo;
+
+  /// Título na lista (padrão: "Encanador · Luiza").
+  final String? titulo;
+
+  /// Mostra as iniciais (cliente do chamado) em vez do ícone.
+  final String? iniciais;
+
+  /// Segunda mensagem do suporte (padrão: "Vi seu pedido com a …").
+  final String? saudacao;
+
+  String get tituloLista => titulo ?? '$servico · $profissional';
 
   /// Curto, na lista ("Vazamento na pia").
   final String resumo;
@@ -154,3 +181,161 @@ const pedidosRecentes = [
     icone: TablerIcons.brush,
   ),
 ];
+
+/// Conteúdo da central de ajuda: um para o cliente, outro para o
+/// profissional. As telas são as mesmas.
+@immutable
+class ConteudoAjuda {
+  const ConteudoAjuda({
+    required this.assuntos,
+    required this.perguntas,
+    required this.opcoesSuporte,
+    required this.recentes,
+    required this.tituloRecentes,
+    required this.semRecente,
+    required this.respostaSuporte,
+    this.profissional = false,
+  });
+
+  final List<AssuntoAjuda> assuntos;
+  final List<Artigo> perguntas;
+
+  /// "Sobre o que é?": (título, detalhe). A primeira leva à lista de
+  /// recentes.
+  final List<(String, String?)> opcoesSuporte;
+  final List<PedidoRecente> recentes;
+
+  /// "Qual pedido?" / "Qual chamado?".
+  final String tituloRecentes;
+
+  /// "Não é sobre um pedido" / "Não é sobre um chamado".
+  final String semRecente;
+
+  /// Resposta do atendente à primeira mensagem (simulada).
+  final String respostaSuporte;
+  final bool profissional;
+}
+
+const conteudoCliente = ConteudoAjuda(
+  assuntos: assuntosAjuda,
+  perguntas: perguntasFrequentes,
+  opcoesSuporte: [
+    ('Um pedido recente', 'Escolha qual'),
+    ('Pagamento ou cobrança', null),
+    ('Minha conta', null),
+    ('Segurança ou denúncia', null),
+    ('Outro assunto', null),
+  ],
+  recentes: pedidosRecentes,
+  tituloRecentes: 'Qual pedido?',
+  semRecente: 'Não é sobre um pedido',
+  respostaSuporte: 'Já estou vendo, um instante.',
+);
+
+// ---------- Profissional ----------
+
+const _quandoRecebo = Artigo(
+  'Quando recebo meu dinheiro?',
+  resumo: 'Depende de como o cliente pagou.',
+  secoes: [
+    (
+      'Pago pelo app',
+      'Cai no seu Pix em até 1 dia útil depois que o serviço é concluído, '
+          'já sem a taxa de 10%.',
+    ),
+    (
+      'Pago por fora',
+      'O cliente paga direto a você e o Tatu não cobra taxa. Vocês dois '
+          'confirmam o pagamento no app.',
+    ),
+  ],
+);
+
+const _taxa = Artigo(
+  'Como funciona a taxa de 10%?',
+  resumo: 'O Tatu só cobra quando o cliente paga pelo app.',
+  secoes: [
+    (
+      'Pago pelo app',
+      'Descontamos 10% do valor do serviço. Num serviço de R\$ 150,00, '
+          'você recebe R\$ 135,00.',
+    ),
+    (
+      'Pago por fora',
+      'Não tem taxa. Cadastro, perfil e receber chamados também são grátis.',
+    ),
+  ],
+);
+
+const _semChamados = Artigo('Por que não recebo chamados?');
+
+const assuntosAjudaProfissional = [
+  AssuntoAjuda('Chamados e clientes', TablerIcons.briefcase, [_semChamados]),
+  AssuntoAjuda('Ganhos e Pix', TablerIcons.wallet, [
+    _quandoRecebo,
+    _taxa,
+    Artigo('Cliente pagou por fora'),
+    Artigo('Trocar minha chave Pix'),
+    Artigo('O Pix não caiu'),
+    Artigo('Ver meus ganhos', atalho: AtalhoAjuda.ganhos),
+  ]),
+  AssuntoAjuda('Cadastro e verificação', TablerIcons.id, []),
+  AssuntoAjuda('Segurança', TablerIcons.shield_check, []),
+];
+
+/// Chamados recentes do profissional, mais recentes primeiro.
+const chamadosRecentes = [
+  PedidoRecente(
+    rotulo: 'Chamado',
+    servico: 'Ana Martins',
+    profissional: '',
+    titulo: 'Ana Martins · R\$ 150',
+    iniciais: 'Ana Martins',
+    resumo: 'Vazamento na pia · Pago pelo app',
+    descricao: 'R\$ 150,00 · Pago pelo app',
+    quando: 'Hoje',
+    icone: TablerIcons.user,
+    saudacao: 'Como posso ajudar com esse chamado?',
+  ),
+  PedidoRecente(
+    rotulo: 'Chamado',
+    servico: 'Júlia Costa',
+    profissional: '',
+    titulo: 'Júlia Costa · R\$ 90',
+    iniciais: 'Júlia Costa',
+    resumo: 'Troca de torneira · Por fora',
+    descricao: 'R\$ 90,00 · Por fora',
+    quando: 'ontem',
+    icone: TablerIcons.user,
+    saudacao: 'Como posso ajudar com esse chamado?',
+  ),
+  PedidoRecente(
+    rotulo: 'Chamado',
+    servico: 'Roberto Alves',
+    profissional: '',
+    titulo: 'Roberto Alves · R\$ 220',
+    iniciais: 'Roberto Alves',
+    resumo: 'Chuveiro queimado · Pago pelo app',
+    descricao: 'R\$ 220,00 · Pago pelo app',
+    quando: '02 nov',
+    icone: TablerIcons.user,
+    saudacao: 'Como posso ajudar com esse chamado?',
+  ),
+];
+
+const conteudoProfissional = ConteudoAjuda(
+  assuntos: assuntosAjudaProfissional,
+  perguntas: [_quandoRecebo, _taxa, _semChamados],
+  opcoesSuporte: [
+    ('Um chamado recente', 'Escolha qual'),
+    ('Ganhos ou Pix', null),
+    ('Cadastro e verificação', null),
+    ('Segurança ou denúncia', null),
+    ('Outro assunto', null),
+  ],
+  recentes: chamadosRecentes,
+  tituloRecentes: 'Qual chamado?',
+  semRecente: 'Não é sobre um chamado',
+  respostaSuporte: 'Vou verificar o repasse, um instante.',
+  profissional: true,
+);

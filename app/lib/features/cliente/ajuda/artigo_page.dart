@@ -9,9 +9,14 @@ import 'abrir_ajuda.dart';
 
 /// Artigo da ajuda: título, resumo, seções, "Isso ajudou?" e suporte.
 class ArtigoPage extends StatefulWidget {
-  const ArtigoPage({super.key, required this.artigo});
+  const ArtigoPage({
+    super.key,
+    required this.artigo,
+    this.conteudo = conteudoCliente,
+  });
 
   final Artigo artigo;
+  final ConteudoAjuda conteudo;
 
   @override
   State<ArtigoPage> createState() => _ArtigoPageState();
@@ -30,7 +35,7 @@ class _ArtigoPageState extends State<ArtigoPage> {
       subtitulo: a.resumo ?? '',
       botao: 'Falar com o suporte',
       botaoCinza: true,
-      onBotao: () => abrirSuporte(context),
+      onBotao: () => abrirSuporte(context, widget.conteudo),
       children: [
         for (final (titulo, texto) in a.secoes) ...[
           Text(titulo, style: _titulo),

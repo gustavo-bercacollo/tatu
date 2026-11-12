@@ -5,10 +5,12 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/fotos_trabalho.dart';
+import '../../../data/ajuda.dart';
 import '../../../data/perfil.dart';
 import '../../../data/profissional.dart';
 import '../../../shared/widgets/avatar_usuario.dart';
 import '../../../shared/widgets/back_circle_button.dart';
+import '../../cliente/ajuda/ajuda_page.dart';
 import '../../cliente/foto/foto_perfil_sheet.dart';
 import '../../../shared/widgets/lista_agrupada.dart';
 import '../../cliente/home_page.dart';
@@ -231,7 +233,10 @@ class PerfilProfissionalPage extends StatelessWidget {
                         ItemLista(
                           icone: TablerIcons.help_circle,
                           texto: 'Ajuda',
-                          onTap: () => _emBreve(context, 'Ajuda'),
+                          onTap: () => _abrir(
+                            context,
+                            const AjudaPage(conteudo: conteudoProfissional),
+                          ),
                         ),
                         ItemLista(
                           icone: TablerIcons.shield_lock,

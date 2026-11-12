@@ -4,13 +4,16 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/ajuda.dart';
+import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import 'chat_suporte_page.dart';
 
 /// Falar com o suporte · "Qual pedido?": escolhe um pedido recente.
 class EscolherPedidoPage extends StatefulWidget {
-  const EscolherPedidoPage({super.key});
+  const EscolherPedidoPage({super.key, this.conteudo = conteudoCliente});
+
+  final ConteudoAjuda conteudo;
 
   @override
   State<EscolherPedidoPage> createState() => _EscolherPedidoPageState();
@@ -19,35 +22,42 @@ class EscolherPedidoPage extends StatefulWidget {
 class _EscolherPedidoPageState extends State<EscolherPedidoPage> {
   int _escolhido = 0;
 
-  void _abrirChat([PedidoRecente? pedido]) => Navigator.of(context)
-      .push(MaterialPageRoute(builder: (_) => ChatSuportePage(pedido: pedido)));
+  void _abrirChat([PedidoRecente? pedido]) => Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (_) =>
+          ChatSuportePage(pedido: pedido, conteudo: widget.conteudo),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
     return CadastroScaffold(
-      titulo: 'Qual pedido?',
+      titulo: widget.conteudo.tituloRecentes,
       subtitulo: 'Os mais recentes aparecem primeiro.',
       botao: 'Continuar',
-      onBotao: () => _abrirChat(pedidosRecentes[_escolhido]),
+      onBotao: () => _abrirChat(widget.conteudo.recentes[_escolhido]),
       children: [
-        for (final (i, p) in pedidosRecentes.indexed) ...[
+        for (final (i, p) in widget.conteudo.recentes.indexed) ...[
           OpcaoSelecionavel(
             selecionado: i == _escolhido,
-            rotulo: '${p.servico} · ${p.profissional}',
+            rotulo: p.tituloLista,
             onTap: () => setState(() => _escolhido = i),
             child: Padding(
               padding: const EdgeInsets.all(14),
               child: Row(
                 children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: const BoxDecoration(
-                      color: TatuColors.bg,
-                      shape: BoxShape.circle,
+                  if (p.iniciais != null)
+                    AvatarIniciais(nome: p.iniciais!, tamanho: 40)
+                  else
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(
+                        color: TatuColors.bg,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(p.icone, size: 20),
                     ),
-                    child: Icon(p.icone, size: 20),
-                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -57,7 +67,7 @@ class _EscolherPedidoPageState extends State<EscolherPedidoPage> {
                           children: [
                             Expanded(
                               child: Text(
-                                '${p.servico} · ${p.profissional}',
+                                p.tituloLista,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 17,
@@ -81,7 +91,10 @@ class _EscolherPedidoPageState extends State<EscolherPedidoPage> {
         ],
         const SizedBox(height: 4),
         Center(
-          child: LinkAzul('Não é sobre um pedido', onTap: () => _abrirChat()),
+          child: LinkAzul(
+            widget.conteudo.semRecente,
+            onTap: () => _abrirChat(),
+          ),
         ),
       ],
     );

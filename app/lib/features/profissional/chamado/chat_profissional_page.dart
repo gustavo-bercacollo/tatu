@@ -7,10 +7,12 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/servico_profissional.dart';
+import '../../../data/ajuda.dart';
 import '../../../data/conversas_profissional.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/lista_agrupada.dart';
+import '../../cliente/ajuda/ajuda_page.dart';
 import '../../cliente/mensagens/denunciar_page.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/back_circle_button.dart';
@@ -123,6 +125,12 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
                 'Outro motivo',
               ],
             ),
+          ),
+        );
+      case 'Ajuda':
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const AjudaPage(conteudo: conteudoProfissional),
           ),
         );
       default:

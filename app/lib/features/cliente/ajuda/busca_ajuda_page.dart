@@ -12,7 +12,13 @@ import 'abrir_ajuda.dart';
 
 /// Busca na ajuda: resultados por título; sem nada, "Nada encontrado".
 class BuscaAjudaPage extends StatefulWidget {
-  const BuscaAjudaPage({super.key, this.termo = ''});
+  const BuscaAjudaPage({
+    super.key,
+    this.termo = '',
+    this.conteudo = conteudoCliente,
+  });
+
+  final ConteudoAjuda conteudo;
 
   /// Termo já digitado (para abrir a busca preenchida).
   final String termo;
@@ -38,7 +44,7 @@ class _BuscaAjudaPageState extends State<BuscaAjudaPage> {
   @override
   Widget build(BuildContext context) {
     final termo = _controller.text.trim();
-    final achados = buscarAjuda(termo);
+    final achados = buscarAjuda(termo, widget.conteudo.assuntos);
     final vazio = termo.isNotEmpty && achados.isEmpty;
     return Scaffold(
       backgroundColor: vazio ? TatuColors.bg : TatuColors.surfaceGrouped,
@@ -87,7 +93,11 @@ class _BuscaAjudaPageState extends State<BuscaAjudaPage> {
                                     for (final a in achados)
                                       LinhaSimples(
                                         texto: a.titulo,
-                                        onTap: () => abrirArtigo(context, a),
+                                        onTap: () => abrirArtigo(
+                                          context,
+                                          a,
+                                          widget.conteudo,
+                                        ),
                                       ),
                                   ],
                                 ),
@@ -96,7 +106,7 @@ class _BuscaAjudaPageState extends State<BuscaAjudaPage> {
                   ),
                   if (vazio)
                     FilledButton(
-                      onPressed: () => abrirSuporte(context),
+                      onPressed: () => abrirSuporte(context, widget.conteudo),
                       child: const Text('Falar com o suporte'),
                     ),
                 ],

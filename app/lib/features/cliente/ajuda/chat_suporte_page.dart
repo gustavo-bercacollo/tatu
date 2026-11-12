@@ -6,6 +6,7 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../data/ajuda.dart';
 import '../../../data/conta.dart';
+import '../../../data/profissional.dart';
 import '../../../shared/widgets/back_circle_button.dart';
 import '../../../shared/widgets/chat.dart';
 import 'ajuda_page.dart';
@@ -13,9 +14,14 @@ import 'ajuda_page.dart';
 /// Chat com o suporte do Tatu. Com [pedido], mostra o pedido no topo.
 /// Versão simulada: o atendente responde sozinho à primeira mensagem.
 class ChatSuportePage extends StatefulWidget {
-  const ChatSuportePage({super.key, this.pedido});
+  const ChatSuportePage({
+    super.key,
+    this.pedido,
+    this.conteudo = conteudoCliente,
+  });
 
   final PedidoRecente? pedido;
+  final ConteudoAjuda conteudo;
 
   @override
   State<ChatSuportePage> createState() => _ChatSuportePageState();
@@ -32,13 +38,18 @@ class _ChatSuportePageState extends State<ChatSuportePage> {
   final _campo = TextEditingController();
   Timer? _resposta;
   late final List<_Mensagem> _mensagens = [
-    _Mensagem('Oi, ${conta.nome}! Sou o Rafael, do suporte.'),
+    _Mensagem('Oi, $_nome! Sou o Rafael, do suporte.'),
     _Mensagem(
       widget.pedido == null
           ? 'Como posso ajudar?'
-          : 'Vi seu pedido com a ${widget.pedido!.profissional}. Como ajudo?',
+          : widget.pedido!.saudacao ??
+                'Vi seu pedido com a ${widget.pedido!.profissional}. '
+                    'Como ajudo?',
     ),
   ];
+
+  String get _nome =>
+      widget.conteudo.profissional ? profissional.primeiroNome : conta.nome;
 
   @override
   void dispose() {
@@ -57,7 +68,7 @@ class _ChatSuportePageState extends State<ChatSuportePage> {
       _resposta = Timer(const Duration(seconds: 2), () {
         if (!mounted) return;
         setState(
-          () => _mensagens.add(const _Mensagem('Já estou vendo, um instante.')),
+          () => _mensagens.add(_Mensagem(widget.conteudo.respostaSuporte)),
         );
       });
     }
@@ -71,6 +82,7 @@ class _ChatSuportePageState extends State<ChatSuportePage> {
       mensagens: [
         if (p != null) ...[
           CartaoPedidoChat(
+            rotulo: p.rotulo,
             servico: p.servico,
             descricao: p.descricao,
             lado: p.quando,
