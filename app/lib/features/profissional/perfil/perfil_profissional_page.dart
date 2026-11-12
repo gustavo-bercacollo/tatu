@@ -7,10 +7,9 @@ import '../../../core/theme/tatu_texto.dart';
 import '../../../data/fotos_trabalho.dart';
 import '../../../data/perfil.dart';
 import '../../../data/profissional.dart';
-import '../../../shared/widgets/abas_cliente.dart';
 import '../../../shared/widgets/avatar_usuario.dart';
+import '../../../shared/widgets/back_circle_button.dart';
 import '../../cliente/foto/foto_perfil_sheet.dart';
-import '../abas.dart';
 import '../../../shared/widgets/lista_agrupada.dart';
 import '../../cliente/home_page.dart';
 import '../cadastro/pix_page.dart';
@@ -64,11 +63,7 @@ class PerfilProfissionalPage extends StatelessWidget {
         final p = profissional;
         return Scaffold(
           backgroundColor: TatuColors.surfaceGrouped,
-          bottomNavigationBar: const AbasDoProfissional(
-            ativa: AbaCliente.perfil,
-          ),
           body: SafeArea(
-            bottom: false,
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(
@@ -77,11 +72,15 @@ class PerfilProfissionalPage extends StatelessWidget {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(
                     TatuMedidas.margem,
-                    26,
+                    TatuMedidas.topo,
                     TatuMedidas.margem,
                     TatuMedidas.base,
                   ),
                   children: [
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: BackCircleButton(),
+                    ),
                     Center(
                       child: Semantics(
                         button: true,

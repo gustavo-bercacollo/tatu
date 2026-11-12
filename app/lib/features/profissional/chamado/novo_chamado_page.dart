@@ -11,6 +11,7 @@ import '../../../data/servicos.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import 'chat_profissional_page.dart';
+import 'toque_chamado.dart';
 
 /// P22 · Novo chamado: painel sobre o mapa, com a contagem para aceitar.
 /// Sem resposta até o fim da contagem, o chamado passa para outro.
@@ -33,10 +34,12 @@ class NovoChamadoPage extends StatefulWidget {
 class _NovoChamadoPageState extends State<NovoChamadoPage> {
   late int _restante = widget.restante;
   Timer? _timer;
+  final _toque = ToqueChamado();
 
   @override
   void initState() {
     super.initState();
+    _toque.tocar();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
       if (_restante <= 1) {
@@ -50,6 +53,7 @@ class _NovoChamadoPageState extends State<NovoChamadoPage> {
 
   @override
   void dispose() {
+    _toque.parar();
     _timer?.cancel();
     super.dispose();
   }

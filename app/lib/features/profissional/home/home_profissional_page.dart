@@ -14,6 +14,7 @@ import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import '../abas.dart';
 import '../cadastro/pix_page.dart';
+import '../perfil/perfil_profissional_page.dart';
 import '../chamado/novo_chamado_page.dart';
 
 /// P19–P21 · Home do profissional: mapa e painel offline/online.
@@ -91,8 +92,11 @@ class _HomeProfissionalPageState extends State<HomeProfissionalPage> {
                     children: [
                       _Avatar(
                         nome: p.nome,
-                        onTap: () =>
-                            irParaAbaProfissional(context, AbaCliente.perfil),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const PerfilProfissionalPage(),
+                          ),
+                        ),
                       ),
                       const Spacer(),
                       _Situacao(online: p.online),

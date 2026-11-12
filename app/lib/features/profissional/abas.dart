@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import 'atividade/atividade_profissional_page.dart';
 import 'mensagens/mensagens_profissional_page.dart';
-import 'perfil/perfil_profissional_page.dart';
 
 /// Troca de aba do profissional. Início é a primeira tela da pilha (a
 /// Home); as outras abrem por cima dela, sem animação.
@@ -14,7 +13,7 @@ void irParaAbaProfissional(BuildContext context, AbaCliente aba) {
     AbaCliente.inicio => null,
     AbaCliente.atividade => const AtividadeProfissionalPage(),
     AbaCliente.mensagens => const MensagensProfissionalPage(),
-    AbaCliente.perfil => const PerfilProfissionalPage(),
+    AbaCliente.perfil => null,
   };
   if (tela == null) return;
   nav.push(
@@ -26,7 +25,8 @@ void irParaAbaProfissional(BuildContext context, AbaCliente aba) {
   );
 }
 
-/// Barra de abas do profissional: Início · Atividade · Mensagens · Perfil.
+/// Barra de abas do profissional: Início · Atividade · Mensagens.
+/// O Perfil abre pela foto no canto da Home.
 class AbasDoProfissional extends StatelessWidget {
   const AbasDoProfissional({super.key, required this.ativa});
 
@@ -35,7 +35,6 @@ class AbasDoProfissional extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AbasCliente(
     ativa: ativa,
-    comPerfil: true,
     onTrocar: (a) {
       if (a == ativa) return;
       irParaAbaProfissional(context, a);

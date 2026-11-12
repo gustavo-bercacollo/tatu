@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/features/profissional/chamado/toque_chamado.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/profissional.dart';
 import 'package:tatu/features/profissional/chamado/chat_profissional_page.dart';
@@ -40,6 +41,7 @@ Future<void> _valor(WidgetTester t, String centavos) async {
 }
 
 void main() {
+  ToqueChamado.ativo = false;
   testWidgets('Online: chega um chamado; aceitar abre o chat', (t) async {
     await _home(t);
     expect(find.text('NOVO CHAMADO'), findsOneWidget);

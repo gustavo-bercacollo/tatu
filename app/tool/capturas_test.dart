@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/features/profissional/chamado/toque_chamado.dart';
 import 'package:tatu/data/conversas_profissional.dart';
 import 'package:tatu/data/fotos_trabalho.dart';
 import 'package:tatu/features/cliente/mensagens/denunciar_page.dart'
@@ -164,6 +165,7 @@ Future<void> _capturar(
 }
 
 void main() {
+  ToqueChamado.ativo = false;
   CameraVerificacaoPage.cameraAoVivo = false;
   setUpAll(_carregarFontes);
 

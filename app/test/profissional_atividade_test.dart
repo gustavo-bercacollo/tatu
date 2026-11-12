@@ -49,8 +49,6 @@ void main() {
     await t.tap(find.text('Mensagens'));
     await t.pumpAndSettle();
     expect(find.text('Buscar conversa'), findsOneWidget);
-    await t.tap(find.text('Perfil'));
-    await t.pumpAndSettle();
-    expect(find.text('Trocar para modo cliente'), findsOneWidget);
+    expect(find.text('Perfil'), findsNothing); // perfil só pela foto
   });
 }
