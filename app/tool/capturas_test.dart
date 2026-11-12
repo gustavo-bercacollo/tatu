@@ -44,7 +44,9 @@ import 'package:tatu/features/cliente/chamar/fora_da_area_page.dart';
 import 'package:tatu/features/cliente/chamar/imprevisto_page.dart';
 import 'package:tatu/features/cliente/chamar/localizacao_chamar_page.dart';
 import 'package:tatu/features/cliente/chamar/ninguem_ativo_page.dart';
+import 'package:tatu/features/cliente/chamar/encontrado_page.dart';
 import 'package:tatu/features/cliente/chamar/procurando_page.dart';
+import 'package:tatu/features/cliente/chamar/som_encontrado.dart';
 import 'package:tatu/data/conversas.dart';
 import 'package:tatu/features/cliente/mensagens/chat_page.dart';
 import 'package:tatu/features/cliente/mensagens/denunciar_page.dart';
@@ -170,6 +172,8 @@ Future<void> _capturar(
 
 void main() {
   ToqueChamado.ativo = false;
+  SomEncontrado.ativo = false;
+  ProcurandoPage.aceitaEm = null;
   CameraVerificacaoPage.cameraAoVivo = false;
   setUpAll(_carregarFontes);
 
@@ -997,6 +1001,49 @@ void main() {
       t,
       'procurando-ninguem',
       const NinguemAtivoPage(servico: 'Encanador'),
+    );
+  });
+
+  testWidgets('encontrado', (t) async {
+    await _capturar(
+      t,
+      'encontrado',
+      const EncontradoPage(
+        servico: 'Encanador',
+        endereco: 'Rua Bruno Lobo, 29',
+        restante: 168,
+        animar: false,
+      ),
+    );
+  });
+
+  testWidgets('encontrado-acabando', (t) async {
+    await _capturar(
+      t,
+      'encontrado-acabando',
+      const EncontradoPage(
+        servico: 'Encanador',
+        endereco: 'Rua Bruno Lobo, 29',
+        restante: 15,
+        animar: false,
+      ),
+    );
+  });
+
+  testWidgets('encontrado-ver-outro', (t) async {
+    await _capturar(
+      t,
+      'encontrado-ver-outro',
+      const EncontradoPage(
+        servico: 'Encanador',
+        endereco: 'Rua Bruno Lobo, 29',
+        restante: 168,
+        animar: false,
+      ),
+      preparar: () async {
+        await t.tap(find.text('Ver outro'));
+        await t.pumpAndSettle();
+      },
     );
   });
 

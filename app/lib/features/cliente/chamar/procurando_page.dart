@@ -13,6 +13,7 @@ import '../../../shared/widgets/espaco_anuncio.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import '../abas.dart';
+import 'encontrado_page.dart';
 import 'ninguem_ativo_page.dart';
 
 /// Fase da busca mostrada na tela.
@@ -35,7 +36,13 @@ class ProcurandoPage extends StatefulWidget {
     this.fase = FaseBusca.inicio,
     this.direto,
     this.diretoFeminino = true,
+    this.simularAceite = true,
   });
+
+  /// Protótipo: alguém aceita depois de [aceitaEm] (nulo nos testes que
+  /// esperam o raio expandir). Desligado depois de passar pela fila toda.
+  final bool simularAceite;
+  static Duration? aceitaEm = const Duration(seconds: 8);
 
   /// "Pedir de novo" com o mesmo profissional: chama só ele por
   /// [esperaDireto]; se não aceitar, chama todos os outros por perto.
@@ -78,6 +85,7 @@ class _ProcurandoPageState extends State<ProcurandoPage>
     duration: const Duration(seconds: 2),
   );
   Timer? _fim;
+  Timer? _aceite;
   bool _saiu = false;
 
   double get _limiteExpandir =>
@@ -93,12 +101,17 @@ class _ProcurandoPageState extends State<ProcurandoPage>
       _fim = widget.direto == null
           ? Timer(ProcurandoPage.desisteEm, _ninguemAtivo)
           : Timer(ProcurandoPage.esperaDireto, _chamarOutros);
+      final aceita = ProcurandoPage.aceitaEm;
+      if (widget.simularAceite && aceita != null) {
+        _aceite = Timer(aceita, _encontrou);
+      }
     }
   }
 
   @override
   void dispose() {
     _fim?.cancel();
+    _aceite?.cancel();
     _busca.dispose();
     _pulso.dispose();
     // Saiu pelo "x" ou voltar: a busca continua em segundo plano.
@@ -124,6 +137,23 @@ class _ProcurandoPageState extends State<ProcurandoPage>
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => NinguemAtivoPage(servico: widget.servico),
+      ),
+    );
+  }
+
+  /// Alguém aceitou: "Profissional encontrado". Depois que um
+  /// profissional cancelou, a fila começa no próximo.
+  void _encontrou() {
+    if (!mounted) return;
+    _saiu = true;
+    _fim?.cancel();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => EncontradoPage(
+          servico: widget.servico,
+          endereco: widget.endereco,
+          indice: widget.anterior == null ? 0 : 1,
+        ),
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/conta.dart';
 import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/features/cliente/atividade/atividade_page.dart';
+import 'package:tatu/features/cliente/chamar/procurando_page.dart';
 
 Future<void> _concluidos(WidgetTester t) async {
   t.view.physicalSize = const Size(1179, 2556); // 393×852
@@ -20,6 +21,7 @@ Future<void> _fecharAviso(WidgetTester t) async {
 }
 
 void main() {
+  ProcurandoPage.aceitaEm = null;
   setUp(() {
     pedidos.restaurar();
     conta.restaurar();

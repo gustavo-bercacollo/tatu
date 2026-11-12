@@ -284,6 +284,14 @@ class PedidosRepo extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// A pessoa aceitou o profissional: vira o pedido em andamento e a
+  /// busca em segundo plano (se houver) acaba.
+  void aceitar(PedidoAndamento p) {
+    andamento = p;
+    busca = null;
+    notifyListeners();
+  }
+
   void cancelarAndamento() {
     andamento = null;
     notifyListeners();

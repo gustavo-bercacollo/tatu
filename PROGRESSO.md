@@ -77,6 +77,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Notificações do profissional (`perfil/notificacoes_profissional_page.dart`, dados em `data/notificacoes_profissional.dart`): pedido de permissão na 1ª vez, chamados/ganhos/extras, desligar novo chamado com confirmação, desativadas no celular, Som do novo chamado (Alerta Tatu, Sino, Buzina, Padrão — `assets/sons/`, gerados aqui; vibrar; ouvir). O Novo chamado toca o som escolhido
 - [x] Dados da conta do profissional (`perfil/dados_conta_profissional_page.dart`): dados do documento com cadeado (folha “vem do documento” → câmera), contato da conta, Encerrar perfil profissional → encerrado → modo cliente, Excluir conta bloqueado com valor a receber. `LinhaDado` e `LinhaConsequencia` viraram componentes
 - [x] Espaço reservado para anúncio (`EspacoAnuncio`, 353 × 76, tracejado) na Home do cliente e no Procurando; Procurando com a barra em 3 etapas e “Expandindo…” com o ponto verde
+- [x] Profissional encontrado (`chamar/encontrado_page.dart`, fila em `data/encontrados.dart`): som de “achou!” (`assets/sons/encontrado.wav`, `SomEncontrado`), 3 min para aceitar (vermelho nos últimos 15 s), Ver outro com folha, próximo da fila, Aceitar → pedido em andamento + chat novo. Protótipo: na busca alguém aceita aos 8 s (`ProcurandoPage.aceitaEm`, nulo nos testes)
 - Falta do profissional: cobrar o cliente, avaliar o cliente
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado

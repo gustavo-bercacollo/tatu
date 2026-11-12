@@ -22,6 +22,7 @@ class TatuMedidas {
   static const raioOpcao = 22.0; // cartões grandes de escolha (Boas-vindas)
   static const raioFolha = 30.0; // topo das folhas
   static const raioCodigo = 14.0; // caixinhas do código
+  static const raioCaixa = 14.0; // caixinhas de dados (nota, serviços, estimativa)
   static const raioSegmento = 12.0; // seletor Recebidas/Enviadas
 
   // Alturas

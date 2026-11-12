@@ -132,6 +132,37 @@ class ConversasRepo extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Conversa nova com quem a pessoa acabou de aceitar (fica no topo).
+  Conversa comecar({
+    required String nome,
+    required String profissao,
+    required bool feminino,
+    required String servico,
+    required String rua,
+  }) {
+    conversas.removeWhere((c) => c.nome == nome && c.emAndamento);
+    final c = Conversa(
+      nome: nome,
+      profissao: profissao,
+      feminino: feminino,
+      servico: servico,
+      descricao: servico,
+      rua: rua,
+      quando: 'agora',
+      emAndamento: true,
+      online: true,
+      mensagens: [
+        MensagemChat(
+          texto: 'Oi! Aceitei seu pedido. Me conta um pouco mais do problema?',
+          hora: horaAgora(),
+        ),
+      ],
+    );
+    conversas = [c, ...conversas];
+    notifyListeners();
+    return c;
+  }
+
   void marcarLida(Conversa c) {
     if (c.naoLidas == 0) return;
     c.naoLidas = 0;

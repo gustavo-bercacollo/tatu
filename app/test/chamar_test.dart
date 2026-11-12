@@ -9,6 +9,8 @@ import 'package:tatu/data/enderecos.dart';
 import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/data/perfil.dart';
 import 'package:tatu/features/cliente/chamar/imprevisto_page.dart';
+import 'package:tatu/features/cliente/chamar/procurando_page.dart';
+import 'package:tatu/features/cliente/chamar/som_encontrado.dart';
 import 'package:tatu/features/cliente/home_page.dart';
 
 void _tela(WidgetTester t) {
@@ -45,6 +47,8 @@ Future<void> _chamar(WidgetTester t) async {
 }
 
 void main() {
+  ProcurandoPage.aceitaEm = null;
+  SomEncontrado.ativo = false;
   setUp(() {
     conta.restaurar();
     enderecos.restaurar();
