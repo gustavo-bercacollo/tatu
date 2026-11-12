@@ -15,6 +15,12 @@ ButtonStyle tatuBotaoPerigo() => FilledButton.styleFrom(
   foregroundColor: TatuColors.danger,
 );
 
+/// Botão vermelho cheio (emergência: ligar 190, sair agora).
+ButtonStyle tatuBotaoVermelho() => FilledButton.styleFrom(
+  backgroundColor: TatuColors.danger,
+  foregroundColor: TatuColors.onAction,
+);
+
 ThemeData tatuTheme() => ThemeData(
   useMaterial3: true,
   fontFamily: 'Inter',

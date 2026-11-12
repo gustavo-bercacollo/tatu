@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/features/profissional/chamado/toque_chamado.dart';
 import 'package:tatu/data/conversas_profissional.dart';
 import 'package:tatu/data/navegacao.dart';
+import 'package:tatu/data/seguranca.dart';
 import 'package:tatu/data/notificacoes_profissional.dart';
 import 'package:tatu/features/profissional/perfil/notificacoes_profissional_page.dart';
 import 'package:tatu/features/profissional/perfil/dados_conta_profissional_page.dart';
@@ -38,6 +39,7 @@ import 'package:tatu/features/profissional/perfil/sobre_page.dart';
 import 'package:tatu/data/sobre_ia.dart';
 import 'package:tatu/features/profissional/servico/andamento_page.dart';
 import 'package:tatu/features/profissional/servico/rota.dart';
+import 'package:tatu/features/profissional/servico/seguranca.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/ajuda.dart';
 import 'package:tatu/data/avaliacoes.dart';
@@ -148,6 +150,7 @@ Future<void> _capturar(
   conversasProfissional.restaurar();
   notificacoesProfissional.restaurar();
   navegacao.restaurar();
+  seguranca.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -1693,6 +1696,57 @@ void main() {
       'pro-em-andamento',
       EmAndamentoPage(inicio: DateTime(2026, 11, 10, 14, 32)),
     );
+  });
+
+  Future<void> abrirSegurancaCap(WidgetTester t) async {
+    await t.tap(find.bySemanticsLabel('Segurança'));
+    await t.pumpAndSettle();
+  }
+
+  testWidgets('pro-seguranca', (t) async {
+    await _capturar(
+      t,
+      'pro-seguranca',
+      EmAndamentoPage(inicio: DateTime(2026, 11, 10, 14, 32)),
+      preparar: () => abrirSegurancaCap(t),
+    );
+  });
+
+  testWidgets('pro-alerta-ativo', (t) async {
+    await _capturar(
+      t,
+      'pro-alerta-ativo',
+      EmAndamentoPage(inicio: DateTime(2026, 11, 10, 14, 32)),
+      preparar: () async {
+        seguranca.acionarAlerta();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-sair-atendimento', (t) async {
+    await _capturar(
+      t,
+      'pro-sair-atendimento',
+      EmAndamentoPage(inicio: DateTime(2026, 11, 10, 14, 32)),
+      preparar: () async {
+        await abrirSegurancaCap(t);
+        await t.tap(find.text('Sair agora'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-voce-saiu', (t) async {
+    await _capturar(t, 'pro-voce-saiu', const VoceSaiuPage());
+  });
+
+  testWidgets('pro-ligar-190', (t) async {
+    await _capturar(t, 'pro-ligar-190', const Ligar190Page());
+  });
+
+  testWidgets('pro-contatos-confianca', (t) async {
+    await _capturar(t, 'pro-contatos-confianca', const ContatosConfiancaPage());
   });
 
   testWidgets('pro-novo-chamado', (t) async {

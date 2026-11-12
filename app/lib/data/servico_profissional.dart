@@ -15,7 +15,19 @@ class ServicoAceito {
     this.distanciaKm = 1.2,
     this.minutos = 6,
     this.feminino = true,
+    this.bairro = 'Vila Mariana, São Paulo',
+    this.celularCliente = '(11) 9••••-7777',
+    this.pedido = 'TT-48213',
   });
+
+  /// Bairro e cidade (para ler ao 190).
+  final String bairro;
+
+  /// Celular do cliente, mascarado.
+  final String celularCliente;
+
+  /// Número do pedido (sem o "#").
+  final String pedido;
 
   final String cliente;
   final double notaCliente;

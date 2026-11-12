@@ -42,7 +42,7 @@ void main() {
     expect(find.text('Ana foi avisada de que você está aí.'), findsOneWidget);
     await t.tap(find.text('Iniciar serviço'));
     await t.pumpAndSettle();
-    expect(find.text('Serviço em andamento'), findsOneWidget);
+    expect(find.text('Em serviço'), findsOneWidget);
   });
 
   testWidgets('Abrir rota: escolhe o app, "Usar sempre" guarda', (t) async {

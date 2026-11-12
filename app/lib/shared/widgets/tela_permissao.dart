@@ -126,6 +126,7 @@ class TelaPermissaoCorpo extends StatelessWidget {
     required this.texto,
     this.aviso = false,
     this.sucesso = false,
+    this.perigo = false,
     this.extra,
   });
 
@@ -134,6 +135,9 @@ class TelaPermissaoCorpo extends StatelessWidget {
   final String texto;
   final bool aviso;
   final bool sucesso;
+
+  /// Círculo vermelho claro (segurança, perigo).
+  final bool perigo;
   final Widget? extra;
 
   @override
@@ -148,7 +152,9 @@ class TelaPermissaoCorpo extends StatelessWidget {
             height: 112,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: aviso
+              color: perigo
+                  ? TatuColors.dangerSoft
+                  : aviso
                   ? TatuColors.warningSoft
                   : sucesso
                   ? TatuColors.onlineSoft

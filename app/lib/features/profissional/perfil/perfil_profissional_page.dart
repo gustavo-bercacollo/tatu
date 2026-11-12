@@ -10,6 +10,7 @@ import '../../../data/notificacoes_profissional.dart';
 import '../../../data/perfil.dart';
 import '../../../data/navegacao.dart';
 import '../../../data/profissional.dart';
+import '../../../data/seguranca.dart';
 import '../../../shared/widgets/avatar_usuario.dart';
 import '../../../shared/widgets/back_circle_button.dart';
 import '../../cliente/ajuda/ajuda_page.dart';
@@ -23,6 +24,7 @@ import '../home/home_profissional_page.dart';
 import 'dados_conta_profissional_page.dart';
 import 'fotos_trabalho_page.dart';
 import '../servico/rota.dart';
+import '../servico/seguranca.dart';
 import 'notificacoes_profissional_page.dart';
 import 'previa_page.dart';
 import 'regiao_page.dart';
@@ -71,6 +73,7 @@ class PerfilProfissionalPage extends StatelessWidget {
         perfil,
         notificacoesProfissional,
         navegacao,
+        seguranca,
       ]),
       builder: (context, _) {
         final p = profissional;
@@ -239,6 +242,13 @@ class PerfilProfissionalPage extends StatelessWidget {
                           valor: navegacao.preferido.nome,
                           onTap: () =>
                               _abrir(context, const AppNavegacaoPage()),
+                        ),
+                        ItemLista(
+                          icone: TablerIcons.shield_check,
+                          texto: 'Contatos de confiança',
+                          valor: '${seguranca.contatos.length}',
+                          onTap: () =>
+                              _abrir(context, const ContatosConfiancaPage()),
                         ),
                         ItemLista(
                           icone: TablerIcons.user_circle,

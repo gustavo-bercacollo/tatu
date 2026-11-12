@@ -8,15 +8,18 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/navegacao.dart';
+import '../../../data/seguranca.dart';
 import '../../../data/servico_profissional.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
+import '../../../shared/widgets/back_circle_button.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import 'rota.dart';
+import 'seguranca.dart';
 
 void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
   ..hideCurrentSnackBar()
@@ -318,7 +321,8 @@ class _AvisoPerto extends StatelessWidget {
   );
 }
 
-/// P25 · Serviço em andamento: concluir e cobrar.
+/// P25 · Serviço em andamento: cliente, valor, início, escudo de
+/// segurança no topo e "Concluir e cobrar".
 class EmAndamentoPage extends StatelessWidget {
   const EmAndamentoPage({
     super.key,
@@ -336,6 +340,7 @@ class EmAndamentoPage extends StatelessWidget {
         '${inicio.hour.toString().padLeft(2, '0')}:'
         '${inicio.minute.toString().padLeft(2, '0')}';
     return Scaffold(
+      backgroundColor: TatuColors.surfaceGrouped,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -350,40 +355,123 @@ class EmAndamentoPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(
-                    child: ListView(
+                  SizedBox(
+                    height: 36,
+                    child: Stack(
+                      alignment: Alignment.center,
                       children: [
                         const Align(
                           alignment: Alignment.centerLeft,
-                          child: SeloPreto('Em andamento'),
+                          child: BackCircleButton(),
                         ),
-                        const SizedBox(height: 14),
                         const Text(
-                          'Serviço em andamento',
+                          'Em andamento',
                           style: TextStyle(
-                            fontSize: 30,
-                            height: 36 / 30,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.6,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        Text('Iniciado às $hora', style: TatuTexto.detalhe),
-                        const SizedBox(height: TatuMedidas.entreSecoes),
-                        LinhaCliente(
-                          titulo: s.cliente,
-                          detalhe: s.rua,
-                          onMensagem: () => _emBreve(context, 'Chat'),
-                        ),
-                        const SizedBox(height: TatuMedidas.entreItens),
-                        CartaoServico(servico: s, comObservacao: true),
-                        const SizedBox(height: TatuMedidas.entreItens + 4),
                         Align(
-                          alignment: Alignment.centerLeft,
-                          child: LinkAzul(
-                            'Precisa mudar o valor?',
-                            onTap: () => _emBreve(context, 'Chat'),
+                          alignment: Alignment.centerRight,
+                          child: BotaoEscudo(servico: s),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ListenableBuilder(
+                    listenable: seguranca,
+                    builder: (_, _) => seguranca.alertaAtivo
+                        ? const Padding(
+                            padding: EdgeInsets.only(top: 10),
+                            child: Center(child: SeloAlertaAtivo()),
+                          )
+                        : const SizedBox(height: 10),
+                  ),
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.only(top: 10),
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
+                          decoration: BoxDecoration(
+                            color: TatuColors.bg,
+                            borderRadius: BorderRadius.circular(
+                              TatuMedidas.raioOpcao,
+                            ),
                           ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                children: [
+                                  AvatarIniciais(nome: s.cliente, tamanho: 44),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          s.cliente,
+                                          style: const TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          '${s.descricao} · ${reais(s.valor)}',
+                                          style: TatuTexto.detalhe,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              const Divider(
+                                height: 1,
+                                color: TatuColors.hairline,
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Iniciado às $hora',
+                                      style: TatuTexto.detalhe,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 8,
+                                    height: 8,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        color: TatuColors.online,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    'Em serviço',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: TatuColors.onlineTexto,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: TatuMedidas.entreItens + 8),
+                        CartaoAcao(
+                          icone: const Icon(TablerIcons.pencil, size: 22),
+                          titulo: 'Precisa mudar o valor?',
+                          detalhe: 'Envie uma nova proposta pelo chat.',
+                          onTap: () => _emBreve(context, 'Chat'),
                         ),
                       ],
                     ),
