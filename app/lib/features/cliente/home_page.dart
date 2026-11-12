@@ -14,6 +14,7 @@ import '../../data/perfil.dart';
 import '../../data/servicos.dart';
 import '../../data/sugestao_servico.dart';
 import '../../shared/widgets/abas_cliente.dart';
+import '../../shared/widgets/espaco_anuncio.dart';
 import '../../shared/widgets/avatar_usuario.dart';
 import '../../shared/widgets/folha.dart';
 import '../../shared/widgets/lista_agrupada.dart';
@@ -251,6 +252,8 @@ class _HomeClientePageState extends State<HomeClientePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      const EspacoAnuncio(),
+                      const SizedBox(height: TatuMedidas.entreSecoes),
                       const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

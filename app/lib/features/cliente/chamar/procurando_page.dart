@@ -9,6 +9,7 @@ import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/pedidos.dart';
 import '../../../shared/widgets/abas_cliente.dart';
+import '../../../shared/widgets/espaco_anuncio.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import '../abas.dart';
@@ -275,22 +276,51 @@ class _ProcurandoPageState extends State<ProcurandoPage>
         const SizedBox(height: 8),
         Text(texto, style: TatuTexto.corpo),
         const SizedBox(height: TatuMedidas.entreSecoes),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(3),
-          child: LinearProgressIndicator(
-            value: _busca.value,
-            minHeight: 6,
-            color: TatuColors.action,
-            backgroundColor: TatuColors.trilho,
-          ),
-        ),
         if (expandindo) ...[
-          const SizedBox(height: TatuMedidas.entreItens),
-          const Text(
-            'Expandindo a busca para sua região…',
-            style: TatuTexto.nota,
+          const Row(
+            children: [
+              SizedBox(
+                width: 10,
+                height: 10,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: TatuColors.online,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Expandindo a busca para sua região…',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
           ),
+          const SizedBox(height: TatuMedidas.entreItens + 4),
         ],
+        // Três etapas da busca (o raio cresce a cada uma).
+        Row(
+          children: [
+            for (var i = 0; i < 3; i++) ...[
+              if (i > 0) const SizedBox(width: 6),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: (_busca.value * 3 - i).clamp(0.0, 1.0),
+                    minHeight: 6,
+                    color: TatuColors.action,
+                    backgroundColor: TatuColors.trilho,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+        const SizedBox(height: TatuMedidas.entreSecoes),
+        const EspacoAnuncio(),
         const SizedBox(height: TatuMedidas.entreSecoes),
         FilledButton(
           style: tatuBotaoSecundario(),
