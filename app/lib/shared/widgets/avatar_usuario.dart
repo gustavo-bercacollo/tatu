@@ -37,9 +37,18 @@ ImageProvider? imagemDoPerfil() {
 /// Avatar da pessoa logada: foto ou avatar escolhido; sem nenhum, as
 /// iniciais. Atualiza sozinho quando a foto muda.
 class AvatarUsuario extends StatelessWidget {
-  const AvatarUsuario({super.key, this.tamanho = 36, this.camera = false});
+  const AvatarUsuario({
+    super.key,
+    this.tamanho = 36,
+    this.camera = false,
+    this.nome,
+  });
 
   final double tamanho;
+
+  /// Nome para as iniciais quando não há foto nem avatar
+  /// (padrão: o nome da conta).
+  final String? nome;
 
   /// Mostra o selo de câmera (Perfil: toque para trocar a foto).
   final bool camera;
@@ -51,7 +60,7 @@ class AvatarUsuario extends StatelessWidget {
       builder: (context, _) {
         final imagem = imagemDoPerfil();
         final base = imagem == null
-            ? AvatarIniciais(nome: conta.nomeCompleto, tamanho: tamanho)
+            ? AvatarIniciais(nome: nome ?? conta.nomeCompleto, tamanho: tamanho)
             : AvatarImagem(imagem: imagem, tamanho: tamanho);
         if (!camera) return base;
         return SizedBox(

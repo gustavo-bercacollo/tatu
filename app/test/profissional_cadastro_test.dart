@@ -191,4 +191,16 @@ void main() {
     expect(find.text('Região salva'), findsOneWidget);
     await t.pump(const Duration(seconds: 4));
   });
+
+  testWidgets('Perfil: foto ou avatar, igual ao cliente', (t) async {
+    profissional.demo();
+    await _abrir(t, const PerfilProfissionalPage());
+    expect(find.text('Luiza Vilela'), findsOneWidget);
+    expect(find.text('4,9 · 29 serviços'), findsOneWidget);
+    await t.tap(find.bySemanticsLabel(RegExp('Foto do perfil')));
+    await t.pumpAndSettle();
+    expect(find.text('Tirar foto'), findsOneWidget);
+    expect(find.text('Escolher da galeria'), findsOneWidget);
+    expect(find.text('Escolher um avatar'), findsOneWidget);
+  });
 }

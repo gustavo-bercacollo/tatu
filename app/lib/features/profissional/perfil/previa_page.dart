@@ -6,7 +6,7 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/fotos_trabalho.dart';
 import '../../../data/profissional.dart';
-import '../../../shared/widgets/avatar_iniciais.dart';
+import '../../../shared/widgets/avatar_usuario.dart';
 import '../../../shared/widgets/back_circle_button.dart';
 import '../../../shared/widgets/estrelas.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
@@ -101,7 +101,7 @@ class _PreviaPageState extends State<PreviaPage> {
                         child: BackCircleButton(),
                       ),
                       const SizedBox(height: 8),
-                      Center(child: AvatarIniciais(nome: p.nome, tamanho: 96)),
+                      Center(child: AvatarUsuario(nome: p.nome, tamanho: 96)),
                       const SizedBox(height: TatuMedidas.entreItens),
                       Center(child: NomeVerificado(p.nome, tamanho: 26)),
                       const SizedBox(height: 4),

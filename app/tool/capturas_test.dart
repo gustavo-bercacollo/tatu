@@ -1885,4 +1885,16 @@ void main() {
       ),
     );
   });
+
+  testWidgets('pro-perfil-foto', (t) async {
+    await comDemo(
+      t,
+      'pro-perfil-foto',
+      const PerfilProfissionalPage(),
+      depois: () async {
+        await t.tap(find.bySemanticsLabel(RegExp('Foto do perfil')));
+        await t.pumpAndSettle();
+      },
+    );
+  });
 }

@@ -9,12 +9,12 @@ import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/profissional.dart';
 import '../../../shared/widgets/abas_cliente.dart';
+import '../../../shared/widgets/avatar_usuario.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import '../abas.dart';
 import '../cadastro/pix_page.dart';
 import '../chamado/novo_chamado_page.dart';
-import '../perfil/perfil_profissional_page.dart';
 
 /// P19–P21 · Home do profissional: mapa e painel offline/online.
 /// O app sempre abre offline. Na primeira vez, mostra a dica do botão.
@@ -91,11 +91,8 @@ class _HomeProfissionalPageState extends State<HomeProfissionalPage> {
                     children: [
                       _Avatar(
                         nome: p.nome,
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const PerfilProfissionalPage(),
-                          ),
-                        ),
+                        onTap: () =>
+                            irParaAbaProfissional(context, AbaCliente.perfil),
                       ),
                       const Spacer(),
                       _Situacao(online: p.online),
@@ -160,10 +157,6 @@ class _Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final partes = nome.trim().split(RegExp(r'\s+'));
-    final iniciais = partes.length > 1
-        ? '${partes.first[0]}${partes.last[0]}'
-        : (nome.isEmpty ? '?' : nome[0]);
     return Semantics(
       button: true,
       label: 'Perfil',
@@ -175,18 +168,9 @@ class _Avatar extends StatelessWidget {
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: onTap,
-          child: SizedBox(
-            width: 46,
-            height: 46,
-            child: Center(
-              child: Text(
-                iniciais.toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+          child: Padding(
+            padding: const EdgeInsets.all(3),
+            child: AvatarUsuario(nome: nome, tamanho: 40),
           ),
         ),
       ),

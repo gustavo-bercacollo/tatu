@@ -5,9 +5,12 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/fotos_trabalho.dart';
+import '../../../data/perfil.dart';
 import '../../../data/profissional.dart';
-import '../../../shared/widgets/avatar_iniciais.dart';
-import '../../../shared/widgets/back_circle_button.dart';
+import '../../../shared/widgets/abas_cliente.dart';
+import '../../../shared/widgets/avatar_usuario.dart';
+import '../../cliente/foto/foto_perfil_sheet.dart';
+import '../abas.dart';
 import '../../../shared/widgets/lista_agrupada.dart';
 import '../../cliente/home_page.dart';
 import '../cadastro/pix_page.dart';
@@ -56,12 +59,16 @@ class PerfilProfissionalPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([profissional, fotosTrabalho]),
+      listenable: Listenable.merge([profissional, fotosTrabalho, perfil]),
       builder: (context, _) {
         final p = profissional;
         return Scaffold(
           backgroundColor: TatuColors.surfaceGrouped,
+          bottomNavigationBar: const AbasDoProfissional(
+            ativa: AbaCliente.perfil,
+          ),
           body: SafeArea(
+            bottom: false,
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(
@@ -70,81 +77,69 @@ class PerfilProfissionalPage extends StatelessWidget {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(
                     TatuMedidas.margem,
-                    TatuMedidas.topo,
+                    26,
                     TatuMedidas.margem,
                     TatuMedidas.base,
                   ),
                   children: [
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: BackCircleButton(),
-                    ),
-                    const SizedBox(height: 18),
-                    Row(
-                      children: [
-                        AvatarIniciais(
-                          nome: p.nome,
-                          tamanho: TatuMedidas.avatarPerfil,
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              p.verificacao == Verificacao.aprovada
-                                  ? NomeVerificado(p.nome, tamanho: 24)
-                                  : Text(
-                                      p.nome,
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                              const SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: TatuColors.fill,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          p.nota
-                                              .toStringAsFixed(1)
-                                              .replaceAll('.', ','),
-                                          style: const TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 3),
-                                        const Icon(
-                                          TablerIcons.star_filled,
-                                          size: 11,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    '${p.servicosFeitos} serviços',
-                                    style: TatuTexto.nota,
-                                  ),
-                                ],
-                              ),
-                            ],
+                    Center(
+                      child: Semantics(
+                        button: true,
+                        label: 'Foto do perfil',
+                        child: GestureDetector(
+                          onTap: () => trocarFotoDoPerfil(context),
+                          child: AvatarUsuario(
+                            nome: p.nome,
+                            tamanho: TatuMedidas.avatarPerfil,
+                            camera: true,
                           ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            p.nome,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                        ),
+                        if (p.verificacao == Verificacao.aprovada) ...[
+                          const SizedBox(width: 8),
+                          const Icon(
+                            TablerIcons.circle_check_filled,
+                            size: 20,
+                            color: TatuColors.verified,
+                            semanticLabel: 'Verificado',
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          TablerIcons.star_filled,
+                          size: 14,
+                          color: TatuColors.warning,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${p.nota.toStringAsFixed(1).replaceAll('.', ',')}'
+                          ' · ${p.servicosFeitos} serviços',
+                          style: TatuTexto.detalhe,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 26),
                     FilledButton.icon(
                       onPressed: () => _abrir(context, const PreviaPage()),
                       icon: const Icon(TablerIcons.eye, size: 20),
