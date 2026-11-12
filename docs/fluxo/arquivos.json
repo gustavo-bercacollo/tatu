@@ -225,5 +225,10 @@
  "app/pro-ajuda-artigo.png": "docs/fluxo/app/pro-ajuda-artigo.png",
  "app/pro-suporte-assunto.png": "docs/fluxo/app/pro-suporte-assunto.png",
  "app/pro-suporte-chamado.png": "docs/fluxo/app/pro-suporte-chamado.png",
- "app/pro-suporte-chat.png": "docs/fluxo/app/pro-suporte-chat.png"
+ "app/pro-suporte-chat.png": "docs/fluxo/app/pro-suporte-chat.png",
+ "app/pro-notificacoes.png": "docs/fluxo/app/pro-notificacoes.png",
+ "app/pro-permissao-avisos.png": "docs/fluxo/app/pro-permissao-avisos.png",
+ "app/pro-notificacoes-desligar.png": "docs/fluxo/app/pro-notificacoes-desligar.png",
+ "app/pro-notificacoes-bloqueadas.png": "docs/fluxo/app/pro-notificacoes-bloqueadas.png",
+ "app/pro-som-chamado.png": "docs/fluxo/app/pro-som-chamado.png"
 }

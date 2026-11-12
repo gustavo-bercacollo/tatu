@@ -6,6 +6,7 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/fotos_trabalho.dart';
 import '../../../data/ajuda.dart';
+import '../../../data/notificacoes_profissional.dart';
 import '../../../data/perfil.dart';
 import '../../../data/profissional.dart';
 import '../../../shared/widgets/avatar_usuario.dart';
@@ -19,6 +20,7 @@ import '../cadastro/profissoes_page.dart';
 import '../cadastro/resultado_page.dart';
 import '../home/home_profissional_page.dart';
 import 'fotos_trabalho_page.dart';
+import 'notificacoes_profissional_page.dart';
 import 'previa_page.dart';
 import 'regiao_page.dart';
 import 'sobre_page.dart';
@@ -60,7 +62,12 @@ class PerfilProfissionalPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([profissional, fotosTrabalho, perfil]),
+      listenable: Listenable.merge([
+        profissional,
+        fotosTrabalho,
+        perfil,
+        notificacoesProfissional,
+      ]),
       builder: (context, _) {
         final p = profissional;
         return Scaffold(
@@ -217,8 +224,10 @@ class PerfilProfissionalPage extends StatelessWidget {
                         ItemLista(
                           icone: TablerIcons.bell,
                           texto: 'Notificações',
-                          valor: 'Ativadas',
-                          onTap: () => _emBreve(context, 'Notificações'),
+                          valor: notificacoesProfissional.ativas
+                              ? 'Ativadas'
+                              : 'Desativadas',
+                          onTap: () => abrirNotificacoesProfissional(context),
                         ),
                         ItemLista(
                           icone: TablerIcons.user_circle,

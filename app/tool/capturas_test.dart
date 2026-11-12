@@ -9,6 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/features/profissional/chamado/toque_chamado.dart';
 import 'package:tatu/data/conversas_profissional.dart';
+import 'package:tatu/data/notificacoes_profissional.dart';
+import 'package:tatu/features/profissional/perfil/notificacoes_profissional_page.dart';
 import 'package:tatu/data/fotos_trabalho.dart';
 import 'package:tatu/features/cliente/mensagens/denunciar_page.dart'
     show DenunciarPage, DenunciaEnviadaPage;
@@ -139,6 +141,7 @@ Future<void> _capturar(
   profissional.restaurar();
   fotosTrabalho.restaurar();
   conversasProfissional.restaurar();
+  notificacoesProfissional.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -1965,5 +1968,41 @@ void main() {
         await t.pump(const Duration(seconds: 3));
       },
     );
+  });
+
+  testWidgets('pro-notificacoes', (t) async {
+    await comDemo(t, 'pro-notificacoes', const NotificacoesProfissionalPage());
+  });
+
+  testWidgets('pro-notificacoes-desligar', (t) async {
+    await comDemo(
+      t,
+      'pro-notificacoes-desligar',
+      const NotificacoesProfissionalPage(),
+      depois: () async {
+        await t.tap(find.byType(CupertinoSwitch).first);
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-notificacoes-bloqueadas', (t) async {
+    await comDemo(
+      t,
+      'pro-notificacoes-bloqueadas',
+      const NotificacoesProfissionalPage(),
+      depois: () async {
+        notificacoesProfissional.negarNoCelular();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-som-chamado', (t) async {
+    await comDemo(t, 'pro-som-chamado', const SomChamadoPage());
+  });
+
+  testWidgets('pro-permissao-avisos', (t) async {
+    await comDemo(t, 'pro-permissao-avisos', const PermissaoAvisosPage());
   });
 }
