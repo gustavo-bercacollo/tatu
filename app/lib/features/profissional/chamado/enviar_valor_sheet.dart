@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart' show CupertinoSwitch;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -9,23 +8,15 @@ import '../../../data/profissional.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/folha.dart';
 
-/// Valor que o profissional envia ao cliente.
-typedef ValorEnviado = ({double valor, bool materialIncluso});
-
 /// P24 · Folha "Quanto vai custar?". [rodada] é qual dos 3 valores
 /// possíveis este é. Devolve null se fechar sem enviar.
-Future<ValorEnviado?> pedirValor(
+Future<double?> pedirValor(
   BuildContext context, {
   required String cliente,
   required int rodada,
-  bool materialIncluso = true,
-}) => mostrarFolha<ValorEnviado>(
+}) => mostrarFolha<double>(
   context,
-  builder: (_) => _FolhaValor(
-    cliente: cliente,
-    rodada: rodada,
-    materialIncluso: materialIncluso,
-  ),
+  builder: (_) => _FolhaValor(cliente: cliente, rodada: rodada),
 );
 
 /// Digitação de dinheiro em centavos: "15000" vira "R$ 150,00".
@@ -47,15 +38,10 @@ class ReaisFormatter extends TextInputFormatter {
 }
 
 class _FolhaValor extends StatefulWidget {
-  const _FolhaValor({
-    required this.cliente,
-    required this.rodada,
-    required this.materialIncluso,
-  });
+  const _FolhaValor({required this.cliente, required this.rodada});
 
   final String cliente;
   final int rodada;
-  final bool materialIncluso;
 
   @override
   State<_FolhaValor> createState() => _FolhaValorState();
@@ -64,7 +50,6 @@ class _FolhaValor extends StatefulWidget {
 class _FolhaValorState extends State<_FolhaValor> {
   final _campo = TextEditingController();
   final _foco = FocusNode();
-  late bool _material = widget.materialIncluso;
 
   @override
   void initState() {
@@ -157,23 +142,6 @@ class _FolhaValorState extends State<_FolhaValor> {
                   ),
                 ),
                 const SizedBox(height: TatuMedidas.entreItens),
-                MergeSemantics(
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        child: Text(
-                          'Material incluso',
-                          style: TextStyle(fontSize: 17),
-                        ),
-                      ),
-                      CupertinoSwitch(
-                        value: _material,
-                        activeTrackColor: TatuColors.online,
-                        onChanged: (b) => setState(() => _material = b),
-                      ),
-                    ],
-                  ),
-                ),
                 const SizedBox(height: TatuMedidas.entreItens),
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -205,11 +173,7 @@ class _FolhaValorState extends State<_FolhaValor> {
                 Text('Valor ${widget.rodada} de 3', style: TatuTexto.detalhe),
                 const SizedBox(height: TatuMedidas.entreItens),
                 FilledButton(
-                  onPressed: v > 0
-                      ? () =>
-                            Navigator.of(context)
-                                .pop((valor: v, materialIncluso: _material))
-                      : null,
+                  onPressed: v > 0 ? () => Navigator.of(context).pop(v) : null,
                   child: Text('Enviar para ${widget.cliente}'),
                 ),
               ],

@@ -11,7 +11,7 @@ class ServicoAceito {
     this.referencia = 'Casa com portão amarelo',
     this.descricao = 'Conserto do cano da pia',
     this.valor = 150,
-    this.observacao = 'Material incluso',
+    this.observacao = '',
     this.distanciaKm = 1.2,
     this.minutos = 6,
     this.feminino = true,
@@ -26,7 +26,7 @@ class ServicoAceito {
   final String descricao;
   final double valor;
 
-  /// Detalhe do valor (ex.: "Material incluso").
+  /// Detalhe opcional do valor (vazio = não mostra).
   final String observacao;
   final double distanciaKm;
   final int minutos;

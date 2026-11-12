@@ -65,7 +65,6 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   EstadoValor _estado = EstadoValor.inicio;
   int _rodada = 0; // quantos valores o profissional já enviou
   double _meuValor = 0;
-  bool _material = true;
   double _proposta = 0; // proposta do cliente
   double _combinado = 0;
 
@@ -162,17 +161,11 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   }
 
   Future<void> _enviarValor() async {
-    final v = await pedirValor(
-      context,
-      cliente: _nome,
-      rodada: _rodada + 1,
-      materialIncluso: _material,
-    );
+    final v = await pedirValor(context, cliente: _nome, rodada: _rodada + 1);
     if (v == null || !mounted) return;
     setState(() {
       _rodada++;
-      _meuValor = v.valor;
-      _material = v.materialIncluso;
+      _meuValor = v;
       _estado = EstadoValor.aguardando;
     });
     _timer?.cancel();
@@ -219,7 +212,6 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
             referencia: c.complemento,
             descricao: c.resumo,
             valor: _combinado,
-            observacao: _material ? 'Material incluso' : 'Sem material',
             distanciaKm: c.distanciaKm,
             minutos: c.minutos,
           ),
@@ -310,7 +302,6 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
               _MeuValor(
                 rodada: _rodada,
                 valor: _meuValor,
-                material: _material,
                 icone: TablerIcons.clock,
                 situacao: 'Aguardando a $_nome',
               ),
@@ -319,7 +310,6 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
               _MeuValor(
                 rodada: _rodada,
                 valor: _meuValor,
-                material: _material,
                 icone: TablerIcons.refresh,
                 situacao: '$_nome propôs outro valor',
               ),
@@ -333,7 +323,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
               ),
             ],
             EstadoValor.combinado => [
-              _ValorCombinado(valor: _combinado, material: _material),
+              _ValorCombinado(valor: _combinado),
               const SizedBox(height: TatuMedidas.entreItens),
               _EnderecoLiberado(chamado: c),
             ],
@@ -394,14 +384,12 @@ class _MeuValor extends StatelessWidget {
   const _MeuValor({
     required this.rodada,
     required this.valor,
-    required this.material,
     required this.icone,
     required this.situacao,
   });
 
   final int rodada;
   final double valor;
-  final bool material;
   final IconData icone;
   final String situacao;
 
@@ -423,8 +411,6 @@ class _MeuValor extends StatelessWidget {
               Text('Seu valor · $rodada de $maxRodadas', style: TatuTexto.nota),
               const SizedBox(height: 2),
               _Valor(valor),
-              if (material)
-                const Text('Material incluso', style: TatuTexto.nota),
               const SizedBox(height: 6),
               Row(
                 children: [
@@ -563,10 +549,9 @@ class _Concluido extends StatelessWidget {
 
 /// Cartão verde: os dois lados fecharam o valor.
 class _ValorCombinado extends StatelessWidget {
-  const _ValorCombinado({required this.valor, required this.material});
+  const _ValorCombinado({required this.valor});
 
   final double valor;
-  final bool material;
 
   @override
   Widget build(BuildContext context) {
@@ -598,9 +583,7 @@ class _ValorCombinado extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  material
-                      ? '${reais(valor)} · Material incluso'
-                      : reais(valor),
+                  reais(valor),
                   style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,

@@ -359,7 +359,9 @@ class CartaoServico extends StatelessWidget {
   Widget build(BuildContext context) => _CartaoCinza(
     icone: TablerIcons.tool,
     titulo: servico.descricao,
-    detalhe: comObservacao ? servico.observacao : null,
+    detalhe: comObservacao && servico.observacao.isNotEmpty
+        ? servico.observacao
+        : null,
     direita: reais(servico.valor),
   );
 }

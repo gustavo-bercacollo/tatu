@@ -25,7 +25,6 @@ void main() {
     await t.tap(find.text('Iniciar serviço'));
     await t.pumpAndSettle();
     expect(find.text('Serviço em andamento'), findsOneWidget);
-    expect(find.text('Material incluso'), findsOneWidget);
     expect(find.text('Concluir e cobrar'), findsOneWidget);
   });
 }

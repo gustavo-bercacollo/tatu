@@ -69,7 +69,8 @@ void main() {
     await t.tap(find.text('Aceitar R\$ 120,00'));
     await t.pump();
     expect(find.text('Valor combinado'), findsOneWidget);
-    expect(find.text('R\$ 120,00 · Material incluso'), findsOneWidget);
+    expect(find.text('R\$ 120,00'), findsWidgets);
+    expect(find.text('Material incluso'), findsNothing);
     expect(find.text('Rua das Flores, 120 · apto 32'), findsOneWidget);
     await t.tap(find.text('Estou a caminho').last);
     await t.pump();
@@ -97,7 +98,8 @@ void main() {
     await t.tap(find.text('Enviar para Ana'));
     await t.pumpAndSettle();
     await t.pump(const Duration(seconds: 3));
-    expect(find.text('R\$ 130,00 · Material incluso'), findsOneWidget);
+    expect(find.text('Valor combinado'), findsOneWidget);
+    expect(find.text('R\$ 130,00'), findsWidgets);
   });
 
   testWidgets('Valor: 3 rodadas sem acordo encerram o chamado', (t) async {
