@@ -26,6 +26,7 @@ import 'fotos_trabalho_page.dart';
 import '../servico/rota.dart';
 import '../servico/seguranca.dart';
 import 'notificacoes_profissional_page.dart';
+import 'preferencias_atendimento_page.dart';
 import 'previa_page.dart';
 import 'regiao_page.dart';
 import 'sobre_page.dart';
@@ -249,6 +250,14 @@ class PerfilProfissionalPage extends StatelessWidget {
                           valor: '${seguranca.contatos.length}',
                           onTap: () =>
                               _abrir(context, const ContatosConfiancaPage()),
+                        ),
+                        ItemLista(
+                          icone: TablerIcons.user_check,
+                          texto: 'Preferências de atendimento',
+                          onTap: () => _abrir(
+                            context,
+                            const PreferenciasAtendimentoPage(),
+                          ),
                         ),
                         ItemLista(
                           icone: TablerIcons.user_circle,

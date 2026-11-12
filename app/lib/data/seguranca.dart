@@ -35,6 +35,11 @@ class SegurancaRepo extends ChangeNotifier {
   /// Alerta silencioso disparado no atendimento atual.
   bool alertaAtivo = false;
 
+  /// Preferências de atendimento: só clientes mulheres (para
+  /// profissionais mulheres) e só clientes verificados.
+  bool soMulheres = false;
+  bool soVerificados = false;
+
   void restaurar() {
     contatos = const [
       ContatoConfianca(
@@ -50,6 +55,18 @@ class SegurancaRepo extends ChangeNotifier {
     ];
     compartilharTudo = true;
     alertaAtivo = false;
+    soMulheres = false;
+    soVerificados = false;
+    notifyListeners();
+  }
+
+  void definirSoMulheres(bool v) {
+    soMulheres = v;
+    notifyListeners();
+  }
+
+  void definirSoVerificados(bool v) {
+    soVerificados = v;
     notifyListeners();
   }
 

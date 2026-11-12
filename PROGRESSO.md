@@ -81,6 +81,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Sons no celular: o navegador bloqueava o som que começa sozinho (encontrado, chamado). Agora o 1º toque no app destrava todos (`core/som/`)
 - [x] A caminho no novo desenho (P24): “A caminho da Ana”, Abrir rota (folha com Google Maps, Waze, Apple Mapas, copiar endereço e “Usar sempre”; app não instalado), “Quase lá” com aviso no topo, “Ative sua localização”, preferência “App de navegação” no Perfil (`servico/rota.dart`, dados em `data/navegacao.dart`; links abrem de verdade com `url_launcher`)
 - [x] Segurança do profissional (`servico/seguranca.dart`, dados em `data/seguranca.dart`): Em andamento no desenho novo com escudo (toque abre a folha Segurança; segurar 3 s dispara o alerta silencioso), alerta ativo, Ligar 190 (o que ler ao atendente), Ligar 180, Sair agora → Você saiu do atendimento, Contatos de confiança no Perfil. A notificação que os contatos recebem ficou só como desenho (precisa do backend)
+- [x] Preferências de atendimento no Perfil do profissional (`perfil/preferencias_atendimento_page.dart`): só clientes mulheres (só para profissionais mulheres) e só clientes verificados; `LinhaInterruptor(destaque:)`
 - Falta do profissional: cobrar o cliente, avaliar o cliente
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado

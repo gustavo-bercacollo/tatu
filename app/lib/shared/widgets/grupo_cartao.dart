@@ -76,6 +76,7 @@ class LinhaInterruptor extends StatelessWidget {
     required this.onMudar,
     this.detalhe,
     this.habilitado = true,
+    this.destaque = false,
   });
 
   final String texto;
@@ -84,13 +85,22 @@ class LinhaInterruptor extends StatelessWidget {
   final ValueChanged<bool> onMudar;
   final bool habilitado;
 
+  /// Título em negrito e explicação maior (cartão de uma opção só).
+  final bool destaque;
+
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: const BoxConstraints(minHeight: TatuMedidas.alturaLinha),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: destaque ? 16 : 12,
+        ),
         child: Row(
+          crossAxisAlignment: destaque
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
           children: [
             Expanded(
               child: Column(
@@ -100,14 +110,18 @@ class LinhaInterruptor extends StatelessWidget {
                     texto,
                     style: TextStyle(
                       fontSize: 17,
+                      fontWeight: destaque ? FontWeight.w600 : null,
                       color: habilitado
                           ? TatuColors.textPrimary
                           : TatuColors.textSecondary,
                     ),
                   ),
                   if (detalhe != null) ...[
-                    const SizedBox(height: 2),
-                    Text(detalhe!, style: TatuTexto.nota),
+                    SizedBox(height: destaque ? 6 : 2),
+                    Text(
+                      detalhe!,
+                      style: destaque ? TatuTexto.detalhe : TatuTexto.nota,
+                    ),
                   ],
                 ],
               ),

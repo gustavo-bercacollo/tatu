@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
+import 'package:tatu/data/profissional.dart';
 import 'package:tatu/data/seguranca.dart';
+import 'package:tatu/features/profissional/perfil/preferencias_atendimento_page.dart';
 import 'package:tatu/features/profissional/servico/andamento_page.dart';
 import 'package:tatu/features/profissional/servico/rota.dart';
 import 'package:tatu/features/profissional/servico/seguranca.dart';
@@ -97,5 +99,22 @@ void main() {
     await t.tap(find.byType(CupertinoSwitch));
     await t.pump();
     expect(seguranca.compartilharTudo, isFalse);
+  });
+
+  testWidgets('Preferências: só mulheres aparece para profissional mulher', (
+    t,
+  ) async {
+    profissional.restaurar();
+    await _abrir(t, const PreferenciasAtendimentoPage());
+    expect(find.text('Atender só clientes mulheres'), findsNothing);
+    profissional.demo();
+    await t.pump();
+    expect(find.text('Atender só clientes mulheres'), findsOneWidget);
+    await t.tap(find.byType(CupertinoSwitch).first);
+    await t.pump();
+    expect(seguranca.soMulheres, isTrue);
+    await t.tap(find.byType(CupertinoSwitch).last);
+    await t.pump();
+    expect(seguranca.soVerificados, isTrue);
   });
 }

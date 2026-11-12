@@ -40,6 +40,7 @@ import 'package:tatu/data/sobre_ia.dart';
 import 'package:tatu/features/profissional/servico/andamento_page.dart';
 import 'package:tatu/features/profissional/servico/rota.dart';
 import 'package:tatu/features/profissional/servico/seguranca.dart';
+import 'package:tatu/features/profissional/perfil/preferencias_atendimento_page.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/ajuda.dart';
 import 'package:tatu/data/avaliacoes.dart';
@@ -1733,6 +1734,19 @@ void main() {
         await abrirSegurancaCap(t);
         await t.tap(find.text('Sair agora'));
         await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-preferencias', (t) async {
+    await comDemo(
+      t,
+      'pro-preferencias',
+      const PreferenciasAtendimentoPage(),
+      depois: () async {
+        seguranca.definirSoMulheres(true);
+        seguranca.definirSoVerificados(true);
+        await t.pump();
       },
     );
   });
