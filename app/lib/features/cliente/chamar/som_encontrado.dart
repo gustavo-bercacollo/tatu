@@ -1,5 +1,6 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
+
+import '../../../core/som/som.dart';
 
 /// Som de "achou!" quando um profissional aceita o pedido: arpejo subindo
 /// com brilho, como achar um tesouro. Fica tocando até a pessoa agir
@@ -10,28 +11,18 @@ class SomEncontrado {
 
   static const arquivo = 'sons/encontrado.wav';
 
-  AudioPlayer? _player;
+  bool _tocando = false;
 
   Future<void> tocar() async {
-    if (!ativo || _player != null) return;
-    try {
-      HapticFeedback.mediumImpact();
-      final p = AudioPlayer();
-      _player = p;
-      await p.setReleaseMode(ReleaseMode.loop);
-      await p.play(AssetSource(arquivo), volume: 1);
-    } catch (_) {
-      // Sem som (navegador bloqueou, sem plugin): a tela aparece igual.
-    }
+    if (!ativo || _tocando) return;
+    _tocando = true;
+    HapticFeedback.mediumImpact();
+    await tocarSom(arquivo, repetir: true);
   }
 
   Future<void> parar() async {
-    final p = _player;
-    _player = null;
-    if (p == null) return;
-    try {
-      await p.stop();
-      await p.dispose();
-    } catch (_) {}
+    if (!_tocando) return;
+    _tocando = false;
+    await pararSom(arquivo);
   }
 }

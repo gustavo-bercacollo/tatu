@@ -1,6 +1,6 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
 
+import '../../../core/som/som.dart';
 import '../../../data/notificacoes_profissional.dart';
 
 /// Toque do Tatu quando chega um chamado: o som escolhido em
@@ -10,30 +10,20 @@ class ToqueChamado {
   /// Desligado nos testes e nas capturas (sem som de verdade).
   static bool ativo = true;
 
-  AudioPlayer? _player;
+  String? _arquivo;
 
   /// Com [repetir] falso, toca uma vez só (prévia "Ouvir o som").
   Future<void> tocar({bool repetir = true}) async {
     if (!ativo) return;
     final n = notificacoesProfissional;
-    try {
-      if (n.vibrar) HapticFeedback.heavyImpact();
-      final p = AudioPlayer();
-      _player = p;
-      await p.setReleaseMode(repetir ? ReleaseMode.loop : ReleaseMode.stop);
-      await p.play(AssetSource(n.som.arquivo), volume: 1);
-    } catch (_) {
-      // Sem som (navegador bloqueou, sem plugin): o chamado aparece igual.
-    }
+    if (n.vibrar) HapticFeedback.heavyImpact();
+    _arquivo = n.som.arquivo;
+    await tocarSom(n.som.arquivo, repetir: repetir);
   }
 
   Future<void> parar() async {
-    final p = _player;
-    _player = null;
-    if (p == null) return;
-    try {
-      await p.stop();
-      await p.dispose();
-    } catch (_) {}
+    final a = _arquivo;
+    _arquivo = null;
+    if (a != null) await pararSom(a);
   }
 }
