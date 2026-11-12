@@ -36,6 +36,11 @@ class TatuColors {
   static const mapaFundo = Color(0xFFE9E9EE);
   static const mapaVerde = Color(0xFFDDEBD9);
   static const radar = Color(0x1F34C759); // círculos da busca no mapa
+  static const appGoogle = Color(0xFF34A853); // ícone do Google Maps
+  static const appWaze = Color(0xFF33CCFF); // ícone do Waze
+  static const appApple = Color(0xFF5E9BEB); // ícone do Apple Mapas
+  static const avisoEscuro = Color(0xFF1C1C1E); // aviso fixo no topo do mapa
+  static const avisoEscuroTexto = Color(0xFFAEAEB2); // texto menor nele
 
   /// Editor de foto (tela escura).
   static const editorFundo = Color(0xFF2C2C2E);

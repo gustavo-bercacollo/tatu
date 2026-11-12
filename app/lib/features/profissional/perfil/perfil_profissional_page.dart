@@ -8,6 +8,7 @@ import '../../../data/fotos_trabalho.dart';
 import '../../../data/ajuda.dart';
 import '../../../data/notificacoes_profissional.dart';
 import '../../../data/perfil.dart';
+import '../../../data/navegacao.dart';
 import '../../../data/profissional.dart';
 import '../../../shared/widgets/avatar_usuario.dart';
 import '../../../shared/widgets/back_circle_button.dart';
@@ -21,6 +22,7 @@ import '../cadastro/resultado_page.dart';
 import '../home/home_profissional_page.dart';
 import 'dados_conta_profissional_page.dart';
 import 'fotos_trabalho_page.dart';
+import '../servico/rota.dart';
 import 'notificacoes_profissional_page.dart';
 import 'previa_page.dart';
 import 'regiao_page.dart';
@@ -68,6 +70,7 @@ class PerfilProfissionalPage extends StatelessWidget {
         fotosTrabalho,
         perfil,
         notificacoesProfissional,
+        navegacao,
       ]),
       builder: (context, _) {
         final p = profissional;
@@ -229,6 +232,13 @@ class PerfilProfissionalPage extends StatelessWidget {
                               ? 'Ativadas'
                               : 'Desativadas',
                           onTap: () => abrirNotificacoesProfissional(context),
+                        ),
+                        ItemLista(
+                          icone: TablerIcons.navigation,
+                          texto: 'App de navegação',
+                          valor: navegacao.preferido.nome,
+                          onTap: () =>
+                              _abrir(context, const AppNavegacaoPage()),
                         ),
                         ItemLista(
                           icone: TablerIcons.user_circle,

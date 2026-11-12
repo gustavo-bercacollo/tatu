@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/features/profissional/chamado/toque_chamado.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
+import 'package:tatu/data/navegacao.dart';
 import 'package:tatu/data/profissional.dart';
 import 'package:tatu/features/profissional/chamado/chat_profissional_page.dart';
 import 'package:tatu/features/profissional/home/home_profissional_page.dart';
@@ -41,6 +42,7 @@ Future<void> _valor(WidgetTester t, String centavos) async {
 }
 
 void main() {
+  navegacao.restaurar();
   ToqueChamado.ativo = false;
   testWidgets('Online: chega um chamado; aceitar abre o chat', (t) async {
     await _home(t);
@@ -75,7 +77,7 @@ void main() {
     await t.tap(find.text('Estou a caminho').last);
     await t.pump();
     await t.pump(const Duration(milliseconds: 500));
-    expect(find.text('A caminho'), findsOneWidget);
+    expect(find.text('A caminho da Ana'), findsOneWidget);
     expect(find.text('Rua das Flores, 120'), findsOneWidget);
     await t.pump(const Duration(seconds: 6)); // chega perto
     await t.tap(find.text('Cheguei'));

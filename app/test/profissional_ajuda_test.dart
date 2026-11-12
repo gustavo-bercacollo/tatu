@@ -14,6 +14,8 @@ void main() {
       MaterialApp(theme: tatuTheme(), home: const PerfilProfissionalPage()),
     );
     await t.scrollUntilVisible(find.text('Ajuda'), 200);
+    await t.ensureVisible(find.text('Ajuda'));
+    await t.pumpAndSettle();
     await t.tap(find.text('Ajuda'));
     await t.pumpAndSettle();
     expect(find.text('Chamados e clientes'), findsOneWidget);
@@ -51,6 +53,8 @@ void main() {
       MaterialApp(theme: tatuTheme(), home: const PerfilProfissionalPage()),
     );
     await t.scrollUntilVisible(find.text('Ajuda'), 200);
+    await t.ensureVisible(find.text('Ajuda'));
+    await t.pumpAndSettle();
     await t.tap(find.text('Ajuda'));
     await t.pumpAndSettle();
     await t.tap(find.text('Ganhos e Pix'));

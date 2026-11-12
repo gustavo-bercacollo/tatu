@@ -7,6 +7,7 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
+import '../../../data/navegacao.dart';
 import '../../../data/servico_profissional.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
@@ -15,23 +16,30 @@ import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
+import 'rota.dart';
 
 void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
   ..hideCurrentSnackBar()
   ..showSnackBar(SnackBar(content: Text('$o: em breve')));
 
-/// P24 · A caminho e "Você chegou": mapa com o painel do serviço.
-/// "Cheguei" só libera perto do local (protótipo: depois de [chegaEm]).
+/// P24 · A caminho do cliente: rota no mapa, endereço, "Abrir rota" e
+/// "Cheguei", que só libera perto do local (protótipo: depois de
+/// [chegaEm]) e com a localização ligada. Perto, vira "Quase lá" com o
+/// aviso no topo. Depois do "Cheguei": "Você chegou".
 class ACaminhoPage extends StatefulWidget {
   const ACaminhoPage({
     super.key,
     this.servico = servicoExemplo,
     this.chegaEm = const Duration(seconds: 5),
+    this.perto = false,
     this.chegou = false,
   });
 
   final ServicoAceito servico;
   final Duration chegaEm;
+
+  /// Abre já perto do local (fluxograma e testes).
+  final bool perto;
 
   /// Abre já no local (para o fluxograma e testes).
   final bool chegou;
@@ -41,7 +49,7 @@ class ACaminhoPage extends StatefulWidget {
 }
 
 class _ACaminhoPageState extends State<ACaminhoPage> {
-  late bool _perto = widget.chegou;
+  late bool _perto = widget.perto || widget.chegou;
   late bool _chegou = widget.chegou;
   Timer? _timer;
 
@@ -53,6 +61,9 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
         if (mounted) setState(() => _perto = true);
       });
     }
+    if (!navegacao.localizacaoAtiva) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _pedirLocalizacao());
+    }
   }
 
   @override
@@ -61,16 +72,77 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
     super.dispose();
   }
 
+  Future<void> _pedirLocalizacao() async {
+    if (!mounted) return;
+    final s = widget.servico;
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => LocalizacaoCaminhoPage(
+          cliente: s.primeiroNome,
+          feminino: s.feminino,
+        ),
+      ),
+    );
+    if (mounted) setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = widget.servico;
+    final localizacao = navegacao.localizacaoAtiva;
+    final perto = _perto && localizacao && !_chegou;
+    final daCliente = '${s.feminino ? 'da' : 'do'} ${s.primeiroNome}';
+    final km = s.distanciaKm.toStringAsFixed(1).replaceAll('.', ',');
     return Scaffold(
       body: Stack(
         children: [
           Positioned.fill(
             child: CustomPaint(
               painter: const MapaFalso(),
-              foregroundPainter: _chegou ? _NoLocal() : _Rota(),
+              foregroundPainter: _chegou ? _NoLocal() : _Rota(perto: perto),
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                TatuMedidas.margem,
+                TatuMedidas.topo,
+                TatuMedidas.margem,
+                0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Semantics(
+                      button: true,
+                      label: 'Voltar',
+                      child: Material(
+                        color: TatuColors.bg,
+                        shape: const CircleBorder(),
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          onTap: () => Navigator.of(context).maybePop(),
+                          child: const SizedBox(
+                            width: 36,
+                            height: 36,
+                            child: Icon(TablerIcons.chevron_left, size: 20),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (perto) ...[
+                    const SizedBox(height: 8),
+                    _AvisoPerto(
+                      titulo: 'Você chegou perto $daCliente',
+                      texto:
+                          'Toque em “Cheguei” para avisá-${s.feminino ? 'la' : 'lo'}.',
+                    ),
+                  ],
+                ],
+              ),
             ),
           ),
           Align(
@@ -100,13 +172,13 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
                     children: [
                       const AlcaFolha(),
                       const SizedBox(height: 16),
-                      if (_chegou) ..._topoChegou(s) else ..._topoCaminho(s),
-                      const SizedBox(height: TatuMedidas.entreItens),
-                      CartaoEndereco(servico: s),
-                      const SizedBox(height: 10),
-                      CartaoServico(servico: s),
-                      const SizedBox(height: TatuMedidas.entreItens + 4),
                       if (_chegou) ...[
+                        ..._topoChegou(s),
+                        const SizedBox(height: TatuMedidas.entreItens),
+                        CartaoEndereco(servico: s),
+                        const SizedBox(height: 10),
+                        CartaoServico(servico: s),
+                        const SizedBox(height: TatuMedidas.entreItens + 4),
                         FilledButton(
                           onPressed: () =>
                               Navigator.of(context).pushReplacement(
@@ -130,27 +202,49 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
                           label: Text('Falar com ${s.primeiroNome}'),
                         ),
                       ] else ...[
-                        FilledButton.icon(
-                          onPressed: () => _emBreve(context, 'Abrir rota'),
-                          icon: const Icon(TablerIcons.navigation, size: 20),
-                          label: const Text('Abrir rota'),
+                        Text(
+                          perto ? 'Quase lá' : 'A caminho $daCliente',
+                          style: TatuTexto.tituloFolha,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          perto
+                              ? '200 m $daCliente'
+                              : 'Chegada em ${s.minutos} min · $km km',
+                          style: TatuTexto.detalhe,
+                        ),
+                        const SizedBox(height: TatuMedidas.entreItens + 4),
+                        CartaoEndereco(servico: s),
+                        const SizedBox(height: TatuMedidas.entreItens + 4),
+                        FilledButton(
+                          style: tatuBotaoSecundario(),
+                          onPressed: () => abrirRota(context, s),
+                          child: const Text('Abrir rota'),
                         ),
                         const SizedBox(height: 10),
                         FilledButton(
-                          style: tatuBotaoSecundario(),
-                          onPressed: _perto
+                          style: perto ? null : tatuBotaoSecundario(),
+                          onPressed: perto
                               ? () => setState(() => _chegou = true)
                               : null,
                           child: const Text('Cheguei'),
                         ),
                         const SizedBox(height: 10),
-                        Text(
-                          _perto
-                              ? 'Você está perto do local.'
-                              : 'Libera quando você estiver perto do local.',
-                          textAlign: TextAlign.center,
-                          style: TatuTexto.nota,
-                        ),
+                        if (!localizacao)
+                          Center(
+                            child: LinkAzul(
+                              'Ativar localização',
+                              onTap: _pedirLocalizacao,
+                            ),
+                          )
+                        else
+                          Text(
+                            perto
+                                ? 'Toque quando estiver na porta.'
+                                : '“Cheguei” libera quando você estiver perto.',
+                            textAlign: TextAlign.center,
+                            style: TatuTexto.nota,
+                          ),
                       ],
                     ],
                   ),
@@ -162,26 +256,6 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
       ),
     );
   }
-
-  List<Widget> _topoCaminho(ServicoAceito s) => [
-    Row(
-      children: [
-        const SeloPreto('A caminho'),
-        const Spacer(),
-        Text(
-          '${s.minutos} min · ${s.distanciaKm.toStringAsFixed(1).replaceAll('.', ',')} km',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-        ),
-      ],
-    ),
-    const SizedBox(height: TatuMedidas.entreItens),
-    LinhaCliente(
-      titulo: s.cliente,
-      detalhe:
-          '${s.notaCliente.toStringAsFixed(1).replaceAll('.', ',')} · cliente',
-      onMensagem: () => _emBreve(context, 'Chat'),
-    ),
-  ];
 
   List<Widget> _topoChegou(ServicoAceito s) => [
     const Align(
@@ -196,6 +270,52 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
       style: TatuTexto.detalhe,
     ),
   ];
+}
+
+/// Aviso escuro fixo no topo do mapa ("Você chegou perto da Ana").
+class _AvisoPerto extends StatelessWidget {
+  const _AvisoPerto({required this.titulo, required this.texto});
+
+  final String titulo;
+  final String texto;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+    decoration: BoxDecoration(
+      color: TatuColors.avisoEscuro,
+      borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+    ),
+    child: Row(
+      children: [
+        const Icon(TablerIcons.map_pin, color: TatuColors.onAction, size: 22),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                titulo,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: TatuColors.onAction,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                texto,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: TatuColors.avisoEscuroTexto,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /// P25 · Serviço em andamento: concluir e cobrar.
@@ -424,34 +544,42 @@ class _CartaoCinza extends StatelessWidget {
   }
 }
 
-/// Rota no mapa: ponto azul (você) até o ponto preto (cliente).
+/// Rota no mapa: ponto verde (você) até o ponto preto (cliente). [perto]
+/// põe o ponto verde quase em cima do preto.
 class _Rota extends CustomPainter {
+  const _Rota({this.perto = false});
+
+  final bool perto;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final a = Offset(size.width * .26, size.height * .40);
-    final b = Offset(size.width * .26, size.height * .30);
-    final c = Offset(size.width * .58, size.height * .30);
-    final d = Offset(size.width * .58, size.height * .12);
+    // Medidas do desenho (393 × 852).
+    final sx = size.width / 393;
+    final sy = size.height / 852;
+    Offset o(double x, double y) => Offset(x * sx, y * sy);
+    final a = o(90, 90);
+    final d = o(262, 380);
+    final rota = Path()
+      ..moveTo(a.dx, a.dy)
+      ..cubicTo(120 * sx, 130 * sy, 140 * sx, 230 * sy, 175 * sx, 275 * sy)
+      ..cubicTo(205 * sx, 315 * sy, 255 * sx, 330 * sy, d.dx, d.dy);
     canvas.drawPath(
-      Path()
-        ..moveTo(a.dx, a.dy)
-        ..lineTo(b.dx, b.dy)
-        ..lineTo(c.dx, c.dy)
-        ..lineTo(d.dx, d.dy),
+      rota,
       Paint()
         ..color = TatuColors.action
         ..style = PaintingStyle.stroke
         ..strokeWidth = 5
-        ..strokeJoin = StrokeJoin.round,
+        ..strokeCap = StrokeCap.round,
     );
-    canvas.drawCircle(a, 9, Paint()..color = TatuColors.bg);
-    canvas.drawCircle(a, 6.5, Paint()..color = TatuColors.verified);
+    final eu = perto ? o(250, 360) : a;
+    canvas.drawCircle(d, 15, Paint()..color = TatuColors.bg);
     canvas.drawCircle(d, 11, Paint()..color = TatuColors.action);
-    canvas.drawCircle(d, 4, Paint()..color = TatuColors.bg);
+    canvas.drawCircle(eu, 12, Paint()..color = TatuColors.bg);
+    canvas.drawCircle(eu, 9, Paint()..color = TatuColors.online);
   }
 
   @override
-  bool shouldRepaint(_Rota oldDelegate) => false;
+  bool shouldRepaint(_Rota oldDelegate) => oldDelegate.perto != perto;
 }
 
 /// No local: ponto preto com o círculo verde em volta.

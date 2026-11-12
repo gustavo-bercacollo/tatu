@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/features/profissional/chamado/toque_chamado.dart';
 import 'package:tatu/data/conversas_profissional.dart';
+import 'package:tatu/data/navegacao.dart';
 import 'package:tatu/data/notificacoes_profissional.dart';
 import 'package:tatu/features/profissional/perfil/notificacoes_profissional_page.dart';
 import 'package:tatu/features/profissional/perfil/dados_conta_profissional_page.dart';
@@ -36,6 +37,7 @@ import 'package:tatu/features/profissional/perfil/regiao_page.dart';
 import 'package:tatu/features/profissional/perfil/sobre_page.dart';
 import 'package:tatu/data/sobre_ia.dart';
 import 'package:tatu/features/profissional/servico/andamento_page.dart';
+import 'package:tatu/features/profissional/servico/rota.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/ajuda.dart';
 import 'package:tatu/data/avaliacoes.dart';
@@ -145,6 +147,7 @@ Future<void> _capturar(
   fotosTrabalho.restaurar();
   conversasProfissional.restaurar();
   notificacoesProfissional.restaurar();
+  navegacao.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -1632,6 +1635,56 @@ void main() {
 
   testWidgets('pro-chegou', (t) async {
     await _capturar(t, 'pro-chegou', const ACaminhoPage(chegou: true));
+  });
+
+  testWidgets('pro-quase-la', (t) async {
+    await _capturar(t, 'pro-quase-la', const ACaminhoPage(perto: true));
+  });
+
+  testWidgets('pro-rota-escolher', (t) async {
+    await _capturar(
+      t,
+      'pro-rota-escolher',
+      const ACaminhoPage(chegaEm: Duration(hours: 1)),
+      preparar: () async {
+        await t.tap(find.text('Abrir rota'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-rota-nao-instalado', (t) async {
+    await _capturar(
+      t,
+      'pro-rota-nao-instalado',
+      const ACaminhoPage(chegaEm: Duration(hours: 1)),
+      preparar: () async {
+        await t.tap(find.text('Abrir rota'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Waze'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-localizacao', (t) async {
+    await _capturar(
+      t,
+      'pro-localizacao',
+      const LocalizacaoCaminhoPage(cliente: 'Ana'),
+    );
+  });
+
+  testWidgets('pro-app-navegacao', (t) async {
+    await _capturar(
+      t,
+      'pro-app-navegacao',
+      const AppNavegacaoPage(),
+      preparar: () async {
+        navegacao.escolher(AppNavegacao.google);
+        await t.pump();
+      },
+    );
   });
 
   testWidgets('pro-em-andamento', (t) async {

@@ -79,6 +79,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Espaço reservado para anúncio (`EspacoAnuncio`, 353 × 76, tracejado) na Home do cliente e no Procurando; Procurando com a barra em 3 etapas e “Expandindo…” com o ponto verde
 - [x] Profissional encontrado (`chamar/encontrado_page.dart`, fila em `data/encontrados.dart`): som de “achou!” (`assets/sons/encontrado.wav`, `SomEncontrado`), 3 min para aceitar (vermelho nos últimos 15 s), Ver outro com folha, próximo da fila, Aceitar → pedido em andamento + chat novo. O som fica em loop até a pessoa agir. Ver perfil (C14–C15) usa a mesma tela da Prévia do profissional (`entrada/perfil_publico_page.dart`, dados em `data/perfil_publico.dart`) com Ver outro / Aceitar fixos. Protótipo: na busca alguém aceita aos 8 s (`ProcurandoPage.aceitaEm`, nulo nos testes)
 - [x] Sons no celular: o navegador bloqueava o som que começa sozinho (encontrado, chamado). Agora o 1º toque no app destrava todos (`core/som/`)
+- [x] A caminho no novo desenho (P24): “A caminho da Ana”, Abrir rota (folha com Google Maps, Waze, Apple Mapas, copiar endereço e “Usar sempre”; app não instalado), “Quase lá” com aviso no topo, “Ative sua localização”, preferência “App de navegação” no Perfil (`servico/rota.dart`, dados em `data/navegacao.dart`; links abrem de verdade com `url_launcher`)
 - Falta do profissional: cobrar o cliente, avaliar o cliente
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado
