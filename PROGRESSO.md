@@ -75,6 +75,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Toque do chamado (`assets/sons/chamado.wav`, marimba gerada aqui; `ToqueChamado` com `audioplayers`, em loop no Novo chamado). Abas do profissional voltaram a 3; o Perfil abre pela foto da Home
 - [x] Ajuda do profissional: as telas da Ajuda do cliente recebem um `ConteudoAjuda` (`conteudoCliente` / `conteudoProfissional` em `data/ajuda.dart`): assuntos, perguntas, artigos (Quando recebo, Taxa), “Ver meus ganhos” abre Ganhos, Sobre o que é?, Qual chamado?, chat com o suporte. Abre pelo Perfil e pelas opções do chat
 - [x] Notificações do profissional (`perfil/notificacoes_profissional_page.dart`, dados em `data/notificacoes_profissional.dart`): pedido de permissão na 1ª vez, chamados/ganhos/extras, desligar novo chamado com confirmação, desativadas no celular, Som do novo chamado (Alerta Tatu, Sino, Buzina, Padrão — `assets/sons/`, gerados aqui; vibrar; ouvir). O Novo chamado toca o som escolhido
+- [x] Dados da conta do profissional (`perfil/dados_conta_profissional_page.dart`): dados do documento com cadeado (folha “vem do documento” → câmera), contato da conta, Encerrar perfil profissional → encerrado → modo cliente, Excluir conta bloqueado com valor a receber. `LinhaDado` e `LinhaConsequencia` viraram componentes
 - Falta do profissional: cobrar o cliente, avaliar o cliente
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado

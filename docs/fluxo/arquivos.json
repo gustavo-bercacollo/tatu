@@ -230,5 +230,10 @@
  "app/pro-permissao-avisos.png": "docs/fluxo/app/pro-permissao-avisos.png",
  "app/pro-notificacoes-desligar.png": "docs/fluxo/app/pro-notificacoes-desligar.png",
  "app/pro-notificacoes-bloqueadas.png": "docs/fluxo/app/pro-notificacoes-bloqueadas.png",
- "app/pro-som-chamado.png": "docs/fluxo/app/pro-som-chamado.png"
+ "app/pro-som-chamado.png": "docs/fluxo/app/pro-som-chamado.png",
+ "app/pro-dados-conta.png": "docs/fluxo/app/pro-dados-conta.png",
+ "app/pro-dados-documento.png": "docs/fluxo/app/pro-dados-documento.png",
+ "app/pro-encerrar-perfil.png": "docs/fluxo/app/pro-encerrar-perfil.png",
+ "app/pro-perfil-encerrado.png": "docs/fluxo/app/pro-perfil-encerrado.png",
+ "app/pro-excluir-saldo.png": "docs/fluxo/app/pro-excluir-saldo.png"
 }

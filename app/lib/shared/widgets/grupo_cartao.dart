@@ -336,3 +336,73 @@ class LinhaRotuloValor extends StatelessWidget {
     );
   }
 }
+
+/// Linha com rótulo cinza, valor, ✓ verde de confirmado e seta (ou
+/// cadeado, quando o dado vem do documento).
+class LinhaDado extends StatelessWidget {
+  const LinhaDado({
+    super.key,
+    required this.rotulo,
+    required this.valor,
+    required this.onTap,
+    this.confirmado = false,
+    this.bloqueado = false,
+  });
+
+  final String rotulo;
+  final String valor;
+  final VoidCallback onTap;
+  final bool confirmado;
+
+  /// Vem do documento: cadeado no lugar da seta.
+  final bool bloqueado;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(rotulo, style: TatuTexto.nota),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          valor,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 17),
+                        ),
+                      ),
+                      if (confirmado) ...[
+                        const SizedBox(width: 8),
+                        const Icon(
+                          TablerIcons.check,
+                          size: 18,
+                          color: TatuColors.online,
+                          semanticLabel: 'Confirmado',
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              bloqueado ? TablerIcons.lock : TablerIcons.chevron_right,
+              size: bloqueado ? 20 : 18,
+              color: TatuColors.chevron,
+              semanticLabel: bloqueado ? 'Do documento' : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

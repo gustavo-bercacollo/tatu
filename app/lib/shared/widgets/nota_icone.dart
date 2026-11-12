@@ -132,3 +132,33 @@ class IconeResultado extends StatelessWidget {
     );
   }
 }
+
+/// Linha com ícone num círculo cinza e o texto do que acontece.
+class LinhaConsequencia extends StatelessWidget {
+  const LinhaConsequencia(this.icone, this.texto, {super.key});
+
+  final IconData icone;
+  final String texto;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: const BoxDecoration(
+              color: TatuColors.fill,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icone, size: 20, color: TatuColors.textPrimary),
+          ),
+          const SizedBox(width: 16),
+          Expanded(child: Text(texto, style: TatuTexto.comentario)),
+        ],
+      ),
+    );
+  }
+}

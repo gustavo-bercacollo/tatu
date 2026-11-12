@@ -11,6 +11,7 @@ import 'package:tatu/features/profissional/chamado/toque_chamado.dart';
 import 'package:tatu/data/conversas_profissional.dart';
 import 'package:tatu/data/notificacoes_profissional.dart';
 import 'package:tatu/features/profissional/perfil/notificacoes_profissional_page.dart';
+import 'package:tatu/features/profissional/perfil/dados_conta_profissional_page.dart';
 import 'package:tatu/data/fotos_trabalho.dart';
 import 'package:tatu/features/cliente/mensagens/denunciar_page.dart'
     show DenunciarPage, DenunciaEnviadaPage;
@@ -2004,5 +2005,33 @@ void main() {
 
   testWidgets('pro-permissao-avisos', (t) async {
     await comDemo(t, 'pro-permissao-avisos', const PermissaoAvisosPage());
+  });
+
+  testWidgets('pro-dados-conta', (t) async {
+    await comDemo(t, 'pro-dados-conta', const DadosContaProfissionalPage());
+  });
+
+  testWidgets('pro-dados-documento', (t) async {
+    await comDemo(
+      t,
+      'pro-dados-documento',
+      const DadosContaProfissionalPage(),
+      depois: () async {
+        await t.tap(find.text('Luiza Vilela'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-encerrar-perfil', (t) async {
+    await comDemo(t, 'pro-encerrar-perfil', const EncerrarPerfilPage());
+  });
+
+  testWidgets('pro-perfil-encerrado', (t) async {
+    await comDemo(t, 'pro-perfil-encerrado', const PerfilEncerradoPage());
+  });
+
+  testWidgets('pro-excluir-saldo', (t) async {
+    await comDemo(t, 'pro-excluir-saldo', const ExcluirComSaldoPage());
   });
 }

@@ -19,6 +19,7 @@ import '../cadastro/pix_page.dart';
 import '../cadastro/profissoes_page.dart';
 import '../cadastro/resultado_page.dart';
 import '../home/home_profissional_page.dart';
+import 'dados_conta_profissional_page.dart';
 import 'fotos_trabalho_page.dart';
 import 'notificacoes_profissional_page.dart';
 import 'previa_page.dart';
@@ -232,7 +233,10 @@ class PerfilProfissionalPage extends StatelessWidget {
                         ItemLista(
                           icone: TablerIcons.user_circle,
                           texto: 'Dados da conta',
-                          onTap: () => _emBreve(context, 'Dados da conta'),
+                          onTap: () => _abrir(
+                            context,
+                            const DadosContaProfissionalPage(),
+                          ),
                         ),
                       ],
                     ),

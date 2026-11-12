@@ -145,6 +145,9 @@ class ProfissionalRepo extends ChangeNotifier {
 
   String nome = '';
   String cpf = ''; // só dígitos
+
+  /// Do documento (lido na verificação).
+  String nascimento = '';
   String celular = ''; // só dígitos
   bool feminino = false;
   List<ProfissaoEscolhida> profissoes = [];
@@ -218,6 +221,7 @@ class ProfissionalRepo extends ChangeNotifier {
   void restaurar() {
     nome = '';
     cpf = '';
+    nascimento = '';
     celular = '';
     feminino = false;
     profissoes = [];
@@ -238,6 +242,7 @@ class ProfissionalRepo extends ChangeNotifier {
   void demo({bool comPix = true, bool aprovada = true}) {
     nome = 'Luiza Vilela';
     cpf = '12345678909';
+    nascimento = '12/04/1990';
     celular = '11977776666';
     feminino = true;
     profissoes = const [
