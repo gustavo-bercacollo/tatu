@@ -1047,6 +1047,43 @@ void main() {
     );
   });
 
+  Future<void> abrirPerfilEncontrado(WidgetTester t) async {
+    await t.tap(find.text('Ver perfil'));
+    await t.pumpAndSettle();
+  }
+
+  testWidgets('encontrado-perfil', (t) async {
+    await _capturar(
+      t,
+      'encontrado-perfil',
+      const EncontradoPage(
+        servico: 'Encanador',
+        endereco: 'Rua Bruno Lobo, 29',
+        restante: 168,
+        animar: false,
+      ),
+      preparar: () => abrirPerfilEncontrado(t),
+    );
+  });
+
+  testWidgets('encontrado-perfil-avaliacoes', (t) async {
+    await _capturar(
+      t,
+      'encontrado-perfil-avaliacoes',
+      const EncontradoPage(
+        servico: 'Encanador',
+        endereco: 'Rua Bruno Lobo, 29',
+        restante: 168,
+        animar: false,
+      ),
+      preparar: () async {
+        await abrirPerfilEncontrado(t);
+        await t.drag(find.byType(ListView).first, const Offset(0, -700));
+        await t.pump();
+      },
+    );
+  });
+
   Future<void> abrirOutros(WidgetTester t) async {
     await t.tap(find.text('Outros'));
     await t.pumpAndSettle();

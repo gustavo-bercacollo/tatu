@@ -86,4 +86,37 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('Ver perfil mostra o perfil; Aceitar de lá abre o chat', (
+    t,
+  ) async {
+    await _abrir(
+      t,
+      const EncontradoPage(servico: 'Encanador', endereco: 'Rua A, 1'),
+    );
+    await t.tap(find.text('Ver perfil'));
+    await t.pumpAndSettle();
+    expect(find.text('Encanadora · 1,2 km de você'), findsOneWidget);
+    expect(find.text('Vazamentos'), findsOneWidget);
+    expect(find.text('Aceitar Luiza'), findsOneWidget);
+    await t.tap(find.text('Aceitar Luiza'));
+    await t.pump(const Duration(milliseconds: 600));
+    await t.pump(const Duration(milliseconds: 600));
+    expect(find.byType(ChatPage), findsOneWidget);
+    expect(pedidos.andamento?.profissional, 'Luiza Souza');
+  });
+
+  testWidgets('Ver outro no perfil pergunta e chama o próximo', (t) async {
+    await _abrir(
+      t,
+      const EncontradoPage(servico: 'Encanador', endereco: 'Rua A, 1'),
+    );
+    await t.tap(find.text('Ver perfil'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Ver outro'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Ver outro profissional'));
+    await t.pumpAndSettle();
+    expect(find.text('Carlos Pereira'), findsOneWidget);
+  });
 }

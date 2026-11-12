@@ -13,6 +13,7 @@ import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import '../../profissional/cadastro/resultado_page.dart' show NomeVerificado;
+import '../../entrada/perfil_publico_page.dart';
 import '../abas.dart';
 import '../mensagens/chat_page.dart';
 import '../../../shared/widgets/abas_cliente.dart';
@@ -62,6 +63,7 @@ class _EncontradoPageState extends State<EncontradoPage> {
   late int _restante =
       widget.restante ?? EncontradoPage.prazo.inSeconds;
   Timer? _timer;
+  final _som = SomEncontrado();
 
   ProfissionalEncontrado get _base =>
       filaEncontrados[widget.indice % filaEncontrados.length];
@@ -74,13 +76,17 @@ class _EncontradoPageState extends State<EncontradoPage> {
     nota: _base.nota,
     servicos: _base.servicos,
     chegaEm: _base.chegaEm,
+    distancia: _base.distancia,
+    resposta: _base.resposta,
+    especialidades: _base.especialidades,
+    sobre: _base.sobre,
   );
 
   @override
   void initState() {
     super.initState();
     if (widget.animar) {
-      SomEncontrado().tocar();
+      _som.tocar();
       _timer = Timer.periodic(const Duration(seconds: 1), (_) {
         if (_restante <= 1) {
           _timer?.cancel();
@@ -95,6 +101,7 @@ class _EncontradoPageState extends State<EncontradoPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    _som.parar();
     super.dispose();
   }
 
@@ -102,8 +109,13 @@ class _EncontradoPageState extends State<EncontradoPage> {
   void _proximo() {
     if (!mounted) return;
     _timer?.cancel();
+    _som.parar();
     final proximo = widget.indice + 1;
-    Navigator.of(context).pushReplacement(
+    // Fecha o perfil ou a folha abertos por cima antes de trocar.
+    final nav = Navigator.of(context);
+    final rota = ModalRoute.of(context);
+    nav.popUntil((r) => r == rota);
+    nav.pushReplacement(
       MaterialPageRoute(
         builder: (_) => proximo < filaEncontrados.length
             ? EncontradoPage(
@@ -121,6 +133,7 @@ class _EncontradoPageState extends State<EncontradoPage> {
   }
 
   Future<void> _verOutro() async {
+    _som.parar();
     final p = _p;
     final ok = await confirmar(
       context,
@@ -137,6 +150,7 @@ class _EncontradoPageState extends State<EncontradoPage> {
 
   void _aceitar() {
     _timer?.cancel();
+    _som.parar();
     final p = _p;
     pedidos.aceitar(
       PedidoAndamento(
@@ -164,9 +178,26 @@ class _EncontradoPageState extends State<EncontradoPage> {
     nav.push(MaterialPageRoute(builder: (_) => ChatPage(conversa: c)));
   }
 
-  void _verPerfil() => ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(const SnackBar(content: Text('Perfil do profissional: em breve')));
+  /// Perfil completo (C14–C15) com "Ver outro" e "Aceitar" fixos embaixo.
+  Future<void> _verPerfil() async {
+    _som.parar();
+    final p = _p;
+    final escolha = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (ctx) => PerfilPublicoPage(
+          perfil: perfilDe(p),
+          avatar: AvatarIniciais(nome: p.nome, tamanho: 96),
+          rodape: _Botoes(
+            nome: p.primeiroNome,
+            onVerOutro: () => Navigator.of(ctx).pop(false),
+            onAceitar: () => Navigator.of(ctx).pop(true),
+          ),
+        ),
+      ),
+    );
+    if (!mounted || escolha == null) return;
+    escolha ? _aceitar() : _verOutro();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +229,10 @@ class _EncontradoPageState extends State<EncontradoPage> {
                     shape: const CircleBorder(),
                     child: InkWell(
                       customBorder: const CircleBorder(),
-                      onTap: () => Navigator.of(context).maybePop(),
+                      onTap: () {
+                        _som.parar();
+                        Navigator.of(context).maybePop();
+                      },
                       child: const SizedBox(
                         width: 36,
                         height: 36,
@@ -364,35 +398,55 @@ class _EncontradoPageState extends State<EncontradoPage> {
           ),
         ),
         const SizedBox(height: 20),
-        Row(
-          children: [
-            SizedBox(
-              width: 120,
-              child: FilledButton(
-                style: tatuBotaoSecundario().copyWith(
-                  padding: const WidgetStatePropertyAll(
-                    EdgeInsets.symmetric(horizontal: 12),
-                  ),
-                ),
-                onPressed: _verOutro,
-                child: const Text('Ver outro', maxLines: 1, softWrap: false),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: FilledButton(
-                onPressed: _aceitar,
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text('Aceitar ${p.primeiroNome}'),
-                ),
-              ),
-            ),
-          ],
+        _Botoes(
+          nome: p.primeiroNome,
+          onVerOutro: _verOutro,
+          onAceitar: _aceitar,
         ),
       ],
     );
   }
+}
+
+/// "Ver outro" (cinza) e "Aceitar [nome]" (preto), lado a lado.
+class _Botoes extends StatelessWidget {
+  const _Botoes({
+    required this.nome,
+    required this.onVerOutro,
+    required this.onAceitar,
+  });
+
+  final String nome;
+  final VoidCallback onVerOutro;
+  final VoidCallback onAceitar;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      SizedBox(
+        width: 120,
+        child: FilledButton(
+          style: tatuBotaoSecundario().copyWith(
+            padding: const WidgetStatePropertyAll(
+              EdgeInsets.symmetric(horizontal: 12),
+            ),
+          ),
+          onPressed: onVerOutro,
+          child: const Text('Ver outro', maxLines: 1, softWrap: false),
+        ),
+      ),
+      const SizedBox(width: 10),
+      Expanded(
+        child: FilledButton(
+          onPressed: onAceitar,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text('Aceitar $nome'),
+          ),
+        ),
+      ),
+    ],
+  );
 }
 
 /// Anel com o tempo para aceitar (verde; vermelho no fim).
