@@ -198,9 +198,10 @@ void main() {
     seguranca.mostrarDicaEscudo();
     await _abrir(t, const PedidoAndamentoPage());
     await t.pump();
-    // Só aparece depois de 0,3 s.
-    expect(find.text('Botão de segurança'), findsNothing);
+    // Só aparece depois de 0,5 s.
     await t.pump(const Duration(milliseconds: 300));
+    expect(find.text('Botão de segurança'), findsNothing);
+    await t.pump(const Duration(milliseconds: 200));
     await t.pump();
     expect(find.text('Botão de segurança'), findsOneWidget);
     await t.pump(const Duration(seconds: 3));

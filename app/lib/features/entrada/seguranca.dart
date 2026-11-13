@@ -43,7 +43,7 @@ class BotaoEscudo extends StatefulWidget {
   static const tempoDica = Duration(seconds: 3);
 
   /// Espera antes de mostrar a dica (a tela termina de abrir).
-  static const atrasoDica = Duration(milliseconds: 300);
+  static const atrasoDica = Duration(milliseconds: 500);
 
   @override
   State<BotaoEscudo> createState() => _BotaoEscudoState();
