@@ -8,6 +8,7 @@ import '../../../data/fotos_trabalho.dart';
 import '../../../data/ajuda.dart';
 import '../../../data/notificacoes_profissional.dart';
 import '../../../data/perfil.dart';
+import '../../../data/avaliacoes_profissional.dart';
 import '../../../data/navegacao.dart';
 import '../../../data/profissional.dart';
 import '../../../data/seguranca.dart';
@@ -25,6 +26,7 @@ import 'dados_conta_profissional_page.dart';
 import 'fotos_trabalho_page.dart';
 import '../servico/rota.dart';
 import '../../entrada/seguranca.dart';
+import 'avaliacoes_profissional_page.dart';
 import 'notificacoes_profissional_page.dart';
 import 'preferencias_atendimento_page.dart';
 import 'previa_page.dart';
@@ -75,6 +77,7 @@ class PerfilProfissionalPage extends StatelessWidget {
         notificacoesProfissional,
         navegacao,
         seguranca,
+        avaliacoesProfissional,
       ]),
       builder: (context, _) {
         final p = profissional;
@@ -176,6 +179,19 @@ class PerfilProfissionalPage extends StatelessWidget {
                     GrupoLista(
                       titulo: 'Seu perfil',
                       itens: [
+                        ItemLista(
+                          icone: TablerIcons.star,
+                          texto: 'Minhas avaliações',
+                          valor: avaliacoesProfissional.vazio
+                              ? null
+                              : avaliacoesProfissional.media
+                                    .toStringAsFixed(1)
+                                    .replaceAll('.', ','),
+                          onTap: () => _abrir(
+                            context,
+                            const AvaliacoesProfissionalPage(),
+                          ),
+                        ),
                         ItemLista(
                           icone: TablerIcons.tools,
                           texto: 'Profissões',

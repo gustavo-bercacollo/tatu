@@ -87,6 +87,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Dica “Botão de segurança” embaixo do escudo por 3 s na 1ª vez de cada modo (`BotaoEscudo`)
 - [x] Verificação de identidade do cliente (`cliente/verificar_identidade_page.dart` + `CameraVerificacaoPage(cliente: true)` com cantos verdes e oval verde): pedida ao ligar “Preferir profissionais mulheres”; documento → selfie → Identidade verificada (liga a preferência). `CaixaAviso` (caixa amarela) virou componente
 - [x] “Verificar identidade” no Perfil do cliente (Verificar / Verificada), sem ligar a preferência
+- [x] Minhas avaliações do profissional (`perfil/avaliacoes_profissional_page.dart`, dados em `data/avaliacoes_profissional.dart`): resumo com barras laranja e variação do mês, mais elogiado, filtros (Segmento com ícone), dica da IA, contestar notas 1–2 → contestação recebida → “Em revisão”, estado vazio
 - Falta do profissional: cobrar o cliente, avaliar o cliente
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado

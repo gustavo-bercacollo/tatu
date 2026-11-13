@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/features/profissional/chamado/toque_chamado.dart';
 import 'package:tatu/data/conversas_profissional.dart';
+import 'package:tatu/data/avaliacoes_profissional.dart';
 import 'package:tatu/data/navegacao.dart';
 import 'package:tatu/data/seguranca.dart';
 import 'package:tatu/data/notificacoes_profissional.dart';
@@ -41,6 +42,7 @@ import 'package:tatu/features/profissional/servico/andamento_page.dart';
 import 'package:tatu/features/profissional/servico/rota.dart';
 import 'package:tatu/features/entrada/seguranca.dart';
 import 'package:tatu/features/profissional/perfil/preferencias_atendimento_page.dart';
+import 'package:tatu/features/profissional/perfil/avaliacoes_profissional_page.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/ajuda.dart';
 import 'package:tatu/data/avaliacoes.dart';
@@ -154,6 +156,7 @@ Future<void> _capturar(
   notificacoesProfissional.restaurar();
   navegacao.restaurar();
   seguranca.restaurar();
+  avaliacoesProfissional.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -1800,6 +1803,50 @@ void main() {
         await t.pumpAndSettle();
       },
     );
+  });
+
+  testWidgets('pro-avaliacoes', (t) async {
+    await _capturar(t, 'pro-avaliacoes', const AvaliacoesProfissionalPage());
+  });
+
+  testWidgets('pro-avaliacoes-baixas', (t) async {
+    await _capturar(
+      t,
+      'pro-avaliacoes-baixas',
+      const AvaliacoesProfissionalPage(filtro: 2),
+    );
+  });
+
+  testWidgets('pro-avaliacoes-vazio', (t) async {
+    await _capturar(
+      t,
+      'pro-avaliacoes-vazio',
+      const AvaliacoesProfissionalPage(),
+      preparar: () async {
+        avaliacoesProfissional.limpar();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-contestar', (t) async {
+    avaliacoesProfissional.restaurar();
+    await _capturar(
+      t,
+      'pro-contestar',
+      ContestarAvaliacaoPage(
+        avaliacao: avaliacoesProfissional.recentes.last,
+        motivo: 0,
+      ),
+      preparar: () async {
+        await t.enterText(find.byType(TextField), 'Me xingou por eu ser mulher.');
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-contestacao-recebida', (t) async {
+    await _capturar(t, 'pro-contestacao-recebida', const ContestacaoRecebidaPage());
   });
 
   testWidgets('pro-preferencias', (t) async {

@@ -21,6 +21,7 @@ class TatuColors {
   static const onlineSoft = Color(0xFFE8F7EC); // fundo do ícone de sucesso
   static const onlineTexto = Color(0xFF248A3D); // texto verde em fundo claro
   static const verified = Color(0xFF007AFF);
+  static const verifiedSoft = Color(0xFFEAF2FF); // fundo azul claro (dica da IA)
   static const warning = Color(0xFFFF9F0A); // também as estrelas
   static const warningSoft = Color(0xFFFFF1DB); // fundo do ícone de atenção
   static const warningTexto = Color(0xFFA85F00); // ícone/texto de atenção

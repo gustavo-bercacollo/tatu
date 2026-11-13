@@ -10,9 +10,13 @@ class Segmento extends StatelessWidget {
     required this.opcoes,
     required this.selecionada,
     required this.onMudar,
+    this.icones = const {},
   });
 
   final List<String> opcoes;
+
+  /// Ícone depois do texto, por posição (ex.: estrela em "Até 3 ★").
+  final Map<int, IconData> icones;
   final int selecionada;
   final ValueChanged<int> onMudar;
 
@@ -46,14 +50,36 @@ class Segmento extends StatelessWidget {
                         TatuMedidas.raioSegmento - 2,
                       ),
                     ),
-                    child: Text(
-                      opcoes[i],
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: i == selecionada
-                            ? TatuColors.textPrimary
-                            : TatuColors.textSecondary,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              opcoes[i],
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: i == selecionada
+                                    ? TatuColors.textPrimary
+                                    : TatuColors.textSecondary,
+                              ),
+                            ),
+                            if (icones[i] != null) ...[
+                              const SizedBox(width: 4),
+                              Icon(
+                                icones[i],
+                                size: 14,
+                                color: i == selecionada
+                                    ? TatuColors.textPrimary
+                                    : TatuColors.textSecondary,
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
