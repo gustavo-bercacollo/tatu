@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
+import 'package:tatu/data/atendimento_profissional.dart';
+import 'package:tatu/data/navegacao.dart';
 import 'package:tatu/data/profissional.dart';
+import 'package:tatu/data/servico_profissional.dart';
+import 'package:tatu/features/profissional/atividade/atividade_profissional_page.dart';
 import 'package:tatu/features/profissional/home/home_profissional_page.dart';
 import 'package:tatu/shared/widgets/back_circle_button.dart';
 
@@ -50,5 +54,36 @@ void main() {
     await t.pumpAndSettle();
     expect(find.text('Buscar conversa'), findsOneWidget);
     expect(find.text('Perfil'), findsNothing); // perfil só pela foto
+  });
+
+  testWidgets('Chamado aceito aparece em Atividade · Em andamento', (t) async {
+    t.view.physicalSize = const Size(1179, 2556); // 393×852
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
+    atendimentoProfissional.restaurar();
+    navegacao.restaurar();
+    await t.pumpWidget(
+      MaterialApp(
+        theme: tatuTheme(),
+        home: const AtividadeProfissionalPage(aba: 0),
+      ),
+    );
+    expect(find.text('Nenhum serviço agora'), findsOneWidget);
+
+    atendimentoProfissional.aceitar(chamadoExemplo);
+    await t.pump();
+    expect(find.text('Combinando'), findsOneWidget);
+    expect(find.text(chamadoExemplo.cliente), findsOneWidget);
+
+    atendimentoProfissional.irAteCliente(servicoExemplo);
+    await t.pump();
+    expect(find.text('A caminho'), findsWidgets);
+    await t.tap(find.text(servicoExemplo.cliente));
+    await t.pumpAndSettle();
+    expect(find.textContaining('A caminho d'), findsOneWidget);
+
+    atendimentoProfissional.encerrar();
+    await t.pump();
+    expect(atendimentoProfissional.ativo, isFalse);
   });
 }

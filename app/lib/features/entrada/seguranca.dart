@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
+import '../../data/atendimento_profissional.dart';
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
 import '../../core/theme/tatu_texto.dart';
@@ -41,6 +42,9 @@ class BotaoEscudo extends StatefulWidget {
   /// Quanto tempo a dica "Botão de segurança" fica na tela.
   static const tempoDica = Duration(seconds: 3);
 
+  /// Espera antes de mostrar a dica (a tela termina de abrir).
+  static const atrasoDica = Duration(milliseconds: 300);
+
   @override
   State<BotaoEscudo> createState() => _BotaoEscudoState();
 }
@@ -60,7 +64,8 @@ class _BotaoEscudoState extends State<BotaoEscudo> {
     final cliente = widget.servico.doCliente;
     if (!seguranca.dicaEscudoVista(cliente: cliente)) {
       seguranca.verDicaEscudo(cliente: cliente);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Espera a tela abrir antes de mostrar o balão.
+      _fimDica = Timer(BotaoEscudo.atrasoDica, () {
         if (!mounted) return;
         _dica.show();
         _fimDica = Timer(BotaoEscudo.tempoDica, _esconderDica);
@@ -484,7 +489,11 @@ Future<void> sairDoAtendimento(BuildContext context, Atendimento s) async {
     ),
   );
   if (sair != true || !context.mounted) return;
-  if (s.doCliente) pedidos.cancelarAndamento();
+  if (s.doCliente) {
+    pedidos.cancelarAndamento();
+  } else {
+    atendimentoProfissional.encerrar();
+  }
   Navigator.of(context).pushAndRemoveUntil(
     MaterialPageRoute(builder: (_) => VoceSaiuPage(servico: s)),
     (r) => r.isFirst,

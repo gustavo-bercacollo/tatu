@@ -5,6 +5,10 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/ganhos.dart';
+import '../servico/andamento_page.dart';
+import '../chamado/chat_profissional_page.dart';
+import '../../../data/servico_profissional.dart';
+import '../../../data/atendimento_profissional.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
@@ -73,18 +77,111 @@ class _AtividadeProfissionalPageState extends State<AtividadeProfissionalPage> {
                   ),
                   Expanded(
                     child: _aba == 0
-                        ? const EstadoVazio(
-                            icone: TablerIcons.clock,
-                            titulo: 'Nenhum serviço agora',
-                            texto:
-                                'Quando você aceitar um chamado,\n'
-                                'ele aparece aqui.',
+                        ? ListenableBuilder(
+                            listenable: atendimentoProfissional,
+                            builder: (_, _) => atendimentoProfissional.ativo
+                                ? ListView(
+                                    padding: const EdgeInsets.only(top: 16),
+                                    // Sem const: refaz a cada etapa.
+                                    // ignore: prefer_const_constructors
+                                    children: [_CartaoAtendimento()],
+                                  )
+                                : const EstadoVazio(
+                                    icone: TablerIcons.clock,
+                                    titulo: 'Nenhum serviço agora',
+                                    texto:
+                                        'Quando você aceitar um chamado,\n'
+                                        'ele aparece aqui.',
+                                  ),
                           )
                         : const _Concluidos(),
                   ),
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Chamado aceito: cliente, o que é, etapa e linha do tempo. Toque abre
+/// a tela da etapa (chat, a caminho ou serviço em andamento).
+class _CartaoAtendimento extends StatelessWidget {
+  const _CartaoAtendimento();
+
+  void _abrir(BuildContext context) {
+    final a = atendimentoProfissional;
+    final s = a.servico;
+    final Widget tela = switch (a.etapa) {
+      EtapaAtendimento.combinando => ChatProfissionalPage(
+        chamado: a.chamado ?? chamadoExemplo,
+      ),
+      EtapaAtendimento.aCaminho => ACaminhoPage(servico: s ?? servicoExemplo),
+      EtapaAtendimento.noLocal => ACaminhoPage(
+        servico: s ?? servicoExemplo,
+        chegou: true,
+      ),
+      EtapaAtendimento.emServico => EmAndamentoPage(
+        servico: s ?? servicoExemplo,
+        inicio: a.inicio ?? DateTime.now(),
+      ),
+    };
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => tela));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final a = atendimentoProfissional;
+    final cliente = a.servico?.cliente ?? a.chamado?.cliente ?? '';
+    final descricao = a.servico?.descricao ?? a.chamado?.resumo ?? '';
+    return Material(
+      color: TatuColors.bg,
+      borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => _abrir(context),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  AvatarIniciais(nome: cliente, tamanho: 44),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          cliente,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          descricao,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TatuTexto.nota,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  SeloPreto(a.etapa.selo),
+                ],
+              ),
+              const SizedBox(height: TatuMedidas.entreSecoes),
+              LinhaDoTempoHorizontal(
+                etapas: etapasAtendimento,
+                feitas: a.etapa.feitas,
+              ),
+            ],
           ),
         ),
       ),

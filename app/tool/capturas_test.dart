@@ -9,9 +9,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/features/profissional/chamado/toque_chamado.dart';
 import 'package:tatu/data/conversas_profissional.dart';
+import 'package:tatu/data/atendimento_profissional.dart';
 import 'package:tatu/data/avaliacoes_profissional.dart';
 import 'package:tatu/data/navegacao.dart';
 import 'package:tatu/data/seguranca.dart';
+import 'package:tatu/data/servico_profissional.dart';
 import 'package:tatu/data/notificacoes_profissional.dart';
 import 'package:tatu/features/profissional/perfil/notificacoes_profissional_page.dart';
 import 'package:tatu/features/profissional/perfil/dados_conta_profissional_page.dart';
@@ -157,6 +159,7 @@ Future<void> _capturar(
   navegacao.restaurar();
   seguranca.restaurar();
   avaliacoesProfissional.restaurar();
+  atendimentoProfissional.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -1876,6 +1879,7 @@ void main() {
             home: const PedidoAndamentoPage(key: ValueKey('de novo')),
           ),
         );
+        await t.pump(const Duration(milliseconds: 300));
         await t.pump();
       },
     );
@@ -2008,6 +2012,19 @@ void main() {
 
   testWidgets('pro-atividade', (t) async {
     await _capturar(t, 'pro-atividade', const AtividadeProfissionalPage());
+  });
+
+  testWidgets('pro-atividade-servico', (t) async {
+    await _capturar(
+      t,
+      'pro-atividade-servico',
+      const AtividadeProfissionalPage(aba: 0),
+      preparar: () async {
+        atendimentoProfissional.aceitar(chamadoExemplo);
+        atendimentoProfissional.irAteCliente(servicoExemplo);
+        await t.pump();
+      },
+    );
   });
 
   testWidgets('pro-atividade-andamento', (t) async {

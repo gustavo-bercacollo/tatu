@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+
+import '../../../data/atendimento_profissional.dart';import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
@@ -187,15 +188,18 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
                         CartaoServico(servico: s),
                         const SizedBox(height: TatuMedidas.entreItens + 4),
                         FilledButton(
-                          onPressed: () =>
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (_) => EmAndamentoPage(
-                                    servico: s,
-                                    inicio: DateTime.now(),
-                                  ),
+                          onPressed: () {
+                            final agora = DateTime.now();
+                            atendimentoProfissional.iniciar(agora);
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (_) => EmAndamentoPage(
+                                  servico: s,
+                                  inicio: agora,
                                 ),
                               ),
+                            );
+                          },
                           child: const Text('Iniciar serviço'),
                         ),
                         const SizedBox(height: 10),
@@ -232,7 +236,10 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
                         FilledButton(
                           style: perto ? null : tatuBotaoSecundario(),
                           onPressed: perto
-                              ? () => setState(() => _chegou = true)
+                              ? () {
+                                  atendimentoProfissional.chegou();
+                                  setState(() => _chegou = true);
+                                }
                               : null,
                           child: const Text('Cheguei'),
                         ),

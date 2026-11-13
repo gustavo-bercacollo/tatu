@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+
+import '../../../data/atendimento_profissional.dart';import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
@@ -154,6 +155,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     if (!sim || !mounted) return;
     _timer?.cancel();
     conversasProfissional.cancelar(c);
+    atendimentoProfissional.encerrar();
     Navigator.of(context).pop();
   }
 
@@ -190,6 +192,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
         _estado = EstadoValor.combinado;
       });
     } else if (_rodada >= maxRodadas) {
+      atendimentoProfissional.encerrar();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const SemAcordoPage()),
       );
@@ -210,21 +213,19 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
 
   void _irAteOCliente() {
     final c = widget.chamado;
+    final s = ServicoAceito(
+      cliente: c.cliente,
+      notaCliente: c.notaCliente,
+      rua: c.rua,
+      referencia: c.complemento,
+      descricao: c.resumo,
+      valor: _combinado,
+      distanciaKm: c.distanciaKm,
+      minutos: c.minutos,
+    );
+    atendimentoProfissional.irAteCliente(s);
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => ACaminhoPage(
-          servico: ServicoAceito(
-            cliente: c.cliente,
-            notaCliente: c.notaCliente,
-            rua: c.rua,
-            referencia: c.complemento,
-            descricao: c.resumo,
-            valor: _combinado,
-            distanciaKm: c.distanciaKm,
-            minutos: c.minutos,
-          ),
-        ),
-      ),
+      MaterialPageRoute(builder: (_) => ACaminhoPage(servico: s)),
     );
   }
 
