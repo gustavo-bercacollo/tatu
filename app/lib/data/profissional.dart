@@ -24,6 +24,11 @@ const maxEspecialidades = 3;
 /// Provisória: comissão ainda é decisão em aberto.
 const taxaTatu = 0.10;
 
+/// Conta pausada: [limiteVisitasSemServico] das últimas [janelaVisitas]
+/// visitas terminaram sem serviço (só a visita cobrada). Provisório.
+const janelaVisitas = 8;
+const limiteVisitasSemServico = 5;
+
 const _especialidades = {
   'Encanador': [
     'Reparos',
@@ -171,6 +176,32 @@ class ProfissionalRepo extends ChangeNotifier {
   /// A dica "Pronta para começar?" já foi vista.
   bool dicaVista = false;
 
+  /// Últimas visitas, a mais recente no fim (true = terminou sem serviço,
+  /// só a visita cobrada).
+  final List<bool> visitas = [];
+
+  /// Visitas sem serviço entre as últimas [janelaVisitas].
+  int get visitasSemServico =>
+      visitas.reversed.take(janelaVisitas).where((v) => v).length;
+
+  /// Muitas visitas sem serviço pausam a conta (até falar com o suporte).
+  bool get pausada => visitasSemServico >= limiteVisitasSemServico;
+
+  void registrarVisita({required bool semServico}) {
+    visitas.add(semServico);
+    if (pausada) online = false;
+    notifyListeners();
+  }
+
+  /// Simula a conta pausada (5 das últimas 8 visitas sem serviço).
+  void pausarParaDemo() {
+    visitas
+      ..clear()
+      ..addAll([false, true, false, true, false, true, true, true]);
+    online = false;
+    notifyListeners();
+  }
+
   int raioKm = 10;
   double nota = 4.9;
   int servicosFeitos = 29;
@@ -235,6 +266,7 @@ class ProfissionalRepo extends ChangeNotifier {
     online = false;
     dicaVista = false;
     raioKm = 10;
+    visitas.clear();
     notifyListeners();
   }
 
@@ -253,6 +285,7 @@ class ProfissionalRepo extends ChangeNotifier {
     verificacao = aprovada ? Verificacao.aprovada : Verificacao.emAnalise;
     online = false;
     dicaVista = true;
+    visitas.clear();
     notifyListeners();
   }
 
@@ -322,6 +355,7 @@ class ProfissionalRepo extends ChangeNotifier {
   }
 
   void ficarOnline(bool v) {
+    if (v && pausada) return;
     online = v;
     notifyListeners();
   }

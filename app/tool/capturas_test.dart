@@ -63,6 +63,8 @@ import 'package:tatu/features/cliente/mensagens/mensagens_page.dart';
 import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/features/cliente/atividade/atividade_page.dart';
 import 'package:tatu/features/cliente/atividade/avaliar_page.dart';
+import 'package:tatu/features/cliente/atividade/contestar_page.dart';
+import 'package:tatu/features/cliente/atividade/servico_finalizado_page.dart';
 import 'package:tatu/features/cliente/atividade/recibo_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_andamento_page.dart';
 import 'package:tatu/features/cliente/preferencias_cliente_page.dart';
@@ -781,6 +783,29 @@ void main() {
       'pedido-cancelado',
       const PedidoCanceladoPage(profissional: 'Luiza'),
     );
+  });
+
+  testWidgets('servico-concluido', (t) async {
+    await _capturar(
+      t,
+      'servico-concluido',
+      ServicoFinalizadoPage(pedido: PedidosRepo().concluidos.first),
+    );
+  });
+
+  testWidgets('servico-nao-realizado', (t) async {
+    await _capturar(
+      t,
+      'servico-nao-realizado',
+      ServicoFinalizadoPage(
+        pedido: PedidosRepo().concluidos.first,
+        realizado: false,
+      ),
+    );
+  });
+
+  testWidgets('contestar', (t) async {
+    await _capturar(t, 'contestar', const ContestarServicoPage());
   });
 
   testWidgets('pedido-concluido', (t) async {
@@ -1586,6 +1611,18 @@ void main() {
     await comDemo(t, 'pro-home-offline', const HomeProfissionalPage());
   });
 
+  testWidgets('pro-home-pausada', (t) async {
+    await comDemo(
+      t,
+      'pro-home-pausada',
+      const HomeProfissionalPage(),
+      depois: () async {
+        profissional.pausarParaDemo();
+        await t.pump();
+      },
+    );
+  });
+
   testWidgets('pro-home-online', (t) async {
     await comDemo(
       t,
@@ -1766,6 +1803,18 @@ void main() {
       t,
       'pro-em-andamento',
       EmAndamentoPage(inicio: DateTime(2026, 11, 10, 14, 32)),
+    );
+  });
+
+  testWidgets('pro-so-visita', (t) async {
+    await _capturar(
+      t,
+      'pro-so-visita',
+      EmAndamentoPage(inicio: DateTime(2026, 11, 10, 14, 32)),
+      preparar: () async {
+        await t.tap(find.text('Encerrar e cobrar só a visita'));
+        await t.pumpAndSettle();
+      },
     );
   });
 

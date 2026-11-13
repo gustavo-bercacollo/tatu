@@ -43,4 +43,5 @@ class TatuMedidas {
   static const avatarOpcao = 80.0; // cada avatar para escolher (3 por fileira)
   static const aroAvatar = 3.0; // aro preto do avatar escolhido
   static const circuloRecorte = 300.0; // círculo de "Ajustar foto"
+  static const quadradoFoto = 64.0; // quadrado tracejado de foto (contestação)
 }

@@ -64,3 +64,8 @@ String reais(num valor) {
   final cent = (centavos % 100).toString().padLeft(2, '0');
   return 'R\$ $b,$cent';
 }
+
+/// 40 → "R$ 40" (sem centavos quando o valor é redondo).
+String reaisInteiros(num v) => v == v.roundToDouble()
+    ? reais(v).replaceFirst(RegExp(r',00$'), '')
+    : reais(v);

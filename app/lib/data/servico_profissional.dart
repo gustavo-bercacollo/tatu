@@ -11,6 +11,7 @@ class ServicoAceito {
     this.referencia = 'Casa com portão amarelo',
     this.descricao = 'Conserto do cano da pia',
     this.valor = 150,
+    this.visita = 40,
     this.observacao = '',
     this.distanciaKm = 1.2,
     this.minutos = 6,
@@ -36,7 +37,11 @@ class ServicoAceito {
   /// Ponto de referência (ex.: "Casa com portão amarelo").
   final String referencia;
   final String descricao;
+  /// Total combinado (visita + serviço).
   final double valor;
+
+  /// Parte da visita: é cobrada mesmo se o serviço não acontecer.
+  final double visita;
 
   /// Detalhe opcional do valor (vazio = não mostra).
   final String observacao;

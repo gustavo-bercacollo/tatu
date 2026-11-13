@@ -10,8 +10,10 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
+import '../../../data/ajuda.dart';
 import '../../../data/profissional.dart';
 import '../../../shared/widgets/abas_cliente.dart';
+import '../../cliente/ajuda/abrir_ajuda.dart';
 import '../../../shared/widgets/avatar_usuario.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
@@ -108,18 +110,27 @@ class _HomeProfissionalPageState extends State<HomeProfissionalPage> {
                     TatuMedidas.margem,
                     0,
                   ),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _Avatar(
-                        nome: p.nome,
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const PerfilProfissionalPage(),
+                      Row(
+                        children: [
+                          _Avatar(
+                            nome: p.nome,
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const PerfilProfissionalPage(),
+                              ),
+                            ),
                           ),
-                        ),
+                          const Spacer(),
+                          _Situacao(online: p.online),
+                        ],
                       ),
-                      const Spacer(),
-                      _Situacao(online: p.online),
+                      if (p.pausada) ...[
+                        const SizedBox(height: TatuMedidas.entreItens + 4),
+                        const _ContaPausada(),
+                      ],
                     ],
                   ),
                 ),
@@ -168,6 +179,76 @@ class _Ponto extends StatelessWidget {
           color: online ? TatuColors.action : TatuColors.textSecondary,
           border: Border.all(color: TatuColors.bg, width: 3),
         ),
+      ),
+    );
+  }
+}
+
+/// Aviso vermelho: conta pausada por muitas visitas sem serviço.
+class _ContaPausada extends StatelessWidget {
+  const _ContaPausada();
+
+  @override
+  Widget build(BuildContext context) {
+    final p = profissional;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      decoration: BoxDecoration(
+        color: TatuColors.dangerSoft,
+        borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            TablerIcons.alert_triangle,
+            size: 22,
+            color: TatuColors.danger,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Conta pausada',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: TatuColors.danger,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${p.visitasSemServico} das últimas $janelaVisitas visitas '
+                  'terminaram sem serviço. Fale com o suporte para voltar.',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    height: 1.35,
+                    color: TatuColors.danger,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: TatuColors.danger,
+                      foregroundColor: TatuColors.onAction,
+                      minimumSize: const Size(0, 32),
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      textStyle: Theme.of(context).textTheme.labelLarge
+                          ?.copyWith(fontSize: 15, fontWeight: FontWeight.w600),
+                    ),
+                    onPressed: () =>
+                        abrirSuporte(context, conteudoProfissional),
+                    child: const Text('Falar com o suporte'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -318,11 +399,13 @@ class BotaoOnline extends StatelessWidget {
             child: const Text('Ficar offline'),
           )
         : FilledButton.icon(
-            onPressed: () {
-              profissional
-                ..verDica()
-                ..ficarOnline(true);
-            },
+            onPressed: profissional.pausada
+                ? null
+                : () {
+                    profissional
+                      ..verDica()
+                      ..ficarOnline(true);
+                  },
             icon: const Icon(TablerIcons.power, size: 20),
             label: const Text('Ficar online'),
           );

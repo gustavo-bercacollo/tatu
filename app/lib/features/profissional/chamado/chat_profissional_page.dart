@@ -69,6 +69,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   int _rodada = 0; // quantos valores o profissional já enviou
   double _meuValor = 0;
   String _meuDetalhe = ''; // "Visita R$ 40 · Serviço R$ 150"
+  double _minhaVisita = 0;
   double _proposta = 0; // proposta do cliente
   double _combinado = 0;
 
@@ -178,6 +179,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
       _rodada++;
       _meuValor = v.total;
       _meuDetalhe = v.detalhe;
+      _minhaVisita = v.visita;
       _estado = EstadoValor.aguardando;
     });
     _timer?.cancel();
@@ -222,6 +224,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
       referencia: c.complemento,
       descricao: c.resumo,
       valor: _combinado,
+      visita: _minhaVisita < _combinado ? _minhaVisita : 0,
       distanciaKm: c.distanciaKm,
       minutos: c.minutos,
     );

@@ -9,10 +9,12 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/navegacao.dart';
+import '../../../data/profissional.dart';
 import '../../../data/seguranca.dart';
 import '../../../data/servico_profissional.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
+import '../../../shared/widgets/aviso_topo.dart';
 import '../../../shared/widgets/back_circle_button.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
@@ -344,6 +346,58 @@ class EmAndamentoPage extends StatelessWidget {
   final ServicoAceito servico;
   final DateTime inicio;
 
+  /// Fecha o atendimento e volta para a Home com o aviso no topo.
+  void _encerrar(
+    BuildContext context, {
+    required bool semServico,
+    required String titulo,
+    required String texto,
+  }) {
+    profissional.registrarVisita(semServico: semServico);
+    atendimentoProfissional.encerrar();
+    // O aviso fica no Overlay raiz e continua na Home.
+    mostrarAvisoTopo(context, titulo: titulo, texto: texto);
+    Navigator.of(context).popUntil((r) => r.isFirst);
+  }
+
+  /// Conclui: o cliente é cobrado do valor combinado.
+  void _concluir(BuildContext context) {
+    final s = servico;
+    _encerrar(
+      context,
+      semServico: false,
+      titulo: 'Serviço concluído',
+      texto:
+          '${s.cliente.split(' ').first} pagou ${reais(s.valor)}. '
+          'Cai no seu Pix em até 1 dia útil.',
+    );
+  }
+
+  /// Encerra sem serviço: só a visita é cobrada.
+  Future<void> _soVisita(BuildContext context) async {
+    final s = servico;
+    final nome = s.cliente.split(' ').first;
+    final visita = reaisInteiros(s.visita);
+    final sim = await confirmar(
+      context,
+      titulo: 'Encerrar e cobrar só a visita?',
+      texto:
+          '${s.feminino ? 'A' : 'O'} $nome paga $visita pela visita. '
+          'O serviço não é cobrado. Isso fica no seu histórico.',
+      aviso: 'Muitas visitas sem serviço pausam sua conta.',
+      confirmar: 'Encerrar e cobrar $visita',
+      cancelar: 'Voltar',
+      esquerda: true,
+    );
+    if (!sim || !context.mounted) return;
+    _encerrar(
+      context,
+      semServico: true,
+      titulo: 'Visita cobrada',
+      texto: '$nome pagou ${reais(s.visita)} pela visita.',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = servico;
@@ -489,10 +543,25 @@ class EmAndamentoPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  FilledButton(
-                    onPressed: () => _emBreve(context, 'Cobrar o cliente'),
-                    child: const Text('Concluir e cobrar'),
+                  Text(
+                    'Ao concluir, ${s.feminino ? 'a' : 'o'} '
+                    '${s.cliente.split(' ').first} é cobrad'
+                    '${s.feminino ? 'a' : 'o'} automaticamente.',
+                    textAlign: TextAlign.center,
+                    style: TatuTexto.nota,
                   ),
+                  const SizedBox(height: TatuMedidas.entreItens),
+                  FilledButton(
+                    onPressed: () => _concluir(context),
+                    child: const Text('Concluir serviço'),
+                  ),
+                  if (s.visita > 0) ...[
+                    const SizedBox(height: 4),
+                    LinkAzul(
+                      'Encerrar e cobrar só a visita',
+                      onTap: () => _soVisita(context),
+                    ),
+                  ],
                 ],
               ),
             ),

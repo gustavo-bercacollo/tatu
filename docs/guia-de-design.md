@@ -134,7 +134,7 @@ ThemeData tatuTheme() => ThemeData(
 | C6 | Profissional encontrado | Mapa com rota e tempo; nota, serviços, distância; estimativa "R$ 80 a R$ 250"; Aceitar / Ver outro; contagem de prazo; seta para o perfil |
 | C7 | Perfil do profissional | Topo (nota, serviços, resposta média, especialidades, sobre, verificação); rolagem (fotos, medalhas, avaliações em carrossel de 3 + "Ver todas"); barra fixa "Ver outro / Aceitar" |
 | C8 | Chat | Resumo do pedido fixo; respostas rápidas; câmera; "Luiza enviou um valor" + cartão do valor ("Visita R$ 40 · Serviço R$ 150", total, forma de pagamento com "Trocar", "Reservamos agora. Só cobramos no fim.", **Confirmar valor** / Pedir outro valor); folha "Quanto você quer pagar?"; contraproposta ("1 de 3") |
-| C9 | Cobrança | No fim do serviço o app cobra o valor reservado; estados: cobrança pendente, pago, falha no pagamento (trocar forma de pagamento). Não existe pagamento por fora |
+| C9 | Cobrança | No fim do serviço o app cobra o valor reservado: **Serviço concluído** (visita, serviço, forma, nº do recibo → "Avaliar a Luiza") ou **Serviço não realizado** (só a visita cobrada → "Chamar outro encanador"). Nos dois, "Algo errado? Avise em até 24h" abre **O que deu errado?** (motivos + fotos; o valor do serviço fica retido, a visita não entra). Falha no pagamento: trocar forma de pagamento. Não existe pagamento por fora |
 | C10 | Pagamento | Folha (cartão, Pix, parcelas até 6x) → "Pagamento feito" com recibo → Avaliação (estrelas, tags, comentário opcional, "A [nome] também avalia você") |
 | C11 | Atividade | Em andamento (linha do tempo: Pedido, Combinado, A caminho, Serviço, Pagamento; busca em segundo plano com "Cancelar pedido"); Concluídos (por mês, Pedir de novo, Recibo, Avaliar) |
 | C12 | Mensagens | Lista simples; cobrança pendente isolada em cartão no topo com botão Pagar; estado vazio |
@@ -154,7 +154,7 @@ ThemeData tatuTheme() => ThemeData(
 | P8 | Novo chamado | Anel de contagem; serviço, descrição, foto, tempo/distância, região aproximada, nota do cliente, estimativa; Aceitar / Recusar |
 | P9 | Chat | Igual ao do cliente + respostas rápidas + botão **Enviar valor** → folha "Quanto vai custar?" (Visita + Serviço; "A visita é sua mesmo se o serviço não acontecer."; Material incluso; "Você recebe": total, taxa do Tatu, no seu Pix; "Valor 1 de 3") |
 | P10 | Andamento | A caminho (endereço exato, Abrir rota, "Cheguei" só perto do local); Chegou (Iniciar serviço); Em andamento (Concluir e cobrar, "Precisa mudar o valor?") |
-| P11 | Cobrança | "Cobrar [cliente]" (valor, taxa, você recebe, fotos opcionais) → Aguardando → Pagamento recebido → Avaliar o cliente |
+| P11 | Cobrança | Em andamento: "Ao concluir, a Ana é cobrada automaticamente." → **Concluir serviço**; ou "Encerrar e cobrar só a visita" (folha com aviso "Muitas visitas sem serviço pausam sua conta.") → Avaliar o cliente |
 | P12 | Atividade e Ganhos | Cartão de ganhos da semana; Aguardando pagamento; Concluídos (Pago); Ganhos (hoje, semana, mês, gráfico, recebido / a receber) |
 | P13 | Perfil | Cabeçalho, "Ver como o cliente vê" (prévia com faixa), Profissões, Fotos de trabalhos, Sobre você, Região de atendimento (2 a 20 km), Onde receber, Verificação, Notificações, Dados da conta, Ajuda, Privacidade, Sair |
 
@@ -185,6 +185,8 @@ ThemeData tatuTheme() => ThemeData(
 ### 5.4 Pagamento
 - **Todo pagamento passa pelo app** (decidido em 13/11/2026): não existe pagamento por fora. Cartão (parcelas até 6x) ou Pix.
 - Ao **confirmar o valor**, o app reserva o valor na forma de pagamento do cliente ("Reservamos agora. Só cobramos no fim."); a cobrança acontece no fim do serviço. A avaliação abre depois do pagamento.
+- O profissional pode **encerrar e cobrar só a visita** (serviço não feito). Muitas visitas sem serviço **pausam a conta** (provisório: 5 das últimas 8); a Home mostra "Conta pausada" e só o suporte reativa.
+- O cliente pode **contestar** em até 24 h; o valor do serviço fica retido até resolver, a visita não entra.
 - Comprovante para os dois lados.
 - **Taxa**: comissão sobre todo serviço (valor de exemplo: 10%). A profissional vê o total, a taxa e o que cai no Pix antes de enviar o valor.
 

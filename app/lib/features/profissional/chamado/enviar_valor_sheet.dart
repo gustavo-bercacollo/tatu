@@ -34,10 +34,6 @@ class ValorProposto {
   ].join(' · ');
 }
 
-/// "R$ 40" (sem centavos quando o valor é redondo).
-String reaisInteiros(double v) =>
-    v == v.roundToDouble() ? 'R\$ ${v.round()}' : reais(v);
-
 /// P24 · Folha "Quanto vai custar?". [rodada] é qual dos 3 valores
 /// possíveis este é. Devolve null se fechar sem enviar.
 Future<ValorProposto?> pedirValor(

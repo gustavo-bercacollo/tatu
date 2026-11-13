@@ -48,6 +48,41 @@ class BotaoTracejado extends StatelessWidget {
   }
 }
 
+/// Quadrado tracejado para foto ("+" adiciona; imagem = espaço vazio).
+class QuadradoFoto extends StatelessWidget {
+  const QuadradoFoto({
+    super.key,
+    this.icone = TablerIcons.photo,
+    this.onTap,
+    this.rotulo,
+  });
+
+  final IconData icone;
+  final VoidCallback? onTap;
+
+  /// Nome lido pelo leitor de tela.
+  final String? rotulo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: onTap != null,
+      label: rotulo,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: CustomPaint(
+          painter: const _Tracejado(),
+          child: SizedBox.square(
+            dimension: TatuMedidas.quadradoFoto,
+            child: Icon(icone, size: 24, color: TatuColors.textSecondary),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _Tracejado extends CustomPainter {
   const _Tracejado();
 
