@@ -193,18 +193,21 @@ void main() {
     );
   });
 
-  testWidgets('Dica do escudo aparece na 1ª vez e some em 3 s', (t) async {
+  testWidgets('Dica do escudo: espera 0,8 s e fica 4 s', (t) async {
     pedidos.restaurar();
     seguranca.mostrarDicaEscudo();
     await _abrir(t, const PedidoAndamentoPage());
     await t.pump();
-    // Só aparece depois de 0,5 s.
-    await t.pump(const Duration(milliseconds: 300));
+    // Só aparece depois de 0,8 s.
+    await t.pump(const Duration(milliseconds: 600));
     expect(find.text('Botão de segurança'), findsNothing);
     await t.pump(const Duration(milliseconds: 200));
     await t.pump();
     expect(find.text('Botão de segurança'), findsOneWidget);
+    // Fica 4 s na tela.
     await t.pump(const Duration(seconds: 3));
+    expect(find.text('Botão de segurança'), findsOneWidget);
+    await t.pump(const Duration(seconds: 1));
     await t.pump();
     expect(find.text('Botão de segurança'), findsNothing);
     // Na 2ª vez, não aparece.

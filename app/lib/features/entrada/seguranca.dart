@@ -40,10 +40,10 @@ class BotaoEscudo extends StatefulWidget {
   static const segurarPor = Duration(seconds: 3);
 
   /// Quanto tempo a dica "Botão de segurança" fica na tela.
-  static const tempoDica = Duration(seconds: 3);
+  static const tempoDica = Duration(seconds: 4);
 
   /// Espera antes de mostrar a dica (a tela termina de abrir).
-  static const atrasoDica = Duration(milliseconds: 500);
+  static const atrasoDica = Duration(milliseconds: 800);
 
   @override
   State<BotaoEscudo> createState() => _BotaoEscudoState();

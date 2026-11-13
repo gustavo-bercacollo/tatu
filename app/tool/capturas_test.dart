@@ -1879,7 +1879,7 @@ void main() {
             home: const PedidoAndamentoPage(key: ValueKey('de novo')),
           ),
         );
-        await t.pump(const Duration(milliseconds: 500));
+        await t.pump(const Duration(milliseconds: 800));
         await t.pump();
       },
     );
