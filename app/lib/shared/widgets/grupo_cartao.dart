@@ -106,14 +106,20 @@ class LinhaInterruptor extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    texto,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: destaque ? FontWeight.w600 : null,
-                      color: habilitado
-                          ? TatuColors.textPrimary
-                          : TatuColors.textSecondary,
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      texto,
+                      maxLines: destaque ? 1 : null,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: destaque ? FontWeight.w600 : null,
+                        // No destaque, só o interruptor fica apagado.
+                        color: habilitado || destaque
+                            ? TatuColors.textPrimary
+                            : TatuColors.textSecondary,
+                      ),
                     ),
                   ),
                   if (detalhe != null) ...[

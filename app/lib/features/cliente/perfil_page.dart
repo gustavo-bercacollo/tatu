@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/seguranca.dart';
 import '../entrada/seguranca.dart';
+import 'preferencias_cliente_page.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../profissional/trocar_modo.dart';
@@ -188,6 +189,15 @@ class PerfilClientePage extends StatelessWidget {
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => const ContatosConfiancaPage(),
+                        ),
+                      ),
+                    ),
+                    ItemLista(
+                      icone: TablerIcons.user_check,
+                      texto: 'Preferências de atendimento',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const PreferenciasClientePage(),
                         ),
                       ),
                     ),

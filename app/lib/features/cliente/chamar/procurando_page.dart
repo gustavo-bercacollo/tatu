@@ -8,10 +8,12 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/pedidos.dart';
+import '../../../data/seguranca.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../../shared/widgets/espaco_anuncio.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
+import '../../entrada/seguranca.dart';
 import '../abas.dart';
 import 'encontrado_page.dart';
 import 'ninguem_ativo_page.dart';
@@ -230,6 +232,21 @@ class _ProcurandoPageState extends State<ProcurandoPage>
                   ),
                 ),
               ],
+            ),
+          ),
+          // Preferência de atendimento do cliente no topo do mapa.
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(top: TatuMedidas.topo + 6),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ListenableBuilder(
+                  listenable: seguranca,
+                  builder: (_, _) => seguranca.preferirMulheres
+                      ? const SeloPreferencia('Só profissionais mulheres')
+                      : const SizedBox.shrink(),
+                ),
+              ),
             ),
           ),
           Align(

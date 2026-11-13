@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
+import '../../../data/seguranca.dart';
+import '../../entrada/seguranca.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_colors.dart';
@@ -80,6 +83,23 @@ class _HomeProfissionalPageState extends State<HomeProfissionalPage> {
             children: [
               const Positioned.fill(child: CustomPaint(painter: MapaFalso())),
               Center(child: _Ponto(online: p.online)),
+              if (p.online)
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 72),
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: ListenableBuilder(
+                        listenable: seguranca,
+                        builder: (_, _) => seguranca.soMulheres
+                            ? const SeloPreferencia('Só clientes mulheres')
+                            : seguranca.soVerificados
+                            ? const SeloPreferencia('Só clientes verificados')
+                            : const SizedBox.shrink(),
+                      ),
+                    ),
+                  ),
+                ),
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(

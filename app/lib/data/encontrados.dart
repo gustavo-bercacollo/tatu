@@ -71,6 +71,20 @@ const filaEncontrados = [
         'desentupimentos no mesmo dia.',
   ),
   ProfissionalEncontrado(
+    nome: 'Fernanda Lima',
+    profissao: 'Encanadora',
+    feminino: true,
+    nota: '4,8',
+    servicos: 143,
+    chegaEm: '16 min',
+    distancia: '2,1 km',
+    resposta: '4 min',
+    especialidades: ['Vazamentos', 'Torneiras', 'Caixa d’água'],
+    sobre:
+        'Encanadora há 6 anos. Atendo vazamentos e troca de torneiras '
+        'com capricho.',
+  ),
+  ProfissionalEncontrado(
     nome: 'Roberto Alves',
     profissao: 'Encanador',
     feminino: false,
@@ -84,6 +98,13 @@ const filaEncontrados = [
         'Encanador e instalador. Troco registros, chuveiros e faço '
         'manutenção de aquecedores.',
   ),
+];
+
+/// Fila que vale para o cliente: com "Preferir profissionais mulheres",
+/// só profissionais mulheres.
+List<ProfissionalEncontrado> filaPara({required bool soMulheres}) => [
+  for (final p in filaEncontrados)
+    if (!soMulheres || p.feminino) p,
 ];
 
 /// Estimativa da plataforma para o serviço na região (sempre rotulada

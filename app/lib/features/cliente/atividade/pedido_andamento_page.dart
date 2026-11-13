@@ -61,7 +61,7 @@ class PedidoAndamentoPage extends StatelessWidget {
               children: [
                 ListenableBuilder(
                   listenable: seguranca,
-                  builder: (_, _) => seguranca.alertaAtivo
+                  builder: (_, _) => seguranca.alertaCliente
                       ? const Padding(
                           padding: EdgeInsets.only(bottom: 14),
                           child: Center(child: SeloAlertaAtivo()),

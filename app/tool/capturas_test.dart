@@ -61,6 +61,7 @@ import 'package:tatu/features/cliente/atividade/atividade_page.dart';
 import 'package:tatu/features/cliente/atividade/avaliar_page.dart';
 import 'package:tatu/features/cliente/atividade/recibo_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_andamento_page.dart';
+import 'package:tatu/features/cliente/preferencias_cliente_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_cancelado_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_concluido_page.dart';
 import 'package:tatu/data/documentos.dart';
@@ -1590,6 +1591,40 @@ void main() {
     );
   });
 
+  testWidgets('pro-home-so-mulheres', (t) async {
+    await comDemo(
+      t,
+      'pro-home-so-mulheres',
+      const HomeProfissionalPage(),
+      depois: () async {
+        seguranca.definirSoMulheres(true);
+        await t.tap(find.text('Ficar online'));
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('cliente-preferencias', (t) async {
+    await _capturar(t, 'cliente-preferencias', const PreferenciasClientePage());
+  });
+
+  testWidgets('procurando-so-mulheres', (t) async {
+    await _capturar(
+      t,
+      'procurando-so-mulheres',
+      const ProcurandoPage(
+        servico: 'Encanador',
+        endereco: 'Rua Bruno Lobo, 29',
+        animar: false,
+      ),
+      preparar: () async {
+        seguranca.definirIdentidade(Identidade.mulher);
+        seguranca.definirPreferirMulheres(true);
+        await t.pump();
+      },
+    );
+  });
+
   testWidgets('pro-perfil', (t) async {
     await comDemo(t, 'pro-perfil', const PerfilProfissionalPage());
   });
@@ -1719,7 +1754,7 @@ void main() {
       'pro-alerta-ativo',
       EmAndamentoPage(inicio: DateTime(2026, 11, 10, 14, 32)),
       preparar: () async {
-        seguranca.acionarAlerta();
+        seguranca.acionarAlerta(cliente: false);
         await t.pump();
       },
     );
@@ -1766,7 +1801,7 @@ void main() {
       'cliente-alerta-ativo',
       const PedidoAndamentoPage(),
       preparar: () async {
-        seguranca.acionarAlerta();
+        seguranca.acionarAlerta(cliente: true);
         await t.pump();
       },
     );

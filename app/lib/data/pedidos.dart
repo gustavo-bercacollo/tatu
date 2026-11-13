@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import 'seguranca.dart';
+
 /// Etapas de um pedido, na ordem.
 const etapasPedido = [
   'Pedido feito',
@@ -287,12 +289,14 @@ class PedidosRepo extends ChangeNotifier {
   /// A pessoa aceitou o profissional: vira o pedido em andamento e a
   /// busca em segundo plano (se houver) acaba.
   void aceitar(PedidoAndamento p) {
+    seguranca.encerrarAlerta(cliente: true);
     andamento = p;
     busca = null;
     notifyListeners();
   }
 
   void cancelarAndamento() {
+    seguranca.encerrarAlerta(cliente: true);
     andamento = null;
     notifyListeners();
   }

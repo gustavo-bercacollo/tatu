@@ -2,9 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
+import 'package:tatu/data/encontrados.dart';
 import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/data/profissional.dart';
 import 'package:tatu/features/cliente/atividade/pedido_andamento_page.dart';
+import 'package:tatu/features/cliente/preferencias_cliente_page.dart';
 import 'package:tatu/data/seguranca.dart';
 import 'package:tatu/features/profissional/perfil/preferencias_atendimento_page.dart';
 import 'package:tatu/features/profissional/servico/andamento_page.dart';
@@ -42,7 +44,7 @@ void main() {
     expect(find.text('Ligar 180'), findsOneWidget);
     await t.tap(find.text('Alerta silencioso'));
     await t.pumpAndSettle();
-    expect(seguranca.alertaAtivo, isTrue);
+    expect(seguranca.alertaProfissional || seguranca.alertaCliente, isTrue);
     expect(find.text('Alerta ativo · 2 contatos'), findsOneWidget);
     await t.pump(const Duration(seconds: 4));
   });
@@ -55,7 +57,7 @@ void main() {
     await t.pump(const Duration(seconds: 3));
     await g.up();
     await t.pumpAndSettle();
-    expect(seguranca.alertaAtivo, isTrue);
+    expect(seguranca.alertaProfissional || seguranca.alertaCliente, isTrue);
     expect(find.text('Ligar 180'), findsNothing); // não abriu a folha
     await t.pump(const Duration(seconds: 4));
   });
@@ -68,7 +70,7 @@ void main() {
     await t.pumpAndSettle();
     expect(find.text('LEIA PARA O ATENDENTE'), findsOneWidget);
     expect(find.text('Pedido nº TT-48213'), findsOneWidget);
-    expect(seguranca.alertaAtivo, isTrue);
+    expect(seguranca.alertaProfissional || seguranca.alertaCliente, isTrue);
     await t.tap(find.text('Ligar 190 agora'));
     await t.pump();
     expect(ligacoes.single.toString(), 'tel:190');
@@ -142,5 +144,51 @@ void main() {
     await t.pumpAndSettle();
     expect(find.text('Você saiu do atendimento'), findsOneWidget);
     expect(pedidos.andamento, isNull);
+  });
+
+  testWidgets('Alerta do cliente acaba ao cancelar o pedido', (t) async {
+    pedidos.restaurar();
+    seguranca.acionarAlerta(cliente: true);
+    expect(seguranca.alertaCliente, isTrue);
+    pedidos.cancelarAndamento();
+    expect(seguranca.alertaCliente, isFalse);
+    seguranca.acionarAlerta(cliente: true);
+    pedidos.aceitar(
+      const PedidoAndamento(
+        servico: 'Encanador',
+        profissao: 'Encanador',
+        profissional: 'Carlos Pereira',
+        nota: '4,8',
+        endereco: 'Rua A, 1',
+        valor: '',
+        pagamento: '',
+        etapasFeitas: 1,
+      ),
+    );
+    expect(seguranca.alertaCliente, isFalse);
+    // O alerta de um modo não aparece no outro.
+    seguranca.acionarAlerta(cliente: false);
+    expect(seguranca.alertaCliente, isFalse);
+  });
+
+  testWidgets('Cliente: preferir mulheres só depois de se identificar', (
+    t,
+  ) async {
+    await _abrir(t, const PreferenciasClientePage());
+    expect(find.text('Não informado'), findsOneWidget);
+    await t.tap(find.byType(CupertinoSwitch));
+    await t.pump();
+    expect(seguranca.preferirMulheres, isFalse);
+    await t.tap(find.text('Como você se identifica'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Mulher'));
+    await t.pumpAndSettle();
+    await t.tap(find.byType(CupertinoSwitch));
+    await t.pump();
+    expect(seguranca.preferirMulheres, isTrue);
+    expect(
+      filaPara(soMulheres: true).map((p) => p.primeiroNome),
+      ['Luiza', 'Fernanda'],
+    );
   });
 }

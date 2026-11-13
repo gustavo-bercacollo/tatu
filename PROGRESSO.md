@@ -83,6 +83,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Segurança do profissional (`servico/seguranca.dart`, dados em `data/seguranca.dart`): Em andamento no desenho novo com escudo (toque abre a folha Segurança; segurar 3 s dispara o alerta silencioso), alerta ativo, Ligar 190 (o que ler ao atendente), Ligar 180, Sair agora → Você saiu do atendimento, Contatos de confiança no Perfil. A notificação que os contatos recebem ficou só como desenho (precisa do backend)
 - [x] Preferências de atendimento no Perfil do profissional (`perfil/preferencias_atendimento_page.dart`): só clientes mulheres (só para profissionais mulheres) e só clientes verificados; `LinhaInterruptor(destaque:)`
 - [x] Segurança também no cliente: escudo no Pedido em andamento com as mesmas opções (190, 180, alerta, sair agora, que cancela o pedido) e Contatos de confiança no Perfil. A segurança virou comum aos dois modos (`entrada/seguranca.dart`, `Atendimento.doServico`/`doPedido`)
+- [x] Preferências de atendimento do cliente (`cliente/preferencias_cliente_page.dart`): preferir profissionais mulheres depois de informar “Como você se identifica” (Mulher); selo rosa `SeloPreferencia` no Procurando e na Home online do profissional; fila da demo só com mulheres. Corrigido: o alerta silencioso agora é separado por modo e acaba ao cancelar ou aceitar outro pedido
 - Falta do profissional: cobrar o cliente, avaliar o cliente
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado

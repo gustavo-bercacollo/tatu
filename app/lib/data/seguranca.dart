@@ -76,6 +76,19 @@ class Atendimento {
   );
 }
 
+/// Como o cliente se identifica (só o Tatu vê).
+enum Identidade { naoInformado, mulher, homem, outro, prefiroNaoDizer }
+
+extension IdentidadeTexto on Identidade {
+  String get nome => switch (this) {
+    Identidade.naoInformado => 'Não informado',
+    Identidade.mulher => 'Mulher',
+    Identidade.homem => 'Homem',
+    Identidade.outro => 'Outro',
+    Identidade.prefiroNaoDizer => 'Prefiro não dizer',
+  };
+}
+
 /// Pessoa que recebe o alerta silencioso do profissional.
 @immutable
 class ContatoConfianca {
@@ -108,8 +121,18 @@ class SegurancaRepo extends ChangeNotifier {
   /// Contatos acompanham todo atendimento ao vivo, não só no alerta.
   bool compartilharTudo = true;
 
-  /// Alerta silencioso disparado no atendimento atual.
-  bool alertaAtivo = false;
+  /// Alerta silencioso disparado no atendimento atual, separado por modo
+  /// (cliente e profissional). Acaba junto com o atendimento.
+  bool alertaCliente = false;
+  bool alertaProfissional = false;
+
+  bool alertaAtivoPara({required bool cliente}) =>
+      cliente ? alertaCliente : alertaProfissional;
+
+  /// Preferências do cliente: como se identifica e se prefere
+  /// profissionais mulheres (só para quem se identifica como mulher).
+  Identidade identidade = Identidade.naoInformado;
+  bool preferirMulheres = false;
 
   /// Preferências de atendimento: só clientes mulheres (para
   /// profissionais mulheres) e só clientes verificados.
@@ -130,7 +153,10 @@ class SegurancaRepo extends ChangeNotifier {
       ),
     ];
     compartilharTudo = true;
-    alertaAtivo = false;
+    alertaCliente = false;
+    alertaProfissional = false;
+    identidade = Identidade.naoInformado;
+    preferirMulheres = false;
     soMulheres = false;
     soVerificados = false;
     notifyListeners();
@@ -146,13 +172,34 @@ class SegurancaRepo extends ChangeNotifier {
     notifyListeners();
   }
 
-  void acionarAlerta() {
-    alertaAtivo = true;
+  void acionarAlerta({required bool cliente}) {
+    if (cliente) {
+      alertaCliente = true;
+    } else {
+      alertaProfissional = true;
+    }
     notifyListeners();
   }
 
-  void encerrarAlerta() {
-    alertaAtivo = false;
+  /// Fim do atendimento: o alerta não passa para o próximo pedido.
+  void encerrarAlerta({required bool cliente}) {
+    if (!alertaAtivoPara(cliente: cliente)) return;
+    if (cliente) {
+      alertaCliente = false;
+    } else {
+      alertaProfissional = false;
+    }
+    notifyListeners();
+  }
+
+  void definirIdentidade(Identidade i) {
+    identidade = i;
+    if (i != Identidade.mulher) preferirMulheres = false;
+    notifyListeners();
+  }
+
+  void definirPreferirMulheres(bool v) {
+    preferirMulheres = v && identidade == Identidade.mulher;
     notifyListeners();
   }
 

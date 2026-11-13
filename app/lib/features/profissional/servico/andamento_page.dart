@@ -64,6 +64,10 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
         if (mounted) setState(() => _perto = true);
       });
     }
+    // Atendimento novo: o alerta do anterior não continua.
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => seguranca.encerrarAlerta(cliente: false),
+    );
     if (!navegacao.localizacaoAtiva) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _pedirLocalizacao());
     }
@@ -382,7 +386,7 @@ class EmAndamentoPage extends StatelessWidget {
                   ),
                   ListenableBuilder(
                     listenable: seguranca,
-                    builder: (_, _) => seguranca.alertaAtivo
+                    builder: (_, _) => seguranca.alertaProfissional
                         ? const Padding(
                             padding: EdgeInsets.only(top: 10),
                             child: Center(child: SeloAlertaAtivo()),

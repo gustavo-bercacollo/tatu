@@ -9,6 +9,7 @@ import '../../../core/theme/tatu_theme.dart';
 import '../../../data/conversas.dart';
 import '../../../data/encontrados.dart';
 import '../../../data/pedidos.dart';
+import '../../../data/seguranca.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
@@ -66,7 +67,10 @@ class _EncontradoPageState extends State<EncontradoPage> {
   final _som = SomEncontrado();
 
   ProfissionalEncontrado get _base =>
-      filaEncontrados[widget.indice % filaEncontrados.length];
+      _fila[widget.indice % _fila.length];
+
+  List<ProfissionalEncontrado> get _fila =>
+      filaPara(soMulheres: seguranca.preferirMulheres);
 
   /// A profissão segue o serviço pedido.
   ProfissionalEncontrado get _p => ProfissionalEncontrado(
@@ -117,7 +121,7 @@ class _EncontradoPageState extends State<EncontradoPage> {
     nav.popUntil((r) => r == rota);
     nav.pushReplacement(
       MaterialPageRoute(
-        builder: (_) => proximo < filaEncontrados.length
+        builder: (_) => proximo < _fila.length
             ? EncontradoPage(
                 servico: widget.servico,
                 endereco: widget.endereco,

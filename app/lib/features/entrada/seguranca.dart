@@ -51,7 +51,7 @@ class _BotaoEscudoState extends State<BotaoEscudo> {
     _segurando = Timer(BotaoEscudo.segurarPor, () {
       _disparou = true;
       HapticFeedback.heavyImpact();
-      _acionarAlerta(context);
+      _acionarAlerta(context, widget.servico);
     });
   }
 
@@ -71,7 +71,9 @@ class _BotaoEscudoState extends State<BotaoEscudo> {
     return ListenableBuilder(
       listenable: seguranca,
       builder: (_, _) {
-        final ativo = seguranca.alertaAtivo;
+        final ativo = seguranca.alertaAtivoPara(
+          cliente: widget.servico.doCliente,
+        );
         return Semantics(
           button: true,
           label: 'Segurança',
@@ -100,6 +102,42 @@ class _BotaoEscudoState extends State<BotaoEscudo> {
       },
     );
   }
+}
+
+/// Pílula rosa no topo do mapa quando há preferência de atendimento
+/// ("Só clientes mulheres", "Só profissionais mulheres").
+class SeloPreferencia extends StatelessWidget {
+  const SeloPreferencia(this.texto, {super.key});
+
+  final String texto;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    decoration: const ShapeDecoration(
+      color: TatuColors.preferenciaSoft,
+      shape: StadiumBorder(),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(TablerIcons.users, size: 16, color: TatuColors.preferencia),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(
+            texto,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: TatuColors.preferencia,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /// Pílula "Alerta ativo · 2 contatos" embaixo do título.
@@ -147,8 +185,8 @@ class SeloAlertaAtivo extends StatelessWidget {
   }
 }
 
-void _acionarAlerta(BuildContext context) {
-  seguranca.acionarAlerta();
+void _acionarAlerta(BuildContext context, Atendimento a) {
+  seguranca.acionarAlerta(cliente: a.doCliente);
   final n = seguranca.contatos.length;
   mostrarAvisoTopo(
     context,
@@ -257,7 +295,7 @@ Future<void> abrirSeguranca(BuildContext context, Atendimento s) async {
     case '180':
       await ligar('180');
     case 'alerta':
-      _acionarAlerta(context);
+      _acionarAlerta(context, s);
     case 'sair':
       await sairDoAtendimento(context, s);
   }
@@ -367,7 +405,9 @@ class VoceSaiuPage extends StatelessWidget {
                         children: [
                           FilledButton(
                             onPressed: () {
-                              seguranca.encerrarAlerta();
+                              seguranca.encerrarAlerta(
+                                cliente: servico.doCliente,
+                              );
                               servico.doCliente
                                   ? irParaAba(context, AbaCliente.inicio)
                                   : abrirHomeProfissional(context);
@@ -437,9 +477,10 @@ class _Ligar190PageState extends State<Ligar190Page> {
   @override
   void initState() {
     super.initState();
-    if (!seguranca.alertaAtivo) {
+    final cliente = widget.servico.doCliente;
+    if (!seguranca.alertaAtivoPara(cliente: cliente)) {
       WidgetsBinding.instance.addPostFrameCallback(
-        (_) => seguranca.acionarAlerta(),
+        (_) => seguranca.acionarAlerta(cliente: cliente),
       );
     }
   }

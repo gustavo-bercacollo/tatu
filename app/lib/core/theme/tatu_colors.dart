@@ -39,6 +39,8 @@ class TatuColors {
   static const appGoogle = Color(0xFF34A853); // ícone do Google Maps
   static const appWaze = Color(0xFF33CCFF); // ícone do Waze
   static const appApple = Color(0xFF5E9BEB); // ícone do Apple Mapas
+  static const preferencia = Color(0xFFC2367F); // selo "Só mulheres"
+  static const preferenciaSoft = Color(0xFFFCE7F3); // fundo do selo
   static const avisoEscuro = Color(0xFF1C1C1E); // aviso fixo no topo do mapa
   static const avisoEscuroTexto = Color(0xFFAEAEB2); // texto menor nele
 

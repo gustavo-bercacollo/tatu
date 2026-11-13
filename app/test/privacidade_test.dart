@@ -11,6 +11,9 @@ Future<void> _abrir(WidgetTester t) async {
   await t.pumpWidget(
     MaterialApp(theme: tatuTheme(), home: const PerfilClientePage()),
   );
+  await t.scrollUntilVisible(find.text('Privacidade e termos'), 200);
+  await t.ensureVisible(find.text('Privacidade e termos'));
+  await t.pumpAndSettle();
   await t.tap(find.text('Privacidade e termos'));
   await t.pumpAndSettle();
 }
