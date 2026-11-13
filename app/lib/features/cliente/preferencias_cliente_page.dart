@@ -9,6 +9,7 @@ import '../../shared/widgets/folha.dart';
 import '../../shared/widgets/grupo_cartao.dart';
 import '../../shared/widgets/lista_agrupada.dart';
 import '../../shared/widgets/tela_interna.dart';
+import 'verificar_identidade_page.dart';
 
 /// Preferências de atendimento do cliente: preferir profissionais
 /// mulheres (só para quem se identifica como mulher).
@@ -51,8 +52,14 @@ class PreferenciasClientePage extends StatelessWidget {
             nota =
                 'Para usar essa preferência, informe como você se '
                 'identifica. Só o Tatu vê essa informação.';
+          } else if (pode && s.identidadeVerificada) {
+            nota =
+                'Identidade verificada. Só o Tatu vê essa informação. Você '
+                'pode mudar quando quiser.';
           } else if (pode) {
-            nota = 'Só o Tatu vê essa informação. Você pode mudar quando quiser.';
+            nota =
+                'Para ligar, vamos verificar sua identidade (documento e '
+                'selfie). Só o Tatu vê essa informação.';
           } else {
             nota =
                 '“Preferir profissionais mulheres” é para quem se identifica '
@@ -71,7 +78,9 @@ class PreferenciasClientePage extends StatelessWidget {
                         'Pode demorar um pouco mais para alguém aceitar.',
                     valor: s.preferirMulheres,
                     habilitado: pode,
-                    onMudar: s.definirPreferirMulheres,
+                    onMudar: (v) => v
+                        ? ligarPreferenciaMulheres(context)
+                        : s.definirPreferirMulheres(false),
                   ),
                 ],
               ),

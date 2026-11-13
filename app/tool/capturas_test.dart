@@ -62,6 +62,7 @@ import 'package:tatu/features/cliente/atividade/avaliar_page.dart';
 import 'package:tatu/features/cliente/atividade/recibo_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_andamento_page.dart';
 import 'package:tatu/features/cliente/preferencias_cliente_page.dart';
+import 'package:tatu/features/cliente/verificar_identidade_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_cancelado_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_concluido_page.dart';
 import 'package:tatu/data/documentos.dart';
@@ -1606,6 +1607,34 @@ void main() {
 
   testWidgets('cliente-preferencias', (t) async {
     await _capturar(t, 'cliente-preferencias', const PreferenciasClientePage());
+  });
+
+  testWidgets('cliente-verificar', (t) async {
+    await _capturar(t, 'cliente-verificar', const VerificarIdentidadePage());
+  });
+
+  testWidgets('cliente-camera-documento', (t) async {
+    await _capturar(
+      t,
+      'cliente-camera-documento',
+      const CameraVerificacaoPage(etapa: EtapaFoto.frente, cliente: true),
+    );
+  });
+
+  testWidgets('cliente-camera-selfie', (t) async {
+    await _capturar(
+      t,
+      'cliente-camera-selfie',
+      const CameraVerificacaoPage(etapa: EtapaFoto.selfie, cliente: true),
+    );
+  });
+
+  testWidgets('cliente-identidade-verificada', (t) async {
+    await _capturar(
+      t,
+      'cliente-identidade-verificada',
+      const IdentidadeVerificadaPage(),
+    );
   });
 
   testWidgets('procurando-so-mulheres', (t) async {

@@ -9,6 +9,8 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../data/profissional.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/nota_icone.dart';
+import '../../../data/seguranca.dart';
+import '../../cliente/verificar_identidade_page.dart';
 import 'resultado_page.dart';
 
 /// P12 · Passo 4: o que vai ser pedido na verificação.
@@ -66,15 +68,19 @@ enum EtapaFoto { frente, verso, selfie }
 /// Sem câmera ao vivo (navegador sem permissão, testes), o botão abre a
 /// câmera do celular.
 /// Com [refazendo], tira só esta foto e volta para "Em análise".
+/// Com [cliente], é a verificação do cliente (documento → selfie, visual
+/// com cantos verdes) e termina em "Identidade verificada".
 class CameraVerificacaoPage extends StatefulWidget {
   const CameraVerificacaoPage({
     super.key,
     required this.etapa,
     this.refazendo = false,
+    this.cliente = false,
   });
 
   final EtapaFoto etapa;
   final bool refazendo;
+  final bool cliente;
 
   /// Desligado nos testes e nas capturas (sem câmera de verdade).
   static bool cameraAoVivo = true;
@@ -167,6 +173,21 @@ class _CameraVerificacaoPageState extends State<CameraVerificacaoPage> {
 
   void _usar() {
     final foto = _foto!;
+    if (widget.cliente) {
+      if (_selfie) {
+        seguranca.verificarIdentidade();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const IdentidadeVerificadaPage()),
+        );
+        return;
+      }
+      setState(() {
+        _foto = null;
+        _etapa = EtapaFoto.selfie;
+      });
+      _ligarCamera();
+      return;
+    }
     switch (_etapa) {
       case EtapaFoto.frente:
         profissional.fotoFrente = foto;
@@ -252,6 +273,7 @@ class _CameraVerificacaoPageState extends State<CameraVerificacaoPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.cliente) return _visualCliente();
     const branco = TatuColors.onAction;
     final cinzaClaro = branco.withValues(alpha: 0.75);
     final quadro = _selfie
@@ -428,4 +450,217 @@ class _CameraVerificacaoPageState extends State<CameraVerificacaoPage> {
       ),
     );
   }
+
+  /// Visual da verificação do cliente: título no topo, quadro com cantos
+  /// verdes (documento) ou oval verde (selfie), instrução embaixo e o
+  /// botão redondo de tirar.
+  Widget _visualCliente() {
+    const branco = TatuColors.onAction;
+    final cinza = branco.withValues(alpha: 0.6);
+    final conferindo = _foto != null;
+    final quadro = _selfie
+        ? AspectRatio(
+            aspectRatio: 0.76,
+            child: Container(
+              decoration: const ShapeDecoration(
+                color: TatuColors.editorFundo,
+                shape: OvalBorder(
+                  side: BorderSide(color: TatuColors.online, width: 4),
+                ),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: _conteudoQuadro(),
+            ),
+          )
+        : AspectRatio(
+            aspectRatio: 1.52,
+            child: CustomPaint(
+              foregroundPainter: const _CantosVerdes(),
+              child: Container(
+                margin: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  color: TatuColors.editorFundo,
+                  borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
+                  border: Border.all(color: branco, width: 3),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: _conteudoQuadro(),
+              ),
+            ),
+          );
+    final titulo = conferindo
+        ? 'Ficou boa?'
+        : _selfie
+        ? 'Olhe para a câmera e pisque'
+        : 'Encaixe o documento no quadro';
+    final texto = conferindo
+        ? (_selfie
+              ? 'Confira se o rosto aparece inteiro e nítido.'
+              : 'Confira se dá para ler todos os dados.')
+        : _selfie
+        ? 'Assim sabemos que é uma pessoa de verdade.'
+        : 'A foto é tirada sozinha quando estiver nítida.';
+    return Scaffold(
+      backgroundColor: TatuColors.textPrimary,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: TatuMedidas.larguraMax),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                TatuMedidas.margem,
+                TatuMedidas.topo,
+                TatuMedidas.margem,
+                TatuMedidas.base,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    height: 36,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Semantics(
+                            button: true,
+                            label: 'Voltar',
+                            child: Material(
+                              color: TatuColors.editorFundo,
+                              shape: const CircleBorder(),
+                              child: InkWell(
+                                customBorder: const CircleBorder(),
+                                onTap: () => Navigator.of(context).maybePop(),
+                                child: const SizedBox(
+                                  width: 36,
+                                  height: 36,
+                                  child: Icon(
+                                    TablerIcons.chevron_left,
+                                    size: 20,
+                                    color: branco,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          _selfie ? 'Agora uma selfie' : 'Frente do documento',
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            color: branco,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: _selfie ? 50 : 0),
+                    child: quadro,
+                  ),
+                  const SizedBox(height: TatuMedidas.entreSecoes + 12),
+                  Text(
+                    titulo,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w500,
+                      color: branco,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    texto,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 13, color: cinza),
+                  ),
+                  const Spacer(),
+                  if (conferindo) ...[
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: branco,
+                        foregroundColor: TatuColors.textPrimary,
+                      ),
+                      onPressed: _usar,
+                      child: const Text('Usar esta foto'),
+                    ),
+                    const SizedBox(height: 10),
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: TatuColors.editorFundo,
+                        foregroundColor: branco,
+                      ),
+                      onPressed: () {
+                        setState(() => _foto = null);
+                        if (!_aoVivo) _tirar();
+                      },
+                      child: const Text('Tirar outra'),
+                    ),
+                  ] else
+                    Center(
+                      child: Semantics(
+                        button: true,
+                        label: 'Tirar foto',
+                        child: GestureDetector(
+                          onTap: _tirar,
+                          child: Container(
+                            width: 72,
+                            height: 72,
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: branco, width: 4),
+                            ),
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: _tirando
+                                    ? branco.withValues(alpha: 0.5)
+                                    : branco,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Cantos verdes em volta do quadro do documento.
+class _CantosVerdes extends CustomPainter {
+  const _CantosVerdes();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()
+      ..color = TatuColors.online
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 5
+      ..strokeCap = StrokeCap.round;
+    const l = 34.0;
+    final w = size.width;
+    final h = size.height;
+    for (final (x, y, dx, dy) in [
+      (0.0, 0.0, 1.0, 1.0),
+      (w, 0.0, -1.0, 1.0),
+      (0.0, h, 1.0, -1.0),
+      (w, h, -1.0, -1.0),
+    ]) {
+      canvas.drawLine(Offset(x, y), Offset(x + dx * l, y), p);
+      canvas.drawLine(Offset(x, y), Offset(x, y + dy * l), p);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_CantosVerdes oldDelegate) => false;
 }

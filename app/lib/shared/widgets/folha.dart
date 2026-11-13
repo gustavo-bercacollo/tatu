@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
 import '../../core/theme/tatu_theme.dart';
 import '../../core/theme/tatu_texto.dart';
 import 'lista_agrupada.dart';
+import 'nota_icone.dart';
 
 /// Alça cinza no topo das folhas.
 class AlcaFolha extends StatelessWidget {
@@ -170,36 +170,7 @@ Future<bool?> perguntar(
               ],
               const SizedBox(height: TatuMedidas.entreSecoes),
               if (aviso != null) ...[
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: TatuColors.warningSoft,
-                    borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        TablerIcons.alert_triangle,
-                        size: 20,
-                        color: TatuColors.warningTexto,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          aviso,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            color: TatuColors.warningTexto,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                CaixaAviso(aviso),
                 const SizedBox(height: TatuMedidas.entreItens + 4),
               ],
               if (destacarCancelar) botaoCancelar else botaoConfirmar,

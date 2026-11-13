@@ -158,6 +158,16 @@ class SegurancaRepo extends ChangeNotifier {
   Identidade identidade = Identidade.naoInformado;
   bool preferirMulheres = false;
 
+  /// Cliente mandou documento e selfie (protótipo: aprova na hora).
+  bool identidadeVerificada = false;
+
+  void verificarIdentidade() {
+    identidadeVerificada = true;
+    identidade = Identidade.mulher;
+    preferirMulheres = true;
+    notifyListeners();
+  }
+
   /// Preferências de atendimento: só clientes mulheres (para
   /// profissionais mulheres) e só clientes verificados.
   bool soMulheres = false;
@@ -183,6 +193,7 @@ class SegurancaRepo extends ChangeNotifier {
     dicaEscudoProfissional = true;
     identidade = Identidade.naoInformado;
     preferirMulheres = false;
+    identidadeVerificada = false;
     soMulheres = false;
     soVerificados = false;
     notifyListeners();

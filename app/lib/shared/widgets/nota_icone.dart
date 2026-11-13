@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
@@ -134,6 +135,43 @@ class IconeResultado extends StatelessWidget {
 }
 
 /// Linha com ícone num círculo cinza e o texto do que acontece.
+/// Caixa amarela de atenção (ícone de alerta + texto).
+class CaixaAviso extends StatelessWidget {
+  const CaixaAviso(this.texto, {super.key});
+
+  final String texto;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    decoration: BoxDecoration(
+      color: TatuColors.warningSoft,
+      borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Icon(
+          TablerIcons.alert_triangle,
+          size: 20,
+          color: TatuColors.warningTexto,
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            texto,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              color: TatuColors.warningTexto,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 class LinhaConsequencia extends StatelessWidget {
   const LinhaConsequencia(this.icone, this.texto, {super.key});
 

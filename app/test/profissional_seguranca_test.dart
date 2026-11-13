@@ -184,8 +184,9 @@ void main() {
     await t.tap(find.text('Mulher'));
     await t.pumpAndSettle();
     await t.tap(find.byType(CupertinoSwitch));
-    await t.pump();
-    expect(seguranca.preferirMulheres, isTrue);
+    await t.pumpAndSettle();
+    // Antes de ligar, pede a verificação da identidade.
+    expect(find.text('Verifique sua identidade'), findsOneWidget);
     expect(
       filaPara(soMulheres: true).map((p) => p.primeiroNome),
       ['Luiza', 'Fernanda'],
