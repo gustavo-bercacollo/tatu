@@ -112,6 +112,30 @@ class ContatoConfianca {
 class SegurancaRepo extends ChangeNotifier {
   SegurancaRepo() {
     restaurar();
+    // No app, a dica do escudo aparece na 1ª vez de cada modo.
+    dicaEscudoCliente = false;
+    dicaEscudoProfissional = false;
+  }
+
+  /// Já mostrou a dica "Botão de segurança" neste modo.
+  bool dicaEscudoCliente = true;
+  bool dicaEscudoProfissional = true;
+
+  bool dicaEscudoVista({required bool cliente}) =>
+      cliente ? dicaEscudoCliente : dicaEscudoProfissional;
+
+  void verDicaEscudo({required bool cliente}) {
+    if (cliente) {
+      dicaEscudoCliente = true;
+    } else {
+      dicaEscudoProfissional = true;
+    }
+  }
+
+  /// Para a demo e as capturas: mostra a dica de novo.
+  void mostrarDicaEscudo() {
+    dicaEscudoCliente = false;
+    dicaEscudoProfissional = false;
   }
 
   static const maxContatos = 5;
@@ -155,6 +179,8 @@ class SegurancaRepo extends ChangeNotifier {
     compartilharTudo = true;
     alertaCliente = false;
     alertaProfissional = false;
+    dicaEscudoCliente = true;
+    dicaEscudoProfissional = true;
     identidade = Identidade.naoInformado;
     preferirMulheres = false;
     soMulheres = false;

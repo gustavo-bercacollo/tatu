@@ -191,4 +191,21 @@ void main() {
       ['Luiza', 'Fernanda'],
     );
   });
+
+  testWidgets('Dica do escudo aparece na 1ª vez e some em 3 s', (t) async {
+    pedidos.restaurar();
+    seguranca.mostrarDicaEscudo();
+    await _abrir(t, const PedidoAndamentoPage());
+    await t.pump();
+    expect(find.text('Botão de segurança'), findsOneWidget);
+    await t.pump(const Duration(seconds: 3));
+    await t.pump();
+    expect(find.text('Botão de segurança'), findsNothing);
+    // Na 2ª vez, não aparece.
+    await _abrir(t, const PedidoAndamentoPage(key: ValueKey(2)));
+    await t.pump();
+    expect(find.text('Botão de segurança'), findsNothing);
+    // O modo profissional tem a sua.
+    expect(seguranca.dicaEscudoVista(cliente: false), isFalse);
+  });
 }

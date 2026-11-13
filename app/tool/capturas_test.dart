@@ -1786,6 +1786,26 @@ void main() {
     );
   });
 
+  testWidgets('cliente-dica-escudo', (t) async {
+    await _capturar(
+      t,
+      'cliente-dica-escudo',
+      const PedidoAndamentoPage(),
+      preparar: () async {
+        seguranca.mostrarDicaEscudo();
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: const PedidoAndamentoPage(key: ValueKey('de novo')),
+          ),
+        );
+        await t.pump();
+      },
+    );
+    await t.pump(const Duration(seconds: 4));
+  });
+
   testWidgets('cliente-seguranca', (t) async {
     await _capturar(
       t,

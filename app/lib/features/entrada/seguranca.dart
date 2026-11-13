@@ -38,6 +38,9 @@ class BotaoEscudo extends StatefulWidget {
 
   static const segurarPor = Duration(seconds: 3);
 
+  /// Quanto tempo a dica "Botão de segurança" fica na tela.
+  static const tempoDica = Duration(seconds: 3);
+
   @override
   State<BotaoEscudo> createState() => _BotaoEscudoState();
 }
@@ -46,7 +49,32 @@ class _BotaoEscudoState extends State<BotaoEscudo> {
   Timer? _segurando;
   bool _disparou = false;
 
+  // Dica da 1ª vez: balão escuro embaixo do escudo por alguns segundos.
+  final _ancora = LayerLink();
+  final _dica = OverlayPortalController();
+  Timer? _fimDica;
+
+  @override
+  void initState() {
+    super.initState();
+    final cliente = widget.servico.doCliente;
+    if (!seguranca.dicaEscudoVista(cliente: cliente)) {
+      seguranca.verDicaEscudo(cliente: cliente);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _dica.show();
+        _fimDica = Timer(BotaoEscudo.tempoDica, _esconderDica);
+      });
+    }
+  }
+
+  void _esconderDica() {
+    _fimDica?.cancel();
+    if (mounted && _dica.isShowing) _dica.hide();
+  }
+
   void _inicio() {
+    _esconderDica();
     _disparou = false;
     _segurando = Timer(BotaoEscudo.segurarPor, () {
       _disparou = true;
@@ -63,11 +91,35 @@ class _BotaoEscudoState extends State<BotaoEscudo> {
   @override
   void dispose() {
     _segurando?.cancel();
+    _fimDica?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    return OverlayPortal(
+      controller: _dica,
+      overlayChildBuilder: (_) => Align(
+        alignment: Alignment.topLeft,
+        child: CompositedTransformFollower(
+          link: _ancora,
+          targetAnchor: Alignment.bottomRight,
+          followerAnchor: Alignment.topRight,
+          offset: const Offset(0, 4),
+          child: Material(
+            type: MaterialType.transparency,
+            child: GestureDetector(
+              onTap: _esconderDica,
+              child: const _DicaEscudo(),
+            ),
+          ),
+        ),
+      ),
+      child: CompositedTransformTarget(link: _ancora, child: _botao()),
+    );
+  }
+
+  Widget _botao() {
     return ListenableBuilder(
       listenable: seguranca,
       builder: (_, _) {
@@ -102,6 +154,79 @@ class _BotaoEscudoState extends State<BotaoEscudo> {
       },
     );
   }
+}
+
+/// Balão escuro da 1ª vez: "Botão de segurança / Toque se algo der
+/// errado.", com a pontinha apontando para o escudo.
+class _DicaEscudo extends StatelessWidget {
+  const _DicaEscudo();
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      liveRegion: true,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: CustomPaint(
+              size: const Size(14, 7),
+              painter: _Pontinha(),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+            decoration: BoxDecoration(
+              color: TatuColors.avisoEscuro,
+              borderRadius: BorderRadius.circular(TatuMedidas.raioSegmento),
+            ),
+            child: const Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Botão de segurança',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: TatuColors.onAction,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Toque se algo der errado.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: TatuColors.avisoEscuroTexto,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Pontinha extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(0, size.height)
+        ..lineTo(size.width / 2, 0)
+        ..lineTo(size.width, size.height)
+        ..close(),
+      Paint()..color = TatuColors.avisoEscuro,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_Pontinha oldDelegate) => false;
 }
 
 /// Pílula rosa no topo do mapa quando há preferência de atendimento

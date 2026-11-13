@@ -84,6 +84,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Preferências de atendimento no Perfil do profissional (`perfil/preferencias_atendimento_page.dart`): só clientes mulheres (só para profissionais mulheres) e só clientes verificados; `LinhaInterruptor(destaque:)`
 - [x] Segurança também no cliente: escudo no Pedido em andamento com as mesmas opções (190, 180, alerta, sair agora, que cancela o pedido) e Contatos de confiança no Perfil. A segurança virou comum aos dois modos (`entrada/seguranca.dart`, `Atendimento.doServico`/`doPedido`)
 - [x] Preferências de atendimento do cliente (`cliente/preferencias_cliente_page.dart`): preferir profissionais mulheres depois de informar “Como você se identifica” (Mulher); selo rosa `SeloPreferencia` no Procurando e na Home online do profissional; fila da demo só com mulheres. Corrigido: o alerta silencioso agora é separado por modo e acaba ao cancelar ou aceitar outro pedido
+- [x] Dica “Botão de segurança” embaixo do escudo por 3 s na 1ª vez de cada modo (`BotaoEscudo`)
 - Falta do profissional: cobrar o cliente, avaliar o cliente
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado
