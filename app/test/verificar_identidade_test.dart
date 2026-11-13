@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/profissional.dart';
 import 'package:tatu/data/seguranca.dart';
+import 'package:tatu/features/cliente/perfil_page.dart';
 import 'package:tatu/features/cliente/preferencias_cliente_page.dart';
 import 'package:tatu/features/profissional/cadastro/verificacao_page.dart';
 
@@ -61,5 +62,41 @@ void main() {
     await t.pumpAndSettle();
     expect(seguranca.preferirMulheres, isTrue);
     expect(find.text('Verifique sua identidade'), findsNothing);
+  });
+
+  testWidgets('Verificar identidade pelo Perfil não liga a preferência', (
+    t,
+  ) async {
+    t.view.physicalSize = const Size(1179, 2556); // 393×852
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
+    final bytes = File('assets/avatares/avatar-2.png').readAsBytesSync();
+    profissional.tirarFoto = ({required bool frontal}) async => bytes;
+    await t.pumpWidget(
+      MaterialApp(theme: tatuTheme(), home: const PerfilClientePage()),
+    );
+    await t.scrollUntilVisible(find.text('Verificar identidade'), 200);
+    await t.ensureVisible(find.text('Verificar identidade'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Verificar identidade'));
+    await t.pumpAndSettle();
+    expect(
+      find.textContaining('só atendem clientes verificados'),
+      findsOneWidget,
+    );
+    await t.tap(find.text('Começar'));
+    await t.pumpAndSettle();
+    for (var i = 0; i < 2; i++) {
+      await t.tap(find.bySemanticsLabel('Tirar foto'));
+      await t.pumpAndSettle();
+      await t.tap(find.text('Usar esta foto'));
+      await t.pumpAndSettle();
+    }
+    expect(find.text('Identidade verificada'), findsOneWidget);
+    await t.tap(find.text('Concluir'));
+    await t.pumpAndSettle();
+    expect(seguranca.identidadeVerificada, isTrue);
+    expect(seguranca.preferirMulheres, isFalse);
+    expect(find.text('Verificada'), findsOneWidget);
   });
 }

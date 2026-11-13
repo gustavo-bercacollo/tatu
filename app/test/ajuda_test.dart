@@ -10,6 +10,9 @@ Future<void> _abrirAjuda(WidgetTester t) async {
   await t.pumpWidget(
     MaterialApp(theme: tatuTheme(), home: const PerfilClientePage()),
   );
+  await t.scrollUntilVisible(find.text('Ajuda'), 200);
+  await t.ensureVisible(find.text('Ajuda'));
+  await t.pumpAndSettle();
   await t.tap(find.text('Ajuda'));
   await t.pumpAndSettle();
 }

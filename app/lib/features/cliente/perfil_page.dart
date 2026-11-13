@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../data/seguranca.dart';
+import '../../shared/widgets/aviso_topo.dart';
 import '../entrada/seguranca.dart';
 import 'preferencias_cliente_page.dart';
+import 'verificar_identidade_page.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../profissional/trocar_modo.dart';
@@ -191,6 +193,26 @@ class PerfilClientePage extends StatelessWidget {
                           builder: (_) => const ContatosConfiancaPage(),
                         ),
                       ),
+                    ),
+                    ItemLista(
+                      icone: TablerIcons.rosette_discount_check,
+                      texto: 'Verificar identidade',
+                      valor: seguranca.identidadeVerificada
+                          ? 'Verificada'
+                          : 'Verificar',
+                      onTap: () => seguranca.identidadeVerificada
+                          ? mostrarAvisoTopo(
+                              context,
+                              titulo: 'Identidade verificada',
+                              texto: 'Você já fez a verificação.',
+                            )
+                          : Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const VerificarIdentidadePage(
+                                  paraPreferencia: false,
+                                ),
+                              ),
+                            ),
                     ),
                     ItemLista(
                       icone: TablerIcons.user_check,

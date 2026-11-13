@@ -161,10 +161,14 @@ class SegurancaRepo extends ChangeNotifier {
   /// Cliente mandou documento e selfie (protótipo: aprova na hora).
   bool identidadeVerificada = false;
 
-  void verificarIdentidade() {
+  /// Com [ligarPreferencia], veio do "Preferir profissionais mulheres"
+  /// e já liga a preferência.
+  void verificarIdentidade({bool ligarPreferencia = false}) {
     identidadeVerificada = true;
-    identidade = Identidade.mulher;
-    preferirMulheres = true;
+    if (ligarPreferencia) {
+      identidade = Identidade.mulher;
+      preferirMulheres = true;
+    }
     notifyListeners();
   }
 

@@ -76,11 +76,15 @@ class CameraVerificacaoPage extends StatefulWidget {
     required this.etapa,
     this.refazendo = false,
     this.cliente = false,
+    this.ligarPreferencia = true,
   });
 
   final EtapaFoto etapa;
   final bool refazendo;
   final bool cliente;
+
+  /// Cliente: ao terminar, liga "Preferir profissionais mulheres".
+  final bool ligarPreferencia;
 
   /// Desligado nos testes e nas capturas (sem câmera de verdade).
   static bool cameraAoVivo = true;
@@ -175,9 +179,15 @@ class _CameraVerificacaoPageState extends State<CameraVerificacaoPage> {
     final foto = _foto!;
     if (widget.cliente) {
       if (_selfie) {
-        seguranca.verificarIdentidade();
+        seguranca.verificarIdentidade(
+          ligarPreferencia: widget.ligarPreferencia,
+        );
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const IdentidadeVerificadaPage()),
+          MaterialPageRoute(
+            builder: (_) => IdentidadeVerificadaPage(
+              paraPreferencia: widget.ligarPreferencia,
+            ),
+          ),
         );
         return;
       }

@@ -13,21 +13,27 @@ import '../profissional/cadastro/verificacao_page.dart';
 /// Cliente: verificar a identidade para usar a preferência por
 /// profissionais mulheres (documento + selfie ao vivo).
 class VerificarIdentidadePage extends StatelessWidget {
-  const VerificarIdentidadePage({super.key});
+  const VerificarIdentidadePage({super.key, this.paraPreferencia = true});
+
+  /// Veio do "Preferir profissionais mulheres" (senão, do Perfil).
+  final bool paraPreferencia;
 
   @override
   Widget build(BuildContext context) {
     return CadastroScaffold(
       titulo: 'Verifique sua identidade',
-      subtitulo:
-          'Para usar a preferência por mulheres, precisamos saber quem você '
-          'é. Leva uns 2 minutos.',
+      subtitulo: paraPreferencia
+          ? 'Para usar a preferência por mulheres, precisamos saber quem '
+                'você é. Leva uns 2 minutos.'
+          : 'Alguns profissionais só atendem clientes verificados. '
+                'Leva uns 2 minutos.',
       botao: 'Começar',
       onBotao: () => Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) => const CameraVerificacaoPage(
+          builder: (_) => CameraVerificacaoPage(
             etapa: EtapaFoto.frente,
             cliente: true,
+            ligarPreferencia: paraPreferencia,
           ),
         ),
       ),
@@ -102,7 +108,9 @@ class _Item extends StatelessWidget {
 
 /// Fim da verificação do cliente: a preferência já fica ligada.
 class IdentidadeVerificadaPage extends StatelessWidget {
-  const IdentidadeVerificadaPage({super.key});
+  const IdentidadeVerificadaPage({super.key, this.paraPreferencia = true});
+
+  final bool paraPreferencia;
 
   @override
   Widget build(BuildContext context) {
@@ -115,9 +123,11 @@ class IdentidadeVerificadaPage extends StatelessWidget {
         color: TatuColors.online,
       ),
       titulo: 'Identidade verificada',
-      texto:
-          'A preferência por profissionais mulheres está ativa. Você pode '
-          'desligar quando quiser, no Perfil ou na Home.',
+      texto: paraPreferencia
+          ? 'A preferência por profissionais mulheres está ativa. Você pode '
+                'desligar quando quiser, no Perfil ou na Home.'
+          : 'Pronto! Agora você também pode chamar profissionais que só '
+                'atendem clientes verificados.',
       principal: 'Concluir',
       onPrincipal: () => Navigator.of(context).maybePop(),
     );
