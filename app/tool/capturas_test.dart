@@ -1965,7 +1965,8 @@ void main() {
       preparar: () async {
         await t.tap(find.text('Enviar valor'));
         await t.pumpAndSettle();
-        await t.enterText(find.byType(TextField).last, '15000');
+        await t.enterText(find.widgetWithText(TextField, 'R\$ 0').first, '40');
+        await t.enterText(find.byType(TextField).last, '150');
         await t.pump();
       },
     );
@@ -1976,7 +1977,7 @@ void main() {
       t,
       'pro-chat-valor',
       const ChatProfissionalPage(resposta: Duration(hours: 1)),
-      preparar: () => enviarValor(t, '15000'),
+      preparar: () => enviarValor(t, '150'),
     );
   });
 
@@ -1986,7 +1987,7 @@ void main() {
       'pro-chat-proposta',
       const ChatProfissionalPage(),
       preparar: () async {
-        await enviarValor(t, '15000');
+        await enviarValor(t, '150');
         await t.pump(const Duration(seconds: 3));
       },
     );
@@ -1998,7 +1999,7 @@ void main() {
       'pro-chat-combinado',
       const ChatProfissionalPage(),
       preparar: () async {
-        await enviarValor(t, '15000');
+        await enviarValor(t, '150');
         await t.pump(const Duration(seconds: 3));
         await t.tap(find.textContaining('Aceitar R'));
         await t.pump();

@@ -45,11 +45,13 @@ const artigoPagamento = Artigo(
   secoes: [
     (
       'Pelo app',
-      'Pague com cartão ou Pix. A cobrança só acontece depois que você confirma o valor.',
+      'Pague com cartão (até 6x) ou Pix. Quando você confirma o valor, '
+          'ele fica reservado e só é cobrado no fim do serviço.',
     ),
     (
-      'Direto ao profissional',
-      'Também pode pagar por fora. Nesse caso, vocês dois confirmam o pagamento no app.',
+      'Sempre pelo Tatu',
+      'Todo pagamento passa pelo app. Assim você tem recibo e o Tatu '
+          'pode ajudar se algo der errado.',
     ),
   ],
 );
@@ -236,33 +238,33 @@ const conteudoCliente = ConteudoAjuda(
 
 const _quandoRecebo = Artigo(
   'Quando recebo meu dinheiro?',
-  resumo: 'Depende de como o cliente pagou.',
+  resumo: 'Todo pagamento passa pelo app.',
   secoes: [
     (
-      'Pago pelo app',
+      'No seu Pix',
       'Cai no seu Pix em até 1 dia útil depois que o serviço é concluído, '
           'já sem a taxa de 10%.',
     ),
     (
-      'Pago por fora',
-      'O cliente paga direto a você e o Tatu não cobra taxa. Vocês dois '
-          'confirmam o pagamento no app.',
+      'Valor garantido',
+      'Quando o cliente confirma o valor, ele fica reservado. A visita é '
+          'sua mesmo se o serviço não acontecer.',
     ),
   ],
 );
 
 const _taxa = Artigo(
   'Como funciona a taxa de 10%?',
-  resumo: 'O Tatu só cobra quando o cliente paga pelo app.',
+  resumo: 'O Tatu só cobra quando você recebe por um serviço.',
   secoes: [
     (
-      'Pago pelo app',
-      'Descontamos 10% do valor do serviço. Num serviço de R\$ 150,00, '
-          'você recebe R\$ 135,00.',
+      'Por serviço',
+      'Descontamos 10% do total (visita + serviço). Num total de '
+          'R\$ 190,00, cai R\$ 171,00 no seu Pix.',
     ),
     (
-      'Pago por fora',
-      'Não tem taxa. Cadastro, perfil e receber chamados também são grátis.',
+      'Grátis',
+      'Cadastro, perfil e receber chamados não têm taxa.',
     ),
   ],
 );
@@ -274,7 +276,7 @@ const assuntosAjudaProfissional = [
   AssuntoAjuda('Ganhos e Pix', TablerIcons.wallet, [
     _quandoRecebo,
     _taxa,
-    Artigo('Cliente pagou por fora'),
+    Artigo('Cliente quer pagar por fora'),
     Artigo('Trocar minha chave Pix'),
     Artigo('O Pix não caiu'),
     Artigo('Ver meus ganhos', atalho: AtalhoAjuda.ganhos),
@@ -303,8 +305,8 @@ const chamadosRecentes = [
     profissional: '',
     titulo: 'Júlia Costa · R\$ 90',
     iniciais: 'Júlia Costa',
-    resumo: 'Troca de torneira · Por fora',
-    descricao: 'R\$ 90,00 · Por fora',
+    resumo: 'Troca de torneira · Pago pelo app',
+    descricao: 'R\$ 90,00 · Pago pelo app',
     quando: 'ontem',
     icone: TablerIcons.user,
     saudacao: 'Como posso ajudar com esse chamado?',

@@ -133,8 +133,8 @@ ThemeData tatuTheme() => ThemeData(
 | C5 | **Procurando** | Mapa com profissionais próximos; 1) primeiros 60 s; 2) "Expandindo a busca…" (raio aumenta); 3) "Ninguém ativo nesse momento": busca continua em segundo plano, botão "Voltar ao início" (linha "Buscando em segundo plano"). Notificação quando alguém ACEITA |
 | C6 | Profissional encontrado | Mapa com rota e tempo; nota, serviços, distância; estimativa "R$ 80 a R$ 250"; Aceitar / Ver outro; contagem de prazo; seta para o perfil |
 | C7 | Perfil do profissional | Topo (nota, serviços, resposta média, especialidades, sobre, verificação); rolagem (fotos, medalhas, avaliações em carrossel de 3 + "Ver todas"); barra fixa "Ver outro / Aceitar" |
-| C8 | Chat | Resumo do pedido fixo; respostas rápidas; câmera; cartão **Valor combinado** (Confirmar / Pedir outro valor); folha "Quanto você quer pagar?"; contraproposta ("1 de 3") |
-| C9 | Cobrança | Cartão no chat com botão **Pagar R$ X** e "Já paguei por fora"; estados: pendente, pago pelo app, aguardando a profissional confirmar |
+| C8 | Chat | Resumo do pedido fixo; respostas rápidas; câmera; "Luiza enviou um valor" + cartão do valor ("Visita R$ 40 · Serviço R$ 150", total, forma de pagamento com "Trocar", "Reservamos agora. Só cobramos no fim.", **Confirmar valor** / Pedir outro valor); folha "Quanto você quer pagar?"; contraproposta ("1 de 3") |
+| C9 | Cobrança | No fim do serviço o app cobra o valor reservado; estados: cobrança pendente, pago, falha no pagamento (trocar forma de pagamento). Não existe pagamento por fora |
 | C10 | Pagamento | Folha (cartão, Pix, parcelas até 6x) → "Pagamento feito" com recibo → Avaliação (estrelas, tags, comentário opcional, "A [nome] também avalia você") |
 | C11 | Atividade | Em andamento (linha do tempo: Pedido, Combinado, A caminho, Serviço, Pagamento; busca em segundo plano com "Cancelar pedido"); Concluídos (por mês, Pedir de novo, Recibo, Avaliar) |
 | C12 | Mensagens | Lista simples; cobrança pendente isolada em cartão no topo com botão Pagar; estado vazio |
@@ -152,10 +152,10 @@ ThemeData tatuTheme() => ThemeData(
 | P6 | Primeira Home | Dica apontando "Ficar online" (só na primeira vez) |
 | P7 | Home | Offline: botão "Ficar online", resumo do dia, lembrete "Cadastre onde receber" se faltar; Online: "Buscando chamados…" |
 | P8 | Novo chamado | Anel de contagem; serviço, descrição, foto, tempo/distância, região aproximada, nota do cliente, estimativa; Aceitar / Recusar |
-| P9 | Chat | Igual ao do cliente + respostas rápidas + botão **Enviar valor** |
+| P9 | Chat | Igual ao do cliente + respostas rápidas + botão **Enviar valor** → folha "Quanto vai custar?" (Visita + Serviço; "A visita é sua mesmo se o serviço não acontecer."; Material incluso; "Você recebe": total, taxa do Tatu, no seu Pix; "Valor 1 de 3") |
 | P10 | Andamento | A caminho (endereço exato, Abrir rota, "Cheguei" só perto do local); Chegou (Iniciar serviço); Em andamento (Concluir e cobrar, "Precisa mudar o valor?") |
-| P11 | Cobrança | "Cobrar [cliente]" (valor, taxa, você recebe, fotos opcionais, "Recebi por fora") → Aguardando → Pagamento recebido → Avaliar o cliente |
-| P12 | Atividade e Ganhos | Cartão de ganhos da semana; Aguardando pagamento; Concluídos (Pago / Por fora); Ganhos (hoje, semana, mês, gráfico, pelo app / por fora / a receber) |
+| P11 | Cobrança | "Cobrar [cliente]" (valor, taxa, você recebe, fotos opcionais) → Aguardando → Pagamento recebido → Avaliar o cliente |
+| P12 | Atividade e Ganhos | Cartão de ganhos da semana; Aguardando pagamento; Concluídos (Pago); Ganhos (hoje, semana, mês, gráfico, recebido / a receber) |
 | P13 | Perfil | Cabeçalho, "Ver como o cliente vê" (prévia com faixa), Profissões, Fotos de trabalhos, Sobre você, Região de atendimento (2 a 20 km), Onde receber, Verificação, Notificações, Dados da conta, Ajuda, Privacidade, Sair |
 
 ---
@@ -177,16 +177,16 @@ ThemeData tatuTheme() => ThemeData(
 - O profissional pode usar "Isso é de outra categoria" para redirecionar o chamado.
 
 ### 5.3 Valor e chat
-- O profissional envia o **valor**; o cliente **confirma** ou pede outro. Até **3 rodadas**; depois sugere "Ver outro profissional".
+- O profissional envia o **valor** em duas partes: **visita** (dele mesmo se o serviço não acontecer) e **serviço**, e diz se o material está incluso. O cliente **confirma** ou pede outro. Até **3 rodadas**; depois sugere "Ver outro profissional".
 - Valor confirmado só muda com uma nova proposta aceita pelo cliente.
 - Endereço exato só aparece ao profissional **depois do valor confirmado**; antes, só a região aproximada.
 - Estimativa de preço é da plataforma, por região e serviço, e sempre rotulada como estimativa.
 
 ### 5.4 Pagamento
-- Pagar pelo app é **opcional**. Cartão (parcelas até 6x) ou Pix.
-- "Já paguei por fora" exige **confirmação da profissional**; "Recebi por fora" exige a do cliente. Só então a avaliação abre.
+- **Todo pagamento passa pelo app** (decidido em 13/11/2026): não existe pagamento por fora. Cartão (parcelas até 6x) ou Pix.
+- Ao **confirmar o valor**, o app reserva o valor na forma de pagamento do cliente ("Reservamos agora. Só cobramos no fim."); a cobrança acontece no fim do serviço. A avaliação abre depois do pagamento.
 - Comprovante para os dois lados.
-- **Taxa**: comissão só sobre pagamento pelo app (valor de exemplo: 10%). Pagamento por fora não tem taxa. A profissional vê o valor líquido antes de cobrar.
+- **Taxa**: comissão sobre todo serviço (valor de exemplo: 10%). A profissional vê o total, a taxa e o que cai no Pix antes de enviar o valor.
 
 ### 5.5 Cadastro do profissional
 - Até **3 profissões**, até **3 especialidades** por profissão (as que aparecem no cartão do cliente).
@@ -217,7 +217,7 @@ ThemeData tatuTheme() => ThemeData(
 - Busca: "Procurando um profissional" / "Expandindo a busca para sua região…" / "Ninguém ativo nesse momento" / "Cancelar pedido".
 - Profissional encontrado: "Aceitar Luiza" / "Ver outro profissional" / "Estimativa na sua região: R$ 80 a R$ 250".
 - Chat: "Você aceitou a Luiza. Combinem os detalhes e o valor por aqui." / "Valor combinado" / "Confirmar valor" / "Pedir outro valor".
-- Cobrança: "Pagar R$ 150,00" / "Já paguei por fora" / "Aguardando a Luiza confirmar".
+- Valor: "Luiza enviou um valor" / "Visita R$ 40 · Serviço R$ 150" / "Reservamos agora. Só cobramos no fim." / "Quanto vai custar?" / "Material incluso" / "Você recebe" / "Taxa do Tatu (10%)" / "No seu Pix".
 - Cadastro profissional: "Trabalhe com o que você sabe fazer" / "O cadastro leva uns 5 minutos" / "Seus dados" / "Qual é a sua profissão?" / "Escolha até 3 em que você manda muito bem." / "Onde você quer receber?" / "Vamos confirmar que é você" / "Cadastro aprovado!" / "Precisamos de uma nova foto".
 
 ---

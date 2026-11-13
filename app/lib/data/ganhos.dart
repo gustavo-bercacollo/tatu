@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 /// Como o serviço foi (ou vai ser) pago.
-enum SituacaoGanho { aguardando, pago, porFora }
+enum SituacaoGanho { aguardando, pago }
 
 /// Serviço feito pelo profissional (lista da Atividade).
 @immutable
@@ -20,7 +20,7 @@ class ServicoFeito {
   /// "hoje, 11:20", "ontem", "2 nov".
   final String quando;
 
-  /// O que o profissional recebe (já sem a taxa, quando pago pelo app).
+  /// O que o profissional recebe (já sem a taxa).
   final double valor;
   final SituacaoGanho situacao;
 }
@@ -31,7 +31,6 @@ class ResumoGanhos {
   const ResumoGanhos({
     required this.nome,
     required this.peloApp,
-    required this.porFora,
     required this.aReceber,
     this.barras = const [],
     this.rotulos = const [],
@@ -41,7 +40,6 @@ class ResumoGanhos {
   /// "de hoje", "da semana", "do mês" (depois de "Total").
   final String nome;
   final double peloApp;
-  final double porFora;
   final double aReceber;
 
   /// Ganhos por dia (só na semana).
@@ -52,7 +50,7 @@ class ResumoGanhos {
   final int atual;
 
   /// O "a receber" não entra no total.
-  double get total => peloApp + porFora;
+  double get total => peloApp;
 }
 
 /// Ganhos e serviços do profissional. Versão simulada (sem backend).
@@ -81,7 +79,7 @@ class GanhosRepo {
       220,
       SituacaoGanho.pago,
     ),
-    ServicoFeito('Paula Dias', 'Encanador', '2 nov', 90, SituacaoGanho.porFora),
+    ServicoFeito('Paula Dias', 'Encanador', '2 nov', 81, SituacaoGanho.pago),
   ];
 
   List<ServicoFeito> get aguardando => [
@@ -97,24 +95,21 @@ class GanhosRepo {
   ResumoGanhos get hoje => const ResumoGanhos(
     nome: 'de hoje',
     peloApp: 135,
-    porFora: 0,
     aReceber: 150,
   );
 
   ResumoGanhos get semana => const ResumoGanhos(
     nome: 'da semana',
-    peloApp: 355,
-    porFora: 90,
+    peloApp: 436,
     aReceber: 150,
-    barras: [90, 220, 135, 0, 0, 0, 0],
+    barras: [81, 220, 135, 0, 0, 0, 0],
     rotulos: ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'],
     atual: 2,
   );
 
   ResumoGanhos get mes => const ResumoGanhos(
     nome: 'do mês',
-    peloApp: 1420,
-    porFora: 310,
+    peloApp: 1699,
     aReceber: 150,
   );
 }

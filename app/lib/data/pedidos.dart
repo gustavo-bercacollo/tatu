@@ -123,7 +123,6 @@ class PedidoConcluido {
     this.minhaAvaliacao,
     this.editavelAte,
     this.cancelado = false,
-    this.pagoPorFora = false,
     this.online = false,
     this.chegaEm = '~15 min',
   });
@@ -156,9 +155,6 @@ class PedidoConcluido {
   /// Cancelado: sem valor, sem recibo e sem avaliação.
   final bool cancelado;
 
-  /// Pago direto ao profissional: o recibo vira "Comprovante".
-  final bool pagoPorFora;
-
   /// O profissional está online agora (para "Pedir de novo").
   final bool online;
 
@@ -189,7 +185,6 @@ class PedidoConcluido {
     minhaAvaliacao: a,
     editavelAte: editavelAte,
     cancelado: cancelado,
-    pagoPorFora: pagoPorFora,
     online: online,
     chegaEm: chegaEm,
   );
@@ -246,13 +241,12 @@ class PedidosRepo extends ChangeNotifier {
         profissional: 'Rafael Lima',
         descricao: 'Tomada sem energia',
         endereco: 'Rua das Flores, 120',
-        pagamento: 'Pago direto',
+        pagamento: 'Pix',
         valor: r'R$ 220,00',
         dia: '02 nov',
         hora: '10:05',
         mes: 'Novembro',
         numero: '#TT-47960',
-        pagoPorFora: true,
         editavelAte: '09 nov',
         minhaAvaliacao: AvaliacaoEnviada(
           nota: 5,

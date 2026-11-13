@@ -371,11 +371,6 @@ class _Linha extends StatelessWidget {
                   pequeno: true,
                 ),
                 SituacaoGanho.pago => const SeloVerde('Pago', pequeno: true),
-                SituacaoGanho.porFora => const SeloVerde(
-                  'Por fora',
-                  cinza: true,
-                  pequeno: true,
-                ),
               },
             ],
           ),

@@ -193,7 +193,7 @@ path.entre { opacity: .5; }
 /* ===== DADOS =====
    status: app (já no app, imagem real) · desenho (desenho pronto, ainda não no app) · andamento (tela ainda não desenhada)
    Para atualizar: mudar o status/imagem da tela, ou acrescentar telas e ligações. */
-const ATUALIZADO = '12/11/2026';
+const ATUALIZADO = '13/11/2026';
 
 const ETAPAS = {
   entrada:   { nome: 'Entrada e cadastro', lado: 'ambos' },
@@ -251,17 +251,16 @@ const TELAS_RAW = [
   ['a-todas','—','Todas as avaliações','procurar','andamento'],
 
   ['c16','C16','Chat','combinar','desenho', U+'04 - Combinar e pagar/16-chat.svg',["Respostas rápidas: “Pode vir agora” · “Quanto fica?”"]],
-  ['c17','C17','Chat · valor combinado','combinar','desenho', U+'04 - Combinar e pagar/17-chat-valor-combinado.svg'],
+  ['c17','C17','Chat · valor combinado','combinar','desenho', U+'04 - Combinar e pagar/17-chat-valor-combinado.svg',["Novo: “Visita R$ 40 · Serviço R$ 150”, cartão com “Trocar” e “Reservamos agora. Só cobramos no fim.”"]],
   ['c18','C18','Chat · pedir outro valor','combinar','desenho', U+'04 - Combinar e pagar/18-chat-pedir-outro-valor.svg',["Até 3 propostas"]],
-  ['c19','C19','Chat · cobrança pendente','combinar','desenho', U+'04 - Combinar e pagar/19-chat-cobranca.svg'],
+  ['c19','C19','Chat · cobrança pendente','combinar','desenho', U+'04 - Combinar e pagar/19-chat-cobranca.svg',["Sem “Já paguei por fora”: todo pagamento é pelo app"]],
   ['c20','C20','Pagamento','combinar','desenho', U+'04 - Combinar e pagar/20-pagamento.svg',["Cartão (até 6x) ou Pix"]],
   ['c21','C21','Pagamento feito · recibo','combinar','desenho', U+'04 - Combinar e pagar/21-pagamento-feito.svg'],
   ['c22','C22','Avaliação','combinar','app','docs/fluxo/app/avaliar.png',["Nota, elogios (Pontual, Educada…) e comentário; o profissional também avalia você","Também serve para editar a avaliação"]],
   ['a-foto','—','Enviar foto no chat','combinar','andamento'],
-  ['a-porfora','—','Paguei por fora · aguardando a profissional confirmar','combinar','andamento'],
   ['a-recibo','—','Baixar recibo','combinar','andamento'],
   ['c104','C104','Recibo','contaC','app','docs/fluxo/app/recibo.png',["“Enviar por e-mail” pede o e-mail se a conta não tiver"]],
-  ['c105','C105','Comprovante · pago por fora','contaC','app','docs/fluxo/app/comprovante.png',["Comprovante do serviço, não do pagamento"]],
+  ['c105','C105','Recibo · pago com Pix','contaC','app','docs/fluxo/app/comprovante.png',["Todo pagamento passa pelo app (sem pagamento por fora)"]],
   ['c106','C106','Sua avaliação','contaC','app','docs/fluxo/app/sua-avaliacao.png'],
   ['c101','C101','Folha · pedir de novo','contaC','app','docs/fluxo/app/pedir-de-novo.png',["Mesmo profissional (se online) ou qualquer um do serviço"]],
   ['c102','C102','Folha · pedir de novo (offline)','contaC','app','docs/fluxo/app/pedir-de-novo-offline.png'],
@@ -396,7 +395,7 @@ const TELAS_RAW = [
   ['p24l','P24l','Ative sua localização','chamados','app','docs/fluxo/app/pro-localizacao.png',["Na demo, aparece na 1ª ida até o cliente; “Abrir Ajustes” já liga a localização","“Agora não”: o “Cheguei” fica travado até ativar"]],
   ['p31n','P31n','App de navegação','contaP','app','docs/fluxo/app/pro-app-navegacao.png',["Usado no “Abrir rota”"]],
   ['p21b','P21b','Folha · ficar offline e trocar?','chamados','app','docs/fluxo/app/pro-trocar-online.png',["Aparece ao trocar para cliente estando online"]],
-  ['pa-valor','—','Folha · Quanto vai custar?','chamados','app','docs/fluxo/app/pro-enviar-valor.png',["Valor e quanto recebe (pelo app e por fora)","“Valor 1 de 3”: até 3 rodadas"]],
+  ['pa-valor','—','Folha · Quanto vai custar?','chamados','app','docs/fluxo/app/pro-enviar-valor.png',["Visita + serviço, material incluso","Você recebe: total, taxa do Tatu e no seu Pix","“Valor 1 de 3”: até 3 rodadas"]],
   ['pa-foto','—','Enviar foto no chat','chamados','andamento'],
   ['pa-chegou','—','Chegou · iniciar serviço','chamados','app','docs/fluxo/app/pro-chegou.png',["O cliente é avisado"]],
   ['pa-msgs','—','Mensagens do profissional','chamados','app','docs/fluxo/app/pro-mensagens.png',["Em andamento e Anteriores; busca por nome","Selos: valor combinado (verde) e proposta (laranja)"]],
@@ -421,11 +420,10 @@ const TELAS_RAW = [
   ['p31ar','P31ar','Contestação recebida','contaP','app','docs/fluxo/app/pro-contestacao-recebida.png',["Na lista, a avaliação passa a mostrar “Em revisão pela equipe”"]],
   ['p31p','P31p','Preferências de atendimento','contaP','app','docs/fluxo/app/pro-preferencias.png',["“Atender só clientes mulheres” só aparece para profissionais mulheres","Protótipo: guarda a escolha, mas ainda não filtra chamados (precisa do backend)"]],
   ['p31c','P31c','Contatos de confiança','contaP','app','docs/fluxo/app/pro-contatos-confianca.png',["Até 5 contatos; “···” remove","No app, “Adicionar contato” ainda mostra “em breve”"]],
-  ['p26','P26','Cobrar o cliente','servico','desenho', W+'03 - Serviço e cobrança/26-cobrar-cliente.svg',["Fotos do serviço (opcional) → câmera"]],
+  ['p26','P26','Cobrar o cliente','servico','desenho', W+'03 - Serviço e cobrança/26-cobrar-cliente.svg',["Fotos do serviço (opcional) → câmera","Sem “Recebi por fora”: todo pagamento é pelo app"]],
   ['p27','P27','Cobrança · aguardando','servico','desenho', W+'03 - Serviço e cobrança/27-cobranca-aguardando.svg'],
   ['p28','P28','Pagamento recebido · avaliar o cliente','servico','desenho', W+'03 - Serviço e cobrança/28-avaliar-cliente.svg'],
   ['p25b','P25b','Folha · termine o serviço antes de trocar','servico','desenho', W+'03 - Serviço e cobrança/25b-trocar-bloqueado.png',["Com serviço em andamento não dá para trocar de modo"]],
-  ['pa-porfora','—','Recebi por fora · aguardando o cliente confirmar','servico','andamento'],
 
   ['p29','P29','Atividade · concluídos','contaP','app','docs/fluxo/app/pro-atividade.png',["Ganhos da semana no topo; toque abre Ganhos","Aguardando pagamento separado dos concluídos"]],
   ['p29b','P29b','Atividade · em andamento (vazio)','contaP','app','docs/fluxo/app/pro-atividade-andamento.png'],
@@ -564,8 +562,6 @@ const LIGACOES = [
   ['c18','c17','Enviar proposta','t'],
   ['c17','c19','Confirmar valor · serviço concluído','t'],
   ['c19','c20','Pagar R$ 150,00','t'],
-  ['c19','a-porfora','Já paguei por fora','t'],
-  ['c20','a-porfora','Já paguei por fora','t'],
   ['c20','c21','Pagar R$ 150,00','t'],
   ['c21','c22','Avaliar a Luiza','t'],
   ['c21','a-recibo','Baixar recibo','t'],
@@ -597,12 +593,12 @@ const LIGACOES = [
   ['c88','c03','Pedir de novo','t'],
   ['c88','c60','Preciso de ajuda com este pedido','t'],
   ['c24','c104','Recibo','t'],
-  ['c24','c105','Recibo · pago direto ao profissional','t'],
+  ['c24','c105','Recibo · pago com Pix','t'],
   ['c24','c22','Avaliar','t'],
   ['c24','c106','estrelas · já avaliou','t'],
   ['c106','c22','Editar avaliação','t'],
   ['c104','a-recibo','Baixar PDF · Compartilhar','t'],
-  ['c105','a-recibo','Baixar comprovante','t'],
+  ['c105','a-recibo','Baixar PDF · Enviar por e-mail','t'],
   ['c25','c26','sem conversas','e'],
   ['c25','c90','cobrança pendente','e'],
   ['c90','c20','Pagar','t'],
@@ -835,8 +831,6 @@ const LIGACOES = [
   ['p31p','p21p','preferência ligada · ficar online','t'],
   ['p25','p23','Precisa mudar o valor?','t'],
   ['p26','p27','Cobrar R$ 150,00','t'],
-  ['p26','pa-porfora','Recebi por fora','t'],
-  ['p27','pa-porfora','Recebi por fora','t'],
   ['p27','p28','cliente paga','a'],
   ['p27','p21','Voltar ao início','t'],
   ['p28','p21','Enviar avaliação','t'],
@@ -913,7 +907,6 @@ const LIGACOES = [
   ['c17','p24','valor confirmado libera o endereço','s'],
   ['p26','c19','cobrança chega no chat','s'],
   ['c21','p28','pagamento confirmado','s'],
-  ['a-porfora','pa-porfora','a outra parte confirma','s'],
 ];
 
 /* ===== MONTAGEM ===== */

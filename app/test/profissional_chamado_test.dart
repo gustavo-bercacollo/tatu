@@ -30,7 +30,7 @@ Future<void> _chat(WidgetTester t) async {
   );
 }
 
-/// Abre a folha, digita o valor em centavos e envia.
+/// Abre a folha, digita o valor do serviço (reais) e envia.
 Future<void> _valor(WidgetTester t, String centavos) async {
   await t.tap(find.text('Enviar valor'));
   await t.pumpAndSettle();
@@ -59,7 +59,7 @@ void main() {
     expect(find.text('Estou a caminho'), findsNWidgets(2));
 
     // 1º valor: a cliente propõe outro.
-    await _valor(t, '15000');
+    await _valor(t, '150');
     expect(find.text('Seu valor · 1 de 3'), findsOneWidget);
     expect(find.text('Aguardando a Ana'), findsOneWidget);
     await t.pump(const Duration(seconds: 3));
@@ -89,12 +89,12 @@ void main() {
 
   testWidgets('Valor: 2º valor perto da proposta é aceito', (t) async {
     await _chat(t);
-    await _valor(t, '15000');
+    await _valor(t, '150');
     await t.pump(const Duration(seconds: 3));
     await t.tap(find.text('Enviar outro valor'));
     await t.pumpAndSettle();
     expect(find.text('Valor 2 de 3'), findsOneWidget);
-    await t.enterText(find.byType(TextField).last, '13000');
+    await t.enterText(find.byType(TextField).last, '130');
     await t.pump();
     expect(find.text('R\$ 117,00'), findsOneWidget); // pelo app, sem a taxa
     await t.tap(find.text('Enviar para Ana'));
@@ -106,12 +106,12 @@ void main() {
 
   testWidgets('Valor: 3 rodadas sem acordo encerram o chamado', (t) async {
     await _chat(t);
-    await _valor(t, '15000');
+    await _valor(t, '150');
     await t.pump(const Duration(seconds: 3));
     for (var i = 2; i <= 3; i++) {
       await t.tap(find.text('Enviar outro valor'));
       await t.pumpAndSettle();
-      await t.enterText(find.byType(TextField).last, '15000');
+      await t.enterText(find.byType(TextField).last, '150');
       await t.pump();
       await t.tap(find.text('Enviar para Ana'));
       await t.pumpAndSettle();

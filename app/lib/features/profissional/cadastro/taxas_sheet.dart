@@ -69,8 +69,8 @@ class _FolhaTaxas extends StatelessWidget {
             ),
             const SizedBox(height: 18),
             const Text(
-              'O Tatu só cobra quando o cliente paga pelo app. '
-              'Pagamento por fora não tem taxa.',
+              'Todo pagamento passa pelo app. O Tatu só cobra quando '
+              'você recebe por um serviço.',
               style: TextStyle(
                 fontSize: 16,
                 height: 1.4,
@@ -80,7 +80,7 @@ class _FolhaTaxas extends StatelessWidget {
             const SizedBox(height: TatuMedidas.entreSecoes),
             _Cartao(
               children: [
-                const Text('Serviço pago pelo app', style: TatuTexto.nota),
+                const Text('Por serviço', style: TatuTexto.nota),
                 const SizedBox(height: 6),
                 Text(
                   pct,
@@ -109,7 +109,7 @@ class _FolhaTaxas extends StatelessWidget {
                 Divider(height: 1, indent: 32),
                 _Gratis('Receber chamados: grátis'),
                 Divider(height: 1, indent: 32),
-                _Gratis('Pagamento por fora: sem taxa'),
+                _Gratis('Serviço que não aconteceu: sem taxa'),
               ],
             ),
             const SizedBox(height: TatuMedidas.entreSecoes + 8),

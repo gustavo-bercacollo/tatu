@@ -24,7 +24,7 @@ void main() {
     // Pergunta frequente com texto.
     await t.tap(find.text('Quando recebo meu dinheiro?'));
     await t.pumpAndSettle();
-    expect(find.text('Pago pelo app'), findsOneWidget);
+    expect(find.text('No seu Pix'), findsOneWidget);
     await t.tap(find.text('Falar com o suporte'));
     await t.pumpAndSettle();
     expect(find.text('Um chamado recente'), findsOneWidget);

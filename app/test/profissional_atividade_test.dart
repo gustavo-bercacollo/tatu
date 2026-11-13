@@ -21,11 +21,11 @@ void main() {
     await t.tap(find.text('Atividade'));
     await t.pumpAndSettle();
     expect(find.text('Esta semana'), findsOneWidget);
-    expect(find.text('R\$ 445,00'), findsOneWidget);
+    expect(find.text('R\$ 436,00'), findsOneWidget);
     expect(find.text('3 serviços · R\$ 150,00 a receber'), findsOneWidget);
     expect(find.text('Aguardando pagamento'), findsOneWidget);
     expect(find.text('Rafael Gomes'), findsOneWidget);
-    expect(find.text('Por fora'), findsOneWidget);
+    expect(find.text('Por fora'), findsNothing);
 
     await t.tap(find.text('Em andamento'));
     await t.pump();
@@ -34,7 +34,7 @@ void main() {
     await t.tap(find.text('Esta semana'));
     await t.pumpAndSettle();
     expect(find.text('Total da semana'), findsOneWidget);
-    expect(find.text('R\$ 355,00'), findsOneWidget);
+    expect(find.text('R\$ 436,00'), findsNWidgets(2)); // total e recebido
     await t.tap(find.text('Hoje'));
     await t.pump();
     expect(find.text('Total de hoje'), findsOneWidget);

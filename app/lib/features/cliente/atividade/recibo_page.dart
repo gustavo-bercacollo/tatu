@@ -13,8 +13,7 @@ import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/tela_interna.dart';
 import '../conta/novo_email_page.dart';
 
-/// Recibo do pedido pago pelo app. Se foi pago direto ao profissional, vira
-/// "Comprovante" (do serviço, não do pagamento).
+/// Recibo do pedido (todo pagamento passa pelo app).
 class ReciboPage extends StatelessWidget {
   const ReciboPage({super.key, required this.pedido});
 
@@ -44,9 +43,8 @@ class ReciboPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = pedido;
-    final fora = p.pagoPorFora;
     return TelaInterna(
-      titulo: fora ? 'Comprovante' : 'Recibo',
+      titulo: 'Recibo',
       fundoCinza: true,
       acao: 'Compartilhar',
       acaoIcone: TablerIcons.share_2,
@@ -79,21 +77,12 @@ class ReciboPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: TatuMedidas.entreItens),
-                SeloVerde(
-                  fora
-                      ? 'Pago direto ao profissional'
-                      : 'Pago · ${p.pagamento}',
-                  aviso: fora,
-                ),
+                SeloVerde('Pago · ${p.pagamento}'),
               ],
             ),
           ),
           const SizedBox(height: TatuMedidas.entreItens + 4),
           GrupoCartao(
-            nota: fora
-                ? 'Pagamentos por fora não passam pelo Tatu.\n'
-                      'Este é um comprovante do serviço,\nnão do pagamento.'
-                : null,
             linhas: [
               LinhaRotuloValor(rotulo: 'Serviço', valor: p.descricao),
               LinhaRotuloValor(rotulo: 'Profissional', valor: p.profissional),
@@ -107,18 +96,15 @@ class ReciboPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           FilledButton(
-            onPressed: () =>
-                _emBreve(context, fora ? 'Baixar comprovante' : 'Baixar PDF'),
-            child: Text(fora ? 'Baixar comprovante' : 'Baixar PDF'),
+            onPressed: () => _emBreve(context, 'Baixar PDF'),
+            child: const Text('Baixar PDF'),
           ),
-          if (!fora) ...[
-            const SizedBox(height: 10),
-            FilledButton(
-              style: tatuBotaoSecundario(),
-              onPressed: () => _enviarPorEmail(context),
-              child: const Text('Enviar por e-mail'),
-            ),
-          ],
+          const SizedBox(height: 10),
+          FilledButton(
+            style: tatuBotaoSecundario(),
+            onPressed: () => _enviarPorEmail(context),
+            child: const Text('Enviar por e-mail'),
+          ),
         ],
       ),
     );

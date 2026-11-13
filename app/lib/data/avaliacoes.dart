@@ -107,7 +107,7 @@ class AvaliacoesRepo extends ChangeNotifier {
         comentario: 'Tudo certo, pagou na hora.',
         tags: ['Pagou rápido'],
         servico: 'troca de registro',
-        valor: 'R\$ 120,00 · pago por fora',
+        valor: 'R\$ 120,00 · Pix',
       ),
     ].toList();
     _enviadas = const [

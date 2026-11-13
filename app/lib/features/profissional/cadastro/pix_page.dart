@@ -99,8 +99,8 @@ class _PixPageState extends State<PixPage> {
       esquerda: true,
       titulo: 'Deixar para depois?',
       texto:
-          'Sem uma chave Pix, você não consegue cobrar pelo app. '
-          'Pagamentos por fora continuam funcionando.',
+          'Sem uma chave Pix, você não recebe pelos serviços. '
+          'Todo pagamento passa pelo app.',
       nota: 'Você cadastra quando quiser, em Perfil.',
       confirmar: 'Cadastrar agora',
       cancelar: 'Fazer depois',

@@ -70,7 +70,7 @@ void main() {
     await _fecharAviso(t);
   });
 
-  testWidgets('Recibo pelo app e comprovante pago por fora', (t) async {
+  testWidgets('Recibo (todo pagamento é pelo app)', (t) async {
     conta.email = null;
     await _concluidos(t);
     await t.tap(find.text('Recibo').first);
@@ -88,9 +88,9 @@ void main() {
 
     await t.tap(find.text('Recibo').last);
     await t.pumpAndSettle();
-    expect(find.text('Comprovante'), findsOneWidget);
-    expect(find.text('Pago direto ao profissional'), findsOneWidget);
-    expect(find.text('Baixar comprovante'), findsOneWidget);
+    expect(find.text('Pago · Pix'), findsOneWidget);
+    expect(find.text('Comprovante'), findsNothing);
+    expect(find.text('Baixar PDF'), findsOneWidget);
   });
 
   testWidgets('Pedir de novo: mesma pessoa (online) ou offline', (t) async {

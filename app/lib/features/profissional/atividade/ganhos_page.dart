@@ -81,13 +81,8 @@ class _GanhosPageState extends State<GanhosPage> {
                   child: Column(
                     children: [
                       LinhaRotuloValor(
-                        rotulo: 'Recebido pelo app',
+                        rotulo: 'Recebido',
                         valor: reais(r.peloApp),
-                      ),
-                      const Divider(height: 1),
-                      LinhaRotuloValor(
-                        rotulo: 'Recebido por fora',
-                        valor: reais(r.porFora),
                       ),
                       const Divider(height: 1),
                       LinhaRotuloValor(

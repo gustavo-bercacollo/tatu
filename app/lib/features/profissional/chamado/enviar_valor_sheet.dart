@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -8,18 +9,47 @@ import '../../../data/profissional.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/folha.dart';
 
+/// Valor que o profissional envia: visita + serviço.
+@immutable
+class ValorProposto {
+  const ValorProposto({
+    required this.visita,
+    required this.servico,
+    this.material = false,
+  });
+
+  /// Fica com o profissional mesmo se o serviço não acontecer.
+  final double visita;
+  final double servico;
+
+  /// O material já está incluso no valor.
+  final bool material;
+
+  double get total => visita + servico;
+
+  /// "Visita R$ 40 · Serviço R$ 150".
+  String get detalhe => [
+    if (visita > 0) 'Visita ${reaisInteiros(visita)}',
+    if (servico > 0) 'Serviço ${reaisInteiros(servico)}',
+  ].join(' · ');
+}
+
+/// "R$ 40" (sem centavos quando o valor é redondo).
+String reaisInteiros(double v) =>
+    v == v.roundToDouble() ? 'R\$ ${v.round()}' : reais(v);
+
 /// P24 · Folha "Quanto vai custar?". [rodada] é qual dos 3 valores
 /// possíveis este é. Devolve null se fechar sem enviar.
-Future<double?> pedirValor(
+Future<ValorProposto?> pedirValor(
   BuildContext context, {
   required String cliente,
   required int rodada,
-}) => mostrarFolha<double>(
+}) => mostrarFolha<ValorProposto>(
   context,
   builder: (_) => _FolhaValor(cliente: cliente, rodada: rodada),
 );
 
-/// Digitação de dinheiro em centavos: "15000" vira "R$ 150,00".
+/// Digitação de reais inteiros: "150" vira "R$ 150".
 class ReaisFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
@@ -27,9 +57,9 @@ class ReaisFormatter extends TextInputFormatter {
     TextEditingValue newValue,
   ) {
     var d = soDigitos(newValue.text);
-    if (d.length > 7) d = d.substring(0, 7);
-    final centavos = int.tryParse(d) ?? 0;
-    final texto = centavos == 0 ? '' : reais(centavos / 100);
+    if (d.length > 5) d = d.substring(0, 5);
+    final n = int.tryParse(d) ?? 0;
+    final texto = n == 0 ? '' : 'R\$ $n';
     return TextEditingValue(
       text: texto,
       selection: TextSelection.collapsed(offset: texto.length),
@@ -48,27 +78,40 @@ class _FolhaValor extends StatefulWidget {
 }
 
 class _FolhaValorState extends State<_FolhaValor> {
-  final _campo = TextEditingController();
-  final _foco = FocusNode();
+  final _visita = TextEditingController();
+  final _servico = TextEditingController();
+  final _focoVisita = FocusNode();
+  final _focoServico = FocusNode();
+  bool _material = false;
 
   @override
   void initState() {
     super.initState();
-    _foco.addListener(() => setState(() {}));
+    _focoVisita.addListener(() => setState(() {}));
+    _focoServico.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
-    _campo.dispose();
-    _foco.dispose();
+    _visita.dispose();
+    _servico.dispose();
+    _focoVisita.dispose();
+    _focoServico.dispose();
     super.dispose();
   }
 
-  double get _valor => (int.tryParse(soDigitos(_campo.text)) ?? 0) / 100;
+  double _ler(TextEditingController c) =>
+      (int.tryParse(soDigitos(c.text)) ?? 0).toDouble();
 
   @override
   Widget build(BuildContext context) {
-    final v = _valor;
+    final valor = ValorProposto(
+      visita: _ler(_visita),
+      servico: _ler(_servico),
+      material: _material,
+    );
+    final total = valor.total;
+    final taxa = total * taxaTatu;
     final pct = (taxaTatu * 100).round();
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
@@ -95,53 +138,50 @@ class _FolhaValorState extends State<_FolhaValor> {
                   style: TatuTexto.corpo,
                 ),
                 const SizedBox(height: TatuMedidas.entreItens + 4),
-                GestureDetector(
-                  onTap: _foco.requestFocus,
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-                    decoration: BoxDecoration(
-                      color: TatuColors.fill,
-                      borderRadius: BorderRadius.circular(
-                        TatuMedidas.raioCampo,
-                      ),
-                      border: Border.all(
-                        color: _foco.hasFocus
-                            ? TatuColors.textPrimary
-                            : Colors.transparent,
-                        width: 1.5,
+                Row(
+                  children: [
+                    Expanded(
+                      child: _CampoValor(
+                        rotulo: 'Visita',
+                        controller: _visita,
+                        foco: _focoVisita,
+                        autofocus: true,
+                        onMudar: () => setState(() {}),
                       ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Valor do serviço', style: TatuTexto.nota),
-                        TextField(
-                          controller: _campo,
-                          focusNode: _foco,
-                          autofocus: true,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [ReaisFormatter()],
-                          onChanged: (_) => setState(() {}),
-                          cursorColor: TatuColors.textPrimary,
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.6,
-                          ),
-                          decoration: const InputDecoration.collapsed(
-                            hintText: 'R\$ 0,00',
-                            hintStyle: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.w700,
-                              color: TatuColors.textDisabled,
-                            ),
-                          ),
-                        ),
-                      ],
+                    const SizedBox(width: TatuMedidas.entreItens),
+                    Expanded(
+                      child: _CampoValor(
+                        rotulo: 'Serviço',
+                        controller: _servico,
+                        foco: _focoServico,
+                        onMudar: () => setState(() {}),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
                 const SizedBox(height: TatuMedidas.entreItens),
+                const Text(
+                  'A visita é sua mesmo se o serviço não acontecer.',
+                  style: TatuTexto.nota,
+                ),
+                const SizedBox(height: TatuMedidas.entreItens),
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Material incluso',
+                        style: TextStyle(fontSize: 17),
+                      ),
+                    ),
+                    CupertinoSwitch(
+                      value: _material,
+                      activeTrackColor: TatuColors.online,
+                      inactiveTrackColor: TatuColors.trilho,
+                      onChanged: (v) => setState(() => _material = v),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: TatuMedidas.entreItens),
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -160,12 +200,11 @@ class _FolhaValorState extends State<_FolhaValor> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      _Recebe(
-                        'Pelo app (taxa de $pct%)',
-                        reais(v * (1 - taxaTatu)),
-                      ),
+                      _Recebe('Total · visita + serviço', reais(total)),
                       const SizedBox(height: 6),
-                      _Recebe('Pago por fora', reais(v)),
+                      _Recebe('Taxa do Tatu ($pct%)', '– ${reais(taxa)}'),
+                      const SizedBox(height: 6),
+                      _Recebe('No seu Pix', reais(total - taxa), forte: true),
                     ],
                   ),
                 ),
@@ -173,7 +212,9 @@ class _FolhaValorState extends State<_FolhaValor> {
                 Text('Valor ${widget.rodada} de 3', style: TatuTexto.detalhe),
                 const SizedBox(height: TatuMedidas.entreItens),
                 FilledButton(
-                  onPressed: v > 0 ? () => Navigator.of(context).pop(v) : null,
+                  onPressed: total > 0
+                      ? () => Navigator.of(context).pop(valor)
+                      : null,
                   child: Text('Enviar para ${widget.cliente}'),
                 ),
               ],
@@ -185,19 +226,91 @@ class _FolhaValorState extends State<_FolhaValor> {
   }
 }
 
+/// Caixa cinza com rótulo e valor grande; borda preta quando em foco.
+class _CampoValor extends StatelessWidget {
+  const _CampoValor({
+    required this.rotulo,
+    required this.controller,
+    required this.foco,
+    required this.onMudar,
+    this.autofocus = false,
+  });
+
+  final String rotulo;
+  final TextEditingController controller;
+  final FocusNode foco;
+  final VoidCallback onMudar;
+  final bool autofocus;
+
+  @override
+  Widget build(BuildContext context) {
+    const estilo = TextStyle(
+      fontSize: 30,
+      fontWeight: FontWeight.w700,
+      letterSpacing: -0.6,
+    );
+    return GestureDetector(
+      onTap: foco.requestFocus,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+        decoration: BoxDecoration(
+          color: TatuColors.fill,
+          borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
+          border: Border.all(
+            color: foco.hasFocus ? TatuColors.textPrimary : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(rotulo, style: TatuTexto.nota),
+            TextField(
+              controller: controller,
+              focusNode: foco,
+              autofocus: autofocus,
+              keyboardType: TextInputType.number,
+              inputFormatters: [ReaisFormatter()],
+              onChanged: (_) => onMudar(),
+              cursorColor: TatuColors.textPrimary,
+              style: estilo,
+              decoration: InputDecoration.collapsed(
+                hintText: 'R\$ 0',
+                hintStyle: estilo.copyWith(color: TatuColors.textDisabled),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _Recebe extends StatelessWidget {
-  const _Recebe(this.rotulo, this.valor);
+  const _Recebe(this.rotulo, this.valor, {this.forte = false});
 
   final String rotulo;
   final String valor;
+  final bool forte;
 
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      Expanded(child: Text(rotulo, style: TatuTexto.detalhe)),
+      Expanded(
+        child: Text(
+          rotulo,
+          style: forte
+              ? const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)
+              : TatuTexto.detalhe,
+        ),
+      ),
       Text(
         valor,
-        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: forte ? FontWeight.w700 : FontWeight.w400,
+          color: forte ? TatuColors.textPrimary : TatuColors.textSecondary,
+        ),
       ),
     ],
   );

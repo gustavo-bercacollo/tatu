@@ -68,6 +68,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   EstadoValor _estado = EstadoValor.inicio;
   int _rodada = 0; // quantos valores o profissional já enviou
   double _meuValor = 0;
+  String _meuDetalhe = ''; // "Visita R$ 40 · Serviço R$ 150"
   double _proposta = 0; // proposta do cliente
   double _combinado = 0;
 
@@ -175,7 +176,8 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     if (v == null || !mounted) return;
     setState(() {
       _rodada++;
-      _meuValor = v;
+      _meuValor = v.total;
+      _meuDetalhe = v.detalhe;
       _estado = EstadoValor.aguardando;
     });
     _timer?.cancel();
@@ -311,6 +313,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
               _MeuValor(
                 rodada: _rodada,
                 valor: _meuValor,
+                detalhe: _meuDetalhe,
                 icone: TablerIcons.clock,
                 situacao: 'Aguardando a $_nome',
               ),
@@ -319,6 +322,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
               _MeuValor(
                 rodada: _rodada,
                 valor: _meuValor,
+                detalhe: _meuDetalhe,
                 icone: TablerIcons.refresh,
                 situacao: '$_nome propôs outro valor',
               ),
@@ -393,12 +397,14 @@ class _MeuValor extends StatelessWidget {
   const _MeuValor({
     required this.rodada,
     required this.valor,
+    required this.detalhe,
     required this.icone,
     required this.situacao,
   });
 
   final int rodada;
   final double valor;
+  final String detalhe;
   final IconData icone;
   final String situacao;
 
@@ -420,6 +426,7 @@ class _MeuValor extends StatelessWidget {
               Text('Seu valor · $rodada de $maxRodadas', style: TatuTexto.nota),
               const SizedBox(height: 2),
               _Valor(valor),
+              if (detalhe.isNotEmpty) Text(detalhe, style: TatuTexto.nota),
               const SizedBox(height: 6),
               Row(
                 children: [

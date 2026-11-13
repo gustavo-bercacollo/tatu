@@ -18,6 +18,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - 04/11/2026 — Tela **Nome** (referência `tatu-tela-4-nome.html`); esqueleto `CadastroScaffold` + `CadastroNota` compartilhado pelas telas de cadastro.
 - 04/11/2026 — **Fluxograma** de todas as telas (cliente + profissional, toques, status) publicado: https://claude.ai/artifact/UbvPYpEqyP5sWj9cbtvT7B. Fonte em `docs/fluxo/`. Atualizar a cada mudança de tela (ver CLAUDE.md).
 - 04/11/2026 — Tela **Código SMS** (referência `tatu-tela-3-codigo-sms.html`) entre Celular e Nome. Corrigido: texto dos botões não usava Inter; botão desabilitado com texto `#B0B0B5`.
+- 13/11/2026 — **Sem pagamento por fora**: todo pagamento passa pelo app (guia, CLAUDE.md e fluxograma). Folha "Quanto vai custar?" do profissional com Visita + Serviço, Material incluso e "Você recebe" (total, taxa, no seu Pix); cartão do valor mostra "Visita · Serviço". Recibo do cliente sem "Comprovante"; Ganhos sem "Recebido por fora"/selo "Por fora"; Taxas, Pix e Ajuda reescritos. Falta: cartão do valor do cliente no chat (Visita · Serviço, cartão com "Trocar", "Reservamos agora. Só cobramos no fim.", Confirmar valor) — ainda só desenho.
 
 ## Telas comuns
 - [x] Boas-vindas ("Como você quer usar o Tatu?") — `features/entrada/boas_vindas_page.dart`

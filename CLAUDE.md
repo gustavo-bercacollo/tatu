@@ -24,7 +24,7 @@ Minimalista, iPhone/Mac. Fundo branco, cinzas translúcidos, texto preto, botão
 - IA marca o serviço (✦) pela descrição; escolha manual nunca é sobrescrita; conflito só gera folha de confirmação.
 - Profissional envia valor; cliente confirma ou pede outro (até 3 rodadas). **Endereço exato só depois do valor confirmado.**
 - Faixa de preço é estimativa da plataforma (região + serviço), sempre rotulada como estimativa.
-- Pagar pelo app é opcional (cartão até 6x ou Pix). "Por fora" exige confirmação da outra parte. Comissão só no pagamento pelo app.
+- **Todo pagamento é pelo app** (cartão até 6x ou Pix); **não existe pagamento por fora** (decidido em 13/11/2026). Valor = visita + serviço (material incluso ou não); ao confirmar, o valor fica reservado e só é cobrado no fim. Comissão sobre todo serviço.
 - Profissional: até 3 profissões × 3 especialidades; Pix no nome do CPF; verificação (documento só por câmera + selfie), reprovação corrigível ou definitiva. App sempre abre **offline**.
 - Contato: quem se cadastra pelo e-mail confirma o celular ao chamar o primeiro profissional (uma vez); quem se cadastra pelo celular informa o e-mail quando ele faz falta (recibo, pagamento, cópia dos dados).
 - Avaliação mútua; perfil mostra 3 avaliações em carrossel + "Ver todas".
