@@ -16,7 +16,11 @@ class TelaInterna extends StatelessWidget {
     this.acaoIcone,
     this.rodape,
     this.fundoCinza = false,
+    this.direita,
   });
+
+  /// Widget próprio no canto direito do topo (ex.: escudo).
+  final Widget? direita;
 
   final String titulo;
   final String? acao;
@@ -55,6 +59,7 @@ class TelaInterna extends StatelessWidget {
                     acao: acao,
                     onAcao: onAcao,
                     acaoIcone: acaoIcone,
+                    direita: direita,
                   ),
                   Expanded(child: corpo),
                   ?rodape,

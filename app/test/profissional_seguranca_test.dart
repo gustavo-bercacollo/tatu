@@ -2,12 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
+import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/data/profissional.dart';
+import 'package:tatu/features/cliente/atividade/pedido_andamento_page.dart';
 import 'package:tatu/data/seguranca.dart';
 import 'package:tatu/features/profissional/perfil/preferencias_atendimento_page.dart';
 import 'package:tatu/features/profissional/servico/andamento_page.dart';
 import 'package:tatu/features/profissional/servico/rota.dart';
-import 'package:tatu/features/profissional/servico/seguranca.dart';
+import 'package:tatu/features/entrada/seguranca.dart';
 
 Future<void> _abrir(WidgetTester t, Widget tela) async {
   t.view.physicalSize = const Size(1179, 2556); // 393×852
@@ -116,5 +118,29 @@ void main() {
     await t.tap(find.byType(CupertinoSwitch).last);
     await t.pump();
     expect(seguranca.soVerificados, isTrue);
+  });
+
+  testWidgets('Cliente: escudo no pedido, 190 e sair agora', (t) async {
+    pedidos.restaurar();
+    await _abrir(t, const PedidoAndamentoPage());
+    await t.tap(find.bySemanticsLabel('Segurança'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Ligar 190'));
+    await t.pumpAndSettle();
+    expect(find.text('Profissional'), findsOneWidget);
+    expect(find.text('Luiza Souza'), findsOneWidget);
+    await t.tap(find.text('Voltar'));
+    await t.pumpAndSettle();
+    expect(find.text('Alerta ativo · 2 contatos'), findsOneWidget);
+    await t.tap(find.bySemanticsLabel('Segurança'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Sair agora'));
+    await t.pumpAndSettle();
+    expect(find.text('A profissional é bloqueada para você.'), findsOneWidget);
+    expect(find.text('Nada é cobrado por sair.'), findsOneWidget);
+    await t.tap(find.widgetWithText(FilledButton, 'Sair agora'));
+    await t.pumpAndSettle();
+    expect(find.text('Você saiu do atendimento'), findsOneWidget);
+    expect(pedidos.andamento, isNull);
   });
 }

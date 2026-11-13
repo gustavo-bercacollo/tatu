@@ -24,7 +24,7 @@ import '../home/home_profissional_page.dart';
 import 'dados_conta_profissional_page.dart';
 import 'fotos_trabalho_page.dart';
 import '../servico/rota.dart';
-import '../servico/seguranca.dart';
+import '../../entrada/seguranca.dart';
 import 'notificacoes_profissional_page.dart';
 import 'preferencias_atendimento_page.dart';
 import 'previa_page.dart';

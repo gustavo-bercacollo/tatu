@@ -5,24 +5,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
-import '../../../core/theme/tatu_colors.dart';
-import '../../../core/theme/tatu_medidas.dart';
-import '../../../core/theme/tatu_texto.dart';
-import '../../../core/theme/tatu_theme.dart';
-import '../../../data/ajuda.dart';
-import '../../../data/seguranca.dart';
-import '../../../data/servico_profissional.dart';
-import '../../../shared/widgets/avatar_iniciais.dart';
-import '../../../shared/widgets/aviso_topo.dart';
-import '../../../shared/widgets/folha.dart';
-import '../../../shared/widgets/lista_agrupada.dart';
-import '../../../shared/widgets/nota_icone.dart';
-import '../../../shared/widgets/opcao_selecionavel.dart';
-import '../../../shared/widgets/tela_interna.dart';
-import '../../../shared/widgets/tela_permissao.dart';
-import '../../cliente/ajuda/chat_suporte_page.dart';
-import '../cadastro/resultado_page.dart' show abrirHomeProfissional;
-import 'rota.dart' show abrirLink;
+import '../../core/theme/tatu_colors.dart';
+import '../../core/theme/tatu_medidas.dart';
+import '../../core/theme/tatu_texto.dart';
+import '../../core/theme/tatu_theme.dart';
+import '../../data/ajuda.dart';
+import '../../data/seguranca.dart';
+import '../../data/pedidos.dart';
+import '../../shared/widgets/avatar_iniciais.dart';
+import '../../shared/widgets/aviso_topo.dart';
+import '../../shared/widgets/folha.dart';
+import '../../shared/widgets/lista_agrupada.dart';
+import '../../shared/widgets/nota_icone.dart';
+import '../../shared/widgets/opcao_selecionavel.dart';
+import '../../shared/widgets/tela_interna.dart';
+import '../../shared/widgets/tela_permissao.dart';
+import '../../shared/widgets/abas_cliente.dart';
+import '../cliente/abas.dart';
+import '../cliente/ajuda/chat_suporte_page.dart';
+import '../profissional/cadastro/resultado_page.dart' show abrirHomeProfissional;
+import '../profissional/servico/rota.dart' show abrirLink;
 
 /// Liga para um número (190, 180).
 Future<void> ligar(String numero) => abrirLink(Uri.parse('tel:$numero'));
@@ -32,7 +34,7 @@ Future<void> ligar(String numero) => abrirLink(Uri.parse('tel:$numero'));
 class BotaoEscudo extends StatefulWidget {
   const BotaoEscudo({super.key, required this.servico});
 
-  final ServicoAceito servico;
+  final Atendimento servico;
 
   static const segurarPor = Duration(seconds: 3);
 
@@ -158,7 +160,7 @@ void _acionarAlerta(BuildContext context) {
 }
 
 /// Folha "Segurança": 190, 180, alerta silencioso e sair agora.
-Future<void> abrirSeguranca(BuildContext context, ServicoAceito s) async {
+Future<void> abrirSeguranca(BuildContext context, Atendimento s) async {
   final escolha = await mostrarFolha<String>(
     context,
     builder: (ctx) => SafeArea(
@@ -262,8 +264,8 @@ Future<void> abrirSeguranca(BuildContext context, ServicoAceito s) async {
 }
 
 /// "Sair do atendimento agora?" → "Você saiu do atendimento".
-Future<void> sairDoAtendimento(BuildContext context, ServicoAceito s) async {
-  final ela = s.feminino;
+Future<void> sairDoAtendimento(BuildContext context, Atendimento s) async {
+  final ela = s.outroFeminino;
   final sair = await mostrarFolha<bool>(
     context,
     builder: (ctx) => SafeArea(
@@ -286,13 +288,15 @@ Future<void> sairDoAtendimento(BuildContext context, ServicoAceito s) async {
               style: TatuTexto.tituloFolha,
             ),
             const SizedBox(height: TatuMedidas.entreSecoes),
-            const LinhaConsequencia(
+            LinhaConsequencia(
               TablerIcons.check,
-              'Você não perde pontos nem posição.',
+              s.doCliente
+                  ? 'Nada é cobrado por sair.'
+                  : 'Você não perde pontos nem posição.',
             ),
             LinhaConsequencia(
               TablerIcons.x,
-              '${ela ? 'A cliente' : 'O cliente'} é '
+              '${s.papel[0].toUpperCase()}${s.papel.substring(1)} é '
               '${ela ? 'bloqueada' : 'bloqueado'} para você.',
             ),
             const LinhaConsequencia(
@@ -317,6 +321,7 @@ Future<void> sairDoAtendimento(BuildContext context, ServicoAceito s) async {
     ),
   );
   if (sair != true || !context.mounted) return;
+  if (s.doCliente) pedidos.cancelarAndamento();
   Navigator.of(context).pushAndRemoveUntil(
     MaterialPageRoute(builder: (_) => VoceSaiuPage(servico: s)),
     (r) => r.isFirst,
@@ -325,9 +330,9 @@ Future<void> sairDoAtendimento(BuildContext context, ServicoAceito s) async {
 
 /// Depois de sair: "Você está em um lugar seguro?".
 class VoceSaiuPage extends StatelessWidget {
-  const VoceSaiuPage({super.key, this.servico = servicoExemplo});
+  const VoceSaiuPage({super.key, this.servico = Atendimento.exemplo});
 
-  final ServicoAceito servico;
+  final Atendimento servico;
 
   @override
   Widget build(BuildContext context) {
@@ -363,7 +368,9 @@ class VoceSaiuPage extends StatelessWidget {
                           FilledButton(
                             onPressed: () {
                               seguranca.encerrarAlerta();
-                              abrirHomeProfissional(context);
+                              servico.doCliente
+                                  ? irParaAba(context, AbaCliente.inicio)
+                                  : abrirHomeProfissional(context);
                             },
                             child: const Text('Estou bem'),
                           ),
@@ -383,8 +390,10 @@ class VoceSaiuPage extends StatelessWidget {
                               'Contar o que aconteceu',
                               onTap: () => Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (_) => const ChatSuportePage(
-                                    conteudo: conteudoProfissional,
+                                  builder: (_) => ChatSuportePage(
+                                    conteudo: servico.doCliente
+                                        ? conteudoCliente
+                                        : conteudoProfissional,
                                   ),
                                 ),
                               ),
@@ -415,12 +424,10 @@ class VoceSaiuPage extends StatelessWidget {
 class Ligar190Page extends StatefulWidget {
   const Ligar190Page({
     super.key,
-    this.servico = servicoExemplo,
-    this.chegouAs = '14:32',
+    this.servico = Atendimento.exemplo,
   });
 
-  final ServicoAceito servico;
-  final String chegouAs;
+  final Atendimento servico;
 
   @override
   State<Ligar190Page> createState() => _Ligar190PageState();
@@ -440,7 +447,7 @@ class _Ligar190PageState extends State<Ligar190Page> {
   @override
   Widget build(BuildContext context) {
     final s = widget.servico;
-    final complemento = s.referencia.split(' · ').first;
+    final complemento = s.complemento;
     return TelaInterna(
       titulo: 'Ligar 190',
       corpo: ListView(
@@ -508,16 +515,22 @@ class _Ligar190PageState extends State<Ligar190Page> {
                 ),
                 const Divider(height: 1, color: TatuColors.hairline),
                 _Dado(
-                  rotulo: 'Cliente',
-                  valor: s.cliente,
-                  detalhe: 'Celular ${s.celularCliente}',
+                  rotulo: s.doCliente ? 'Profissional' : 'Cliente',
+                  valor: s.outro,
+                  detalhe: 'Celular ${s.celularOutro}',
                 ),
                 const Divider(height: 1, color: TatuColors.hairline),
-                _Dado(
-                  rotulo: 'Chegou às',
-                  valor: widget.chegouAs,
-                  detalhe: 'Pedido nº ${s.pedido}',
-                ),
+                s.chegouAs.isEmpty
+                    ? _Dado(
+                        rotulo: 'Pedido',
+                        valor: 'nº ${s.pedido}',
+                        detalhe: s.descricao,
+                      )
+                    : _Dado(
+                        rotulo: 'Chegou às',
+                        valor: s.chegouAs,
+                        detalhe: 'Pedido nº ${s.pedido}',
+                      ),
               ],
             ),
           ),

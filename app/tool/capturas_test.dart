@@ -39,7 +39,7 @@ import 'package:tatu/features/profissional/perfil/sobre_page.dart';
 import 'package:tatu/data/sobre_ia.dart';
 import 'package:tatu/features/profissional/servico/andamento_page.dart';
 import 'package:tatu/features/profissional/servico/rota.dart';
-import 'package:tatu/features/profissional/servico/seguranca.dart';
+import 'package:tatu/features/entrada/seguranca.dart';
 import 'package:tatu/features/profissional/perfil/preferencias_atendimento_page.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/ajuda.dart';
@@ -1747,6 +1747,48 @@ void main() {
         seguranca.definirSoMulheres(true);
         seguranca.definirSoVerificados(true);
         await t.pump();
+      },
+    );
+  });
+
+  testWidgets('cliente-seguranca', (t) async {
+    await _capturar(
+      t,
+      'cliente-seguranca',
+      const PedidoAndamentoPage(),
+      preparar: () => abrirSegurancaCap(t),
+    );
+  });
+
+  testWidgets('cliente-alerta-ativo', (t) async {
+    await _capturar(
+      t,
+      'cliente-alerta-ativo',
+      const PedidoAndamentoPage(),
+      preparar: () async {
+        seguranca.acionarAlerta();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('cliente-ligar-190', (t) async {
+    await _capturar(
+      t,
+      'cliente-ligar-190',
+      Ligar190Page(servico: Atendimento.doPedido(pedidos.andamento!)),
+    );
+  });
+
+  testWidgets('cliente-sair', (t) async {
+    await _capturar(
+      t,
+      'cliente-sair',
+      const PedidoAndamentoPage(),
+      preparar: () async {
+        await abrirSegurancaCap(t);
+        await t.tap(find.text('Sair agora'));
+        await t.pumpAndSettle();
       },
     );
   });

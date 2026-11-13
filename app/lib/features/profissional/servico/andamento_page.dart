@@ -19,7 +19,7 @@ import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import 'rota.dart';
-import 'seguranca.dart';
+import '../../entrada/seguranca.dart';
 
 void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
   ..hideCurrentSnackBar()
@@ -373,7 +373,9 @@ class EmAndamentoPage extends StatelessWidget {
                         ),
                         Align(
                           alignment: Alignment.centerRight,
-                          child: BotaoEscudo(servico: s),
+                          child: BotaoEscudo(
+                            servico: Atendimento.doServico(s, chegouAs: hora),
+                          ),
                         ),
                       ],
                     ),

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../../data/seguranca.dart';
+import '../entrada/seguranca.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../profissional/trocar_modo.dart';
@@ -43,6 +46,7 @@ class PerfilClientePage extends StatelessWidget {
         enderecos,
         pagamentos,
         notificacoes,
+        seguranca,
       ]),
       builder: (context, _) => _tela(context, emBreve),
     );
@@ -174,6 +178,16 @@ class PerfilClientePage extends StatelessWidget {
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => const NotificacoesPage(),
+                        ),
+                      ),
+                    ),
+                    ItemLista(
+                      icone: TablerIcons.shield_check,
+                      texto: 'Contatos de confiança',
+                      valor: '${seguranca.contatos.length}',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ContatosConfiancaPage(),
                         ),
                       ),
                     ),

@@ -12,7 +12,11 @@ class TopoTela extends StatelessWidget {
     this.acao,
     this.onAcao,
     this.acaoIcone,
+    this.direita,
   });
+
+  /// Widget próprio à direita (ex.: escudo de segurança).
+  final Widget? direita;
 
   final String titulo;
   final String? acao;
@@ -36,7 +40,9 @@ class TopoTela extends StatelessWidget {
             titulo,
             style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
           ),
-          if (acaoIcone != null)
+          if (direita != null)
+            Align(alignment: Alignment.centerRight, child: direita)
+          else if (acaoIcone != null)
             Align(
               alignment: Alignment.centerRight,
               child: Semantics(

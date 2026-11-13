@@ -6,11 +6,13 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/conversas.dart';
 import '../../../data/pedidos.dart';
+import '../../../data/seguranca.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/tela_interna.dart';
+import '../../entrada/seguranca.dart';
 import '../mensagens/chat_page.dart';
 import 'pedido_cancelado_page.dart';
 
@@ -47,6 +49,9 @@ class PedidoAndamentoPage extends StatelessWidget {
     return TelaInterna(
       titulo: 'Pedido',
       fundoCinza: true,
+      direita: p == null
+          ? null
+          : BotaoEscudo(servico: Atendimento.doPedido(p)),
       corpo: p == null
           ? const SizedBox.shrink()
           : ListView(
@@ -54,6 +59,15 @@ class PedidoAndamentoPage extends StatelessWidget {
                 vertical: TatuMedidas.entreSecoes,
               ),
               children: [
+                ListenableBuilder(
+                  listenable: seguranca,
+                  builder: (_, _) => seguranca.alertaAtivo
+                      ? const Padding(
+                          padding: EdgeInsets.only(bottom: 14),
+                          child: Center(child: SeloAlertaAtivo()),
+                        )
+                      : const SizedBox.shrink(),
+                ),
                 _CartaoBranco(
                   child: Column(
                     children: [

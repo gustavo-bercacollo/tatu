@@ -1,5 +1,81 @@
 import 'package:flutter/foundation.dart';
 
+import 'pedidos.dart';
+import 'servico_profissional.dart';
+
+/// O atendimento em curso, do ponto de vista de quem usa o app
+/// (cliente ou profissional): quem é a outra pessoa e onde é.
+@immutable
+class Atendimento {
+  const Atendimento({
+    required this.doCliente,
+    required this.outro,
+    required this.outroFeminino,
+    required this.rua,
+    this.complemento = '',
+    this.bairro = 'Jardim Primavera, São Paulo',
+    this.celularOutro = '(11) 9••••-7777',
+    this.pedido = 'TT-48213',
+    this.chegouAs = '',
+    this.descricao = '',
+  });
+
+  /// Quem usa o app é o cliente (senão, o profissional).
+  final bool doCliente;
+
+  /// Nome da outra pessoa (cliente ou profissional).
+  final String outro;
+  final bool outroFeminino;
+  final String rua;
+  final String complemento;
+  final String bairro;
+  final String celularOutro;
+  final String pedido;
+
+  /// Hora em que o profissional chegou (vazio = ainda não).
+  final String chegouAs;
+  final String descricao;
+
+  String get primeiroNome => outro.split(' ').first;
+
+  /// "a cliente", "o profissional"…
+  String get papel => doCliente
+      ? (outroFeminino ? 'a profissional' : 'o profissional')
+      : (outroFeminino ? 'a cliente' : 'o cliente');
+
+  static const exemplo = Atendimento(
+    doCliente: false,
+    outro: 'Ana Martins',
+    outroFeminino: true,
+    rua: 'Rua das Flores, 120',
+    complemento: 'Apto 4',
+    chegouAs: '14:32',
+  );
+
+  factory Atendimento.doServico(ServicoAceito s, {String chegouAs = ''}) =>
+      Atendimento(
+        doCliente: false,
+        outro: s.cliente,
+        outroFeminino: s.feminino,
+        rua: s.rua,
+        complemento: s.referencia.split(' · ').first,
+        bairro: s.bairro,
+        celularOutro: s.celularCliente,
+        pedido: s.pedido,
+        chegouAs: chegouAs,
+        descricao: s.descricao,
+      );
+
+  factory Atendimento.doPedido(PedidoAndamento p) => Atendimento(
+    doCliente: true,
+    outro: p.profissional,
+    outroFeminino: p.profissao.endsWith('a'),
+    rua: p.endereco,
+    celularOutro: '(11) 9••••-4321',
+    descricao: p.descricao,
+  );
+}
+
 /// Pessoa que recebe o alerta silencioso do profissional.
 @immutable
 class ContatoConfianca {
