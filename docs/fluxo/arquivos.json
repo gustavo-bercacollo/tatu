@@ -276,5 +276,7 @@
  "app/servico-nao-realizado.png": "docs/fluxo/app/servico-nao-realizado.png",
  "app/contestar.png": "docs/fluxo/app/contestar.png",
  "app/pro-so-visita.png": "docs/fluxo/app/pro-so-visita.png",
- "app/pro-home-pausada.png": "docs/fluxo/app/pro-home-pausada.png"
+ "app/pro-home-pausada.png": "docs/fluxo/app/pro-home-pausada.png",
+ "app/chat-pedir-valor.png": "docs/fluxo/app/chat-pedir-valor.png",
+ "app/chat-valor-confirmado.png": "docs/fluxo/app/chat-valor-confirmado.png"
 }

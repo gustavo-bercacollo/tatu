@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
@@ -45,23 +44,6 @@ Future<ValorProposto?> pedirValor(
   builder: (_) => _FolhaValor(cliente: cliente, rodada: rodada),
 );
 
-/// Digitação de reais inteiros: "150" vira "R$ 150".
-class ReaisFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    var d = soDigitos(newValue.text);
-    if (d.length > 5) d = d.substring(0, 5);
-    final n = int.tryParse(d) ?? 0;
-    final texto = n == 0 ? '' : 'R\$ $n';
-    return TextEditingValue(
-      text: texto,
-      selection: TextSelection.collapsed(offset: texto.length),
-    );
-  }
-}
 
 class _FolhaValor extends StatefulWidget {
   const _FolhaValor({required this.cliente, required this.rodada});

@@ -852,6 +852,26 @@ void main() {
     );
   });
 
+  testWidgets('chat-pedir-valor', (t) async {
+    await _capturar(
+      t,
+      'chat-pedir-valor',
+      ChatPage(conversa: ConversasRepo().conversas.first),
+      preparar: () async {
+        await t.tap(find.text('Pedir outro valor'));
+        await t.pumpAndSettle();
+        await t.enterText(find.byType(TextField).last, '150');
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('chat-valor-confirmado', (t) async {
+    final c = ConversasRepo().conversas.first;
+    c.valor!.situacao = SituacaoValor.confirmado;
+    await _capturar(t, 'chat-valor-confirmado', ChatPage(conversa: c));
+  });
+
   testWidgets('chat-anexar', (t) async {
     await _capturar(
       t,

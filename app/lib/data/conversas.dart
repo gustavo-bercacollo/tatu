@@ -25,6 +25,33 @@ class MensagemChat {
 }
 
 /// Conversa com um profissional sobre um pedido.
+/// Em que ponto está o valor que o profissional enviou.
+enum SituacaoValor { aguardandoVoce, pediuOutro, confirmado }
+
+/// Valor enviado pelo profissional: visita + serviço. [rodada] é qual
+/// dos 3 valores possíveis este é.
+class ValorProposta {
+  ValorProposta({
+    required this.visita,
+    required this.servico,
+    this.material = false,
+    this.rodada = 1,
+    this.situacao = SituacaoValor.aguardandoVoce,
+    this.pedido,
+  });
+
+  double visita;
+  double servico;
+  bool material;
+  int rodada;
+  SituacaoValor situacao;
+
+  /// Valor que o cliente pediu (quando pediu outro).
+  double? pedido;
+
+  double get total => visita + servico;
+}
+
 class Conversa {
   Conversa({
     required this.nome,
@@ -39,7 +66,11 @@ class Conversa {
     this.online = false,
     this.naoLidas = 0,
     this.concluidoEm,
+    this.valor,
   });
+
+  /// Valor enviado pelo profissional (null = ainda não enviou).
+  ValorProposta? valor;
 
   final String nome;
   final String profissao;
@@ -103,6 +134,7 @@ class ConversasRepo extends ChangeNotifier {
           MensagemChat(texto: 'Ótimo, pode vir agora?', minha: true),
           MensagemChat(texto: 'Chego em 12 min.'),
         ],
+        valor: ValorProposta(visita: 40, servico: 150),
       ),
       Conversa(
         nome: 'Rafael Lima',
@@ -161,6 +193,36 @@ class ConversasRepo extends ChangeNotifier {
     conversas = [c, ...conversas];
     notifyListeners();
     return c;
+  }
+
+  /// O cliente confirma o valor: fica reservado e só é cobrado no fim.
+  void confirmarValor(Conversa c) {
+    c.valor?.situacao = SituacaoValor.confirmado;
+    notifyListeners();
+  }
+
+  /// O cliente pede outro valor (total que ele quer pagar).
+  void pedirOutroValor(Conversa c, double total) {
+    final v = c.valor;
+    if (v == null) return;
+    v
+      ..pedido = total
+      ..situacao = SituacaoValor.pediuOutro;
+    notifyListeners();
+  }
+
+  /// Resposta simulada do profissional: um novo valor no meio do caminho
+  /// (a visita continua a mesma).
+  void profissionalResponde(Conversa c) {
+    final v = c.valor;
+    if (v == null || v.situacao != SituacaoValor.pediuOutro) return;
+    final meio = ((v.total + (v.pedido ?? v.total)) / 2 / 10).round() * 10.0;
+    v
+      ..servico = (meio - v.visita).clamp(0, double.infinity).toDouble()
+      ..rodada += 1
+      ..pedido = null
+      ..situacao = SituacaoValor.aguardandoVoce;
+    notifyListeners();
   }
 
   void marcarLida(Conversa c) {

@@ -65,6 +65,24 @@ String reais(num valor) {
   return 'R\$ $b,$cent';
 }
 
+/// Digitação de reais inteiros: "150" vira "R$ 150".
+class ReaisFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    var d = soDigitos(newValue.text);
+    if (d.length > 5) d = d.substring(0, 5);
+    final n = int.tryParse(d) ?? 0;
+    final texto = n == 0 ? '' : 'R\$ $n';
+    return TextEditingValue(
+      text: texto,
+      selection: TextSelection.collapsed(offset: texto.length),
+    );
+  }
+}
+
 /// 40 → "R$ 40" (sem centavos quando o valor é redondo).
 String reaisInteiros(num v) => v == v.roundToDouble()
     ? reais(v).replaceFirst(RegExp(r',00$'), '')

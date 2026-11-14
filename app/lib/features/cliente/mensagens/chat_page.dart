@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -6,6 +8,7 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/ajuda.dart';
 import '../../../data/conversas.dart';
+import '../../../data/pagamentos.dart';
 import '../../../data/pedidos.dart';
 import '../../../data/perfil.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
@@ -17,6 +20,8 @@ import '../ajuda/chat_suporte_page.dart';
 import '../atividade/pedido_andamento_page.dart';
 import '../foto/camera_desativada_page.dart';
 import '../atividade/pedido_concluido_page.dart';
+import '../pagamento/pagamento_page.dart';
+import 'cartao_valor.dart';
 import 'denunciar_page.dart';
 
 void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
@@ -25,9 +30,17 @@ void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
 
 /// Chat com o profissional do pedido.
 class ChatPage extends StatefulWidget {
-  const ChatPage({super.key, required this.conversa});
+  const ChatPage({
+    super.key,
+    required this.conversa,
+    this.resposta = const Duration(seconds: 2),
+  });
 
   final Conversa conversa;
+
+  /// Protótipo: quanto o profissional demora para responder a um pedido
+  /// de outro valor.
+  final Duration resposta;
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -35,13 +48,57 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final _campo = TextEditingController();
+  Timer? _timer;
 
   Conversa get _c => widget.conversa;
 
   @override
   void dispose() {
+    _timer?.cancel();
     _campo.dispose();
     super.dispose();
+  }
+
+  void _trocarPagamento() => Navigator.of(
+    context,
+  ).push(MaterialPageRoute(builder: (_) => const PagamentoPage()));
+
+  Future<void> _pedirOutro() async {
+    final v = _c.valor;
+    if (v == null) return;
+    final total = await pedirOutroValor(
+      context,
+      nome: _c.primeiroNome,
+      artigo: _c.artigo,
+      rodada: v.rodada,
+    );
+    if (total == null || !mounted) return;
+    conversas.pedirOutroValor(_c, total);
+    _timer?.cancel();
+    _timer = Timer(widget.resposta, () => conversas.profissionalResponde(_c));
+  }
+
+  List<Widget> _valor() {
+    final v = _c.valor;
+    if (v == null || _c.encerrada) return const [];
+    return [
+      const SizedBox(height: TatuMedidas.entreSecoes),
+      NotaChat('${_c.primeiroNome} enviou um valor'),
+      const SizedBox(height: TatuMedidas.entreItens),
+      switch (v.situacao) {
+        SituacaoValor.aguardandoVoce => CartaoValorRecebido(
+          valor: v,
+          onConfirmar: () => conversas.confirmarValor(_c),
+          onTrocar: _trocarPagamento,
+          onPedirOutro: v.rodada < maxRodadasValor ? _pedirOutro : null,
+        ),
+        SituacaoValor.pediuOutro => CartaoValorPedido(
+          valor: v,
+          nome: '${_c.artigo} ${_c.primeiroNome}',
+        ),
+        SituacaoValor.confirmado => CartaoValorConfirmado(valor: v),
+      },
+    ];
   }
 
   void _enviar() {
@@ -177,7 +234,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: conversas,
+      listenable: Listenable.merge([conversas, pagamentos]),
       builder: (context, _) {
         final msgs = _c.mensagens;
         final ultimaFotoMinha = msgs.lastIndexWhere((m) => m.minha && m.foto);
@@ -216,6 +273,7 @@ class _ChatPageState extends State<ChatPage> {
                   onTentarDeNovo: () => conversas.reenviar(m),
                 ),
               ),
+            ..._valor(),
             if (_c.encerrada) ...[
               const SizedBox(height: TatuMedidas.entreSecoes + 8),
               NotaChat('Serviço concluído em ${_c.concluidoEm}'),
