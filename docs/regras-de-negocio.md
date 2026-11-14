@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 14/11/2026 (v3)
+Atualizado em 14/11/2026 (v4)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -9,6 +9,7 @@ Este documento é a fonte única das regras do Tatu: o que o app faz, o que perm
 - Cada regra tem um número fixo (RN-01, RN-02…). O número nunca muda nem é reaproveitado, para telas, código e conversas poderem citá-lo.
 - Regra que mudou: a linha é reescrita e a mudança entra no Histórico, no fim.
 - Regra ainda não decidida fica em Decisões em aberto, não nas seções.
+- Problemas que o Tatu pode ter ficam em Problemas mapeados. Quando um é resolvido, as regras entram nas seções e o problema é marcado como resolvido.
 - Valores marcados como exemplo (taxa de 10%, prazos) são provisórios até a decisão final.
 - Princípio que vale para tudo: o Tatu é prático e rápido. Menos telas, menos toques; caso raro se resolve dentro da tela que já existe.
 
@@ -167,10 +168,30 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 - [ ] **Conta bancária.** Hoje o profissional recebe só por Pix. Avaliar conta bancária depois.
 - [ ] **Ligação pelo app.** O botão Ligar existe. Decidir se a ligação esconde o número real das partes.
 
-## 11. Histórico de mudanças
+## 11. Problemas mapeados
+
+Situações que podem dar errado no uso real do app. Resolvemos um por vez, em ordem.
+
+| Nº | Problema | Situação | Regras |
+| --- | --- | --- | --- |
+| P-01 | O profissional aceita e não aparece. | Resolvido | RN-76 a RN-79 |
+| P-02 | O profissional chega e o cliente não está. | Resolvido | RN-80 a RN-82 |
+| P-03 | Cliente e profissional fecham por fora na próxima vez, sem o app. | Em discussão | — |
+| P-04 | O profissional quebra algo na casa durante o serviço. | A resolver | — |
+| P-05 | O problema volta dias depois do serviço (a contestação vale só 24 horas). | A resolver | — |
+| P-06 | Preço abusivo, principalmente em emergência. | A resolver | — |
+| P-07 | Material comprado no meio do serviço, fora do combinado. | A resolver | — |
+| P-08 | Cartão recusado na hora da cobrança final. | A resolver | — |
+| P-09 | Avaliações falsas para inflar a nota. | A resolver | — |
+| P-10 | Fraude no cadastro do profissional (documento de outra pessoa). | A resolver | — |
+| P-11 | Sem internet no local para tocar "Concluir serviço". | A resolver | — |
+| P-12 | Serviço que leva vários dias, maior que um atendimento de urgência. | A resolver | — |
+
+## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 14/11/2026 | — | Nova seção Problemas mapeados (P-01 a P-12). |
 | 14/11/2026 | RN-80 a RN-82 | Cliente que não aparece: espera de 10 minutos, visita cobrada e pausa por ausências. |
 | 13/11/2026 | RN-76 a RN-79 | Profissional que aceita e não aparece: prazo para sair, devolução à busca, atraso sem custo e pausa por abandonos. |
 | 13/11/2026 | — | Documento criado com todas as regras decididas até aqui. |
