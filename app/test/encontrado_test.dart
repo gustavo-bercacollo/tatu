@@ -85,6 +85,9 @@ void main() {
       find.textContaining('Aceitei seu pedido'),
       findsOneWidget,
     );
+    // RN-26: o chat já chega com o valor (visita + serviço).
+    expect(find.text('Visita R\$ 40 · Serviço R\$ 150'), findsOneWidget);
+    expect(conversas.conversas.first.valor?.total, 190);
   });
 
   testWidgets('Ver perfil mostra o perfil; Aceitar de lá abre o chat', (

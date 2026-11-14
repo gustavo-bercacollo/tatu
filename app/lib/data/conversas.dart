@@ -185,10 +185,13 @@ class ConversasRepo extends ChangeNotifier {
       online: true,
       mensagens: [
         MensagemChat(
-          texto: 'Oi! Aceitei seu pedido. Me conta um pouco mais do problema?',
+          texto: 'Oi! Aceitei seu pedido. Posso ir agora.',
           hora: horaAgora(),
         ),
       ],
+      // RN-26: o profissional manda o valor (visita + serviço) pelo chat;
+      // o cliente confirma o total uma vez. Protótipo: já chega enviado.
+      valor: ValorProposta(visita: 40, servico: 150),
     );
     conversas = [c, ...conversas];
     notifyListeners();
