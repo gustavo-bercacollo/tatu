@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 14/11/2026 (v6)
+Atualizado em 14/11/2026 (v9)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -35,6 +35,7 @@ Uma pessoa tem uma conta só, que pode ter os dois perfis: cliente e profissiona
 | RN-13 | Fotos de trabalhos: até 12, revisadas antes de aparecer. Recusadas se mostram rosto de pessoa ou endereço. |
 | RN-14 | Encerrar o perfil profissional mantém a conta de cliente. Para voltar, ele refaz a verificação. |
 | RN-15 | Excluir a conta apaga os dois perfis. Fica bloqueado enquanto houver pedido em andamento ou dinheiro a receber. |
+| RN-97 | No cadastro de cada profissão, o profissional marca como atende: no local, à distância ou os dois. Pode mudar depois no Perfil. |
 
 ## 2. Pedido e busca
 
@@ -52,6 +53,9 @@ O cliente descreve o problema e toca em Chamar. O app avisa todos os profissiona
 | RN-23 | Se o cliente já tem um pedido ativo do mesmo serviço, o app pergunta antes de chamar outro. |
 | RN-24 | Fora da área atendida, o app avisa e oferece "Me avise quando chegar". |
 | RN-25 | Sem localização ativa, o cliente usa um endereço salvo. |
+| RN-92 | Todo pedido é "No local" ou "À distância". O cliente escolhe na Home, num seletor acima dos serviços. O padrão é No local. |
+| RN-93 | No pedido à distância o endereço e a localização não contam. O chamado vai para profissionais online de qualquer cidade que atendem à distância naquela profissão. |
+| RN-94 | A busca à distância não usa raio. Vai em ondas: primeiro os mais bem avaliados que estão online, depois todos os online. |
 
 ## 3. Valor, visita e pagamento
 
@@ -70,6 +74,11 @@ Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do própri
 | RN-34 | O Tatu cobra comissão sobre todo serviço, visita incluída. Valor de exemplo: 10%. |
 | RN-35 | O dinheiro fica retido por 24 horas depois da conclusão e então cai no Pix do profissional, já sem a comissão. |
 | RN-36 | Reembolso volta pelo mesmo meio do pagamento: estorno no cartão ou devolução do Pix. |
+| RN-87 | Cada valor combinado é um pagamento. O profissional pode enviar um novo valor na mesma conversa quantas vezes precisar: outro dia, outra etapa ou outro serviço. |
+| RN-88 | O Tatu cobra a comissão em cada valor combinado. |
+| RN-89 | Nenhum valor fica aberto por mais de 7 dias (exemplo). Passou disso, o app pede para concluir ou dividir o trabalho em partes. Não existe chamado aberto por meses. |
+| RN-90 | Um valor em aberto não impede o profissional de ficar online e atender outros clientes. O cliente também pode ter vários profissionais ao mesmo tempo. |
+| RN-91 | Valores altos podem ser parcelados no cartão. Exemplo: a partir de R$ 300, em até 6 vezes. |
 
 ## 4. Atendimento
 
@@ -82,7 +91,10 @@ Do valor confirmado até a avaliação, o atendimento segue sempre a mesma ordem
 | RN-39 | Na chegada, o cliente vê a foto e o nome do profissional e um código de 4 dígitos. Ele pede o código antes de abrir a porta. |
 | RN-40 | O profissional pode tirar fotos ao chegar e ao concluir. Elas servem de prova numa contestação. |
 | RN-41 | Ao concluir, os dois se avaliam. O cliente pode editar a avaliação até 7 dias depois. |
-| RN-42 | Depois de concluído, o chat fica só para leitura. |
+| RN-42 | Depois de concluído, a conversa continua aberta. Cliente e profissional voltam a se falar por ela quando quiserem, sem fazer um pedido novo. |
+| RN-95 | Serviço à distância não tem Visita, rota, "Cheguei" nem código na porta. O valor tem só o Serviço. Confirmado o valor, o pedido vai direto para Em andamento. |
+| RN-96 | A entrega à distância é feita pelo chat, com arquivos. O profissional toca em Concluir serviço, o cliente é cobrado e a contestação em 24 horas vale igual. |
+| RN-98 | Serviço à distância não mostra o botão de segurança (ninguém vai até ninguém). Denúncia continua pelo menu do chat. |
 
 ## 5. Cancelamentos e contestação
 
@@ -167,10 +179,15 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 
 - [ ] **Foto da cliente no modo só mulheres.** Recomendação: a profissional vê só o selo "Cliente verificada", nunca a selfie. Opcional: a cliente escolhe mostrar uma foto de perfil conferida com a selfie. As telas atuais ainda mostram a foto.
 - [ ] **Código na porta para todos.** Hoje o cliente sempre vê o código, mas a tela de conferência do profissional existe só no modo só mulheres. Decidir se vale para todo atendimento.
+- [ ] **Parcelamento.** Valor mínimo, número de parcelas e quem paga os juros (o Tatu não paga). Hoje: a partir de R$ 300, até 6 vezes, como exemplo.
+- [ ] **Avaliação em conversas com vários pagamentos.** Avaliar a cada valor concluído ou manter uma avaliação só por profissional, que o cliente atualiza.
 - [ ] **Valor da comissão.** 10% é exemplo.
 - [ ] **Prazos finais.** Tempo do profissional para aceitar um chamado, tempo do cliente para aceitar (hoje 3 minutos), retenção antes do repasse (hoje 24 horas).
 - [ ] **Recuperação de conta.** O que fazer quando a pessoa perde o celular: recuperar pelo e-mail, selfie para profissional, "Sair de todos os aparelhos".
 - [ ] **Conta bancária.** Hoje o profissional recebe só por Pix. Avaliar conta bancária depois.
+- [ ] **Abandono à distância.** O que acontece quando o profissional aceita e não responde no chat. Sugestão: mesmo "Ainda vai?" da RN-77 e contar como abandono.
+- [ ] **Profissões à distância no lançamento.** As telas usam Designer, Programador, Professor, Contador e Advogado como exemplo.
+- [ ] **Arquivos e links no chat à distância.** Como conviver com o contato oculto (RN-85, fase 2).
 - [ ] **Ligação pelo app.** O botão Ligar existe. Decidir se a ligação esconde o número real das partes.
 
 ## 11. Problemas mapeados
@@ -182,20 +199,24 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-01 | O profissional aceita e não aparece. | Resolvido | RN-76 a RN-79 |
 | P-02 | O profissional chega e o cliente não está. | Resolvido | RN-80 a RN-82 |
 | P-03 | Cliente e profissional fecham por fora na próxima vez, sem o app. | Decidido · fase 2 | RN-83 a RN-86 |
-| P-04 | O profissional quebra algo na casa durante o serviço. | A resolver | — |
-| P-05 | O problema volta dias depois do serviço (a contestação vale só 24 horas). | A resolver | — |
+| P-04 | O profissional quebra algo na casa durante o serviço. | Adiado: fora do escopo por enquanto | — |
+| P-05 | O problema volta dias depois do serviço (a contestação vale só 24 horas). | Adiado | — |
 | P-06 | Preço abusivo, principalmente em emergência. | A resolver | — |
 | P-07 | Material comprado no meio do serviço, fora do combinado. | A resolver | — |
 | P-08 | Cartão recusado na hora da cobrança final. | A resolver | — |
 | P-09 | Avaliações falsas para inflar a nota. | A resolver | — |
 | P-10 | Fraude no cadastro do profissional (documento de outra pessoa). | A resolver | — |
 | P-11 | Sem internet no local para tocar "Concluir serviço". | A resolver | — |
-| P-12 | Serviço que leva vários dias, maior que um atendimento de urgência. | A resolver | — |
+| P-12 | Serviço que leva vários dias, semanas ou meses. | Resolvido | RN-42, RN-87 a RN-91 |
+| P-13 | Profissional à distância: serviço que não precisa de visita, em que a localização não importa. | Resolvido | RN-92 a RN-98 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 14/11/2026 | RN-92 a RN-98 | Serviço à distância: seletor No local / À distância na Home, busca sem raio, sem visita, entrega pelo chat. |
+| 14/11/2026 | RN-42, RN-87 a RN-91 | A conversa não fecha mais depois do serviço. Cada valor combinado é um pagamento, com comissão em cada um. Limite de 7 dias por valor. Parcelamento. |
+| 14/11/2026 | — | P-04 (dano na casa) e P-05 (problema volta dias depois) adiados. |
 | 14/11/2026 | RN-83 a RN-86 | Contra fechar por fora: Seus profissionais, nota só pelo app, contato oculto no chat. Decidido para a fase 2. |
 | 14/11/2026 | — | Nova seção Problemas mapeados (P-01 a P-12). |
 | 14/11/2026 | RN-80 a RN-82 | Cliente que não aparece: espera de 10 minutos, visita cobrada e pausa por ausências. |
