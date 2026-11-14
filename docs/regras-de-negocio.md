@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 14/11/2026 (v4)
+Atualizado em 14/11/2026 (v6)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -11,6 +11,7 @@ Este documento é a fonte única das regras do Tatu: o que o app faz, o que perm
 - Regra ainda não decidida fica em Decisões em aberto, não nas seções.
 - Problemas que o Tatu pode ter ficam em Problemas mapeados. Quando um é resolvido, as regras entram nas seções e o problema é marcado como resolvido.
 - Valores marcados como exemplo (taxa de 10%, prazos) são provisórios até a decisão final.
+- Regras marcadas com **(fase 2)** já estão decididas, mas só entram no app depois da primeira versão.
 - Princípio que vale para tudo: o Tatu é prático e rápido. Menos telas, menos toques; caso raro se resolve dentro da tela que já existe.
 
 ## 1. Contas e cadastro
@@ -144,6 +145,8 @@ As penalidades existem para impedir abuso, nunca para punir quem se protegeu.
 | RN-69 | Profissional não responde publicamente às avaliações. Discordância vai pela contestação (RN-48). |
 | RN-70 | Anúncios aparecem em dois lugares só: na Home, acima do botão Chamar, e na tela de busca, abaixo da barra de carregamento. |
 | RN-71 | O espaço de anúncio mede 353 × 76 e leva o selo "Patrocinado". Sem anúncio, o espaço some. Na Home, some também enquanto o cliente digita. |
+| RN-83 | **(fase 2)** Em Atividade, "Seus profissionais" mostra quem já atendeu o cliente, com o botão Chamar quando a pessoa está online. Chamar por ali manda o pedido direto para ela. |
+| RN-84 | **(fase 2)** Só serviços feitos pelo app contam para a nota do profissional e para a posição dele nos chamados. |
 
 ## 9. Privacidade e dados (LGPD)
 
@@ -155,6 +158,8 @@ Cada dado é usado só para o motivo pelo qual foi pedido.
 | RN-73 | A selfie da verificação é dado biométrico (sensível pela LGPD). Serve só para confirmar a identidade e para apurar denúncias. |
 | RN-74 | O gênero informado não aparece para ninguém. |
 | RN-75 | Telefone, e-mail e CPF de uma parte nunca aparecem para a outra. O contato acontece pelo chat do Tatu. |
+| RN-85 | **(fase 2)** No chat, telefone, e-mail, @ de rede social e links aparecem como "contato oculto". Quem tenta enviar vê o aviso de que o contato não é enviado e por quê. |
+| RN-86 | **(fase 2)** O Tatu não pune quem fecha por fora, porque não dá para provar. Ele torna o app a opção mais vantajosa: garantia só pelo app, pagamento garantido ao profissional e "Seus profissionais" em um toque. |
 
 ## 10. Decisões em aberto
 
@@ -176,7 +181,7 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | --- | --- | --- | --- |
 | P-01 | O profissional aceita e não aparece. | Resolvido | RN-76 a RN-79 |
 | P-02 | O profissional chega e o cliente não está. | Resolvido | RN-80 a RN-82 |
-| P-03 | Cliente e profissional fecham por fora na próxima vez, sem o app. | Em discussão | — |
+| P-03 | Cliente e profissional fecham por fora na próxima vez, sem o app. | Decidido · fase 2 | RN-83 a RN-86 |
 | P-04 | O profissional quebra algo na casa durante o serviço. | A resolver | — |
 | P-05 | O problema volta dias depois do serviço (a contestação vale só 24 horas). | A resolver | — |
 | P-06 | Preço abusivo, principalmente em emergência. | A resolver | — |
@@ -191,6 +196,7 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 14/11/2026 | RN-83 a RN-86 | Contra fechar por fora: Seus profissionais, nota só pelo app, contato oculto no chat. Decidido para a fase 2. |
 | 14/11/2026 | — | Nova seção Problemas mapeados (P-01 a P-12). |
 | 14/11/2026 | RN-80 a RN-82 | Cliente que não aparece: espera de 10 minutos, visita cobrada e pausa por ausências. |
 | 13/11/2026 | RN-76 a RN-79 | Profissional que aceita e não aparece: prazo para sair, devolução à busca, atraso sem custo e pausa por abandonos. |
