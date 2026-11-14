@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tatu_colors.dart';
@@ -14,15 +13,11 @@ class ValorProposto {
   const ValorProposto({
     required this.visita,
     required this.servico,
-    this.material = false,
   });
 
   /// Fica com o profissional mesmo se o serviço não acontecer.
   final double visita;
   final double servico;
-
-  /// O material já está incluso no valor.
-  final bool material;
 
   double get total => visita + servico;
 
@@ -60,7 +55,6 @@ class _FolhaValorState extends State<_FolhaValor> {
   final _servico = TextEditingController();
   final _focoVisita = FocusNode();
   final _focoServico = FocusNode();
-  bool _material = false;
 
   @override
   void initState() {
@@ -86,7 +80,6 @@ class _FolhaValorState extends State<_FolhaValor> {
     final valor = ValorProposto(
       visita: _ler(_visita),
       servico: _ler(_servico),
-      material: _material,
     );
     final total = valor.total;
     final taxa = total * taxaTatu;
@@ -142,23 +135,6 @@ class _FolhaValorState extends State<_FolhaValor> {
                 const Text(
                   'A visita é sua mesmo se o serviço não acontecer.',
                   style: TatuTexto.nota,
-                ),
-                const SizedBox(height: TatuMedidas.entreItens),
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Text(
-                        'Material incluso',
-                        style: TextStyle(fontSize: 17),
-                      ),
-                    ),
-                    CupertinoSwitch(
-                      value: _material,
-                      activeTrackColor: TatuColors.online,
-                      inactiveTrackColor: TatuColors.trilho,
-                      onChanged: (v) => setState(() => _material = v),
-                    ),
-                  ],
                 ),
                 const SizedBox(height: TatuMedidas.entreItens),
                 Container(

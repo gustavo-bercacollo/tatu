@@ -34,7 +34,6 @@ class ValorProposta {
   ValorProposta({
     required this.visita,
     required this.servico,
-    this.material = false,
     this.rodada = 1,
     this.situacao = SituacaoValor.aguardandoVoce,
     this.pedido,
@@ -42,7 +41,6 @@ class ValorProposta {
 
   double visita;
   double servico;
-  bool material;
   int rodada;
   SituacaoValor situacao;
 

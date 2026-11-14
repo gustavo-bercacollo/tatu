@@ -13,11 +13,10 @@ import '../../../shared/widgets/opcao_selecionavel.dart';
 /// Cada lado pode propor até 3 valores.
 const maxRodadasValor = 3;
 
-/// "Visita R$ 40 · Serviço R$ 150" (e "material incluso", se for).
+/// "Visita R$ 40 · Serviço R$ 150".
 String detalheValor(ValorProposta v) => [
   if (v.visita > 0) 'Visita ${reaisInteiros(v.visita)}',
   'Serviço ${reaisInteiros(v.servico)}',
-  if (v.material) 'material incluso',
 ].join(' · ');
 
 /// C17 · Cartão do valor que o profissional enviou: total, forma de
