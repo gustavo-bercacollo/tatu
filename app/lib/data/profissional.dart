@@ -1,7 +1,9 @@
+import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../shared/formatadores.dart';
+import 'prazos.dart';
 
 /// Profissões que aparecem como atalho no cadastro ("Outros" abre a lista).
 const profissoesPrincipais = [
@@ -185,7 +187,45 @@ class ProfissionalRepo extends ChangeNotifier {
       visitas.reversed.take(janelaVisitas).where((v) => v).length;
 
   /// Muitas visitas sem serviço pausam a conta (até falar com o suporte).
-  bool get pausada => visitasSemServico >= limiteVisitasSemServico;
+  bool get pausadaPorVisitas => visitasSemServico >= limiteVisitasSemServico;
+
+  /// RN-77: chamados que ele aceitou e não foi (devolvidos à busca).
+  final List<DateTime> abandonos = [];
+
+  /// RN-79: abandonos dentro de [Prazos.janelaAbandonos].
+  int get abandonosRecentes {
+    final desde = clock.now().subtract(Prazos.janelaAbandonos);
+    return abandonos.where((d) => d.isAfter(desde)).length;
+  }
+
+  /// RN-79: três abandonos em 30 dias pausam a conta.
+  bool get pausadaPorAbandonos =>
+      abandonosRecentes >= Prazos.abandonosParaPausar;
+
+  /// Conta pausada (por visitas sem serviço ou por abandonos): não fica
+  /// online até falar com o suporte.
+  bool get pausada => pausadaPorVisitas || pausadaPorAbandonos;
+
+  /// RN-77: registra um abandono (chamado devolvido à busca).
+  void registrarAbandono() {
+    abandonos.add(clock.now());
+    if (pausada) online = false;
+    notifyListeners();
+  }
+
+  /// Simula a conta pausada por 3 abandonos em 30 dias (RN-79).
+  void pausarPorAbandonosParaDemo() {
+    final agora = clock.now();
+    abandonos
+      ..clear()
+      ..addAll([
+        agora.subtract(const Duration(days: 20)),
+        agora.subtract(const Duration(days: 6)),
+        agora.subtract(const Duration(hours: 2)),
+      ]);
+    online = false;
+    notifyListeners();
+  }
 
   void registrarVisita({required bool semServico}) {
     visitas.add(semServico);
@@ -267,6 +307,7 @@ class ProfissionalRepo extends ChangeNotifier {
     dicaVista = false;
     raioKm = 10;
     visitas.clear();
+    abandonos.clear();
     notifyListeners();
   }
 
@@ -286,6 +327,7 @@ class ProfissionalRepo extends ChangeNotifier {
     online = false;
     dicaVista = true;
     visitas.clear();
+    abandonos.clear();
     notifyListeners();
   }
 

@@ -11,6 +11,7 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/ajuda.dart';
+import '../../../data/prazos.dart';
 import '../../../data/profissional.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../cliente/ajuda/abrir_ajuda.dart';
@@ -184,7 +185,8 @@ class _Ponto extends StatelessWidget {
   }
 }
 
-/// Aviso vermelho: conta pausada por muitas visitas sem serviço.
+/// Aviso vermelho: conta pausada por muitas visitas sem serviço (RN-63)
+/// ou por abandonos (RN-79).
 class _ContaPausada extends StatelessWidget {
   const _ContaPausada();
 
@@ -220,8 +222,14 @@ class _ContaPausada extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${p.visitasSemServico} das últimas $janelaVisitas visitas '
-                  'terminaram sem serviço. Fale com o suporte para voltar.',
+                  p.pausadaPorAbandonos
+                      // RN-79: 3 abandonos em 30 dias.
+                      ? '${p.abandonosRecentes} chamados abandonados em '
+                            '${Prazos.janelaAbandonos.inDays} dias. '
+                            'Fale com o suporte para voltar.'
+                      : '${p.visitasSemServico} das últimas $janelaVisitas '
+                            'visitas terminaram sem serviço. Fale com o '
+                            'suporte para voltar.',
                   style: const TextStyle(
                     fontSize: 15,
                     height: 1.35,

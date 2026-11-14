@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -8,17 +10,102 @@ import '../../../data/conversas.dart';
 import '../../../data/pedidos.dart';
 import '../../../data/seguranca.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
+import '../../../shared/widgets/aviso_topo.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/tela_interna.dart';
 import '../../entrada/seguranca.dart';
+import '../chamar/procurando_page.dart';
 import '../mensagens/chat_page.dart';
 import 'pedido_cancelado_page.dart';
 
 /// Pedido em andamento: profissional, etapas, dados e "Cancelar pedido".
-class PedidoAndamentoPage extends StatelessWidget {
+/// Mostra também quando o profissional não aparece: "Ainda não saiu"
+/// (RN-76), a volta à busca (RN-77) e o aviso de atraso (RN-78).
+class PedidoAndamentoPage extends StatefulWidget {
   const PedidoAndamentoPage({super.key});
+
+  @override
+  State<PedidoAndamentoPage> createState() => _PedidoAndamentoPageState();
+}
+
+class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
+  Timer? _relogio;
+  bool _perguntouAtraso = false;
+
+  @override
+  void initState() {
+    super.initState();
+    pedidos.addListener(_mudou);
+    // RN-78: confere o atraso enquanto a tela está aberta.
+    _relogio = Timer.periodic(const Duration(seconds: 1), (_) => _atraso());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _atraso());
+  }
+
+  @override
+  void dispose() {
+    pedidos.removeListener(_mudou);
+    _relogio?.cancel();
+    super.dispose();
+  }
+
+  /// RN-77: o pedido voltou à busca; abre a busca com o aviso.
+  void _mudou() {
+    final d = pedidos.devolvido;
+    if (!mounted || d == null || pedidos.andamento != null) return;
+    pedidos.consumirDevolvido();
+    final busca = pedidos.busca;
+    pedidos.cancelarBusca(); // a tela de busca assume daqui
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => ProcurandoPage(
+          servico: busca?.servico ?? d.servico,
+          endereco: busca?.endereco ?? d.endereco,
+          anterior: d,
+          troca: TrocaProfissional.naoConfirmou,
+        ),
+      ),
+    );
+  }
+
+  /// RN-78: passou do dobro do tempo previsto; pode chamar outro sem
+  /// pagar nada, nem a visita.
+  Future<void> _atraso() async {
+    final p = pedidos.andamento;
+    final min = pedidos.minutosDeAtraso();
+    if (!mounted || p == null || min == null) return;
+    if (p.esperandoAtraso || _perguntouAtraso) return;
+    _perguntouAtraso = true;
+    final ela = p.profissao.endsWith('a');
+    final outro = await confirmar(
+      context,
+      titulo: '${p.artigoNome} está ${ela ? 'atrasada' : 'atrasado'}',
+      texto:
+          'Era para chegar há $min minutos.\n'
+          'Você pode chamar outro sem pagar nada.',
+      confirmar: 'Chamar outro ${p.servico.toLowerCase()}',
+      cancelar: 'Continuar esperando',
+      iconeAviso: false,
+    );
+    if (!mounted) return;
+    if (!outro) {
+      pedidos.esperarAtrasado();
+      return;
+    }
+    // RN-78: troca sem custo (nem a visita).
+    pedidos.cancelarAndamento();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => ProcurandoPage(
+          servico: p.servico,
+          endereco: p.endereco,
+          anterior: p,
+          troca: TrocaProfissional.atrasou,
+        ),
+      ),
+    );
+  }
 
   Future<void> _cancelar(BuildContext context, PedidoAndamento p) async {
     final sim = await confirmar(
@@ -42,16 +129,61 @@ class PedidoAndamentoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final p = pedidos.andamento;
+    return ListenableBuilder(
+      listenable: pedidos,
+      builder: (context, _) {
+        final p = pedidos.andamento;
+        final tela = _tela(context, p);
+        if (p == null || !p.aindaNaoSaiu) return tela;
+        // RN-76: aviso fixo no topo enquanto o profissional não sai.
+        return Stack(
+          children: [
+            tela,
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  TatuMedidas.margem,
+                  8,
+                  TatuMedidas.margem,
+                  0,
+                ),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: AvisoEscuro(
+                      icone: const CircleAvatar(
+                        radius: 16,
+                        backgroundColor: TatuColors.warning,
+                        child: Icon(
+                          TablerIcons.clock,
+                          size: 18,
+                          color: TatuColors.onAction,
+                        ),
+                      ),
+                      titulo: '${p.artigoNome} ainda não saiu',
+                      texto:
+                          'Perguntamos se ${p.profissao.endsWith('a') ? 'ela' : 'ele'} '
+                          'ainda vem.',
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _tela(BuildContext context, PedidoAndamento? p) {
     void emBreve(String o) => ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text('$o: em breve')));
     return TelaInterna(
       titulo: 'Pedido',
       fundoCinza: true,
-      direita: p == null
-          ? null
-          : BotaoEscudo(servico: Atendimento.doPedido(p)),
+      direita: p == null ? null : BotaoEscudo(servico: Atendimento.doPedido(p)),
       corpo: p == null
           ? const SizedBox.shrink()
           : ListView(
@@ -107,7 +239,10 @@ class PedidoAndamentoPage extends StatelessWidget {
                               ],
                             ),
                           ),
-                          SeloVerde(p.situacao),
+                          // RN-76: selo laranja enquanto não sai.
+                          p.aindaNaoSaiu
+                              ? const SeloVerde('Ainda não saiu', aviso: true)
+                              : SeloVerde(p.situacao),
                         ],
                       ),
                       const SizedBox(height: TatuMedidas.entreItens + 4),

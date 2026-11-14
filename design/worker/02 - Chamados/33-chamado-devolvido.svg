@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Chamado devolvido à busca</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="196.5" cy="250" r="56" fill="#FFF4E0"/>
+  <g transform="translate(170.5,224) scale(2.1666666666666665)" fill="none" stroke="#A85F00" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="196.5" y="370" font-size="26" font-weight="700" fill="#000000" text-anchor="middle" letter-spacing="-0.5">O chamado voltou à busca</text>
+  <text x="196.5" y="404" font-size="16" font-weight="400" fill="#8E8E93" text-anchor="middle">Você não confirmou a saída e a Ana</text>
+  <text x="196.5" y="427" font-size="16" font-weight="400" fill="#8E8E93" text-anchor="middle">foi avisada. Isso conta como abandono:</text>
+  <text x="196.5" y="450" font-size="16" font-weight="400" fill="#8E8E93" text-anchor="middle">1 de 3 nos últimos 30 dias.</text>
+  <rect x="24" y="756" width="345" height="56" rx="28.0" fill="#EEEEF0"/>
+  <text x="196.5" y="790.0" font-size="17" font-weight="600" fill="#000000" text-anchor="middle">Voltar ao início</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>

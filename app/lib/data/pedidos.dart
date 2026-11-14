@@ -1,5 +1,9 @@
+import 'dart:async';
+
+import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 
+import 'prazos.dart';
 import 'seguranca.dart';
 
 /// Etapas de um pedido, na ordem.
@@ -34,7 +38,49 @@ class PedidoAndamento {
     required this.etapasFeitas,
     this.chegaEm = '12 min',
     this.descricao = 'Vazamento na pia',
+    this.aindaNaoSaiu = false,
+    this.saiuEm,
+    this.esperandoAtraso = false,
   });
+
+  /// RN-76: o profissional passou do prazo e ainda não tocou em
+  /// "Estou a caminho".
+  final bool aindaNaoSaiu;
+
+  /// Quando o profissional saiu (para o atraso, RN-78).
+  final DateTime? saiuEm;
+
+  /// O cliente escolheu "Continuar esperando" no aviso de atraso.
+  final bool esperandoAtraso;
+
+  /// Minutos previstos de chegada ("12 min" → 12).
+  int get minutosChegada =>
+      int.tryParse(chegaEm.split(' ').first) ?? 0;
+
+  PedidoAndamento copiar({
+    int? etapasFeitas,
+    bool? aindaNaoSaiu,
+    DateTime? saiuEm,
+    bool? esperandoAtraso,
+  }) => PedidoAndamento(
+    servico: servico,
+    profissao: profissao,
+    profissional: profissional,
+    nota: nota,
+    endereco: endereco,
+    valor: valor,
+    pagamento: pagamento,
+    etapasFeitas: etapasFeitas ?? this.etapasFeitas,
+    chegaEm: chegaEm,
+    descricao: descricao,
+    aindaNaoSaiu: aindaNaoSaiu ?? this.aindaNaoSaiu,
+    saiuEm: saiuEm ?? this.saiuEm,
+    esperandoAtraso: esperandoAtraso ?? this.esperandoAtraso,
+  );
+
+  /// "A Luiza", "O Carlos".
+  String get artigoNome =>
+      '${profissao.endsWith('a') ? 'A' : 'O'} $primeiroNome';
 
   /// O que a pessoa pediu (ex.: "Vazamento na pia").
   final String descricao;
@@ -203,7 +249,9 @@ class PedidosRepo extends ChangeNotifier {
   bool get semNadaEmAndamento => andamento == null && busca == null;
 
   void restaurar() {
-    andamento = const PedidoAndamento(
+    _pararRelogios();
+    devolvido = null;
+    andamento = PedidoAndamento(
       servico: 'Encanador',
       profissao: 'Encanadora',
       profissional: 'Luiza Souza',
@@ -212,6 +260,7 @@ class PedidosRepo extends ChangeNotifier {
       valor: r'R$ 150,00',
       pagamento: 'Visa 4242',
       etapasFeitas: 3,
+      saiuEm: clock.now(),
     );
     busca = BuscaSegundoPlano(
       servico: 'Eletricista',
@@ -283,6 +332,7 @@ class PedidosRepo extends ChangeNotifier {
   /// A pessoa aceitou o profissional: vira o pedido em andamento e a
   /// busca em segundo plano (se houver) acaba.
   void aceitar(PedidoAndamento p) {
+    _pararRelogios();
     seguranca.encerrarAlerta(cliente: true);
     andamento = p;
     busca = null;
@@ -290,8 +340,103 @@ class PedidosRepo extends ChangeNotifier {
   }
 
   void cancelarAndamento() {
+    _pararRelogios();
     seguranca.encerrarAlerta(cliente: true);
     andamento = null;
+    notifyListeners();
+  }
+
+  // ---------- Profissional que não aparece (RN-76 a RN-78) ----------
+
+  Timer? _prazoSaida;
+  Timer? _prazoResposta;
+
+  /// RN-77: pedido que voltou à busca porque o profissional não confirmou
+  /// que vinha. A tela do pedido usa para abrir a busca de novo.
+  PedidoAndamento? devolvido;
+
+  void _pararRelogios() {
+    _prazoSaida?.cancel();
+    _prazoResposta?.cancel();
+  }
+
+  /// O cliente confirmou o valor (RN-76). Protótipo: o profissional não
+  /// toca em "Estou a caminho", para mostrar o fluxo de quem não aparece.
+  void valorConfirmado() {
+    final p = andamento;
+    if (p == null) return;
+    _pararRelogios();
+    andamento = p.copiar(etapasFeitas: 2, aindaNaoSaiu: false);
+    _prazoSaida = Timer(Prazos.naDemo(Prazos.estouACaminho), aindaNaoSaiu);
+    notifyListeners();
+  }
+
+  /// RN-76: passou o prazo e o profissional ainda não saiu. Ele recebe
+  /// "Ainda vai?"; o cliente vê "Ainda não saiu".
+  void aindaNaoSaiu() {
+    final p = andamento;
+    if (p == null) return;
+    andamento = p.copiar(aindaNaoSaiu: true);
+    _prazoResposta?.cancel();
+    _prazoResposta = Timer(Prazos.naDemo(Prazos.aindaVai), naoConfirmou);
+    notifyListeners();
+  }
+
+  /// O profissional tocou em "Estou a caminho" (ou "Sim, estou saindo").
+  void saiu() {
+    final p = andamento;
+    if (p == null) return;
+    _pararRelogios();
+    andamento = p.copiar(
+      etapasFeitas: 3,
+      aindaNaoSaiu: false,
+      saiuEm: clock.now(),
+    );
+    notifyListeners();
+  }
+
+  /// RN-77: sem resposta (ou "Não consigo ir"): o pedido volta sozinho à
+  /// busca e nada é cobrado.
+  void naoConfirmou() {
+    final p = andamento;
+    if (p == null) return;
+    _pararRelogios();
+    seguranca.encerrarAlerta(cliente: true);
+    devolvido = p;
+    andamento = null;
+    busca = BuscaSegundoPlano(
+      servico: p.servico,
+      endereco: p.endereco,
+      descricao: p.descricao,
+    );
+    notifyListeners();
+  }
+
+  /// A tela já abriu a busca de novo.
+  void consumirDevolvido() => devolvido = null;
+
+  /// RN-78: minutos além do previsto, quando já passou do
+  /// [Prazos.fatorAtraso] × tempo previsto de chegada (senão, nulo).
+  int? minutosDeAtraso([DateTime? agora]) {
+    final p = andamento;
+    final saiu = p?.saiuEm;
+    if (p == null || saiu == null || p.etapasFeitas != 3) return null;
+    final previsto = p.minutosChegada;
+    if (previsto <= 0) return null;
+    // Protótipo: o relógio anda [Prazos.aceleracao] vezes mais rápido.
+    final passou =
+        (agora ?? clock.now()).difference(saiu).inSeconds *
+        Prazos.aceleracao ~/
+        60;
+    if (passou < previsto * Prazos.fatorAtraso) return null;
+    return passou - previsto;
+  }
+
+  /// "Continuar esperando": não pergunta de novo neste pedido.
+  void esperarAtrasado() {
+    final p = andamento;
+    if (p == null) return;
+    andamento = p.copiar(esperandoAtraso: true);
     notifyListeners();
   }
 
@@ -312,6 +457,7 @@ class PedidosRepo extends ChangeNotifier {
 
   /// Para a demo dos estados vazios.
   void limpar() {
+    _pararRelogios();
     andamento = null;
     busca = null;
     concluidos = const [];

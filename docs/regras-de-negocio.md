@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 13/11/2026
+Atualizado em 13/11/2026 (v2)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -95,6 +95,9 @@ Quem cancela ou falha não transfere o custo para o outro lado nem para o Tatu.
 | RN-47 | O suporte decide pelo chat e pelas fotos: o profissional refaz sem custo, reembolso parcial ou reembolso total. O valor devolvido sai do repasse do profissional, nunca do Tatu. |
 | RN-48 | O profissional pode contestar uma avaliação injusta. O suporte revisa em até 3 dias úteis e, se for injusta, ela sai da nota. |
 | RN-49 | Quem contesta demais e sem razão, cliente ou profissional, perde o direito à garantia ou a conta. |
+| RN-76 | Depois de combinar o valor, o profissional tem 10 minutos para tocar "Estou a caminho". Sem isso, o app pergunta "Ainda vai?" e o cliente vê "Ainda não saiu". |
+| RN-77 | Sem resposta ao "Ainda vai?" em 5 minutos, ou com "Não consigo ir", o pedido volta à busca automaticamente e nada é cobrado do cliente. Isso conta como abandono para o profissional. |
+| RN-78 | Se o profissional passar do dobro do tempo previsto de chegada, o cliente pode chamar outro sem pagar nada, nem a visita. |
 
 ## 6. Segurança e atendimento entre mulheres
 
@@ -126,6 +129,7 @@ As penalidades existem para impedir abuso, nunca para punir quem se protegeu.
 | RN-64 | Cancelar atendimentos com frequência baixa a posição do profissional na fila de chamados. |
 | RN-65 | Conta pausada não fica online. O suporte vê o histórico e decide se libera. |
 | RN-66 | Banimento é para fraude, identidade falsa e assédio comprovado. |
+| RN-79 | Três abandonos em 30 dias pausam a conta do profissional até ele falar com o suporte. |
 
 ## 8. Avaliações, perfil e anúncios
 
@@ -152,7 +156,6 @@ Cada dado é usado só para o motivo pelo qual foi pedido.
 
 O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa e sai daqui.
 
-- [ ] **Profissional que aceita e não aparece.** Proposta: ele tem 10 minutos para tocar "Estou a caminho"; sem isso, o app pergunta "Ainda vai?" e, após mais 5 minutos, devolve o pedido à busca. Atraso de mais do dobro do previsto libera "Chamar outro" sem custo. Três abandonos em 30 dias pausam a conta.
 - [ ] **Foto da cliente no modo só mulheres.** Recomendação: a profissional vê só o selo "Cliente verificada", nunca a selfie. Opcional: a cliente escolhe mostrar uma foto de perfil conferida com a selfie. As telas atuais ainda mostram a foto.
 - [ ] **Código na porta para todos.** Hoje o cliente sempre vê o código, mas a tela de conferência do profissional existe só no modo só mulheres. Decidir se vale para todo atendimento.
 - [ ] **Valor da comissão.** 10% é exemplo.
@@ -165,6 +168,7 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 13/11/2026 | RN-76 a RN-79 | Profissional que aceita e não aparece: prazo para sair, devolução à busca, atraso sem custo e pausa por abandonos. |
 | 13/11/2026 | — | Documento criado com todas as regras decididas até aqui. |
 | 13/11/2026 | RN-26, RN-32, RN-33, RN-45 a RN-47, RN-63 | Valor dividido em Visita e Serviço. Encerrar cobrando só a visita. Contestação em 24 horas. Conta pausada por muitas visitas sem serviço. |
 | 13/11/2026 | RN-30, RN-31 | O valor fica reservado no cartão ao confirmar e é cobrado automaticamente ao concluir. Saem a tela de cobrança e o botão Pagar. |

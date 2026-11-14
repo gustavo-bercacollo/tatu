@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../data/atendimento_profissional.dart';import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import '../../../data/atendimento_profissional.dart';
+import 'ainda_vai.dart';
+import '../../../data/profissional.dart';
+import '../../../data/prazos.dart';import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
@@ -59,6 +62,9 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   final _campo = TextEditingController();
   Timer? _timer;
 
+  /// RN-76: prazo para tocar "Estou a caminho" depois de combinar.
+  Timer? _prazoSaida;
+
   /// (texto, minha): conversa de exemplo.
   final _mensagens = <(String, bool)>[
     ('Oi! A pia não para de vazar.', false),
@@ -78,6 +84,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    _prazoSaida?.cancel();
     _campo.dispose();
     super.dispose();
   }
@@ -195,6 +202,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
         _combinado = _meuValor;
         _estado = EstadoValor.combinado;
       });
+      _contarPrazoSaida();
     } else if (_rodada >= maxRodadas) {
       atendimentoProfissional.encerrar();
       Navigator.of(context).pushReplacement(
@@ -210,12 +218,60 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     }
   }
 
-  void _aceitarProposta() => setState(() {
-    _combinado = _proposta;
-    _estado = EstadoValor.combinado;
-  });
+  void _aceitarProposta() {
+    setState(() {
+      _combinado = _proposta;
+      _estado = EstadoValor.combinado;
+    });
+    _contarPrazoSaida();
+  }
+
+  /// RN-76: valor combinado; se não tocar em "Estou a caminho" dentro do
+  /// prazo, o app pergunta "Ainda vai?".
+  void _contarPrazoSaida() {
+    _prazoSaida?.cancel();
+    _prazoSaida = Timer(
+      Prazos.naDemo(Prazos.estouACaminho),
+      _perguntarAindaVai,
+    );
+  }
+
+  Future<void> _perguntarAindaVai() async {
+    if (!mounted) return;
+    final c = widget.chamado;
+    final vai = await perguntarAindaVai(
+      context,
+      cliente: c.primeiroNome,
+      feminino: c.feminino,
+    );
+    if (!mounted) return;
+    if (vai == true) {
+      _irAteOCliente();
+    } else {
+      _devolver(naoConsegue: vai == false);
+    }
+  }
+
+  /// RN-77: "Não consigo ir" ou sem resposta: o chamado volta à busca,
+  /// nada é cobrado do cliente e conta como abandono.
+  void _devolver({required bool naoConsegue}) {
+    _prazoSaida?.cancel();
+    profissional.registrarAbandono();
+    atendimentoProfissional.encerrar();
+    final c = widget.chamado;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => ChamadoDevolvidoPage(
+          cliente: c.primeiroNome,
+          feminino: c.feminino,
+          naoConsegue: naoConsegue,
+        ),
+      ),
+    );
+  }
 
   void _irAteOCliente() {
+    _prazoSaida?.cancel();
     final c = widget.chamado;
     final s = ServicoAceito(
       cliente: c.cliente,

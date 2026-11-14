@@ -6,6 +6,63 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
 
+/// Aviso escuro fixo sobre a tela (ex.: "Você chegou perto da Ana",
+/// "A Luiza ainda não saiu"): ícone, título branco e texto cinza.
+class AvisoEscuro extends StatelessWidget {
+  const AvisoEscuro({
+    super.key,
+    required this.icone,
+    required this.titulo,
+    required this.texto,
+  });
+
+  final Widget icone;
+  final String titulo;
+  final String texto;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+    decoration: BoxDecoration(
+      color: TatuColors.avisoEscuro,
+      borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+      boxShadow: const [
+        BoxShadow(color: TatuColors.sombra, blurRadius: 14, offset: Offset(0, 6)),
+      ],
+    ),
+    child: Row(
+      children: [
+        icone,
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                titulo,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: TatuColors.onAction,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                texto,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: TatuColors.avisoEscuroTexto,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 /// Aviso escuro de sucesso no topo da tela (ex.: "Foto atualizada").
 /// Some sozinho depois de alguns segundos ou ao tocar.
 void mostrarAvisoTopo(

@@ -23,7 +23,11 @@ class TelaPermissao extends StatelessWidget {
     this.voltar = true,
     this.extra,
     this.abas,
+    this.estiloPrincipal,
   });
+
+  /// Estilo do botão principal (ex.: cinza em "Voltar ao início").
+  final ButtonStyle? estiloPrincipal;
 
   final Widget icone;
   final String titulo;
@@ -88,6 +92,7 @@ class TelaPermissao extends StatelessWidget {
                     ),
                   ),
                   FilledButton(
+                    style: estiloPrincipal,
                     onPressed:
                         onPrincipal ??
                         () => ScaffoldMessenger.of(context)

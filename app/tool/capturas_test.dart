@@ -12,6 +12,7 @@ import 'package:tatu/data/conversas_profissional.dart';
 import 'package:tatu/data/atendimento_profissional.dart';
 import 'package:tatu/data/avaliacoes_profissional.dart';
 import 'package:tatu/data/navegacao.dart';
+import 'package:tatu/data/prazos.dart';
 import 'package:tatu/data/seguranca.dart';
 import 'package:tatu/data/servico_profissional.dart';
 import 'package:tatu/data/notificacoes_profissional.dart';
@@ -26,6 +27,7 @@ import 'package:tatu/features/profissional/perfil/fotos_trabalho_page.dart';
 import 'package:tatu/features/profissional/atividade/atividade_profissional_page.dart';
 import 'package:tatu/features/profissional/atividade/ganhos_page.dart';
 import 'package:tatu/features/profissional/cadastro/dados_page.dart';
+import 'package:tatu/features/profissional/chamado/ainda_vai.dart';
 import 'package:tatu/features/profissional/chamado/chat_profissional_page.dart';
 import 'package:tatu/features/profissional/chamado/novo_chamado_page.dart';
 import 'package:tatu/features/profissional/cadastro/especialidades_page.dart';
@@ -1919,6 +1921,102 @@ void main() {
 
   testWidgets('pro-contestacao-recebida', (t) async {
     await _capturar(t, 'pro-contestacao-recebida', const ContestacaoRecebidaPage());
+  });
+
+  // ---------- Profissional que não aparece (RN-76 a RN-79) ----------
+
+  testWidgets('pro-ainda-vai', (t) async {
+    await _capturar(
+      t,
+      'pro-ainda-vai',
+      const ChatProfissionalPage(),
+      preparar: () async {
+        await t.tap(find.text('Enviar valor'));
+        await t.pumpAndSettle();
+        await t.enterText(find.byType(TextField).last, '150');
+        await t.pump();
+        await t.tap(find.text('Enviar para Ana'));
+        await t.pumpAndSettle();
+        await t.pump(const Duration(seconds: 3));
+        await t.tap(find.text('Aceitar R\$ 120,00'));
+        await t.pump();
+        // RN-76: passou o prazo para tocar "Estou a caminho".
+        await t.pump(Prazos.naDemo(Prazos.estouACaminho));
+        await t.pumpAndSettle();
+      },
+    );
+    await t.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('pro-chamado-devolvido', (t) async {
+    await _capturar(
+      t,
+      'pro-chamado-devolvido',
+      const ChamadoDevolvidoPage(),
+      preparar: () async {
+        profissional.registrarAbandono();
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: const ChamadoDevolvidoPage(key: ValueKey('de novo')),
+          ),
+        );
+      },
+    );
+  });
+
+  testWidgets('pro-home-pausada-abandonos', (t) async {
+    await comDemo(
+      t,
+      'pro-home-pausada-abandonos',
+      const HomeProfissionalPage(),
+      depois: () async {
+        profissional.pausarPorAbandonosParaDemo();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('cliente-ainda-nao-saiu', (t) async {
+    await _capturar(
+      t,
+      'cliente-ainda-nao-saiu',
+      const PedidoAndamentoPage(),
+      preparar: () async {
+        pedidos.valorConfirmado();
+        pedidos.aindaNaoSaiu();
+        await t.pump();
+      },
+    );
+    pedidos.restaurar(); // para os relógios do prazo
+  });
+
+  testWidgets('cliente-atraso', (t) async {
+    await _capturar(
+      t,
+      'cliente-atraso',
+      const PedidoAndamentoPage(),
+      preparar: () async {
+        // Previsto 12 min; com 37 min, está 25 min atrasada (RN-78).
+        await t.pump(Prazos.naDemo(const Duration(minutes: 37)));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('cliente-busca-nao-confirmou', (t) async {
+    await _capturar(
+      t,
+      'cliente-busca-nao-confirmou',
+      ProcurandoPage(
+        servico: 'Encanador',
+        endereco: 'Rua das Flores, 120',
+        animar: false,
+        anterior: pedidos.andamento,
+        troca: TrocaProfissional.naoConfirmou,
+      ),
+    );
   });
 
   testWidgets('pro-preferencias', (t) async {

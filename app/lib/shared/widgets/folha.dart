@@ -30,9 +30,13 @@ Future<T?> mostrarFolha<T>(
   required WidgetBuilder builder,
   double? alturaRelativa,
   Color fundo = TatuColors.bg,
+  bool fechavel = true,
 }) {
   return showModalBottomSheet<T>(
     context: context,
+    // [fechavel] falso: só fecha pelos botões (sem arrastar nem tocar fora).
+    isDismissible: fechavel,
+    enableDrag: fechavel,
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: fundo,
@@ -42,12 +46,15 @@ Future<T?> mostrarFolha<T>(
         top: Radius.circular(TatuMedidas.raioFolha),
       ),
     ),
-    builder: (ctx) => alturaRelativa == null
-        ? builder(ctx)
-        : FractionallySizedBox(
-            heightFactor: alturaRelativa,
-            child: builder(ctx),
-          ),
+    builder: (ctx) {
+      final folha = alturaRelativa == null
+          ? builder(ctx)
+          : FractionallySizedBox(
+              heightFactor: alturaRelativa,
+              child: builder(ctx),
+            );
+      return fechavel ? folha : PopScope(canPop: false, child: folha);
+    },
   );
 }
 

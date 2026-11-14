@@ -21,6 +21,18 @@ import 'ninguem_ativo_page.dart';
 /// Fase da busca mostrada na tela.
 enum FaseBusca { inicio, expandindo }
 
+/// Por que a busca recomeçou com [ProcurandoPage.anterior].
+enum TrocaProfissional {
+  /// O profissional cancelou (RN-44).
+  cancelou,
+
+  /// Não confirmou que vinha: voltou sozinho à busca (RN-77).
+  naoConfirmou,
+
+  /// O cliente trocou por atraso, sem custo (RN-78).
+  atrasou,
+}
+
 /// Procurando um profissional: o pedido vai ao mesmo tempo para todos os
 /// ativos por perto (radar no mapa). O raio expande sozinho aos 60 s e,
 /// aos 90 s sem ninguém, a busca segue em segundo plano ("Ninguém ativo").
@@ -39,7 +51,11 @@ class ProcurandoPage extends StatefulWidget {
     this.direto,
     this.diretoFeminino = true,
     this.simularAceite = true,
+    this.troca = TrocaProfissional.cancelou,
   });
+
+  /// Motivo da nova busca quando há [anterior].
+  final TrocaProfissional troca;
 
   /// Protótipo: alguém aceita depois de [aceitaEm] (nulo nos testes que
   /// esperam o raio expandir). Desligado depois de passar pela fila toda.
@@ -294,9 +310,22 @@ class _ProcurandoPageState extends State<ProcurandoPage>
       texto = 'Ninguém aceitou ainda. Estamos chamando\nmais profissionais.';
     } else if (a != null) {
       final ela = a.profissao.endsWith('a');
-      titulo = 'Chamando outro profissional';
-      texto =
-          '${ela ? 'A' : 'O'} ${a.primeiroNome} não está mais disponível.\nNada foi cobrado.';
+      final quem = a.artigoNome;
+      switch (widget.troca) {
+        case TrocaProfissional.naoConfirmou:
+          // RN-77: voltou à busca sozinho, sem cobrar nada.
+          titulo = 'Chamando outro ${widget.servico.toLowerCase()}';
+          texto = '$quem não confirmou que vinha.\nNada foi cobrado.';
+        case TrocaProfissional.atrasou:
+          // RN-78: troca por atraso, sem custo (nem a visita).
+          titulo = 'Chamando outro ${widget.servico.toLowerCase()}';
+          texto =
+              '$quem está ${ela ? 'atrasada' : 'atrasado'}.\n'
+              'Nada foi cobrado.';
+        case TrocaProfissional.cancelou:
+          titulo = 'Chamando outro profissional';
+          texto = '$quem não está mais disponível.\nNada foi cobrado.';
+      }
     } else {
       titulo = 'Procurando um profissional';
       texto = 'Avisamos quem está ativo perto de você.\nO primeiro que aceitar fala com você.';

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/conversas.dart';
+import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/data/pagamentos.dart';
 import 'package:tatu/features/cliente/mensagens/chat_page.dart';
 
@@ -32,6 +33,9 @@ void main() {
     expect(find.text('Valor confirmado'), findsOneWidget);
     expect(find.text('Reservado no Visa 4242. Só cobramos no fim.'),
         findsOneWidget);
+    // RN-76: confirmar começa o prazo da Luiza para sair.
+    expect(pedidos.andamento?.etapasFeitas, 2);
+    pedidos.restaurar(); // para os relógios do prazo
   });
 
   testWidgets('Trocar abre a forma de pagamento', (t) async {

@@ -92,6 +92,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] “Verificar identidade” no Perfil do cliente (Verificar / Verificada), sem ligar a preferência
 - [x] Minhas avaliações do profissional (`perfil/avaliacoes_profissional_page.dart`, dados em `data/avaliacoes_profissional.dart`): resumo com barras laranja e variação do mês, mais elogiado, filtros (Segmento com ícone), dica da IA, contestar notas 1–2 → contestação recebida → “Em revisão”, estado vazio
 - [x] Corrigido: chamado aceito agora aparece em Atividade · Em andamento do profissional (`data/atendimento_profissional.dart`: etapas combinando → a caminho → no local → em serviço; some ao cancelar/sair/sem acordo). Dica do escudo aparece 0,8 s depois e fica 4 s
+- [x] Profissional que aceita e não aparece (RN-76 a RN-79): prazos em `data/prazos.dart` (`Prazos`, relógio 20× mais rápido no protótipo); profissional: folha “Ainda vai?” com contagem (`chamado/ainda_vai.dart`), “O chamado voltou à busca” com contador de abandonos, Home pausada por 3 abandonos; cliente: “Ainda não saiu” no pedido, volta sozinho à busca (`TrocaProfissional.naoConfirmou`), aviso de atraso com “Chamar outro” sem custo. `AvisoEscuro` virou componente
 - Falta do profissional: cobrar o cliente, avaliar o cliente
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado

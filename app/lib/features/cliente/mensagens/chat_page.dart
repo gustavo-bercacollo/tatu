@@ -88,7 +88,13 @@ class _ChatPageState extends State<ChatPage> {
       switch (v.situacao) {
         SituacaoValor.aguardandoVoce => CartaoValorRecebido(
           valor: v,
-          onConfirmar: () => conversas.confirmarValor(_c),
+          onConfirmar: () {
+            conversas.confirmarValor(_c);
+            // RN-76: começa o prazo do profissional para sair.
+            if (pedidos.andamento?.profissional == _c.nome) {
+              pedidos.valorConfirmado();
+            }
+          },
           onTrocar: _trocarPagamento,
           onPedirOutro: v.rodada < maxRodadasValor ? _pedirOutro : null,
         ),

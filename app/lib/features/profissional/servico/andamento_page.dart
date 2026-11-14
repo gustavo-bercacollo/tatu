@@ -145,7 +145,12 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
                   ),
                   if (perto) ...[
                     const SizedBox(height: 8),
-                    _AvisoPerto(
+                    AvisoEscuro(
+                      icone: const Icon(
+                        TablerIcons.map_pin,
+                        color: TatuColors.onAction,
+                        size: 22,
+                      ),
                       titulo: 'Você chegou perto $daCliente',
                       texto:
                           'Toque em “Cheguei” para avisá-${s.feminino ? 'la' : 'lo'}.',
@@ -288,51 +293,6 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
   ];
 }
 
-/// Aviso escuro fixo no topo do mapa ("Você chegou perto da Ana").
-class _AvisoPerto extends StatelessWidget {
-  const _AvisoPerto({required this.titulo, required this.texto});
-
-  final String titulo;
-  final String texto;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-    decoration: BoxDecoration(
-      color: TatuColors.avisoEscuro,
-      borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
-    ),
-    child: Row(
-      children: [
-        const Icon(TablerIcons.map_pin, color: TatuColors.onAction, size: 22),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                titulo,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: TatuColors.onAction,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                texto,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: TatuColors.avisoEscuroTexto,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
 
 /// P25 · Serviço em andamento: cliente, valor, início, escudo de
 /// segurança no topo e "Concluir e cobrar".
