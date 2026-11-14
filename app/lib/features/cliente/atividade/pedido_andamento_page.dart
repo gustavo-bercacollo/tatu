@@ -18,6 +18,7 @@ import '../../../shared/widgets/tela_interna.dart';
 import '../../entrada/seguranca.dart';
 import '../chamar/procurando_page.dart';
 import '../mensagens/chat_page.dart';
+import 'na_porta_page.dart';
 import 'pedido_cancelado_page.dart';
 
 /// Pedido em andamento: profissional, etapas, dados e "Cancelar pedido".
@@ -33,6 +34,7 @@ class PedidoAndamentoPage extends StatefulWidget {
 class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
   Timer? _relogio;
   bool _perguntouAtraso = false;
+  bool _mostrouPorta = false;
 
   @override
   void initState() {
@@ -40,7 +42,19 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
     pedidos.addListener(_mudou);
     // RN-78: confere o atraso enquanto a tela está aberta.
     _relogio = Timer.periodic(const Duration(seconds: 1), (_) => _atraso());
-    WidgetsBinding.instance.addPostFrameCallback((_) => _atraso());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _atraso();
+      _porta();
+    });
+  }
+
+  /// RN-80: o profissional chegou: abre a tela da porta (uma vez).
+  void _porta() {
+    final p = pedidos.andamento;
+    if (!mounted || p == null || !p.naPorta || _mostrouPorta) return;
+    _mostrouPorta = true;
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const NaPortaPage()));
   }
 
   @override
@@ -52,6 +66,13 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
 
   /// RN-77: o pedido voltou à busca; abre a busca com o aviso.
   void _mudou() {
+    // RN-81: o cliente não apareceu (se a porta não estiver aberta por cima).
+    if (mounted &&
+        pedidos.ausente != null &&
+        (ModalRoute.of(context)?.isCurrent ?? true)) {
+      return mostrarAusencia(context);
+    }
+    _porta();
     final d = pedidos.devolvido;
     if (!mounted || d == null || pedidos.andamento != null) return;
     pedidos.consumirDevolvido();

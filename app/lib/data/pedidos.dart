@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 
+import 'conta.dart';
 import 'prazos.dart';
 import 'seguranca.dart';
 
@@ -41,7 +42,22 @@ class PedidoAndamento {
     this.aindaNaoSaiu = false,
     this.saiuEm,
     this.esperandoAtraso = false,
+    this.chegouEm,
+    this.visita = 40,
+    this.codigo = '4821',
   });
+
+  /// RN-80: quando o profissional tocou em "Cheguei" (nulo antes).
+  final DateTime? chegouEm;
+
+  /// Valor da visita (cobrado se o cliente não aparecer, RN-81).
+  final num visita;
+
+  /// RN-39: código de 4 dígitos que o cliente pede antes de abrir a porta.
+  final String codigo;
+
+  /// O profissional chegou e o cliente ainda não abriu a porta.
+  bool get naPorta => chegouEm != null && etapasFeitas == 3;
 
   /// RN-76: o profissional passou do prazo e ainda não tocou em
   /// "Estou a caminho".
@@ -54,14 +70,14 @@ class PedidoAndamento {
   final bool esperandoAtraso;
 
   /// Minutos previstos de chegada ("12 min" → 12).
-  int get minutosChegada =>
-      int.tryParse(chegaEm.split(' ').first) ?? 0;
+  int get minutosChegada => int.tryParse(chegaEm.split(' ').first) ?? 0;
 
   PedidoAndamento copiar({
     int? etapasFeitas,
     bool? aindaNaoSaiu,
     DateTime? saiuEm,
     bool? esperandoAtraso,
+    DateTime? chegouEm,
   }) => PedidoAndamento(
     servico: servico,
     profissao: profissao,
@@ -76,6 +92,9 @@ class PedidoAndamento {
     aindaNaoSaiu: aindaNaoSaiu ?? this.aindaNaoSaiu,
     saiuEm: saiuEm ?? this.saiuEm,
     esperandoAtraso: esperandoAtraso ?? this.esperandoAtraso,
+    chegouEm: chegouEm ?? this.chegouEm,
+    visita: visita,
+    codigo: codigo,
   );
 
   /// "A Luiza", "O Carlos".
@@ -105,7 +124,7 @@ class PedidoAndamento {
   String get primeiroNome => profissional.split(' ').first;
 
   /// Situação mostrada no selo verde (última etapa feita).
-  String get situacao => etapasPedido[etapasFeitas - 1];
+  String get situacao => naPorta ? 'Chegou' : etapasPedido[etapasFeitas - 1];
 }
 
 /// Pedido sem ninguém aceitar ainda: a busca continua em segundo plano.
@@ -251,6 +270,7 @@ class PedidosRepo extends ChangeNotifier {
   void restaurar() {
     _pararRelogios();
     devolvido = null;
+    ausente = null;
     andamento = PedidoAndamento(
       servico: 'Encanador',
       profissao: 'Encanadora',
@@ -350,6 +370,8 @@ class PedidosRepo extends ChangeNotifier {
 
   Timer? _prazoSaida;
   Timer? _prazoResposta;
+  Timer? _prazoChegada;
+  Timer? _prazoEspera;
 
   /// RN-77: pedido que voltou à busca porque o profissional não confirmou
   /// que vinha. A tela do pedido usa para abrir a busca de novo.
@@ -358,6 +380,8 @@ class PedidosRepo extends ChangeNotifier {
   void _pararRelogios() {
     _prazoSaida?.cancel();
     _prazoResposta?.cancel();
+    _prazoChegada?.cancel();
+    _prazoEspera?.cancel();
   }
 
   /// O cliente confirmou o valor (RN-76). Protótipo: o profissional não
@@ -421,6 +445,7 @@ class PedidosRepo extends ChangeNotifier {
     final p = andamento;
     final saiu = p?.saiuEm;
     if (p == null || saiu == null || p.etapasFeitas != 3) return null;
+    if (p.chegouEm != null) return null;
     final previsto = p.minutosChegada;
     if (previsto <= 0) return null;
     // Protótipo: o relógio anda [Prazos.aceleracao] vezes mais rápido.
@@ -437,8 +462,54 @@ class PedidosRepo extends ChangeNotifier {
     final p = andamento;
     if (p == null) return;
     andamento = p.copiar(esperandoAtraso: true);
+    // Protótipo: quem esperou vê o profissional chegar pouco depois.
+    _prazoChegada?.cancel();
+    _prazoChegada = Timer(Prazos.naDemo(const Duration(minutes: 3)), chegou);
     notifyListeners();
   }
+
+  // ---------- Cliente que não aparece (RN-80 a RN-82) ----------
+
+  /// RN-81: pedido encerrado porque o cliente não apareceu; a tela aberta
+  /// mostra "Você não estava no local".
+  PedidoAndamento? ausente;
+
+  /// RN-80: o profissional tocou em "Cheguei": o cliente vê a porta e
+  /// começa a espera de [Prazos.esperaCliente].
+  void chegou() {
+    final p = andamento;
+    if (p == null || p.chegouEm != null) return;
+    _pararRelogios();
+    andamento = p.copiar(etapasFeitas: 3, chegouEm: clock.now());
+    _prazoEspera = Timer(Prazos.naDemo(Prazos.esperaCliente), clienteAusente);
+    notifyListeners();
+  }
+
+  /// RN-39: o código confere; o serviço começa.
+  void abriuPorta() {
+    final p = andamento;
+    if (p == null) return;
+    _pararRelogios();
+    andamento = p.copiar(etapasFeitas: 4);
+    notifyListeners();
+  }
+
+  /// RN-81: a espera acabou e o profissional tocou em "Cliente não
+  /// apareceu": o chamado acaba e só a visita é cobrada. Conta para a
+  /// pausa da conta (RN-82).
+  void clienteAusente() {
+    final p = andamento;
+    if (p == null) return;
+    _pararRelogios();
+    seguranca.encerrarAlerta(cliente: true);
+    ausente = p;
+    andamento = null;
+    conta.registrarAusencia();
+    notifyListeners();
+  }
+
+  /// A tela já mostrou "Você não estava no local".
+  void consumirAusente() => ausente = null;
 
   /// Ninguém aceitou ainda: o pedido segue buscando em segundo plano.
   void buscarEmSegundoPlano(BuscaSegundoPlano b) {

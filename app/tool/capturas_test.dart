@@ -3,6 +3,7 @@
 //   flutter test tool/capturas_test.dart --update-goldens
 import 'dart:io';
 
+import 'package:clock/clock.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -69,6 +70,7 @@ import 'package:tatu/features/cliente/atividade/contestar_page.dart';
 import 'package:tatu/features/cliente/atividade/servico_finalizado_page.dart';
 import 'package:tatu/features/cliente/atividade/recibo_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_andamento_page.dart';
+import 'package:tatu/features/cliente/atividade/na_porta_page.dart';
 import 'package:tatu/features/cliente/preferencias_cliente_page.dart';
 import 'package:tatu/features/cliente/verificar_identidade_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_cancelado_page.dart';
@@ -1767,7 +1769,65 @@ void main() {
   });
 
   testWidgets('pro-chegou', (t) async {
-    await _capturar(t, 'pro-chegou', const ACaminhoPage(chegou: true));
+    // RN-80: 2 min 18 s de espera (o protótipo anda 20× mais rápido).
+    await withClock(Clock.fixed(DateTime(2026, 11, 14, 14, 32)), () async {
+      await _capturar(
+        t,
+        'pro-chegou',
+        const ACaminhoPage(
+          chegou: true,
+          esperou: Duration(minutes: 2, seconds: 18),
+        ),
+      );
+    });
+  });
+
+  testWidgets('pro-cliente-nao-apareceu', (t) async {
+    await withClock(Clock.fixed(DateTime(2026, 11, 14, 14, 32)), () async {
+      await _capturar(
+        t,
+        'pro-cliente-nao-apareceu',
+        const ACaminhoPage(chegou: true, esperou: Duration(minutes: 10)),
+        preparar: () async {
+          await t.tap(find.text('Cliente não apareceu'));
+          await t.pumpAndSettle();
+        },
+      );
+    });
+  });
+
+  testWidgets('cliente-na-porta', (t) async {
+    await _capturar(
+      t,
+      'cliente-na-porta',
+      const PedidoAndamentoPage(),
+      preparar: () async {
+        pedidos.chegou();
+        await t.pump();
+        await t.pump(const Duration(milliseconds: 600));
+      },
+    );
+    pedidos.restaurar(); // para o relógio da espera
+  });
+
+  testWidgets('cliente-ausente', (t) async {
+    await _capturar(
+      t,
+      'cliente-ausente',
+      VoceNaoEstavaPage(pedido: pedidos.andamento!),
+    );
+  });
+
+  testWidgets('cliente-home-pausada', (t) async {
+    await _capturar(
+      t,
+      'cliente-home-pausada',
+      const HomeClientePage(),
+      preparar: () async {
+        conta.pausarPorAusenciasParaDemo();
+        await t.pump();
+      },
+    );
   });
 
   testWidgets('pro-quase-la', (t) async {
@@ -1913,14 +1973,21 @@ void main() {
         motivo: 0,
       ),
       preparar: () async {
-        await t.enterText(find.byType(TextField), 'Me xingou por eu ser mulher.');
+        await t.enterText(
+          find.byType(TextField),
+          'Me xingou por eu ser mulher.',
+        );
         await t.pump();
       },
     );
   });
 
   testWidgets('pro-contestacao-recebida', (t) async {
-    await _capturar(t, 'pro-contestacao-recebida', const ContestacaoRecebidaPage());
+    await _capturar(
+      t,
+      'pro-contestacao-recebida',
+      const ContestacaoRecebidaPage(),
+    );
   });
 
   // ---------- Profissional que não aparece (RN-76 a RN-79) ----------

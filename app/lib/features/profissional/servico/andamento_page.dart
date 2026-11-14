@@ -2,7 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../data/atendimento_profissional.dart';import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:clock/clock.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+
+import '../../../data/atendimento_profissional.dart';
+import '../../../data/prazos.dart';
 
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
@@ -18,7 +22,6 @@ import '../../../shared/widgets/aviso_topo.dart';
 import '../../../shared/widgets/back_circle_button.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
-import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import 'rota.dart';
@@ -31,7 +34,8 @@ void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
 /// P24 · A caminho do cliente: rota no mapa, endereço, "Abrir rota" e
 /// "Cheguei", que só libera perto do local (protótipo: depois de
 /// [chegaEm]) e com a localização ligada. Perto, vira "Quase lá" com o
-/// aviso no topo. Depois do "Cheguei": "Você chegou".
+/// aviso no topo. Depois do "Cheguei": "Aguardando a Ana" com a espera
+/// de [Prazos.esperaCliente] (RN-80) e "Cliente não apareceu" (RN-81).
 class ACaminhoPage extends StatefulWidget {
   const ACaminhoPage({
     super.key,
@@ -39,7 +43,11 @@ class ACaminhoPage extends StatefulWidget {
     this.chegaEm = const Duration(seconds: 5),
     this.perto = false,
     this.chegou = false,
+    this.esperou = Duration.zero,
   });
+
+  /// Com [chegou]: quanto da espera já passou (fluxograma e testes).
+  final Duration esperou;
 
   final ServicoAceito servico;
   final Duration chegaEm;
@@ -59,9 +67,14 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
   late bool _chegou = widget.chegou;
   Timer? _timer;
 
+  /// RN-80: quando tocou em "Cheguei" (começa a espera).
+  DateTime? _chegouEm;
+  Timer? _relogioEspera;
+
   @override
   void initState() {
     super.initState();
+    if (widget.chegou) _comecarEspera(widget.esperou);
     if (!_perto) {
       _timer = Timer(widget.chegaEm, () {
         if (mounted) setState(() => _perto = true);
@@ -79,7 +92,56 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    _relogioEspera?.cancel();
     super.dispose();
+  }
+
+  /// RN-80: começa a contar a espera pelo cliente. Protótipo: o relógio
+  /// anda [Prazos.aceleracao] vezes mais rápido.
+  void _comecarEspera([Duration jaPassou = Duration.zero]) {
+    _chegouEm = clock.now().subtract(jaPassou ~/ Prazos.aceleracao);
+    _relogioEspera?.cancel();
+    _relogioEspera = Timer.periodic(const Duration(milliseconds: 250), (t) {
+      if (!mounted) return t.cancel();
+      setState(() {});
+      if (_restante == Duration.zero) t.cancel();
+    });
+  }
+
+  /// Quanto falta da espera (zero quando acabou).
+  Duration get _restante {
+    final c = _chegouEm;
+    if (c == null) return Prazos.esperaCliente;
+    final r =
+        Prazos.esperaCliente - clock.now().difference(c) * Prazos.aceleracao;
+    return r.isNegative ? Duration.zero : r;
+  }
+
+  /// RN-81: a espera acabou e o cliente não apareceu: encerra o chamado
+  /// e recebe só a visita. Não conta como visita sem serviço (RN-63):
+  /// a ausência é do cliente (RN-82).
+  Future<void> _clienteNaoApareceu() async {
+    final s = widget.servico;
+    final a = s.feminino ? 'A' : 'O';
+    final visita = reais(s.visita);
+    final sim = await confirmar(
+      context,
+      titulo: '$a ${s.primeiroNome} não apareceu?',
+      texto:
+          'Você encerra o chamado e recebe a visita.\n'
+          '$a ${s.primeiroNome} é ${s.feminino ? 'cobrada' : 'cobrado'} $visita.',
+      confirmar: 'Encerrar e receber a visita',
+      cancelar: 'Esperar mais',
+      iconeAviso: false,
+    );
+    if (!sim || !mounted) return;
+    atendimentoProfissional.encerrar();
+    mostrarAvisoTopo(
+      context,
+      titulo: 'Visita recebida',
+      texto: '$a ${s.primeiroNome} pagou $visita pela visita.',
+    );
+    Navigator.of(context).popUntil((r) => r.isFirst);
   }
 
   Future<void> _pedirLocalizacao() async {
@@ -188,36 +250,39 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
                       const AlcaFolha(),
                       const SizedBox(height: 16),
                       if (_chegou) ...[
-                        ..._topoChegou(s),
-                        const SizedBox(height: TatuMedidas.entreItens),
-                        CartaoEndereco(servico: s),
+                        ..._aguardando(s),
                         const SizedBox(height: 10),
-                        CartaoServico(servico: s),
-                        const SizedBox(height: TatuMedidas.entreItens + 4),
                         FilledButton(
                           onPressed: () {
                             final agora = DateTime.now();
                             atendimentoProfissional.iniciar(agora);
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
-                                builder: (_) => EmAndamentoPage(
-                                  servico: s,
-                                  inicio: agora,
-                                ),
+                                builder: (_) =>
+                                    EmAndamentoPage(servico: s, inicio: agora),
                               ),
                             );
                           },
                           child: const Text('Iniciar serviço'),
                         ),
                         const SizedBox(height: 10),
-                        FilledButton.icon(
+                        // RN-81: só depois da espera.
+                        FilledButton(
                           style: tatuBotaoSecundario(),
-                          onPressed: () => _emBreve(context, 'Chat'),
-                          icon: const Icon(
-                            TablerIcons.message_circle,
-                            size: 20,
-                          ),
-                          label: Text('Falar com ${s.primeiroNome}'),
+                          onPressed: _restante == Duration.zero
+                              ? _clienteNaoApareceu
+                              : null,
+                          child: const Text('Cliente não apareceu'),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _restante == Duration.zero
+                              ? 'A espera acabou.'
+                              : 'Libera depois de '
+                                    '${Prazos.esperaCliente.inMinutes} min '
+                                    'de espera.',
+                          textAlign: TextAlign.center,
+                          style: TatuTexto.nota,
                         ),
                       ] else ...[
                         Text(
@@ -245,6 +310,7 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
                           onPressed: perto
                               ? () {
                                   atendimentoProfissional.chegou();
+                                  _comecarEspera();
                                   setState(() => _chegou = true);
                                 }
                               : null,
@@ -278,21 +344,94 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
     );
   }
 
-  List<Widget> _topoChegou(ServicoAceito s) => [
-    const Align(
-      alignment: Alignment.centerLeft,
-      child: SeloVerde('No local', pequeno: true),
-    ),
-    const SizedBox(height: 10),
-    const Text('Você chegou', style: TatuTexto.tituloFolha),
-    const SizedBox(height: 4),
-    Text(
-      '${s.primeiroNome} foi ${s.feminino ? 'avisada' : 'avisado'} de que você está aí.',
-      style: TatuTexto.detalhe,
-    ),
-  ];
+  /// RN-80: "Aguardando a Ana" com o tempo de espera.
+  List<Widget> _aguardando(ServicoAceito s) {
+    final c = _chegouEm ?? clock.now();
+    final hora =
+        '${c.hour.toString().padLeft(2, '0')}:'
+        '${c.minute.toString().padLeft(2, '0')}';
+    final r = _restante;
+    final acabou = r == Duration.zero;
+    final tempo =
+        '${r.inMinutes}:${(r.inSeconds % 60).toString().padLeft(2, '0')}';
+    final passou = 1 - r.inMilliseconds / Prazos.esperaCliente.inMilliseconds;
+    return [
+      Text(
+        'Aguardando ${s.feminino ? 'a' : 'o'} ${s.primeiroNome}',
+        style: TatuTexto.tituloFolha,
+      ),
+      const SizedBox(height: 4),
+      Text(
+        'Você chegou às $hora · ${s.feminino ? 'ela' : 'ele'} foi '
+        '${s.feminino ? 'avisada' : 'avisado'}',
+        style: TatuTexto.detalhe,
+      ),
+      const SizedBox(height: TatuMedidas.entreItens + 4),
+      Container(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+        decoration: BoxDecoration(
+          color: TatuColors.fill,
+          borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Tempo de espera',
+                    style: TatuTexto.nota.copyWith(fontWeight: FontWeight.w500),
+                  ),
+                ),
+                Text(
+                  tempo,
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w700,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                    color: acabou ? TatuColors.danger : TatuColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(3),
+              child: LinearProgressIndicator(
+                value: passou.clamp(0, 1).toDouble(),
+                minHeight: 6,
+                backgroundColor: TatuColors.circle,
+                color: acabou ? TatuColors.danger : TatuColors.action,
+              ),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: TatuMedidas.entreItens + 4),
+      Row(
+        children: [
+          Expanded(
+            child: FilledButton.icon(
+              style: tatuBotaoSecundario(),
+              onPressed: () => _emBreve(context, 'Mensagem'),
+              icon: const Icon(TablerIcons.message_circle, size: 20),
+              label: const Text('Mensagem'),
+            ),
+          ),
+          const SizedBox(width: 9),
+          Expanded(
+            child: FilledButton.icon(
+              style: tatuBotaoSecundario(),
+              onPressed: () => _emBreve(context, 'Ligar'),
+              icon: const Icon(TablerIcons.phone, size: 20),
+              label: const Text('Ligar'),
+            ),
+          ),
+        ],
+      ),
+    ];
+  }
 }
-
 
 /// P25 · Serviço em andamento: cliente, valor, início, escudo de
 /// segurança no topo e "Concluir e cobrar".

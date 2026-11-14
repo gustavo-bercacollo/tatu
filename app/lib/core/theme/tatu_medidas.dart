@@ -22,7 +22,8 @@ class TatuMedidas {
   static const raioOpcao = 22.0; // cartões grandes de escolha (Boas-vindas)
   static const raioFolha = 30.0; // topo das folhas
   static const raioCodigo = 14.0; // caixinhas do código
-  static const raioCaixa = 14.0; // caixinhas de dados (nota, serviços, estimativa)
+  static const raioCaixa =
+      14.0; // caixinhas de dados (nota, serviços, estimativa)
   static const raioSegmento = 12.0; // seletor Recebidas/Enviadas
 
   // Alturas
@@ -40,6 +41,9 @@ class TatuMedidas {
   // Avatares e foto do perfil
   static const avatarPerfil = 76.0; // topo do Perfil
   static const avatarGrande = 124.0; // prévia em "Escolha um avatar"
+  static const avatarChegada = 112.0; // quem está na porta (RN-39)
+  static const codigoPortaLargura = 52.0; // cada dígito do código da porta
+  static const codigoPortaAltura = 64.0;
   static const avatarOpcao = 80.0; // cada avatar para escolher (3 por fileira)
   static const aroAvatar = 3.0; // aro preto do avatar escolhido
   static const circuloRecorte = 300.0; // círculo de "Ajustar foto"

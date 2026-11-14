@@ -5,6 +5,7 @@ import '../../core/theme/tatu_medidas.dart';
 import '../../core/theme/tatu_texto.dart';
 import '../../core/theme/tatu_theme.dart';
 import 'back_circle_button.dart';
+import 'opcao_selecionavel.dart';
 
 /// Tela de permissão negada (localização, câmera…): ícone num círculo,
 /// título, explicação, "Abrir Ajustes" e uma alternativa.
@@ -24,7 +25,13 @@ class TelaPermissao extends StatelessWidget {
     this.extra,
     this.abas,
     this.estiloPrincipal,
+    this.link,
+    this.onLink,
   });
+
+  /// Link azul embaixo dos botões (ex.: "Algo errado? Avise em até 24h").
+  final String? link;
+  final VoidCallback? onLink;
 
   /// Estilo do botão principal (ex.: cinza em "Voltar ao início").
   final ButtonStyle? estiloPrincipal;
@@ -109,6 +116,10 @@ class TelaPermissao extends StatelessWidget {
                       onPressed: onAlternativa,
                       child: Text(alternativa!),
                     ),
+                  ],
+                  if (link != null) ...[
+                    const SizedBox(height: 4),
+                    LinkAzul(link!, onTap: onLink ?? () {}),
                   ],
                 ],
               ),

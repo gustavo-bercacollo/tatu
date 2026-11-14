@@ -32,14 +32,14 @@ void main() {
     // Longe: "Cheguei" ainda não funciona.
     await t.tap(find.text('Cheguei'));
     await t.pump();
-    expect(find.text('Você chegou'), findsNothing);
+    expect(find.text('Aguardando a Ana'), findsNothing);
     await t.pump(const Duration(seconds: 6));
     expect(find.text('Quase lá'), findsOneWidget);
     expect(find.text('Você chegou perto da Ana'), findsOneWidget);
     await t.tap(find.text('Cheguei'));
     await t.pump();
-    expect(find.text('Você chegou'), findsOneWidget);
-    expect(find.text('Ana foi avisada de que você está aí.'), findsOneWidget);
+    expect(find.text('Aguardando a Ana'), findsOneWidget);
+    expect(find.textContaining('ela foi avisada'), findsOneWidget);
     await t.tap(find.text('Iniciar serviço'));
     await t.pumpAndSettle();
     expect(find.text('Em serviço'), findsOneWidget);

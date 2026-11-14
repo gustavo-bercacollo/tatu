@@ -193,7 +193,7 @@ path.entre { opacity: .5; }
 /* ===== DADOS =====
    status: app (já no app, imagem real) · desenho (desenho pronto, ainda não no app) · andamento (tela ainda não desenhada)
    Para atualizar: mudar o status/imagem da tela, ou acrescentar telas e ligações. */
-const ATUALIZADO = '13/11/2026';
+const ATUALIZADO = '14/11/2026';
 
 const ETAPAS = {
   entrada:   { nome: 'Entrada e cadastro', lado: 'ambos' },
@@ -227,6 +227,9 @@ const TELAS_RAW = [
   ['c77','C77','Chamar · fora da área','pedir','app','docs/fluxo/app/chamar-fora-da-area.png',["“Me avise quando chegar” volta para a Home com o aviso “Combinado”"]],
   ['c78','C78','Folha · já tem um pedido igual a caminho','pedir','app','docs/fluxo/app/chamar-ja-tem-pedido.png'],
   ['c80','C80','Profissional teve um imprevisto','procurar','app','docs/fluxo/app/chamar-imprevisto.png',["Aparece quando o profissional cancela depois de aceitar (vem do servidor)"]],
+  ['c132','C132','O profissional chegou · código','contaC','app','docs/fluxo/app/cliente-na-porta.png',["RN-39: foto, nome verificado e o código de 4 dígitos para pedir antes de abrir","RN-80: “A Luiza espera por até 10 minutos”","Protótipo: abre sozinha 3 min depois de “Continuar esperando” no aviso de atraso"]],
+  ['c95','C95','Você não estava no local','contaC','app','docs/fluxo/app/cliente-ausente.png',["RN-81: o profissional esperou 10 min; só a visita é cobrada","Conta como ausência (RN-82)"]],
+  ['c96','C96','Home · conta pausada','pedir','app','docs/fluxo/app/cliente-home-pausada.png',["RN-82: 3 ausências em 30 dias","Mesmo aviso de conta pausada do profissional; “Chamar profissional” desativado","Toque no aviso abre o suporte"]],
   ['c79n','C79n','Chamando outro · não confirmou','procurar','app','docs/fluxo/app/cliente-busca-nao-confirmou.png',["RN-77: a profissional não respondeu “Ainda vai?” (ou não pode ir); a busca recomeça sozinha e nada é cobrado","Mesma busca do Procurando, com outro texto"]],
   ['c79','C79','Chamando outro profissional','procurar','app','docs/fluxo/app/chamar-outro.png',["Mesma busca do Procurando (C10), avisando que a profissional anterior saiu"]],
   ['c05','C05','Home · conflito','pedir','desenho', U+'02 - Pedir serviço/05-home-conflito.svg'],
@@ -406,7 +409,8 @@ const TELAS_RAW = [
   ['p21b','P21b','Folha · ficar offline e trocar?','chamados','app','docs/fluxo/app/pro-trocar-online.png',["Aparece ao trocar para cliente estando online"]],
   ['pa-valor','—','Folha · Quanto vai custar?','chamados','app','docs/fluxo/app/pro-enviar-valor.png',["Visita + serviço, material incluso","Você recebe: total, taxa do Tatu e no seu Pix","“Valor 1 de 3”: até 3 rodadas"]],
   ['pa-foto','—','Enviar foto no chat','chamados','andamento'],
-  ['pa-chegou','—','Chegou · iniciar serviço','chamados','app','docs/fluxo/app/pro-chegou.png',["O cliente é avisado"]],
+  ['pa-chegou','P41','Aguardando o cliente','chamados','app','docs/fluxo/app/pro-chegou.png',["RN-80: depois do “Cheguei”, contador de 10 min; o cliente é avisado","“Cliente não apareceu” só libera depois da espera","“Iniciar serviço” quando o cliente abre a porta","Protótipo: relógio 20× mais rápido (10 min = 30 s)"]],
+  ['p42','P42','Folha · cliente não apareceu','chamados','app','docs/fluxo/app/pro-cliente-nao-apareceu.png',["RN-81: encerra o chamado e recebe só a visita","Não conta como visita sem serviço (a ausência é do cliente)"]],
   ['pa-msgs','—','Mensagens do profissional','chamados','app','docs/fluxo/app/pro-mensagens.png',["Em andamento e Anteriores; busca por nome","Selos: valor combinado (verde) e proposta (laranja)"]],
   ['pa-msgs0','—','Mensagens · vazio','chamados','app','docs/fluxo/app/pro-mensagens-vazio.png'],
   ['pa-msgs1','—','Chat · opções','chamados','app','docs/fluxo/app/pro-chat-opcoes.png',["Abre tocando no nome do cliente","No app, Ligar e Ver chamado ainda mostram “em breve”"]],
@@ -812,6 +816,16 @@ const LIGACOES = [
   ['p24l','p24','Abrir Ajustes · Agora não','t'],
   ['p31','p31n','App de navegação','t'],
   ['pa-chegou','p25','Iniciar serviço','t'],
+  ['pa-chegou','p42','Cliente não apareceu · depois de 10 min','t'],
+  ['p42','pa-chegou','Esperar mais','t'],
+  ['p42','p20','Encerrar e receber a visita','t'],
+  ['pa-chegou','c132','o cliente é avisado','s'],
+  ['c85t','c132','Continuar esperando · ela chega','a'],
+  ['c132','c85','O código confere','t'],
+  ['c132','c85','Não é essa pessoa · Segurança','t'],
+  ['c132','c95','10 min sem abrir · ela encerra','a'],
+  ['c95','c03','Pedir de novo','t'],
+  ['c95','c96','3ª ausência em 30 dias','a'],
 
   ['p25','p20','Concluir serviço · cliente cobrado','t'],
   ['p25','pa-so-visita','Encerrar e cobrar só a visita','t'],

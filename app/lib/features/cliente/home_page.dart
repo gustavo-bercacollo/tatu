@@ -14,6 +14,10 @@ import '../../data/perfil.dart';
 import '../../data/servicos.dart';
 import '../../data/sugestao_servico.dart';
 import '../../shared/widgets/abas_cliente.dart';
+import '../../shared/widgets/conta_pausada.dart';
+import '../../data/ajuda.dart';
+import 'ajuda/abrir_ajuda.dart';
+import '../../data/prazos.dart';
 import '../../shared/widgets/espaco_anuncio.dart';
 import '../../shared/widgets/avatar_usuario.dart';
 import '../../shared/widgets/folha.dart';
@@ -64,11 +68,17 @@ class _HomeClientePageState extends State<HomeClientePage> {
   void initState() {
     super.initState();
     _focoDescricao.addListener(() => setState(() {}));
+    conta.addListener(_contaMudou);
+  }
+
+  void _contaMudou() {
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
     _espera?.cancel();
+    conta.removeListener(_contaMudou);
     _descricao.dispose();
     _focoDescricao.dispose();
     super.dispose();
@@ -157,7 +167,30 @@ class _HomeClientePageState extends State<HomeClientePage> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         _cabecalho(),
-                        const SizedBox(height: 40),
+                        // RN-82: ausências demais pausam a conta.
+                        ListenableBuilder(
+                          listenable: conta,
+                          builder: (_, _) => conta.pausadaPorAusencias
+                              ? Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: TatuMedidas.entreSecoes,
+                                  ),
+                                  child: AvisoContaPausada(
+                                    motivo:
+                                        '${conta.ausenciasRecentes} ausências em '
+                                        '${Prazos.janelaAusencias.inDays} dias.',
+                                    destaque: 'Fale com o suporte para voltar a pedir.',
+                                    onTap: () =>
+                                        abrirSuporte(context, conteudoCliente),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                        SizedBox(
+                          height: conta.pausadaPorAusencias
+                              ? TatuMedidas.entreSecoes + 4
+                              : 40,
+                        ),
                         ListenableBuilder(
                           listenable: conta,
                           builder: (_, _) => Text(
@@ -283,7 +316,10 @@ class _HomeClientePageState extends State<HomeClientePage> {
                       ),
                       const SizedBox(height: 8),
                       FilledButton(
-                        onPressed: _naoSei
+                        // RN-82: conta pausada não chama ninguém.
+                        onPressed: conta.pausadaPorAusencias
+                            ? null
+                            : _naoSei
                             ? (_descricao.text.trim().isEmpty
                                   ? null
                                   : () => chamarProfissional(
@@ -294,7 +330,9 @@ class _HomeClientePageState extends State<HomeClientePage> {
                             ? null
                             : () => chamarProfissional(context, servico),
                         child: Text(
-                          _naoSei
+                          conta.pausadaPorAusencias
+                              ? 'Chamar profissional'
+                              : _naoSei
                               ? (_descricao.text.trim().isEmpty
                                     ? 'Descreva o problema'
                                     : 'Chamar profissional')

@@ -1,6 +1,8 @@
+import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 
 import '../shared/formatadores.dart';
+import 'prazos.dart';
 
 /// Dados da conta da pessoa logada. Versão simulada (sem backend).
 ///
@@ -22,6 +24,35 @@ class ContaRepo extends ChangeNotifier {
   /// Pedido em andamento impede excluir a conta.
   bool pedidoEmAndamento = false;
 
+  /// RN-82: quando o cliente não apareceu (profissional esperou e
+  /// cobrou a visita).
+  List<DateTime> ausencias = [];
+
+  /// Ausências dentro de [Prazos.janelaAusencias].
+  int get ausenciasRecentes {
+    final desde = clock.now().subtract(Prazos.janelaAusencias);
+    return ausencias.where((d) => d.isAfter(desde)).length;
+  }
+
+  /// RN-82: conta pausada até falar com o suporte; não chama ninguém.
+  bool get pausadaPorAusencias =>
+      ausenciasRecentes >= Prazos.ausenciasParaPausar;
+
+  void registrarAusencia() {
+    ausencias = [...ausencias, clock.now()];
+    notifyListeners();
+  }
+
+  /// Simula a conta pausada por ausências (RN-82), para a demo.
+  void pausarPorAusenciasParaDemo() {
+    final agora = clock.now();
+    ausencias = [
+      for (var i = 0; i < Prazos.ausenciasParaPausar; i++)
+        agora.subtract(Duration(days: 3 + i * 6)),
+    ];
+    notifyListeners();
+  }
+
   String get nomeCompleto => '$nome $sobrenome'.trim();
 
   /// "+55 (11) 98888-7777" (null sem celular).
@@ -34,6 +65,7 @@ class ContaRepo extends ChangeNotifier {
     celular = '11988887777';
     email = 'ana@email.com';
     pedidoEmAndamento = false;
+    ausencias = [];
     notifyListeners();
   }
 

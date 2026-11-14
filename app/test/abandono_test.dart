@@ -185,6 +185,7 @@ void main() {
       await t.pumpAndSettle();
       expect(find.text('A Luiza está atrasada'), findsNothing);
       expect(pedidos.andamento?.esperandoAtraso, isTrue);
+      pedidos.restaurar(); // RN-80: ela chegou; para o relógio da espera
     });
   });
 }

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Ausência · visita cobrada</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="196.5" cy="200" r="44" fill="#FFF4E0"/>
+  <g transform="translate(174.5,178) scale(1.8333333333333333)" fill="none" stroke="#A85F00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 7v5l3 3"/></g>
+  <text x="196.5" y="300" font-size="26" font-weight="700" fill="#000000" text-anchor="middle" letter-spacing="-0.5">Você não estava no local</text>
+  <text x="196.5" y="330" font-size="16" font-weight="400" fill="#8E8E93" text-anchor="middle">A visita foi cobrada: R$ 40,00</text>
+  <rect x="20" y="380" width="353" height="96" rx="18" fill="#F2F2F7"/>
+  <text x="36" y="412" font-size="15" font-weight="500" fill="#000000" text-anchor="start">A Luiza esperou 10 minutos na porta.</text>
+  <text x="36" y="436" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="start">O serviço não foi cobrado.</text>
+  <rect x="20" y="687" width="353" height="56" rx="28.0" fill="#1C1C1E"/>
+  <text x="196.5" y="721.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Pedir de novo</text>
+  <text x="196.5" y="802" font-size="15" font-weight="600" fill="#007AFF" text-anchor="middle">Algo errado? Avise em até 24h</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>

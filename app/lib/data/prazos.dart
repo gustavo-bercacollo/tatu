@@ -18,6 +18,14 @@ abstract final class Prazos {
   static const abandonosParaPausar = 3;
   static const janelaAbandonos = Duration(days: 30);
 
+  /// RN-80/RN-81: espera do profissional na porta depois do "Cheguei";
+  /// depois dela, libera "Cliente não apareceu".
+  static const esperaCliente = Duration(minutes: 10);
+
+  /// RN-82: ausências do cliente que pausam a conta dentro da janela.
+  static const ausenciasParaPausar = 3;
+  static const janelaAusencias = Duration(days: 30);
+
   /// Protótipo: os relógios andam [aceleracao] vezes mais rápido, para a
   /// demo não esperar 10 minutos de verdade (1 s real = 20 s no app).
   /// Nos testes fica 1 (tempo real, controlado pelo teste).

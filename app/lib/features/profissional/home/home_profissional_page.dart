@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../data/seguranca.dart';
 import '../../entrada/seguranca.dart';
+
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_colors.dart';
@@ -13,6 +14,7 @@ import '../../../core/theme/tatu_theme.dart';
 import '../../../data/ajuda.dart';
 import '../../../data/prazos.dart';
 import '../../../data/profissional.dart';
+import '../../../shared/widgets/conta_pausada.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../cliente/ajuda/abrir_ajuda.dart';
 import '../../../shared/widgets/avatar_usuario.dart';
@@ -193,71 +195,16 @@ class _ContaPausada extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = profissional;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-      decoration: BoxDecoration(
-        color: TatuColors.dangerSoft,
-        borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(
-            TablerIcons.alert_triangle,
-            size: 22,
-            color: TatuColors.danger,
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Conta pausada',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: TatuColors.danger,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  p.pausadaPorAbandonos
-                      // RN-79: 3 abandonos em 30 dias.
-                      ? '${p.abandonosRecentes} chamados abandonados em '
-                            '${Prazos.janelaAbandonos.inDays} dias. '
-                            'Fale com o suporte para voltar.'
-                      : '${p.visitasSemServico} das últimas $janelaVisitas '
-                            'visitas terminaram sem serviço. Fale com o '
-                            'suporte para voltar.',
-                  style: const TextStyle(
-                    fontSize: 15,
-                    height: 1.35,
-                    color: TatuColors.danger,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: TatuColors.danger,
-                      foregroundColor: TatuColors.onAction,
-                      minimumSize: const Size(0, 32),
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      textStyle: Theme.of(context).textTheme.labelLarge
-                          ?.copyWith(fontSize: 15, fontWeight: FontWeight.w600),
-                    ),
-                    onPressed: () =>
-                        abrirSuporte(context, conteudoProfissional),
-                    child: const Text('Falar com o suporte'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+    return AvisoContaPausada(
+      motivo: p.pausadaPorAbandonos
+          // RN-79: 3 abandonos em 30 dias.
+          ? '${p.abandonosRecentes} chamados abandonados em '
+                '${Prazos.janelaAbandonos.inDays} dias. '
+                'Fale com o suporte para voltar.'
+          : '${p.visitasSemServico} das últimas $janelaVisitas '
+                'visitas terminaram sem serviço. Fale com o '
+                'suporte para voltar.',
+      onSuporte: () => abrirSuporte(context, conteudoProfissional),
     );
   }
 }
