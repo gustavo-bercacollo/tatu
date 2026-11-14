@@ -99,10 +99,16 @@ class _ChatSuportePageState extends State<ChatSuportePage> {
                 minha: m.minha,
               ),
             ),
-            child: BalaoChat(texto: m.texto, minha: m.minha),
+            // Com o suporte, contato pode (ex.: e-mail para o recibo).
+            child: BalaoChat(
+              texto: m.texto,
+              minha: m.minha,
+              ocultarContato: false,
+            ),
           ),
       ],
       rodape: BarraMensagem(
+        bloquearContato: false,
         controller: _campo,
         onEnviar: _enviar,
         onCamera: () => ScaffoldMessenger.of(context)

@@ -2182,6 +2182,32 @@ void main() {
     await _capturar(t, 'pro-chat', const ChatProfissionalPage());
   });
 
+  // RN-85: telefone digitado não é enviado.
+  testWidgets('pro-chat-contato-bloqueado', (t) async {
+    await _capturar(
+      t,
+      'pro-chat-contato-bloqueado',
+      const ChatProfissionalPage(),
+      preparar: () async {
+        await t.enterText(
+          find.byType(TextField).last,
+          'me chama no 11 98888-7777',
+        );
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-85: contato recebido aparece oculto.
+  testWidgets('chat-contato-oculto', (t) async {
+    final c = ConversasRepo().conversas.first
+      ..valor = null
+      ..mensagens.add(
+        MensagemChat(texto: 'Se precisar de novo, me chama no 11 97777-1234'),
+      );
+    await _capturar(t, 'chat-contato-oculto', ChatPage(conversa: c));
+  });
+
   Future<void> enviarValor(WidgetTester t, String centavos) async {
     await t.tap(find.text('Enviar valor').last);
     await t.pumpAndSettle();

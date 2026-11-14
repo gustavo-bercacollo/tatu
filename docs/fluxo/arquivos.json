@@ -220,6 +220,8 @@
  "app/cliente-na-porta.png": "docs/fluxo/app/cliente-na-porta.png",
  "app/cliente-ausente.png": "docs/fluxo/app/cliente-ausente.png",
  "app/cliente-home-pausada.png": "docs/fluxo/app/cliente-home-pausada.png",
+ "app/pro-chat-contato-bloqueado.png": "docs/fluxo/app/pro-chat-contato-bloqueado.png",
+ "app/chat-contato-oculto.png": "docs/fluxo/app/chat-contato-oculto.png",
  "app/cliente-verificar.png": "docs/fluxo/app/cliente-verificar.png",
  "app/cliente-camera-documento.png": "docs/fluxo/app/cliente-camera-documento.png",
  "app/cliente-camera-selfie.png": "docs/fluxo/app/cliente-camera-selfie.png",

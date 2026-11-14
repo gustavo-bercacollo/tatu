@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
+import '../contato_oculto.dart';
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
 import '../../core/theme/tatu_texto.dart';
@@ -160,7 +161,15 @@ class BalaoChat extends StatelessWidget {
     this.legenda,
     this.falhou = false,
     this.onTentarDeNovo,
+    this.ocultarContato = true,
+    this.outro,
   });
+
+  /// RN-85: contatos em mensagens recebidas aparecem como "contato oculto".
+  final bool ocultarContato;
+
+  /// "a Luiza", para a nota embaixo do contato oculto.
+  final String? outro;
 
   final String? texto;
   final bool minha;
@@ -172,10 +181,34 @@ class BalaoChat extends StatelessWidget {
   final bool falhou;
   final VoidCallback? onTentarDeNovo;
 
+  /// O texto com cada contato trocado pela pílula "contato oculto".
+  TextSpan _textoComContato(List<TrechoContato> oculto) {
+    final t = texto ?? '';
+    if (oculto.isEmpty) return TextSpan(text: t);
+    final partes = <InlineSpan>[];
+    var i = 0;
+    for (final c in oculto) {
+      if (c.inicio > i) partes.add(TextSpan(text: t.substring(i, c.inicio)));
+      partes.add(
+        const WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: _PilulaOculta(),
+        ),
+      );
+      i = c.fim;
+    }
+    if (i < t.length) partes.add(TextSpan(text: t.substring(i)));
+    return TextSpan(children: partes);
+  }
+
   @override
   Widget build(BuildContext context) {
     final largura = MediaQuery.sizeOf(context).width;
     final raio = BorderRadius.circular(TatuMedidas.raioOpcao);
+    // RN-85: só nas mensagens recebidas (as minhas nunca saem com contato).
+    final oculto = !minha && !foto && ocultarContato && texto != null
+        ? acharContatos(texto!)
+        : const <TrechoContato>[];
     final Widget balao = foto
         ? ClipRRect(
             borderRadius: raio,
@@ -200,8 +233,8 @@ class BalaoChat extends StatelessWidget {
                 color: minha ? TatuColors.action : TatuColors.fill,
                 borderRadius: raio,
               ),
-              child: Text(
-                texto ?? '',
+              child: Text.rich(
+                _textoComContato(oculto),
                 style: TextStyle(
                   fontSize: 17,
                   height: 1.3,
@@ -249,26 +282,205 @@ class BalaoChat extends StatelessWidget {
             padding: const EdgeInsets.only(top: 6),
             child: Text(legenda!, style: TatuTexto.nota),
           ),
+        if (oculto.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: TatuMedidas.entreItens + 4),
+            child: _NotaContatoOculto(outro: outro),
+          ),
       ],
     );
   }
 }
 
-/// Barra embaixo do chat: câmera e campo "Mensagem".
+/// Pílula cinza com cadeado no lugar de um contato (RN-85).
+class _PilulaOculta extends StatelessWidget {
+  const _PilulaOculta();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: TatuColors.fill,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            TablerIcons.lock,
+            size: 15,
+            color: TatuColors.textSecondary,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            'contato oculto',
+            style: TatuTexto.corpo.copyWith(
+              fontWeight: FontWeight.w600,
+              color: TatuColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Cartão cinza embaixo de uma mensagem com contato oculto (RN-85).
+class _NotaContatoOculto extends StatelessWidget {
+  const _NotaContatoOculto({this.outro});
+
+  final String? outro;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: TatuColors.surfaceGrouped,
+        borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            TablerIcons.shield_check,
+            size: 22,
+            color: TatuColors.textSecondary,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Telefones e redes ficam ocultos.',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  outro == null
+                      ? 'Chame de novo pelo app, com garantia.'
+                      : 'Chame $outro de novo pelo app, com garantia.',
+                  style: TatuTexto.nota,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Aviso amarelo acima do campo quando há contato no texto (RN-85).
+class _AvisoContato extends StatelessWidget {
+  const _AvisoContato({required this.titulo, required this.texto});
+
+  final String titulo;
+  final String texto;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: TatuColors.warningSoft,
+        borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            TablerIcons.lock,
+            size: 22,
+            color: TatuColors.warningTexto,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  titulo,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: TatuColors.warningTexto,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  texto,
+                  style: TatuTexto.nota.copyWith(
+                    color: TatuColors.warningTexto,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Barra embaixo do chat: câmera e campo "Mensagem". Com
+/// [bloquearContato], telefone, e-mail, endereço, @ e links não são
+/// enviados: a borda fica preta e aparece o aviso amarelo (RN-85).
 class BarraMensagem extends StatelessWidget {
   const BarraMensagem({
     super.key,
     required this.controller,
     required this.onEnviar,
     required this.onCamera,
+    this.bloquearContato = true,
+    this.porQue = 'Pelo Tatu o serviço tem garantia.',
   });
 
   final TextEditingController controller;
   final VoidCallback onEnviar;
   final VoidCallback onCamera;
+  final bool bloquearContato;
+
+  /// Explicação no aviso (muda entre cliente e profissional).
+  final String porQue;
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) {
+        final contato = bloquearContato
+            ? contatoNoTexto(controller.text)
+            : null;
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (contato != null) ...[
+              _AvisoContato(
+                titulo: contato.aviso,
+                texto: contato == TipoContato.endereco
+                    // RN-28: o endereço vai sozinho depois do valor.
+                    ? 'O endereço vai pelo app depois que o valor é '
+                          'confirmado.'
+                    : porQue,
+              ),
+              const SizedBox(height: TatuMedidas.entreItens + 4),
+            ],
+            _linha(context, bloqueado: contato != null),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _linha(BuildContext context, {required bool bloqueado}) {
+    void enviar() {
+      if (!bloqueado) onEnviar();
+    }
+
     return Row(
       children: [
         Semantics(
@@ -294,13 +506,17 @@ class BarraMensagem extends StatelessWidget {
             height: TatuMedidas.alturaChip,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             alignment: Alignment.centerLeft,
-            decoration: const ShapeDecoration(
-              color: TatuColors.fill,
-              shape: StadiumBorder(),
+            decoration: ShapeDecoration(
+              color: bloqueado ? TatuColors.bg : TatuColors.fill,
+              shape: StadiumBorder(
+                side: bloqueado
+                    ? const BorderSide(color: TatuColors.action, width: 1.5)
+                    : BorderSide.none,
+              ),
             ),
             child: TextField(
               controller: controller,
-              onSubmitted: (_) => onEnviar(),
+              onSubmitted: (_) => enviar(),
               textInputAction: TextInputAction.send,
               cursorColor: TatuColors.textPrimary,
               style: const TextStyle(fontSize: 17),
@@ -315,11 +531,10 @@ class BarraMensagem extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        // Enviar (como no WhatsApp): preto quando há texto.
-        ListenableBuilder(
-          listenable: controller,
-          builder: (context, _) {
-            final temTexto = controller.text.trim().isNotEmpty;
+        // Enviar (como no WhatsApp): preto quando há texto que pode ir.
+        Builder(
+          builder: (context) {
+            final temTexto = controller.text.trim().isNotEmpty && !bloqueado;
             return Semantics(
               button: true,
               label: 'Enviar mensagem',
@@ -328,7 +543,7 @@ class BarraMensagem extends StatelessWidget {
                 shape: const CircleBorder(),
                 child: InkWell(
                   customBorder: const CircleBorder(),
-                  onTap: temTexto ? onEnviar : null,
+                  onTap: temTexto ? enviar : null,
                   child: SizedBox(
                     width: 36,
                     height: 36,

@@ -361,7 +361,11 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
                 minha: m.$2,
               ),
             ),
-            child: BalaoChat(texto: m.$1, minha: m.$2),
+            child: BalaoChat(
+              texto: m.$1,
+              minha: m.$2,
+              outro: '${c.feminino ? 'a' : 'o'} $_nome',
+            ),
           ),
         const SizedBox(height: TatuMedidas.entreSecoes),
         if (_encerrada) _Concluido(valor: widget.concluidoPor!),
@@ -440,10 +444,14 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
                   ),
                   const SizedBox(height: TatuMedidas.entreItens),
                 ],
+                // RN-85: contato não passa pelo chat.
                 BarraMensagem(
                   controller: _campo,
                   onEnviar: _enviar,
                   onCamera: () => _emBreve('Mandar foto'),
+                  porQue:
+                      'Pelo Tatu você recebe garantido, e o serviço conta '
+                      'para sua nota.',
                 ),
               ],
             ),

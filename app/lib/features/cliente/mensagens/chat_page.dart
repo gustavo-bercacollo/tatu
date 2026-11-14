@@ -270,6 +270,7 @@ class _ChatPageState extends State<ChatPage> {
                 child: BalaoChat(
                   texto: m.texto,
                   minha: m.minha,
+                  outro: '${_c.artigo} ${_c.primeiroNome}',
                   foto: m.foto,
                   imagem: m.imagem,
                   legenda: i == ultimaFotoMinha && m.hora != null
@@ -296,10 +297,14 @@ class _ChatPageState extends State<ChatPage> {
                       const _SemInternet(),
                       const SizedBox(height: TatuMedidas.entreItens),
                     ],
+                    // RN-85: contato não passa pelo chat.
                     BarraMensagem(
                       controller: _campo,
                       onEnviar: _enviar,
                       onCamera: _anexar,
+                      porQue:
+                          'Pelo Tatu o serviço tem garantia. Chame '
+                          '${_c.artigo} ${_c.primeiroNome} de novo pelo app.',
                     ),
                   ],
                 ),
