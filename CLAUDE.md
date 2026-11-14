@@ -1,5 +1,7 @@
 # Tatu
 
+> Regras de negócio oficiais (fonte única, numeradas RN-xx): `docs/regras-de-negocio.md`. Se este arquivo e as regras discordarem, valem as regras.
+
 App brasileiro que liga quem precisa de ajuda urgente em casa (encanador, eletricista, pedreiro…) ao profissional disponível mais perto, no estilo Uber/iFood. Diferencial: velocidade, **um profissional por vez**, sem orçamentos para comparar. O app será mostrado a investidores.
 
 Fundador: Gustavo. Fala português; quer respostas **curtas e diretas**. Textos do app 100% em português do Brasil.
