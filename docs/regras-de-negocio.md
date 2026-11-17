@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 17/11/2026 (v17)
+Atualizado em 17/11/2026 (v18)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -157,6 +157,9 @@ A segurança vem de saber quem é cada pessoa, não de confiar no que ela declar
 | RN-125 | O que é arriscado só passa pela entrega à distância, nunca pela conversa. Na entrega, o profissional escolhe Arquivo ou Link do site. Link do site vale para qualquer serviço à distância; programa pronto (.apk, .exe) e script/código-fonte só nas profissões de tecnologia (ex.: Programador). |
 | RN-126 | Proteções da entrega: antivírus em todo arquivo e verificação de site perigoso em todo link, antes de chegar ao cliente; se der problema, a entrega é barrada. O app nunca abre nem roda o arquivo: o cliente só baixa, depois do aviso "Arquivo executável · abra só se você pediu". A entrega fica registrada; se for vírus, a conta é banida (RN-122). |
 | RN-127 | A prévia protegida (RN-99) aceita só imagem, vídeo, PDF ou link de teste. Nada executável. |
+| RN-133 | Cliente e profissional podem denunciar um ao outro pelo menu do chat ("Denunciar" / "Denunciar cliente"). Motivos: comportamento inadequado, assédio ou discriminação, golpe ou pagamento por fora, perfil falso, outro. Dá para contar mais (opcional). A denúncia não é mostrada para o denunciado. |
+| RN-134 | Qualquer mensagem pode ser denunciada: segurar a mensagem → "Denunciar mensagem". Motivos: assédio ou ofensa, conteúdo sexual, ameaça ou chantagem, golpe ou pagamento por fora, outro. A mensagem some da conversa de quem denunciou (vira "Mensagem denunciada · em análise") e o suporte recebe a mensagem com o contexto da conversa. |
+| RN-135 | O suporte analisa toda denúncia. Assédio ou discriminação segue a RN-56 (bloqueio imediato entre os dois). Várias denúncias confirmadas levam a pausa ou suspensão (RN-128 a RN-132). Denúncia falsa feita de propósito e repetida também pune quem denunciou. |
 
 ## 7. Bloqueios e penalidades
 
@@ -252,11 +255,13 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-15 | Menor de idade usando o app, como cliente ou profissional. | Resolvido em parte · "só menor em casa" para depois | RN-110 a RN-112, RN-114 |
 | P-16 | Envio de arquivos maliciosos ou +18, inclusive venda ou troca de material de menores. | Resolvido | RN-119 a RN-124 |
 | P-17 | Conta suspensa com atendimentos ainda em andamento. | Resolvido | RN-128 a RN-132 |
+| P-18 | Denunciar profissional, cliente e mensagem. | Resolvido | RN-133 a RN-135 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 17/11/2026 | RN-133 a RN-135 | Denúncias: pessoa pelo menu do chat (motivos atualizados), mensagem ao segurar, análise do suporte. |
 | 17/11/2026 | RN-128 a RN-132 | Conta pausada ou suspensa com atendimentos em andamento: pausa não afeta, suspensão encerra com regras de dinheiro para cada lado. |
 | 17/11/2026 | — | P-06 (preço abusivo) adiado: a proposta não foi aprovada, decidir depois. |
 | 17/11/2026 | RN-119, RN-124 a RN-127 | Sem links no chat. Link do site, programa e script só pela entrega à distância, com antivírus, verificação e aviso. |
