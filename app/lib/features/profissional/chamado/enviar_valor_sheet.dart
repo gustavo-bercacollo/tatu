@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/profissional.dart';
+import '../../../data/regras_distancia.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/folha.dart';
 
@@ -13,7 +15,11 @@ class ValorProposto {
   const ValorProposto({
     required this.visita,
     required this.servico,
+    this.sinal = 0,
   });
+
+  /// RN-102: sinal pedido à distância (0 = sem sinal).
+  final double sinal;
 
   /// Fica com o profissional mesmo se o serviço não acontecer.
   final double visita;
@@ -59,6 +65,8 @@ class _FolhaValor extends StatefulWidget {
 }
 
 class _FolhaValorState extends State<_FolhaValor> {
+  /// RN-102: "Pedir sinal" (só à distância).
+  bool _sinal = false;
   final _visita = TextEditingController();
   final _servico = TextEditingController();
   final _focoVisita = FocusNode();
@@ -90,6 +98,7 @@ class _FolhaValorState extends State<_FolhaValor> {
       // RN-95: à distância não tem visita.
       visita: d ? 0 : _ler(_visita),
       servico: _ler(_servico),
+      sinal: d && _sinal ? RegrasDistancia.sinalDe(_ler(_servico)) : 0,
     );
     final total = valor.total;
     final taxa = total * taxaTatu;
@@ -116,19 +125,68 @@ class _FolhaValorState extends State<_FolhaValor> {
                 const SizedBox(height: 6),
                 Text(
                   d
-                      ? 'À distância não tem visita, só o serviço.'
+                      ? 'À distância não tem visita.'
                       : 'A ${widget.cliente} pode aceitar ou propor outro valor.',
                   style: TatuTexto.corpo,
                 ),
                 const SizedBox(height: TatuMedidas.entreItens + 4),
-                if (d)
+                if (d) ...[
                   _CampoValor(
                     rotulo: 'Serviço',
                     controller: _servico,
                     foco: _focoServico,
                     autofocus: true,
                     onMudar: () => setState(() {}),
-                  )
+                  ),
+                  const SizedBox(height: TatuMedidas.entreItens),
+                  // RN-102/RN-103: sinal de até 30%, liberado na 1ª entrega.
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(16, 10, 12, 12),
+                    decoration: BoxDecoration(
+                      color: TatuColors.fill,
+                      borderRadius: BorderRadius.circular(
+                        TatuMedidas.raioCampo,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Pedir sinal', style: TatuTexto.nota),
+                              Text(
+                                reaisInteiros(
+                                  RegrasDistancia.sinalDe(_ler(_servico)),
+                                ),
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                  color: _sinal
+                                      ? TatuColors.textPrimary
+                                      : TatuColors.textDisabled,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        CupertinoSwitch(
+                          value: _sinal,
+                          activeTrackColor: TatuColors.online,
+                          inactiveTrackColor: TatuColors.trilho,
+                          onChanged: (v) => setState(() => _sinal = v),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Até ${(RegrasDistancia.sinalMaximo * 100).round()}% do '
+                    'valor. Você recebe o sinal ao mandar a 1ª entrega, '
+                    'mesmo se a ${widget.cliente} não aprovar.',
+                    style: TatuTexto.nota,
+                  ),
+                ]
                 else ...[
                 Row(
                   children: [

@@ -22,8 +22,8 @@ const etapasPedidoDistancia = [
   'Pedido feito',
   'Valor combinado',
   'Em andamento',
-  'Entrega pelo chat',
-  'Pagamento',
+  'Entrega aprovada',
+  'Pagamento do restante',
 ];
 
 /// Nomes curtos das etapas à distância.
@@ -65,13 +65,23 @@ class PedidoAndamento {
     this.visita = 40,
     this.codigo = '4821',
     this.distancia = false,
+    this.sinal = 0,
   });
 
   /// RN-92: pedido à distância (sem visita, rota, porta nem escudo).
   final bool distancia;
 
-  /// Etapas deste pedido (no local ou à distância).
-  List<String> get etapas => distancia ? etapasPedidoDistancia : etapasPedido;
+  /// RN-103: sinal já pago à distância (0 = sem sinal).
+  final num sinal;
+
+  /// Etapas deste pedido (no local ou à distância; com sinal, "Valor
+  /// combinado · sinal pago").
+  List<String> get etapas => !distancia
+      ? etapasPedido
+      : [
+          for (final e in etapasPedidoDistancia)
+            e == 'Valor combinado' && sinal > 0 ? '$e · sinal pago' : e,
+        ];
   List<String> get etapasCurtasDoPedido =>
       distancia ? etapasCurtasDistancia : etapasCurtas;
 
@@ -102,6 +112,7 @@ class PedidoAndamento {
 
   PedidoAndamento copiar({
     int? etapasFeitas,
+    num? sinal,
     bool? aindaNaoSaiu,
     DateTime? saiuEm,
     bool? esperandoAtraso,
@@ -124,6 +135,7 @@ class PedidoAndamento {
     visita: visita,
     codigo: codigo,
     distancia: distancia,
+    sinal: sinal ?? this.sinal,
   );
 
   /// "A Luiza", "O Carlos".
@@ -415,14 +427,15 @@ class PedidosRepo extends ChangeNotifier {
 
   /// O cliente confirmou o valor (RN-76). Protótipo: o profissional não
   /// toca em "Estou a caminho", para mostrar o fluxo de quem não aparece.
-  void valorConfirmado() {
+  void valorConfirmado({num sinal = 0}) {
     final p = andamento;
     if (p == null) return;
     _pararRelogios();
     // RN-95: à distância, confirmado o valor, vai direto para Em
-    // andamento (sem prazo para sair, rota nem porta).
+    // andamento (sem prazo para sair, rota nem porta). RN-103: o sinal
+    // é cobrado agora.
     if (p.distancia) {
-      andamento = p.copiar(etapasFeitas: 3);
+      andamento = p.copiar(etapasFeitas: 3, sinal: sinal);
       notifyListeners();
       return;
     }
@@ -518,6 +531,15 @@ class PedidosRepo extends ChangeNotifier {
     _pararRelogios();
     andamento = p.copiar(etapasFeitas: 3, chegouEm: clock.now());
     _prazoEspera = Timer(Prazos.naDemo(Prazos.esperaCliente), clienteAusente);
+    notifyListeners();
+  }
+
+  /// RN-100: o cliente aprovou a entrega à distância; o restante é
+  /// cobrado.
+  void entregaAprovada() {
+    final p = andamento;
+    if (p == null || !p.distancia) return;
+    andamento = p.copiar(etapasFeitas: 5);
     notifyListeners();
   }
 

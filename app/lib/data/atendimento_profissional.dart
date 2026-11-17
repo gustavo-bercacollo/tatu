@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import 'regras_distancia.dart';
 import 'servico_profissional.dart';
 
 /// Em que ponto está o chamado que o profissional aceitou.
@@ -39,6 +40,18 @@ class AtendimentoProfissionalRepo extends ChangeNotifier {
   EtapaAtendimento etapa = EtapaAtendimento.combinando;
   DateTime? inicio;
 
+  /// RN-101: entregas enviadas neste valor (à distância).
+  int entregas = 0;
+
+  /// RN-99: prévias protegidas enviadas (sem limite).
+  int previas = 0;
+
+  /// RN-101: ainda pode mandar entrega?
+  bool get podeEntregar => entregas < RegrasDistancia.maxEntregas;
+
+  /// RN-103: o sinal é liberado na 1ª entrega.
+  bool get sinalLiberado => entregas > 0;
+
   bool get ativo => chamado != null || servico != null;
 
   void restaurar() {
@@ -46,6 +59,21 @@ class AtendimentoProfissionalRepo extends ChangeNotifier {
     servico = null;
     etapa = EtapaAtendimento.combinando;
     inicio = null;
+    entregas = 0;
+    previas = 0;
+    notifyListeners();
+  }
+
+  /// RN-99: mandou uma prévia protegida.
+  void enviarPrevia() {
+    previas++;
+    notifyListeners();
+  }
+
+  /// RN-101: mandou uma entrega (no máximo 2).
+  void enviarEntrega() {
+    if (!podeEntregar) return;
+    entregas++;
     notifyListeners();
   }
 
@@ -55,6 +83,8 @@ class AtendimentoProfissionalRepo extends ChangeNotifier {
     servico = null;
     etapa = EtapaAtendimento.combinando;
     inicio = null;
+    entregas = 0;
+    previas = 0;
     notifyListeners();
   }
 

@@ -138,7 +138,11 @@ class CartaoValorRecebido extends StatelessWidget {
     required this.onTrocar,
     required this.onPedirOutro,
     this.onParcelas,
+    this.nome = '',
   });
+
+  /// "a Marina" (para "O sinal paga o tempo da Marina.").
+  final String nome;
 
   final ValorProposta valor;
   final VoidCallback onConfirmar;
@@ -160,6 +164,11 @@ class CartaoValorRecebido extends StatelessWidget {
         const SizedBox(height: 4),
         _Total(valor.total),
         const SizedBox(height: TatuMedidas.entreItens + 4),
+        // RN-102/RN-103: sinal cobrado agora, restante quando aprovar.
+        if (valor.sinal > 0) ...[
+          _Sinal(valor: valor),
+          const SizedBox(height: 8),
+        ],
         Semantics(
           button: true,
           label: 'Trocar forma de pagamento',
@@ -206,8 +215,10 @@ class CartaoValorRecebido extends StatelessWidget {
           ),
         ],
         const SizedBox(height: TatuMedidas.entreItens),
-        const Text(
-          'Reservamos agora. Só cobramos no fim.',
+        Text(
+          valor.sinal > 0
+              ? 'O sinal paga o tempo ${_daDo(nome)}.'
+              : 'Reservamos agora. Só cobramos no fim.',
           style: TatuTexto.nota,
         ),
         const SizedBox(height: TatuMedidas.entreItens + 4),
@@ -547,6 +558,56 @@ class _LinhaAcao extends StatelessWidget {
           ],
         ),
       ),
+    ),
+  );
+}
+
+/// "a Marina" → "da Marina"; "o Tiago" → "do Tiago".
+String _daDo(String artigoNome) {
+  if (artigoNome.startsWith('a ')) return 'da ${artigoNome.substring(2)}';
+  if (artigoNome.startsWith('o ')) return 'do ${artigoNome.substring(2)}';
+  return 'do profissional';
+}
+
+/// Caixa cinza "Sinal · cobrado agora" e "Restante · quando aprovar".
+class _Sinal extends StatelessWidget {
+  const _Sinal({required this.valor});
+
+  final ValorProposta valor;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+    decoration: BoxDecoration(
+      color: TatuColors.fill,
+      borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
+    ),
+    child: Column(
+      children: [
+        Row(
+          children: [
+            const Expanded(
+              child: Text(
+                'Sinal · cobrado agora',
+                style: TextStyle(fontSize: 13),
+              ),
+            ),
+            Text(
+              reais(valor.sinal),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            const Expanded(
+              child: Text('Restante · quando aprovar', style: TatuTexto.nota),
+            ),
+            Text(reais(valor.restante), style: TatuTexto.nota),
+          ],
+        ),
+      ],
     ),
   );
 }

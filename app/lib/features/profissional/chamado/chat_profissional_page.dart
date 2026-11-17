@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../cliente/mensagens/entrega_distancia.dart' show LinhaArquivo;
+import '../../../core/theme/tatu_theme.dart';
+import '../../../data/regras_distancia.dart';
 import '../../../data/atendimento_profissional.dart';
 import 'ainda_vai.dart';
 import '../../../data/profissional.dart';
@@ -75,9 +78,14 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   Timer? _prazoSaida;
 
   /// (texto, minha): conversa de exemplo.
-  final _mensagens = <(String, bool)>[
-    ('Oi! A pia não para de vazar.', false),
-    ('Posso ir agora. Já te mando o valor.', true),
+  late final _mensagens = <(String, bool)>[
+    if (widget.chamado.distancia) ...[
+      ('Oi, ${widget.chamado.primeiroNome}! Que estilo você imagina?', true),
+      ('Algo simples e colorido.', false),
+    ] else ...[
+      ('Oi! A pia não para de vazar.', false),
+      ('Posso ir agora. Já te mando o valor.', true),
+    ],
   ];
 
   EstadoValor _estado = EstadoValor.inicio;
@@ -87,6 +95,9 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   double _minhaVisita = 0;
   double _proposta = 0; // proposta do cliente
   double _combinado = 0;
+
+  /// RN-102: sinal pedido no valor enviado (à distância).
+  double _meuSinal = 0;
 
   String get _nome => widget.chamado.primeiroNome;
 
@@ -212,6 +223,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
       _meuValor = v.total;
       _meuDetalhe = v.detalhe;
       _minhaVisita = v.visita;
+      _meuSinal = v.sinal;
       _estado = EstadoValor.aguardando;
     });
     _timer?.cancel();
@@ -256,8 +268,17 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   void _contarPrazoSaida() {
     _prazoSaida?.cancel();
     // RN-95: à distância não há "Estou a caminho" (abandono à distância
-    // ainda é decisão em aberto).
-    if (widget.chamado.distancia) return;
+    // ainda é decisão em aberto). O valor vira marcador (RN-103: sinal).
+    if (widget.chamado.distancia) {
+      setState(
+        () => _mensagens.add((
+          '${_esp}marca:Valor combinado · ${reais(_combinado)}'
+              '${_meuSinal > 0 ? ' · sinal de ${reaisInteiros(_meuSinal)} pago' : ''}',
+          false,
+        )),
+      );
+      return;
+    }
     _prazoSaida = Timer(
       Prazos.naDemo(Prazos.estouACaminho),
       _perguntarAindaVai,
@@ -320,7 +341,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
 
   /// RN-95: à distância, combinado o valor, vai direto para Em andamento
   /// (sem rota, "Cheguei" nem código na porta).
-  void _comecarDistancia() {
+  Future<void> _comecarDistancia() async {
     final c = widget.chamado;
     final s = ServicoAceito(
       cliente: c.cliente,
@@ -334,15 +355,135 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
       minutos: 0,
       feminino: c.feminino,
       distancia: true,
+      sinal: _meuSinal,
     );
     final agora = DateTime.now();
-    atendimentoProfissional
-      ..irAteCliente(s)
-      ..iniciar(agora);
-    Navigator.of(context).pushReplacement(
+    if (atendimentoProfissional.etapa != EtapaAtendimento.emServico) {
+      atendimentoProfissional
+        ..irAteCliente(s)
+        ..iniciar(agora);
+    }
+    _inicioDistancia ??= agora;
+    // Volta ao chat: de lá saem a prévia e a entrega (RN-99, RN-100).
+    final acao = await Navigator.of(context).push<String>(
       MaterialPageRoute(
-        builder: (_) => EmAndamentoPage(servico: s, inicio: agora),
+        builder: (_) => EmAndamentoPage(servico: s, inicio: _inicioDistancia!),
       ),
+    );
+    if (!mounted) return;
+    if (acao == 'previa') _enviarPrevia();
+    if (acao == 'entrega') _enviarEntrega();
+  }
+
+  DateTime? _inicioDistancia;
+
+  // ---------- Entrega à distância (RN-99 a RN-103) ----------
+
+  /// P112 · "O que você vai mandar?": prévia protegida ou entrega.
+  Future<void> _anexo() async {
+    final restantes =
+        RegrasDistancia.maxEntregas - atendimentoProfissional.entregas;
+    final escolha = await mostrarFolha<String>(
+      context,
+      builder: (ctx) => _FolhaAnexo(
+        cliente: _nome,
+        restantes: restantes,
+        onEscolher: (e) => Navigator.of(ctx).pop(e),
+      ),
+    );
+    if (!mounted) return;
+    if (escolha == 'previa') _enviarPrevia();
+    if (escolha == 'entrega') _enviarEntrega();
+  }
+
+  /// RN-99: prévia protegida, à vontade.
+  void _enviarPrevia() {
+    atendimentoProfissional.enviarPrevia();
+    setState(() => _mensagens.add(('${_esp}previa', true)));
+  }
+
+  /// RN-100/RN-101/RN-103: entrega (no máximo 2). Na 1ª, o sinal é
+  /// liberado. Protótipo: na 1ª a cliente pede ajuste; na 2ª, aprova.
+  void _enviarEntrega() {
+    final a = atendimentoProfissional;
+    if (!a.podeEntregar) return;
+    a.enviarEntrega();
+    final n = a.entregas;
+    final c = widget.chamado;
+    final ela = c.feminino ? 'a' : 'o';
+    setState(() {
+      // As prévias anteriores já foram vistas e expiraram.
+      for (var i = 0; i < _mensagens.length; i++) {
+        if (_mensagens[i].$1 == '${_esp}previa') {
+          _mensagens[i] = ('${_esp}previa:vista', true);
+        }
+      }
+      _mensagens
+        ..add(('${_esp}entrega:$n', true))
+        ..add((
+          '${_esp}nota:${n == 1 && _meuSinal > 0 ? 'Sinal de ${reaisInteiros(_meuSinal)} liberado · ' : ''}'
+              'aguardando $ela $_nome aprovar',
+          false,
+        ));
+    });
+    _timer?.cancel();
+    _timer = Timer(widget.resposta, () {
+      if (!mounted) return;
+      setState(() {
+        _mensagens.removeWhere((m) => m.$1.startsWith('${_esp}nota:'));
+        _mensagens.add(
+          n < RegrasDistancia.maxEntregas
+              ? (
+                  '${_esp}ajuste:Quero as letras maiores e o rosa um pouco '
+                      'mais claro.',
+                  false,
+                )
+              : ('${_esp}aprovada', false),
+        );
+      });
+    });
+  }
+
+  /// Balão especial (prévia, entrega, nota, ajuste, aprovada).
+  Widget _especial(String t) {
+    final c = widget.chamado;
+    final corpo = t.substring(1);
+    final max = RegrasDistancia.maxEntregas;
+    if (corpo.startsWith('previa')) {
+      return BalaoPrevia(
+        minha: true,
+        valida: !corpo.endsWith(':vista'),
+        vistaPor: _nome,
+      );
+    }
+    if (corpo.startsWith('entrega:')) {
+      final n = int.parse(corpo.substring(8));
+      final depois = _mensagens.any((m) => m.$1.startsWith('${_esp}ajuste:'));
+      if (depois && n == 1) {
+        return MarcadorChat('Entrega $n de $max enviada');
+      }
+      return _CartaoEntregaEnviada(
+        numero: n,
+        arquivo: n == 1 ? 'entrega-final.zip' : 'entrega-final-v2.zip',
+      );
+    }
+    if (corpo.startsWith('nota:')) return MarcadorChat(corpo.substring(5));
+    if (corpo.startsWith('marca:')) return MarcadorChat(corpo.substring(6));
+    if (corpo.startsWith('ajuste:')) {
+      final ultima = !_mensagens.any((m) => m.$1 == '${_esp}entrega:2');
+      return _AjustePedido(
+        cliente: _nome,
+        feminino: c.feminino,
+        texto: corpo.substring(7),
+        botoes: ultima,
+        onPrevia: _enviarPrevia,
+        onEntrega: _enviarEntrega,
+      );
+    }
+    // RN-100: a cliente aprovou: o restante é cobrado.
+    return MarcoConcluido(
+      '${c.feminino ? 'A' : 'O'} $_nome aprovou · ${reais(_combinado)}',
+      nota: false,
     );
   }
 
@@ -427,16 +568,21 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
           if (_concluida && i == _antes) ..._marco(),
           Padding(
             padding: EdgeInsets.only(
-              top: espacoAntesDoBalao(
-                anteriorMinha: i == 0 ? null : _mensagens[i - 1].$2,
-                minha: m.$2,
-              ),
+              top: m.$1.startsWith(_esp) ||
+                      (i > 0 && _mensagens[i - 1].$1.startsWith(_esp))
+                  ? 18
+                  : espacoAntesDoBalao(
+                      anteriorMinha: i == 0 ? null : _mensagens[i - 1].$2,
+                      minha: m.$2,
+                    ),
             ),
-            child: BalaoChat(
-              texto: m.$1,
-              minha: m.$2,
-              outro: '${c.feminino ? 'a' : 'o'} $_nome',
-            ),
+            child: m.$1.startsWith(_esp)
+                ? _especial(m.$1)
+                : BalaoChat(
+                    texto: m.$1,
+                    minha: m.$2,
+                    outro: '${c.feminino ? 'a' : 'o'} $_nome',
+                  ),
           ),
         ],
         if (_concluida && _mensagens.length == _antes) ..._marco(),
@@ -469,11 +615,13 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
                 onOutro: _enviarValor,
               ),
             ],
+            // À distância, o valor combinado vira marcador na conversa.
+            EstadoValor.combinado when c.distancia => const <Widget>[],
             EstadoValor.combinado => [
               _ValorCombinado(valor: _combinado),
               const SizedBox(height: TatuMedidas.entreItens),
-              // RN-28: no local, o endereço aparece; à distância não há.
-              if (!c.distancia) _EnderecoLiberado(chamado: c),
+              // RN-28: no local, o endereço aparece.
+              _EnderecoLiberado(chamado: c),
             ],
           },
         const SizedBox(height: TatuMedidas.entreItens),
@@ -526,7 +674,10 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
                 BarraMensagem(
                   controller: _campo,
                   onEnviar: _enviar,
-                  onCamera: () => _emBreve('Mandar foto'),
+                  // RN-99/RN-100: à distância, anexo é prévia ou entrega.
+                  onCamera: c.distancia && _estado == EstadoValor.combinado
+                      ? _anexo
+                      : () => _emBreve('Mandar foto'),
                   porQue:
                       'Pelo Tatu você recebe garantido, e o serviço conta '
                       'para sua nota.',
@@ -786,6 +937,245 @@ class SemAcordoPage extends StatelessWidget {
           'continua online para novos chamados.',
       principal: 'Voltar para o início',
       onPrincipal: () => Navigator.of(context).popUntil((r) => r.isFirst),
+    );
+  }
+}
+
+/// Prefixo das mensagens especiais da entrega à distância.
+const _esp = '\u0001';
+
+/// P112 · Folha "O que você vai mandar?" (RN-99, RN-101).
+class _FolhaAnexo extends StatelessWidget {
+  const _FolhaAnexo({
+    required this.cliente,
+    required this.restantes,
+    required this.onEscolher,
+  });
+
+  final String cliente;
+  final int restantes;
+  final ValueChanged<String> onEscolher;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget opcao({
+      required IconData icone,
+      required String titulo,
+      required String detalhe,
+      required String lado,
+      required VoidCallback? onTap,
+    }) => Opacity(
+      opacity: onTap == null ? 0.4 : 1,
+      child: Material(
+        color: TatuColors.fill,
+        borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            child: Row(
+              children: [
+                Icon(icone, size: 22),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        titulo,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(detalhe, style: TatuTexto.nota),
+                    ],
+                  ),
+                ),
+                Text(lado, style: TatuTexto.nota),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          TatuMedidas.margemCadastro,
+          10,
+          TatuMedidas.margemCadastro,
+          TatuMedidas.base + 16,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const AlcaFolha(),
+            const SizedBox(height: 22),
+            const Text(
+              'O que você vai mandar?',
+              style: TatuTexto.tituloFolha,
+            ),
+            const SizedBox(height: TatuMedidas.entreItens + 4),
+            opcao(
+              icone: TablerIcons.lock,
+              titulo: 'Prévia protegida',
+              detalhe: '$cliente só vê no app. Sem baixar, sem print.',
+              lado: 'à vontade',
+              onTap: () => onEscolher('previa'),
+            ),
+            const SizedBox(height: TatuMedidas.entreItens),
+            opcao(
+              icone: TablerIcons.upload,
+              titulo: 'Entrega',
+              detalhe: 'Vale como entrega. Use quando tiver certeza.',
+              lado: restantes == 1 ? '1 restante' : '$restantes restantes',
+              onTap: restantes > 0 ? () => onEscolher('entrega') : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// P113 · Cartão preto da entrega enviada (RN-100).
+class _CartaoEntregaEnviada extends StatelessWidget {
+  const _CartaoEntregaEnviada({required this.numero, required this.arquivo});
+
+  final int numero;
+  final String arquivo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: FractionallySizedBox(
+        widthFactor: 0.82,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+          decoration: BoxDecoration(
+            color: TatuColors.action,
+            borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Entrega $numero de ${RegrasDistancia.maxEntregas}',
+                style: TatuTexto.nota.copyWith(
+                  color: TatuColors.avisoEscuroTexto,
+                ),
+              ),
+              const SizedBox(height: 10),
+              LinhaArquivo(nome: arquivo, detalhe: 'ZIP · 8 MB', escuro: true),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// P114 · A cliente pediu ajuste depois da 1ª entrega (RN-101).
+class _AjustePedido extends StatelessWidget {
+  const _AjustePedido({
+    required this.cliente,
+    required this.feminino,
+    required this.texto,
+    required this.botoes,
+    required this.onPrevia,
+    required this.onEntrega,
+  });
+
+  final String cliente;
+  final bool feminino;
+  final String texto;
+
+  /// Ainda falta mandar a 2ª entrega.
+  final bool botoes;
+  final VoidCallback onPrevia;
+  final VoidCallback onEntrega;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: FractionallySizedBox(
+            widthFactor: 0.82,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: TatuColors.warningSoft,
+                borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        TablerIcons.pencil,
+                        size: 18,
+                        color: TatuColors.warningTexto,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '$cliente pediu um ajuste',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: TatuColors.warningTexto,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text('“$texto”', style: const TextStyle(fontSize: 15)),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Você tem mais 1 entrega. É a última.',
+                    style: TatuTexto.nota.copyWith(
+                      color: TatuColors.warningTexto,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        if (botoes) ...[
+          const SizedBox(height: TatuMedidas.entreItens + 4),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton(
+                  style: tatuBotaoSecundario().copyWith(
+                    minimumSize: const WidgetStatePropertyAll(Size(0, 48)),
+                  ),
+                  onPressed: onPrevia,
+                  child: const FittedBox(child: Text('Enviar prévia')),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: FilledButton(
+                  style: FilledButton.styleFrom(minimumSize: const Size(0, 48)),
+                  onPressed: onEntrega,
+                  child: const FittedBox(child: Text('Enviar entrega 2')),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
     );
   }
 }

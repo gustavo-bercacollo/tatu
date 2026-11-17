@@ -3,6 +3,8 @@
 //   flutter test tool/capturas_test.dart --update-goldens
 import 'dart:io';
 
+import 'package:tatu/core/protecao_tela.dart';
+import 'package:tatu/features/cliente/mensagens/entrega_distancia.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -193,6 +195,7 @@ Future<void> _capturar(
 }
 
 void main() {
+  ProtecaoTela.ativa = false;
   ToqueChamado.ativo = false;
   SomEncontrado.ativo = false;
   ProcurandoPage.aceitaEm = null;
@@ -2624,15 +2627,114 @@ void main() {
     );
   });
 
-  testWidgets('pro-distancia-enviar-valor', (t) async {
+  // RN-102: valor à distância com sinal (P110).
+  testWidgets('pro-distancia-enviar-valor-sinal', (t) async {
     await comDemo(
       t,
-      'pro-distancia-enviar-valor',
+      'pro-distancia-enviar-valor-sinal',
       const ChatProfissionalPage(chamado: chamadoDistanciaExemplo),
       depois: () async {
         await t.tap(find.text('Enviar valor'));
         await t.pumpAndSettle();
         await t.enterText(find.byType(TextField).last, '250');
+        await t.pump();
+        await t.tap(find.byType(CupertinoSwitch));
+        await t.pump();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  /// Chat do profissional à distância até o valor combinado com sinal.
+  Future<void> proCombinado(
+    WidgetTester t, {
+    Duration resposta = const Duration(seconds: 1),
+  }) async {
+    await t.tap(find.text('Enviar valor'));
+    await t.pumpAndSettle();
+    await t.enterText(find.byType(TextField).last, '250');
+    await t.pump();
+    await t.tap(find.byType(CupertinoSwitch));
+    await t.pump();
+    await t.tap(find.text('Enviar para Ana'));
+    await t.pumpAndSettle();
+    await t.pump(resposta);
+    await t.pumpAndSettle();
+    await t.ensureVisible(find.textContaining('Aceitar'));
+    await t.tap(find.textContaining('Aceitar'));
+    await t.pumpAndSettle();
+  }
+
+  Future<void> proAnexo(WidgetTester t, String o) async {
+    await t.tap(find.bySemanticsLabel('Enviar foto'));
+    await t.pumpAndSettle();
+    if (o.isEmpty) return;
+    await t.tap(find.text(o));
+    await t.pumpAndSettle();
+  }
+
+  // RN-99/RN-101: prévia ou entrega (P112).
+  testWidgets('pro-distancia-previa-ou-entrega', (t) async {
+    await comDemo(
+      t,
+      'pro-distancia-previa-ou-entrega',
+      const ChatProfissionalPage(
+        chamado: chamadoDistanciaExemplo,
+        resposta: Duration(seconds: 1),
+      ),
+      depois: () async {
+        await proCombinado(t);
+        await proAnexo(t, '');
+      },
+    );
+  });
+
+  // RN-100/RN-103: entrega enviada, sinal liberado (P113).
+  testWidgets('pro-distancia-entrega-enviada', (t) async {
+    await comDemo(
+      t,
+      'pro-distancia-entrega-enviada',
+      const ChatProfissionalPage(
+        chamado: chamadoDistanciaExemplo,
+        resposta: Duration(seconds: 5),
+      ),
+      depois: () async {
+        await proCombinado(t, resposta: const Duration(seconds: 5));
+        await proAnexo(t, 'Prévia protegida');
+        await proAnexo(t, 'Entrega');
+      },
+    );
+  });
+
+  // RN-101: a cliente pediu ajuste (P114).
+  testWidgets('pro-distancia-ajuste-pedido', (t) async {
+    await comDemo(
+      t,
+      'pro-distancia-ajuste-pedido',
+      const ChatProfissionalPage(
+        chamado: chamadoDistanciaExemplo,
+        resposta: Duration(seconds: 1),
+      ),
+      depois: () async {
+        await proCombinado(t);
+        await proAnexo(t, 'Entrega');
+        await t.pump(const Duration(seconds: 1));
+        await t.pumpAndSettle();
+        await t.drag(find.byType(ListView).first, const Offset(0, -800));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  // RN-106: conta pausada por sinais sem entrega (P115).
+  testWidgets('pro-distancia-conta-pausada-sinais', (t) async {
+    await comDemo(
+      t,
+      'pro-distancia-conta-pausada-sinais',
+      const HomeProfissionalPage(chamadoEm: Duration(hours: 1)),
+      depois: () async {
+        profissional.pausarPorSinaisParaDemo();
         await t.pump();
       },
     );
@@ -2693,7 +2795,8 @@ void main() {
     );
   });
 
-  Conversa conversaDistancia({bool entregue = false}) {
+  /// Conversa à distância com a Marina (valor R$ 250 com sinal de R$ 75).
+  Conversa conversaDistancia({bool primeiraResposta = true}) {
     final c = ConversasRepo().comecar(
       nome: 'Marina Reis',
       profissao: 'Designer',
@@ -2715,24 +2818,155 @@ void main() {
       mensagens: [
         MensagemChat(texto: 'Oi, Ana! Que estilo você imagina?'),
         MensagemChat(texto: 'Algo simples e colorido.', minha: true),
-        MensagemChat(texto: 'Consigo entregar amanhã.'),
-        if (entregue) ...[
-          MensagemChat(arquivo: 'logo-bolos-v1.pdf', arquivoDetalhe: 'PDF · 2,4 MB'),
-          MensagemChat(texto: 'Segue a primeira versão!'),
-          MensagemChat(texto: 'Ficou ótimo, obrigada!', minha: true),
-          MensagemChat.concluido('Serviço concluído · R\$ 250,00 · 15 nov'),
-        ],
+        if (primeiraResposta) MensagemChat(texto: 'Consigo entregar amanhã.'),
       ],
-      valor: entregue ? null : c.valor,
+      valor: c.valor,
     );
   }
 
-  testWidgets('distancia-chat-valor', (t) async {
+  /// Conversa à distância já com o valor confirmado (RN-103).
+  Conversa conversaConfirmada({bool primeiraResposta = true}) {
+    final c = conversaDistancia(primeiraResposta: primeiraResposta);
+    ConversasRepo().confirmarValor(c);
+    return c;
+  }
+
+  // RN-102/RN-103: valor com sinal (C157).
+  testWidgets('distancia-chat-valor-sinal', (t) async {
     await _capturar(
       t,
-      'distancia-chat-valor',
-      ChatPage(conversa: conversaDistancia()),
+      'distancia-chat-valor-sinal',
+      ChatPage(conversa: conversaDistancia(primeiraResposta: false)),
     );
+  });
+
+  // RN-99: prévia protegida no chat (C159).
+  testWidgets('distancia-chat-previa', (t) async {
+    final c = conversaConfirmada();
+    final r = ConversasRepo();
+    r.receberPrevia(c);
+    c.mensagens.add(MensagemChat(texto: 'Gostei! Pode finalizar.', minha: true));
+    await _capturar(t, 'distancia-chat-previa', ChatPage(conversa: c));
+  });
+
+  // RN-99: o visualizador protegido (C160).
+  testWidgets('distancia-previa-protegida', (t) async {
+    await _capturar(
+      t,
+      'distancia-previa-protegida',
+      PreviaProtegidaPage(
+        de: 'Marina',
+        enviadaEm: DateTime.now().subtract(const Duration(minutes: 30)),
+      ),
+    );
+  });
+
+  /// Conversa com a 1ª entrega recebida (prévia vista antes).
+  Conversa conversaEntrega1() {
+    final c = conversaDistancia(primeiraResposta: false);
+    final r = ConversasRepo();
+    r.confirmarValor(c);
+    c.mensagens.removeLast(); // o marcador não aparece nos desenhos 161–167
+    c.mensagens.removeLast(); // "Algo simples…"
+    r.receberPrevia(
+      c,
+      em: DateTime.now().subtract(const Duration(hours: 30)),
+    );
+    c.mensagens.add(MensagemChat(texto: 'Gostei! Pode finalizar.', minha: true));
+    r.receberEntrega(c);
+    return c;
+  }
+
+  // RN-100/RN-101: 1ª entrega (C161) e pedir ajuste (C162).
+  testWidgets('distancia-entrega-1', (t) async {
+    await _capturar(
+      t,
+      'distancia-entrega-1',
+      ChatPage(conversa: conversaEntrega1()),
+    );
+  });
+
+  testWidgets('distancia-pedir-ajuste', (t) async {
+    await _capturar(
+      t,
+      'distancia-pedir-ajuste',
+      ChatPage(conversa: conversaEntrega1()),
+      preparar: () async {
+        await t.tap(find.text('Pedir ajuste'));
+        await t.pumpAndSettle();
+        await t.enterText(
+          find.byType(TextField).last,
+          'Quero as letras maiores e o rosa um pouco mais claro.',
+        );
+        await t.pump();
+      },
+    );
+  });
+
+  /// Conversa com a 2ª entrega (depois do ajuste).
+  Conversa conversaEntrega2() {
+    final c = conversaDistancia(primeiraResposta: false);
+    final r = ConversasRepo();
+    r.confirmarValor(c);
+    c.mensagens
+      ..clear()
+      ..add(MensagemChat(texto: 'Oi, Ana! Que estilo você imagina?'));
+    r.receberEntrega(c);
+    r.pedirAjuste(c, 'Quero as letras maiores.');
+    c.mensagens.add(MensagemChat(texto: 'Ajustado! Vai a versão final.'));
+    r.receberEntrega(c);
+    // Nos desenhos a 1ª mensagem some atrás do marcador do ajuste.
+    c.mensagens.removeAt(0);
+    return c;
+  }
+
+  // RN-101: 2ª entrega (C163), aprovada (C164), reembolso (C165, C166).
+  testWidgets('distancia-entrega-2', (t) async {
+    await _capturar(
+      t,
+      'distancia-entrega-2',
+      ChatPage(conversa: conversaEntrega2()),
+    );
+  });
+
+  testWidgets('distancia-entrega-aprovada', (t) async {
+    final c = conversaEntrega2();
+    ConversasRepo().aprovarEntrega(c);
+    await _capturar(t, 'distancia-entrega-aprovada', ChatPage(conversa: c));
+  });
+
+  testWidgets('distancia-pedir-reembolso', (t) async {
+    await _capturar(
+      t,
+      'distancia-pedir-reembolso',
+      ChatPage(conversa: conversaEntrega2()),
+      preparar: () async {
+        await t.tap(find.text('Reembolso'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('distancia-reembolso-em-analise', (t) async {
+    final c = conversaEntrega2();
+    ConversasRepo().pedirReembolso(c, 'Diferente do combinado');
+    await _capturar(
+      t,
+      'distancia-reembolso-em-analise',
+      ChatPage(conversa: c),
+    );
+  });
+
+  // RN-105: prazo acabou sem entrega (C167).
+  testWidgets('distancia-sem-entrega', (t) async {
+    final c = conversaConfirmada(primeiraResposta: false);
+    c.entrega = EntregaDistancia(
+      confirmadoEm: DateTime.now().subtract(const Duration(days: 8)),
+    );
+    c.mensagens
+      ..add(MensagemChat.dia('há 7 dias'))
+      ..add(MensagemChat(texto: 'Oi, alguma novidade?', minha: true));
+    await _capturar(t, 'distancia-sem-entrega', ChatPage(conversa: c));
   });
 
   testWidgets('distancia-pedido-em-andamento', (t) async {
@@ -2752,18 +2986,11 @@ void main() {
             pagamento: 'Visa 4242',
             etapasFeitas: 3,
             distancia: true,
+            sinal: 75,
           ),
         );
         await t.pump();
       },
-    );
-  });
-
-  testWidgets('distancia-chat-entrega', (t) async {
-    await _capturar(
-      t,
-      'distancia-chat-entrega',
-      ChatPage(conversa: conversaDistancia(entregue: true)),
     );
   });
 

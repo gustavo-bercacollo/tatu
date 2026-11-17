@@ -1,5 +1,8 @@
+import 'package:clock/clock.dart';
+import '../shared/formatadores.dart';
 import 'package:flutter/foundation.dart';
 
+import 'regras_distancia.dart';
 import 'regras_valor.dart';
 
 /// Situação de uma mensagem enviada pela pessoa.
@@ -18,7 +21,40 @@ class MensagemChat {
     this.dia,
     this.arquivo,
     this.arquivoDetalhe,
+    this.previaEm,
+    this.entrega,
+    this.entregueEm,
+    this.marcador,
   });
+
+  /// RN-42: marco "Serviço concluído · R$ 190,00 · 04 nov" no meio da
+  /// conversa, que continua aberta depois dele.
+  MensagemChat.concluido(String concluido) : this(concluido: concluido);
+
+  /// Separador de dia ("12 nov").
+  MensagemChat.dia(String dia) : this(dia: dia);
+
+  /// RN-99: prévia protegida enviada em [em] (só abre no app, expira).
+  MensagemChat.previa(DateTime em, {bool minha = false})
+    : this(previaEm: em, minha: minha);
+
+  /// RN-100: entrega número [n] (1 ou 2) com o arquivo.
+  MensagemChat.entrega(
+    int n, {
+    required String arquivo,
+    required String detalhe,
+    required DateTime em,
+    bool minha = false,
+  }) : this(
+         entrega: n,
+         arquivo: arquivo,
+         arquivoDetalhe: detalhe,
+         entregueEm: em,
+         minha: minha,
+       );
+
+  /// Pílula cinza no meio da conversa ("Valor confirmado · sinal pago").
+  MensagemChat.marcador(String marcador) : this(marcador: marcador);
 
   /// RN-96: arquivo enviado (entrega à distância), ex.: "logo.pdf".
   final String? arquivo;
@@ -26,36 +62,32 @@ class MensagemChat {
   /// "PDF · 2,4 MB".
   final String? arquivoDetalhe;
 
-  /// RN-42: marco "Serviço concluído · R$ 190,00 · 04 nov" no meio da
-  /// conversa, que continua aberta depois dele.
-  MensagemChat.concluido(String this.concluido)
-    : texto = null,
-      minha = false,
-      foto = false,
-      imagem = null,
-      hora = null,
-      envio = EnvioMensagem.enviada,
-      dia = null,
-      arquivo = null,
-      arquivoDetalhe = null;
-
-  /// Separador de dia ("12 nov").
-  MensagemChat.dia(String this.dia)
-    : texto = null,
-      minha = false,
-      foto = false,
-      imagem = null,
-      hora = null,
-      envio = EnvioMensagem.enviada,
-      concluido = null,
-      arquivo = null,
-      arquivoDetalhe = null;
-
   /// Texto do marco de serviço concluído (RN-42).
   final String? concluido;
 
   /// Texto do separador de dia.
   final String? dia;
+
+  /// RN-99: quando a prévia protegida foi enviada (nulo = não é prévia).
+  final DateTime? previaEm;
+
+  /// RN-100/RN-101: número da entrega (nulo = não é entrega).
+  final int? entrega;
+
+  /// Quando a entrega foi enviada (RN-100: aprova sozinha em 48 h).
+  final DateTime? entregueEm;
+
+  /// Pílula cinza centralizada.
+  final String? marcador;
+
+  /// Não é um balão comum (marco, dia, arquivo, prévia, entrega…).
+  bool get especial =>
+      concluido != null ||
+      dia != null ||
+      arquivo != null ||
+      previaEm != null ||
+      entrega != null ||
+      marcador != null;
 
   final String? texto;
   final bool minha;
@@ -65,6 +97,55 @@ class MensagemChat {
   final Uint8List? imagem;
   final String? hora;
   EnvioMensagem envio;
+}
+
+/// RN-100 a RN-105: em que ponto está a entrega à distância de um valor.
+enum SituacaoEntrega {
+  /// Nenhuma entrega ainda.
+  semEntrega,
+
+  /// Entrega enviada, esperando o cliente.
+  aguardando,
+
+  /// RN-101: o cliente pediu ajuste depois da 1ª entrega.
+  ajustePedido,
+
+  /// RN-100: aprovada (pelo cliente ou sozinha em 48 h).
+  aprovada,
+
+  /// RN-104: reembolso pedido depois da 2ª entrega.
+  reembolsoEmAnalise,
+
+  /// RN-105: o prazo acabou sem entrega e o cliente pediu o sinal de volta.
+  sinalDeVoltaPedido,
+}
+
+/// Motivos do pedido de reembolso (RN-104).
+const motivosReembolso = [
+  'Diferente do combinado',
+  'Qualidade ruim',
+  'Outro motivo',
+];
+
+/// Estado da entrega à distância de um valor confirmado.
+class EntregaDistancia {
+  EntregaDistancia({required this.confirmadoEm});
+
+  /// Quando o valor foi confirmado (o prazo da RN-89 conta daqui).
+  final DateTime confirmadoEm;
+  int enviadas = 0;
+  SituacaoEntrega situacao = SituacaoEntrega.semEntrega;
+
+  /// RN-101: o que o cliente pediu para mudar.
+  String? ajuste;
+
+  /// RN-104: motivo do reembolso.
+  String? motivo;
+
+  /// RN-105: tocou em "Esperar mais".
+  bool esperandoMais = false;
+
+  bool get ultima => enviadas >= RegrasDistancia.maxEntregas;
 }
 
 /// Conversa com um profissional sobre um pedido.
@@ -84,7 +165,14 @@ class ValorProposta {
     this.novo = false,
     this.distancia = false,
     this.parcelas = 1,
+    this.sinal = 0,
   });
+
+  /// RN-102/RN-103: sinal cobrado ao confirmar (0 = sem sinal).
+  final double sinal;
+
+  /// RN-103: o que falta cobrar depois do sinal.
+  double get restante => total - sinal;
 
   /// O que este valor cobre ("troca da tubulação"), quando não é o
   /// primeiro serviço da conversa.
@@ -130,6 +218,9 @@ class Conversa {
 
   /// RN-92: pedido à distância.
   final bool distancia;
+
+  /// RN-100 a RN-105: entrega à distância do valor confirmado.
+  EntregaDistancia? entrega;
 
   /// Valor enviado pelo profissional (null = ainda não enviou).
   ValorProposta? valor;
@@ -280,7 +371,7 @@ class ConversasRepo extends ChangeNotifier {
       // o cliente confirma o total uma vez. Protótipo: já chega enviado.
       // RN-95: à distância, só o serviço.
       valor: distancia
-          ? ValorProposta(visita: 0, servico: 250, distancia: true)
+          ? ValorProposta(visita: 0, servico: 250, distancia: true, sinal: 75)
           : ValorProposta(visita: 40, servico: 150),
     );
     conversas = [c, ...conversas];
@@ -289,23 +380,126 @@ class ConversasRepo extends ChangeNotifier {
   }
 
   /// O cliente confirma o valor: fica reservado e só é cobrado no fim.
+  /// À distância, começa a entrega e o sinal é cobrado agora (RN-103).
   void confirmarValor(Conversa c) {
-    c.valor?.situacao = SituacaoValor.confirmado;
+    final v = c.valor;
+    v?.situacao = SituacaoValor.confirmado;
+    if (c.distancia && v != null) {
+      c.entrega = EntregaDistancia(confirmadoEm: clock.now());
+      c.mensagens.add(
+        MensagemChat.marcador(
+          v.sinal > 0
+              ? 'Valor confirmado · sinal de ${reaisInteiros(v.sinal)} pago'
+              : 'Valor confirmado · ${reais(v.total)}',
+        ),
+      );
+    }
     notifyListeners();
   }
 
-  /// RN-96: protótipo da entrega à distância: o profissional manda o
-  /// arquivo pelo chat.
-  void receberEntrega(Conversa c) {
-    c.mensagens
-      ..add(
-        MensagemChat(
-          arquivo: 'entrega-v1.pdf',
-          arquivoDetalhe: 'PDF · 2,4 MB',
-          hora: horaAgora(),
-        ),
-      )
-      ..add(MensagemChat(texto: 'Segue a primeira versão!'));
+  // ---------- Entrega à distância (RN-99 a RN-105) ----------
+
+  /// RN-99: o profissional manda uma prévia protegida (protótipo).
+  void receberPrevia(Conversa c, {DateTime? em}) {
+    c.mensagens.add(MensagemChat.previa(em ?? clock.now()));
+    notifyListeners();
+  }
+
+  /// RN-100/RN-101: o profissional manda uma entrega (no máximo 2).
+  void receberEntrega(Conversa c, {DateTime? em}) {
+    final e = c.entrega;
+    if (e == null || e.ultima) return;
+    e
+      ..enviadas += 1
+      ..situacao = SituacaoEntrega.aguardando;
+    c.mensagens.add(
+      MensagemChat.entrega(
+        e.enviadas,
+        arquivo: e.enviadas == 1 ? 'entrega-final.zip' : 'entrega-final-v2.zip',
+        detalhe: 'ZIP · 8 MB',
+        em: em ?? clock.now(),
+      ),
+    );
+    notifyListeners();
+  }
+
+  /// RN-100: aprovar cobra o restante e conclui.
+  void aprovarEntrega(Conversa c) {
+    final e = c.entrega;
+    if (e == null || e.situacao != SituacaoEntrega.aguardando) return;
+    e.situacao = SituacaoEntrega.aprovada;
+    notifyListeners();
+  }
+
+  /// RN-101: depois da 1ª entrega, o cliente pode pedir um ajuste.
+  void pedirAjuste(Conversa c, String texto) {
+    final e = c.entrega;
+    if (e == null || e.ultima || e.situacao != SituacaoEntrega.aguardando) {
+      return;
+    }
+    e
+      ..situacao = SituacaoEntrega.ajustePedido
+      ..ajuste = texto.trim();
+    c.mensagens.add(MensagemChat(texto: texto.trim(), minha: true));
+    notifyListeners();
+  }
+
+  /// RN-104: depois da 2ª entrega, o cliente pode pedir reembolso; o
+  /// restante fica guardado até o suporte decidir.
+  void pedirReembolso(Conversa c, String motivo) {
+    final e = c.entrega;
+    if (e == null || !e.ultima || e.situacao != SituacaoEntrega.aguardando) {
+      return;
+    }
+    e
+      ..situacao = SituacaoEntrega.reembolsoEmAnalise
+      ..motivo = motivo;
+    notifyListeners();
+  }
+
+  /// RN-100: entregas sem resposta há 48 h são aprovadas sozinhas.
+  /// Devolve se alguma mudou.
+  bool aprovarSozinhas([DateTime? agora]) {
+    final hoje = agora ?? clock.now();
+    var mudou = false;
+    for (final c in conversas) {
+      final e = c.entrega;
+      if (e == null || e.situacao != SituacaoEntrega.aguardando) continue;
+      final ultima = c.mensagens.lastWhere(
+        (m) => m.entrega != null,
+        orElse: () => MensagemChat(),
+      );
+      final em = ultima.entregueEm;
+      if (em != null && RegrasDistancia.aprovadaSozinha(em, hoje)) {
+        e.situacao = SituacaoEntrega.aprovada;
+        mudou = true;
+      }
+    }
+    if (mudou) notifyListeners();
+    return mudou;
+  }
+
+  /// RN-105: o prazo do valor (RN-89) acabou sem nenhuma entrega?
+  bool semEntregaNoPrazo(Conversa c, [DateTime? agora]) {
+    final e = c.entrega;
+    return e != null &&
+        e.enviadas == 0 &&
+        e.situacao == SituacaoEntrega.semEntrega &&
+        !e.esperandoMais &&
+        RegrasValor.vencido(e.confirmadoEm, agora ?? clock.now());
+  }
+
+  /// RN-105: "Esperar mais".
+  void esperarMais(Conversa c) {
+    c.entrega?.esperandoMais = true;
+    notifyListeners();
+  }
+
+  /// RN-105: "Pedir sinal de volta": vai para o suporte.
+  void pedirSinalDeVolta(Conversa c) {
+    final e = c.entrega;
+    if (e == null || e.enviadas > 0) return;
+    e.situacao = SituacaoEntrega.sinalDeVoltaPedido;
     notifyListeners();
   }
 

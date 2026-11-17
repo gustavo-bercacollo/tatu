@@ -7,6 +7,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../data/atendimento_profissional.dart';
 import '../../../data/prazos.dart';
+import '../../../data/regras_distancia.dart';
 import '../../../data/regras_valor.dart';
 
 import '../../../core/theme/tatu_colors.dart';
@@ -617,18 +618,46 @@ class EmAndamentoPage extends StatelessWidget {
                                 color: TatuColors.hairline,
                               ),
                               const SizedBox(height: 16),
+                              if (s.distancia)
+                                // RN-101/RN-103: sinal e entregas.
+                                ListenableBuilder(
+                                  listenable: atendimentoProfissional,
+                                  builder: (_, _) {
+                                    final a = atendimentoProfissional;
+                                    return Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            s.sinal > 0
+                                                ? 'Sinal ${reaisInteiros(s.sinal)} · '
+                                                      '${a.sinalLiberado ? 'liberado' : 'sai na 1ª entrega'}'
+                                                : 'À distância · iniciado às $hora',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TatuTexto.nota,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Entregas: ${a.entregas} de '
+                                          '${RegrasDistancia.maxEntregas}',
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                )
+                              else
                               Row(
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      s.distancia
-                                          ? 'À distância · iniciado às $hora'
-                                          : 'Iniciado às $hora',
+                                      'Iniciado às $hora',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: s.distancia
-                                          ? TatuTexto.nota
-                                          : TatuTexto.detalhe,
+                                      style: TatuTexto.detalhe,
                                     ),
                                   ),
                                   const SizedBox(
@@ -642,8 +671,8 @@ class EmAndamentoPage extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(
-                                    s.distancia ? 'Em andamento' : 'Em serviço',
+                                  const Text(
+                                    'Em serviço',
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
@@ -657,12 +686,14 @@ class EmAndamentoPage extends StatelessWidget {
                         ),
                         const SizedBox(height: TatuMedidas.entreItens + 8),
                         if (s.distancia) ...[
-                          // RN-96: a entrega é pelo chat, com arquivos.
+                          // RN-99: prévias protegidas à vontade.
                           CartaoAcao(
-                            icone: const Icon(TablerIcons.upload, size: 22),
-                            titulo: 'Enviar a entrega',
-                            detalhe: 'Mande os arquivos pelo chat.',
-                            onTap: () => _emBreve(context, 'Chat'),
+                            icone: const Icon(TablerIcons.lock, size: 22),
+                            titulo: 'Enviar prévia protegida',
+                            detalhe:
+                                '${s.feminino ? 'A' : 'O'} ${s.primeiroNome} vê, '
+                                'mas não baixa. Mande quantas quiser.',
+                            onTap: () => Navigator.of(context).pop('previa'),
                           ),
                           const SizedBox(height: TatuMedidas.entreItens),
                         ],
@@ -675,6 +706,41 @@ class EmAndamentoPage extends StatelessWidget {
                       ],
                     ),
                   ),
+                  if (s.distancia)
+                    // RN-96/RN-100: à distância quem conclui é o cliente;
+                    // o profissional manda a entrega (no máximo 2).
+                    ListenableBuilder(
+                      listenable: atendimentoProfissional,
+                      builder: (_, _) {
+                        final a = atendimentoProfissional;
+                        final n = a.entregas;
+                        final max = RegrasDistancia.maxEntregas;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              n == 0
+                                  ? 'Você tem $max entregas. Mande quando tiver certeza.'
+                                  : a.podeEntregar
+                                  ? 'Você tem mais ${max - n} entrega. É a última.'
+                                  : 'Entregas enviadas. Aguardando '
+                                        '${s.feminino ? 'a' : 'o'} '
+                                        '${s.primeiroNome} aprovar.',
+                              textAlign: TextAlign.center,
+                              style: TatuTexto.nota,
+                            ),
+                            const SizedBox(height: TatuMedidas.entreItens),
+                            FilledButton(
+                              onPressed: a.podeEntregar
+                                  ? () => Navigator.of(context).pop('entrega')
+                                  : null,
+                              child: const Text('Enviar entrega'),
+                            ),
+                          ],
+                        );
+                      },
+                    )
+                  else ...[
                   Text(
                     'Ao concluir, ${s.feminino ? 'a' : 'o'} '
                     '${s.cliente.split(' ').first} é cobrad'
@@ -687,6 +753,7 @@ class EmAndamentoPage extends StatelessWidget {
                     onPressed: () => _concluir(context),
                     child: const Text('Concluir serviço'),
                   ),
+                  ],
                   if (s.visita > 0) ...[
                     const SizedBox(height: 4),
                     LinkAzul(

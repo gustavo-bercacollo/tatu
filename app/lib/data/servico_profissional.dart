@@ -20,10 +20,14 @@ class ServicoAceito {
     this.celularCliente = '(11) 9••••-7777',
     this.pedido = 'TT-48213',
     this.distancia = false,
+    this.sinal = 0,
   });
 
   /// RN-95: serviço à distância (sem visita, rota, "Cheguei" nem porta).
   final bool distancia;
+
+  /// RN-102/RN-103: sinal pago pelo cliente (0 = sem sinal).
+  final double sinal;
 
   /// Bairro e cidade (para ler ao 190).
   final String bairro;
@@ -70,6 +74,7 @@ const servicoDistanciaExemplo = ServicoAceito(
   distanciaKm: 0,
   minutos: 0,
   distancia: true,
+  sinal: 75,
 );
 
 /// Chamado que chega para o profissional aceitar ou recusar.

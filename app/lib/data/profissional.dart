@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../shared/formatadores.dart';
 import 'prazos.dart';
+import 'regras_distancia.dart';
 
 /// Profissões que aparecem como atalho no cadastro ("Outros" abre a lista).
 const profissoesPrincipais = [
@@ -252,9 +253,42 @@ class ProfissionalRepo extends ChangeNotifier {
   bool get pausadaPorAbandonos =>
       abandonosRecentes >= Prazos.abandonosParaPausar;
 
+  /// RN-106: sinais à distância que voltaram ao cliente sem entrega.
+  final List<DateTime> sinaisSemEntrega = [];
+
+  int get sinaisSemEntregaRecentes {
+    final desde = clock.now().subtract(RegrasDistancia.janelaSinais);
+    return sinaisSemEntrega.where((d) => d.isAfter(desde)).length;
+  }
+
+  /// RN-106: 3 sinais sem entrega em 30 dias pausam a conta.
+  bool get pausadaPorSinais =>
+      sinaisSemEntregaRecentes >= RegrasDistancia.sinaisParaPausar;
+
+  /// RN-106: um sinal voltou ao cliente sem entrega.
+  void registrarSinalSemEntrega() {
+    sinaisSemEntrega.add(clock.now());
+    if (pausada) online = false;
+    notifyListeners();
+  }
+
+  /// Simula a conta pausada por sinais sem entrega (RN-106).
+  void pausarPorSinaisParaDemo() {
+    final agora = clock.now();
+    sinaisSemEntrega
+      ..clear()
+      ..addAll([
+        for (var i = 0; i < RegrasDistancia.sinaisParaPausar; i++)
+          agora.subtract(Duration(days: 2 + i * 7)),
+      ]);
+    online = false;
+    notifyListeners();
+  }
+
   /// Conta pausada (por visitas sem serviço ou por abandonos): não fica
   /// online até falar com o suporte.
-  bool get pausada => pausadaPorVisitas || pausadaPorAbandonos;
+  bool get pausada =>
+      pausadaPorVisitas || pausadaPorAbandonos || pausadaPorSinais;
 
   /// RN-77: registra um abandono (chamado devolvido à busca).
   void registrarAbandono() {
@@ -359,6 +393,7 @@ class ProfissionalRepo extends ChangeNotifier {
     raioKm = 10;
     visitas.clear();
     abandonos.clear();
+    sinaisSemEntrega.clear();
     notifyListeners();
   }
 
@@ -386,6 +421,7 @@ class ProfissionalRepo extends ChangeNotifier {
     dicaVista = true;
     visitas.clear();
     abandonos.clear();
+    sinaisSemEntrega.clear();
     notifyListeners();
   }
 

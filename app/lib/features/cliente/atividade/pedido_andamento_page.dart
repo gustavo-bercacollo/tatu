@@ -9,6 +9,7 @@ import '../../../core/theme/tatu_texto.dart';
 import '../../../data/conversas.dart';
 import '../../../data/pedidos.dart';
 import '../../../data/seguranca.dart';
+import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/aviso_topo.dart';
 import '../../../shared/widgets/folha.dart';
@@ -322,7 +323,17 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
                     else
                       LinhaRotuloValor(rotulo: 'Endereço', valor: p.endereco),
                     LinhaRotuloValor(rotulo: 'Valor combinado', valor: p.valor),
-                    LinhaRotuloValor(rotulo: 'Pagamento', valor: p.pagamento),
+                    // RN-103: à distância com sinal, mostra o sinal pago.
+                    if (p.distancia && p.sinal > 0)
+                      LinhaRotuloValor(
+                        rotulo: 'Sinal pago',
+                        valor: reais(p.sinal),
+                      )
+                    else
+                      LinhaRotuloValor(
+                        rotulo: 'Pagamento',
+                        valor: p.pagamento,
+                      ),
                   ],
                 ),
                 const SizedBox(height: TatuMedidas.entreSecoes),

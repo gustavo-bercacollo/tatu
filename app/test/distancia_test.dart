@@ -152,12 +152,17 @@ void main() {
     await t.pumpAndSettle();
     await t.tap(find.text('Confirmar valor'));
     await t.pump();
-    // RN-95: direto para Em andamento.
+    // RN-95: direto para Em andamento; RN-103: o sinal é cobrado agora.
     expect(pedidos.andamento?.situacao, 'Em andamento');
-    // RN-96: a entrega chega pelo chat.
+    expect(pedidos.andamento?.sinal, 75);
+    expect(find.text(r'Valor confirmado · sinal de R$ 75 pago'), findsOneWidget);
+    // RN-99/RN-100: chegam a prévia protegida e a 1ª entrega.
     await t.pump(const Duration(seconds: 4));
     await t.pump();
-    expect(find.text('entrega-v1.pdf'), findsOneWidget);
+    expect(find.text('Prévia protegida'), findsOneWidget);
+    await t.pump(const Duration(seconds: 4));
+    await t.pump();
+    expect(find.text('Entrega 1 de 2'), findsOneWidget);
   });
 
   testWidgets('RN-95/RN-98: pedido à distância sem escudo nem endereço', (
@@ -174,6 +179,7 @@ void main() {
         pagamento: 'Visa 4242',
         etapasFeitas: 3,
         distancia: true,
+        sinal: 75,
       ),
     );
     await _abrir(t, const PedidoAndamentoPage());
@@ -182,7 +188,10 @@ void main() {
     expect(find.text('Atendimento'), findsOneWidget);
     expect(find.text('Endereço'), findsNothing);
     expect(find.text('Ligar'), findsNothing);
-    expect(find.text('Entrega pelo chat'), findsOneWidget);
+    // RN-103: sinal pago.
+    expect(find.text('Valor combinado · sinal pago'), findsOneWidget);
+    expect(find.text('Entrega aprovada'), findsOneWidget);
+    expect(find.text('Sinal pago'), findsOneWidget);
     expect(find.text('A caminho'), findsNothing);
   });
 
@@ -206,7 +215,8 @@ void main() {
     expect(find.text('Estou a caminho'), findsNothing);
     await t.tap(find.text('Enviar valor'));
     await t.pumpAndSettle();
-    expect(find.text('À distância não tem visita, só o serviço.'), findsOneWidget);
+    expect(find.text('À distância não tem visita.'), findsOneWidget);
+    expect(find.text('Pedir sinal'), findsOneWidget);
     expect(find.text('Visita'), findsNothing);
     expect(find.text('Taxa do Tatu (10%)'), findsOneWidget);
   });
@@ -217,10 +227,13 @@ void main() {
       EmAndamentoPage(servico: servicoDistanciaExemplo, inicio: DateTime.now()),
     );
     expect(find.byType(BotaoEscudo), findsNothing);
-    expect(find.text('Enviar a entrega'), findsOneWidget);
-    expect(find.textContaining('À distância · iniciado às'), findsOneWidget);
+    // RN-96: no lugar de "Concluir serviço", "Enviar entrega".
+    expect(find.text('Enviar prévia protegida'), findsOneWidget);
+    expect(find.text(r'Sinal R$ 75 · sai na 1ª entrega'), findsOneWidget);
+    expect(find.text('Entregas: 0 de 2'), findsOneWidget);
     expect(find.text('Encerrar e cobrar só a visita'), findsNothing);
-    expect(find.text('Concluir serviço'), findsOneWidget);
+    expect(find.text('Concluir serviço'), findsNothing);
+    expect(find.text('Enviar entrega'), findsOneWidget);
   });
 
   testWidgets('RN-97: como atende em cada profissão', (t) async {

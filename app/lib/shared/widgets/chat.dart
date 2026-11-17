@@ -636,6 +636,137 @@ class SeparadorDia extends StatelessWidget {
   );
 }
 
+/// Pílula cinza centralizada no meio da conversa ("Valor confirmado ·
+/// sinal de R$ 75 pago", "Entrega 1 de 2 · ajuste pedido").
+class MarcadorChat extends StatelessWidget {
+  const MarcadorChat(this.texto, {super.key});
+
+  final String texto;
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      decoration: const ShapeDecoration(
+        color: TatuColors.fill,
+        shape: StadiumBorder(),
+      ),
+      child: Text(texto, textAlign: TextAlign.center, style: TatuTexto.nota),
+    ),
+  );
+}
+
+/// RN-99: balão da prévia protegida. Do profissional ([minha]) é preto;
+/// para o cliente é cinza e abre ao tocar enquanto não expira.
+class BalaoPrevia extends StatelessWidget {
+  const BalaoPrevia({
+    super.key,
+    required this.valida,
+    this.minha = false,
+    this.vistaPor,
+    this.onTap,
+  });
+
+  /// Ainda não expirou.
+  final bool valida;
+  final bool minha;
+
+  /// "Ana": no balão do profissional, "Vista pela Ana · expirada".
+  final String? vistaPor;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final detalhe = minha
+        ? (valida
+              ? 'Enviada · expira em 24h'
+              : 'Vista ${vistaPor == null ? '' : 'pela $vistaPor '}· expirada')
+        : (valida ? 'Só para ver · expira em 24h' : 'Vista · expirada');
+    final corTexto = minha ? TatuColors.onAction : TatuColors.textPrimary;
+    return Column(
+      crossAxisAlignment: minha
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      children: [
+        Align(
+          alignment: minha ? Alignment.centerRight : Alignment.centerLeft,
+          child: FractionallySizedBox(
+            widthFactor: minha ? 0.7 : 0.64,
+            child: Semantics(
+              button: onTap != null && valida,
+              label: 'Prévia protegida',
+              child: GestureDetector(
+                onTap: valida ? onTap : null,
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: minha ? TatuColors.action : TatuColors.fill,
+                    borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: minha
+                              ? TatuColors.editorTrilho
+                              : TatuColors.bg,
+                          borderRadius: BorderRadius.circular(
+                            TatuMedidas.raioCaixa,
+                          ),
+                        ),
+                        child: Icon(TablerIcons.lock, size: 22, color: corTexto),
+                      ),
+                      const SizedBox(width: TatuMedidas.entreItens),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Prévia protegida',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: corTexto,
+                              ),
+                            ),
+                            Text(
+                              detalhe,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TatuTexto.nota.copyWith(
+                                color: minha
+                                    ? TatuColors.avisoEscuroTexto
+                                    : TatuColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        if (!minha && valida) ...[
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: Text(
+              'Toque para ver',
+              style: TatuTexto.nota.copyWith(fontSize: 12),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
 /// RN-96: arquivo enviado no chat (entrega à distância).
 class BalaoArquivo extends StatelessWidget {
   const BalaoArquivo({

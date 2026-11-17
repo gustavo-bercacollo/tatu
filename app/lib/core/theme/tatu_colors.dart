@@ -48,6 +48,9 @@ class TatuColors {
   /// Editor de foto (tela escura).
   static const editorFundo = Color(0xFF2C2C2E);
   static const editorSombra = Color(0xBF2C2C2E); // fora do círculo
+  static const previaFundo = Color(0xFFF9E6EC); // arte de exemplo da prévia (mock)
+  static const previaArte = Color(0xFFE8608A);
+  static const marcaDagua = Color(0x668E8E93); // marca d'água da prévia (RN-99)
   static const sombra = Color(0x2E000000); // sombra de avisos flutuantes
   static const editorTrilho = Color(0xFF48484A);
 }

@@ -11,6 +11,7 @@ import '../../../data/conversas.dart';
 import '../../../data/pagamentos.dart';
 import '../../../data/pedidos.dart';
 import '../../../data/perfil.dart';
+import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/back_circle_button.dart';
 import '../../../shared/widgets/chat.dart';
@@ -21,8 +22,13 @@ import '../atividade/pedido_andamento_page.dart';
 import '../foto/camera_desativada_page.dart';
 import '../atividade/pedido_concluido_page.dart';
 import '../pagamento/pagamento_page.dart';
+import 'package:clock/clock.dart';
+
+import '../../../data/regras_distancia.dart';
+import '../atividade/avaliar_page.dart';
 import 'cartao_valor.dart';
 import 'denunciar_page.dart';
+import 'entrega_distancia.dart';
 
 void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
   ..hideCurrentSnackBar()
@@ -49,6 +55,15 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final _campo = TextEditingController();
   Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    // RN-100: entregas sem resposta há 48 h já foram aprovadas.
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => conversas.aprovarSozinhas(),
+    );
+  }
 
   Conversa get _c => widget.conversa;
 
@@ -88,9 +103,168 @@ class _ChatPageState extends State<ChatPage> {
     _timer = Timer(widget.resposta, () => conversas.profissionalResponde(_c));
   }
 
+  /// RN-100/RN-101: cartão de cada entrega conforme a situação.
+  Widget _entrega(MensagemChat m) {
+    final e = _c.entrega;
+    final v = _c.valor;
+    final nome = _c.primeiroNome;
+    final max = RegrasDistancia.maxEntregas;
+    final ultimaEnviada = e != null && m.entrega == e.enviadas;
+    final enviou = NotaChat('$nome enviou a entrega');
+    if (e == null || v == null) return MarcadorChat('Entrega ${m.entrega}');
+    if (!ultimaEnviada) {
+      // Entrega anterior: virou ajuste.
+      return MarcadorChat('Entrega ${m.entrega} de $max · ajuste pedido');
+    }
+    return switch (e.situacao) {
+      SituacaoEntrega.ajustePedido => MarcadorChat(
+        'Entrega ${m.entrega} de $max · ajuste pedido',
+      ),
+      SituacaoEntrega.aprovada => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          enviou,
+          const SizedBox(height: TatuMedidas.entreItens + 4),
+          CartaoEntregaAprovada(
+            restante: v.restante,
+            total: v.total,
+            nome: nome,
+            onAvaliar: _avaliar,
+          ),
+        ],
+      ),
+      SituacaoEntrega.reembolsoEmAnalise => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          enviou,
+          const SizedBox(height: TatuMedidas.entreItens),
+          MarcadorChat('Entrega ${m.entrega} de $max · reembolso pedido'),
+          const SizedBox(height: TatuMedidas.entreSecoes),
+          // RN-104: o restante fica guardado até o suporte decidir.
+          CaixaEmAnalise(
+            titulo: 'Reembolso em análise',
+            texto:
+                'Resposta em até ${RegrasDistancia.diasUteisSuporte} dias '
+                'úteis.\n${v.sinal > 0 ? 'Nada foi cobrado além do sinal.' : 'Nada foi cobrado.'}',
+          ),
+        ],
+      ),
+      _ => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          enviou,
+          const SizedBox(height: TatuMedidas.entreItens),
+          CartaoEntregaRecebida(
+            numero: m.entrega!,
+            arquivo: m.arquivo ?? '',
+            detalhe: m.arquivoDetalhe ?? '',
+            restante: v.restante,
+            onAprovar: _aprovar,
+            onOutro: e.ultima ? _reembolso : _ajuste,
+          ),
+        ],
+      ),
+    };
+  }
+
+  /// RN-100: aprovar cobra o restante.
+  void _aprovar() {
+    conversas.aprovarEntrega(_c);
+    if (pedidos.andamento?.profissional == _c.nome) {
+      pedidos.entregaAprovada();
+    }
+  }
+
+  /// RN-101: depois da 1ª entrega, pede ajuste. Protótipo: a
+  /// profissional responde e manda a 2ª entrega.
+  Future<void> _ajuste() async {
+    final texto = await pedirAjuste(
+      context,
+      nome: '${_c.artigo == 'a' ? 'A' : 'O'} ${_c.primeiroNome}',
+    );
+    if (texto == null || !mounted) return;
+    conversas.pedirAjuste(_c, texto);
+    _timer?.cancel();
+    _timer = Timer(widget.resposta, () {
+      conversas.enviar(
+        _c,
+        MensagemChat(texto: 'Ajustado! Vai a versão final.'),
+      );
+      conversas.receberEntrega(_c);
+    });
+  }
+
+  /// RN-104: depois da 2ª entrega, pede reembolso ao suporte.
+  Future<void> _reembolso() async {
+    final v = _c.valor;
+    if (v == null) return;
+    final motivo = await pedirReembolso(
+      context,
+      restante: v.restante,
+      sinal: v.sinal,
+      nome: '${_c.artigo} ${_c.primeiroNome}',
+    );
+    if (motivo == null || !mounted) return;
+    conversas.pedirReembolso(_c, motivo);
+  }
+
+  void _avaliar() {
+    final v = _c.valor;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => AvaliarPage(
+          pedido: PedidoConcluido(
+            servico: _c.servico,
+            profissao: _c.profissao,
+            profissional: _c.nome,
+            descricao: _c.descricao,
+            endereco: _c.rua,
+            pagamento: pagamentos.padrao?.curto ?? 'Pix',
+            valor: v == null ? '' : reais(v.total),
+            dia: 'hoje',
+            hora: '',
+            mes: 'Novembro',
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// RN-105: o prazo acabou sem entrega: pode pedir o sinal de volta.
+  List<Widget> _semEntrega() {
+    final e = _c.entrega;
+    final v = _c.valor;
+    if (e == null || v == null || v.sinal <= 0) return const [];
+    if (e.situacao == SituacaoEntrega.sinalDeVoltaPedido) {
+      return [
+        const SizedBox(height: TatuMedidas.entreSecoes),
+        CaixaEmAnalise(
+          titulo: 'Sinal de volta em análise',
+          texto:
+              'Resposta em até ${RegrasDistancia.diasUteisSuporte} dias '
+              'úteis. Sem entrega, o sinal volta para você.',
+        ),
+      ];
+    }
+    if (!conversas.semEntregaNoPrazo(_c)) return const [];
+    return [
+      const SizedBox(height: TatuMedidas.entreSecoes),
+      CartaoSemEntrega(
+        nome: '${_c.artigo == 'a' ? 'A' : 'O'} ${_c.primeiroNome}',
+        sinal: v.sinal,
+        onEsperar: () => conversas.esperarMais(_c),
+        onPedirSinal: () => conversas.pedirSinalDeVolta(_c),
+      ),
+    ];
+  }
+
   List<Widget> _valor() {
     final v = _c.valor;
     if (v == null) return const [];
+    // À distância, depois de confirmar, vale o marcador no chat.
+    if (_c.distancia && v.situacao == SituacaoValor.confirmado) {
+      return const [];
+    }
     return [
       const SizedBox(height: TatuMedidas.entreSecoes),
       // RN-87: numa conversa que já teve serviço, é um valor novo.
@@ -101,19 +275,25 @@ class _ChatPageState extends State<ChatPage> {
       switch (v.situacao) {
         SituacaoValor.aguardandoVoce => CartaoValorRecebido(
           valor: v,
+          nome: '${_c.artigo} ${_c.primeiroNome}',
           onConfirmar: () {
             conversas.confirmarValor(_c);
             // RN-76: começa o prazo do profissional para sair.
             if (pedidos.andamento?.profissional == _c.nome) {
-              pedidos.valorConfirmado();
+              // RN-103: à distância, o sinal é cobrado agora.
+              pedidos.valorConfirmado(sinal: v.sinal);
             }
-            // RN-96: à distância, a entrega chega pelo chat (protótipo).
+            // RN-99/RN-100: à distância, protótipo: chega uma prévia e
+            // depois a 1ª entrega.
             if (_c.distancia) {
               _timer?.cancel();
-              _timer = Timer(
-                widget.resposta * 2,
-                () => conversas.receberEntrega(_c),
-              );
+              _timer = Timer(widget.resposta * 2, () {
+                conversas.receberPrevia(_c);
+                _timer = Timer(
+                  widget.resposta * 2,
+                  () => conversas.receberEntrega(_c),
+                );
+              });
             }
           },
           onTrocar: _trocarPagamento,
@@ -293,6 +473,35 @@ class _ChatPageState extends State<ChatPage> {
                   padding: const EdgeInsets.only(top: 18),
                   child: SeparadorDia(m.dia!),
                 )
+              else if (m.marcador != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 18),
+                  child: MarcadorChat(m.marcador!),
+                )
+              else if (m.previaEm != null)
+                // RN-99: prévia protegida, só no app.
+                Padding(
+                  padding: const EdgeInsets.only(top: 18),
+                  child: BalaoPrevia(
+                    valida: RegrasDistancia.previaValida(
+                      m.previaEm!,
+                      clock.now(),
+                    ),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => PreviaProtegidaPage(
+                          de: _c.primeiroNome,
+                          enviadaEm: m.previaEm!,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              else if (m.entrega != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 18),
+                  child: _entrega(m),
+                )
               else if (m.arquivo != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 18),
@@ -326,6 +535,7 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                 ),
             ..._valor(),
+            ..._semEntrega(),
           ],
           // RN-42: a conversa nunca fecha.
           rodape: Column(

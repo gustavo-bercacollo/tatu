@@ -13,6 +13,7 @@ import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/ajuda.dart';
 import '../../../data/prazos.dart';
+import '../../../data/regras_distancia.dart';
 import '../../../data/profissional.dart';
 import '../../../data/servico_profissional.dart';
 import '../../../shared/widgets/conta_pausada.dart';
@@ -207,7 +208,12 @@ class _ContaPausada extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = profissional;
     return AvisoContaPausada(
-      motivo: p.pausadaPorAbandonos
+      motivo: p.pausadaPorSinais
+          // RN-106: sinais à distância sem entrega.
+          ? '${p.sinaisSemEntregaRecentes} sinais sem entrega em '
+                '${RegrasDistancia.janelaSinais.inDays} dias. '
+                'Fale com o suporte para voltar.'
+          : p.pausadaPorAbandonos
           // RN-79: 3 abandonos em 30 dias.
           ? '${p.abandonosRecentes} chamados abandonados em '
                 '${Prazos.janelaAbandonos.inDays} dias. '
