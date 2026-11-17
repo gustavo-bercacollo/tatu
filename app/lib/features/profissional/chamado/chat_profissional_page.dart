@@ -46,13 +46,22 @@ class ChatProfissionalPage extends StatefulWidget {
     this.chamado = chamadoExemplo,
     this.resposta = const Duration(seconds: 2),
     this.concluidoPor,
+    this.concluidoEm,
+    this.depois = const [],
+    this.diaDepois,
   });
 
   final ChamadoNovo chamado;
   final Duration resposta;
 
-  /// Serviço já concluído por esse valor: conversa encerrada.
+  /// Serviço já concluído por esse valor. RN-42: a conversa continua e
+  /// dá para enviar um novo valor (RN-87).
   final double? concluidoPor;
+  final String? concluidoEm;
+
+  /// Mensagens depois do serviço concluído (texto, minha) e o dia delas.
+  final List<(String, bool)> depois;
+  final String? diaDepois;
 
   @override
   State<ChatProfissionalPage> createState() => _ChatProfissionalPageState();
@@ -89,7 +98,18 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     super.dispose();
   }
 
-  bool get _encerrada => widget.concluidoPor != null;
+  /// Já teve um serviço concluído nesta conversa (RN-42).
+  bool get _concluida => widget.concluidoPor != null;
+
+  /// Quantas mensagens vieram antes do serviço concluído.
+  late final int _antes;
+
+  @override
+  void initState() {
+    super.initState();
+    _antes = _mensagens.length;
+    _mensagens.addAll(widget.depois);
+  }
 
   /// Toque no nome: ligar, ver chamado, ajuda, cancelar e denunciar.
   Future<void> _menu() async {
@@ -111,7 +131,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
             item(TablerIcons.phone, 'Ligar para $_nome'),
             item(TablerIcons.file_text, 'Ver chamado'),
             item(TablerIcons.help_circle, 'Ajuda'),
-            if (!_encerrada)
+            if (!_concluida || _estado != EstadoValor.inicio)
               item(TablerIcons.x, 'Cancelar atendimento', perigo: true),
             item(TablerIcons.alert_triangle, 'Denunciar cliente', perigo: true),
           ],
@@ -180,7 +200,12 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   }
 
   Future<void> _enviarValor() async {
-    final v = await pedirValor(context, cliente: _nome, rodada: _rodada + 1);
+    final v = await pedirValor(
+      context,
+      cliente: _nome,
+      rodada: _rodada + 1,
+      distancia: widget.chamado.distancia,
+    );
     if (v == null || !mounted) return;
     setState(() {
       _rodada++;
@@ -230,6 +255,9 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   /// prazo, o app pergunta "Ainda vai?".
   void _contarPrazoSaida() {
     _prazoSaida?.cancel();
+    // RN-95: à distância não há "Estou a caminho" (abandono à distância
+    // ainda é decisão em aberto).
+    if (widget.chamado.distancia) return;
     _prazoSaida = Timer(
       Prazos.naDemo(Prazos.estouACaminho),
       _perguntarAindaVai,
@@ -290,6 +318,48 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     );
   }
 
+  /// RN-95: à distância, combinado o valor, vai direto para Em andamento
+  /// (sem rota, "Cheguei" nem código na porta).
+  void _comecarDistancia() {
+    final c = widget.chamado;
+    final s = ServicoAceito(
+      cliente: c.cliente,
+      notaCliente: c.notaCliente,
+      rua: '',
+      referencia: '',
+      descricao: c.resumo,
+      valor: _combinado,
+      visita: 0,
+      distanciaKm: 0,
+      minutos: 0,
+      feminino: c.feminino,
+      distancia: true,
+    );
+    final agora = DateTime.now();
+    atendimentoProfissional
+      ..irAteCliente(s)
+      ..iniciar(agora);
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => EmAndamentoPage(servico: s, inicio: agora),
+      ),
+    );
+  }
+
+  /// RN-42: faixa "Serviço concluído" e o dia das mensagens seguintes.
+  List<Widget> _marco() => [
+    const SizedBox(height: 18),
+    MarcoConcluido(
+      'Serviço concluído · ${reais(widget.concluidoPor!)}'
+      '${widget.concluidoEm == null ? '' : ' · ${widget.concluidoEm}'}',
+      nota: false,
+    ),
+    if (widget.diaDepois != null) ...[
+      const SizedBox(height: 18),
+      SeparadorDia(widget.diaDepois!),
+    ],
+  ];
+
   @override
   Widget build(BuildContext context) {
     final c = widget.chamado;
@@ -348,12 +418,13 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
           rotulo: 'Chamado',
           servico: c.profissao,
           descricao: c.resumo,
-          lado: '${c.bairro} · $km km',
+          lado: c.distancia ? 'À distância' : '${c.bairro} · $km km',
         ),
         const SizedBox(height: TatuMedidas.entreSecoes),
         const NotaChat('Você aceitou o chamado. Combinem o valor por aqui.'),
         const SizedBox(height: TatuMedidas.entreItens + 4),
-        for (final (i, m) in _mensagens.indexed)
+        for (final (i, m) in _mensagens.indexed) ...[
+          if (_concluida && i == _antes) ..._marco(),
           Padding(
             padding: EdgeInsets.only(
               top: espacoAntesDoBalao(
@@ -367,10 +438,10 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
               outro: '${c.feminino ? 'a' : 'o'} $_nome',
             ),
           ),
+        ],
+        if (_concluida && _mensagens.length == _antes) ..._marco(),
         const SizedBox(height: TatuMedidas.entreSecoes),
-        if (_encerrada) _Concluido(valor: widget.concluidoPor!),
-        if (!_encerrada)
-          ...switch (_estado) {
+        ...switch (_estado) {
             EstadoValor.inicio => const <Widget>[],
             EstadoValor.aguardando => [
               _MeuValor(
@@ -401,30 +472,37 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
             EstadoValor.combinado => [
               _ValorCombinado(valor: _combinado),
               const SizedBox(height: TatuMedidas.entreItens),
-              _EnderecoLiberado(chamado: c),
+              // RN-28: no local, o endereço aparece; à distância não há.
+              if (!c.distancia) _EnderecoLiberado(chamado: c),
             ],
           },
         const SizedBox(height: TatuMedidas.entreItens),
       ],
-      rodapeColado: _encerrada,
-      rodape: _encerrada
-          ? const ConversaEncerrada()
-          : Column(
+      // RN-42: a conversa nunca fecha.
+      rodape: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (_estado == EstadoValor.inicio) ...[
+                if (_estado == EstadoValor.inicio && _concluida) ...[
+                  // RN-87: cada valor combinado é um pagamento novo.
+                  FilledButton(
+                    onPressed: _enviarValor,
+                    child: const Text('Enviar novo valor'),
+                  ),
+                  const SizedBox(height: TatuMedidas.entreItens),
+                ] else if (_estado == EstadoValor.inicio) ...[
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       spacing: 8,
                       children: [
+                        if (!c.distancia)
                         TatuChip(
                           label: 'Estou a caminho',
                           onTap: () => _enviar('Estou a caminho'),
                         ),
                         TatuChip(
-                          label: 'Mandar foto',
+                          label: c.distancia ? 'Mandar arquivo' : 'Mandar foto',
                           onTap: () => _emBreve('Mandar foto'),
                         ),
                       ],
@@ -439,8 +517,8 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
                 ],
                 if (_estado == EstadoValor.combinado) ...[
                   FilledButton(
-                    onPressed: _irAteOCliente,
-                    child: const Text('Estou a caminho'),
+                    onPressed: c.distancia ? _comecarDistancia : _irAteOCliente,
+                    child: Text(c.distancia ? 'Ver em andamento' : 'Estou a caminho'),
                   ),
                   const SizedBox(height: TatuMedidas.entreItens),
                 ],
@@ -590,44 +668,6 @@ class _Valor extends StatelessWidget {
       ),
     ),
   );
-}
-
-/// Faixa verde: o serviço foi concluído (conversa encerrada).
-class _Concluido extends StatelessWidget {
-  const _Concluido({required this.valor});
-
-  final double valor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      decoration: BoxDecoration(
-        color: TatuColors.onlineSoft,
-        borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            TablerIcons.check,
-            size: 20,
-            color: TatuColors.onlineTexto,
-          ),
-          const SizedBox(width: TatuMedidas.entreItens),
-          Expanded(
-            child: Text(
-              'Serviço concluído · ${reais(valor)}',
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: TatuColors.onlineTexto,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 /// Cartão verde: os dois lados fecharam o valor.

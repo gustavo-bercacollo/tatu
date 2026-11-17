@@ -9,6 +9,7 @@ import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/pedidos.dart';
 import '../../../data/seguranca.dart';
+import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../../shared/widgets/espaco_anuncio.dart';
 import '../../../shared/widgets/folha.dart';
@@ -52,7 +53,12 @@ class ProcurandoPage extends StatefulWidget {
     this.diretoFeminino = true,
     this.simularAceite = true,
     this.troca = TrocaProfissional.cancelou,
+    this.distancia = false,
   });
+
+  /// RN-94: busca à distância, sem mapa nem raio, em ondas: primeiro os
+  /// mais bem avaliados online, depois todos os online.
+  final bool distancia;
 
   /// Motivo da nova busca quando há [anterior].
   final TrocaProfissional troca;
@@ -171,6 +177,7 @@ class _ProcurandoPageState extends State<ProcurandoPage>
           servico: widget.servico,
           endereco: widget.endereco,
           indice: widget.anterior == null ? 0 : 1,
+          distancia: widget.distancia,
         ),
       ),
     );
@@ -182,8 +189,11 @@ class _ProcurandoPageState extends State<ProcurandoPage>
     _saiu = true;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) =>
-            ProcurandoPage(servico: widget.servico, endereco: widget.endereco),
+        builder: (_) => ProcurandoPage(
+          servico: widget.servico,
+          endereco: widget.endereco,
+          distancia: widget.distancia,
+        ),
       ),
     );
   }
@@ -206,6 +216,19 @@ class _ProcurandoPageState extends State<ProcurandoPage>
             child: Stack(
               fit: StackFit.expand,
               children: [
+                if (widget.distancia)
+                  // RN-94: sem mapa; os avatares são quem está online.
+                  ColoredBox(
+                    color: TatuColors.surfaceGrouped,
+                    child: AnimatedBuilder(
+                      animation: Listenable.merge([_pulso, _busca]),
+                      builder: (_, _) => _RadarDistancia(
+                        pulso: _pulso.value,
+                        todos: _expandindo,
+                      ),
+                    ),
+                  )
+                else ...[
                 const CustomPaint(painter: MapaFalso()),
                 AnimatedBuilder(
                   animation: Listenable.merge([_pulso, _busca]),
@@ -217,6 +240,7 @@ class _ProcurandoPageState extends State<ProcurandoPage>
                     ),
                   ),
                 ),
+                ],
                 SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(
@@ -300,7 +324,14 @@ class _ProcurandoPageState extends State<ProcurandoPage>
     final a = widget.anterior;
     final String titulo;
     final String texto;
-    if (widget.direto != null) {
+    if (widget.distancia) {
+      // RN-94: ondas, sem raio.
+      final s = widget.servico.toLowerCase();
+      titulo = 'Procurando um $s';
+      texto = expandindo
+          ? 'Agora avisamos todos os profissionais\nque estão online.'
+          : 'Avisamos primeiro os mais bem avaliados\nque estão online agora.';
+    } else if (widget.direto != null) {
       final ela = widget.diretoFeminino;
       titulo = 'Chamando ${ela ? 'a' : 'o'} ${widget.direto}';
       texto =
@@ -352,7 +383,7 @@ class _ProcurandoPageState extends State<ProcurandoPage>
         const SizedBox(height: 8),
         Text(texto, style: TatuTexto.corpo),
         const SizedBox(height: TatuMedidas.entreSecoes),
-        if (expandindo) ...[
+        if (expandindo && !widget.distancia) ...[
           const Row(
             children: [
               SizedBox(
@@ -408,6 +439,68 @@ class _ProcurandoPageState extends State<ProcurandoPage>
   }
 }
 
+/// RN-94: busca à distância: círculos verdes e os avatares de quem está
+/// online (sem mapa). Na 2ª onda ([todos]) os círculos crescem.
+class _RadarDistancia extends StatelessWidget {
+  const _RadarDistancia({required this.pulso, required this.todos});
+
+  final double pulso;
+  final bool todos;
+
+  static const _online = [
+    ('Marina Reis', Offset(-88, -92)),
+    ('Tiago Santos', Offset(96, -66)),
+    ('Carla Lima', Offset(-78, 76)),
+    ('Julia Prado', Offset(66, 92)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, c) {
+        final centro = Offset(c.maxWidth / 2, c.maxHeight * 0.33);
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _Radar(
+                  pulso: pulso,
+                  expandido: todos,
+                  semPontos: true,
+                ),
+              ),
+            ),
+            for (final (nome, o) in _online)
+              Positioned(
+                left: centro.dx + o.dx - 18,
+                top: centro.dy + o.dy - 18,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    AvatarIniciais(nome: nome, tamanho: 36),
+                    Positioned(
+                      right: -2,
+                      bottom: -2,
+                      child: Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: TatuColors.online,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: TatuColors.bg, width: 2),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
 /// Círculos verdes em volta de quem pediu, profissionais por perto e o
 /// ponto preto no centro. [expandido] aumenta o raio.
 class _Radar extends CustomPainter {
@@ -415,10 +508,14 @@ class _Radar extends CustomPainter {
     required this.pulso,
     required this.expandido,
     this.circulos = true,
+    this.semPontos = false,
   });
 
   final double pulso;
   final bool expandido;
+
+  /// Sem os pontos verdes (à distância, viram avatares).
+  final bool semPontos;
 
   /// Sem círculos quando chama um profissional só.
   final bool circulos;
@@ -432,7 +529,10 @@ class _Radar extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final centro = Offset(size.width / 2, size.height * 0.34);
+    final centro = Offset(
+      size.width / 2,
+      size.height * (semPontos ? 0.33 : 0.34),
+    );
     final escala = expandido ? 1.25 : 1.0;
     final verde = Paint()..color = TatuColors.radar;
     for (final r in circulos ? [60.0, 115.0, 170.0] : const <double>[]) {
@@ -440,7 +540,7 @@ class _Radar extends CustomPainter {
     }
     final borda = Paint()..color = TatuColors.bg;
     final pro = Paint()..color = TatuColors.online;
-    for (final o in _profissionais) {
+    for (final o in semPontos ? const <Offset>[] : _profissionais) {
       canvas.drawCircle(centro + o * escala, 10, borda);
       canvas.drawCircle(centro + o * escala, 7.5, pro);
     }

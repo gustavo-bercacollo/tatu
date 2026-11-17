@@ -100,12 +100,20 @@ void main() {
     expect(find.text('Chego em 12 min.'), findsOneWidget);
   });
 
-  testWidgets('Conversa anterior fica encerrada; lista vazia', (t) async {
+  // RN-42: a conversa continua aberta depois do serviço.
+  testWidgets('Conversa anterior continua aberta; lista vazia', (t) async {
     await _abrirMensagens(t);
     await t.tap(find.text('Rafael Lima'));
     await t.pumpAndSettle();
-    expect(find.text('Esta conversa foi encerrada'), findsOneWidget);
-    expect(find.byType(TextField), findsNothing);
+    expect(find.text('Serviço concluído · R\$ 220,00 · 02 nov'), findsOneWidget);
+    expect(
+      find.text(
+        'A conversa continua aberta. Precisou de novo, é só chamar por aqui.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Esta conversa foi encerrada'), findsNothing);
+    expect(find.byType(TextField), findsOneWidget);
 
     conversas.limpar();
     await t.tap(find.bySemanticsLabel('Voltar'));

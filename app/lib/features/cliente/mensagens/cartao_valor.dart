@@ -6,6 +6,7 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/conversas.dart';
 import '../../../data/pagamentos.dart';
+import '../../../data/regras_valor.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
@@ -13,11 +14,118 @@ import '../../../shared/widgets/opcao_selecionavel.dart';
 /// Cada lado pode propor até 3 valores.
 const maxRodadasValor = 3;
 
-/// "Visita R$ 40 · Serviço R$ 150".
-String detalheValor(ValorProposta v) => [
-  if (v.visita > 0) 'Visita ${reaisInteiros(v.visita)}',
-  'Serviço ${reaisInteiros(v.servico)}',
-].join(' · ');
+/// "Visita R$ 40 · Serviço R$ 150"; à distância, "Serviço · sem visita"
+/// (RN-95); valor novo só de serviço, "Serviço · troca da tubulação".
+String detalheValor(ValorProposta v) {
+  if (v.distancia) return 'Serviço · sem visita';
+  if (v.visita == 0 && v.descricao != null) return 'Serviço · ${v.descricao}';
+  return [
+    if (v.visita > 0) 'Visita ${reaisInteiros(v.visita)}',
+    'Serviço ${reaisInteiros(v.servico)}',
+  ].join(' · ');
+}
+
+/// RN-91: "Em 6x de R$ 200,00" ou "À vista".
+String textoParcelas(double total, int parcelas) => parcelas <= 1
+    ? 'À vista'
+    : 'Em ${parcelas}x de ${reais(total / parcelas)}';
+
+/// C127 · Folha "Parcelar R$ 1.200,00": à vista, 3x ou 6x (RN-91).
+/// Devolve o número de parcelas escolhido (null se fechar).
+Future<int?> escolherParcelas(
+  BuildContext context, {
+  required double total,
+  required int atual,
+}) => mostrarFolha<int>(
+  context,
+  builder: (_) => _FolhaParcelas(total: total, atual: atual),
+);
+
+class _FolhaParcelas extends StatefulWidget {
+  const _FolhaParcelas({required this.total, required this.atual});
+
+  final double total;
+  final int atual;
+
+  @override
+  State<_FolhaParcelas> createState() => _FolhaParcelasState();
+}
+
+class _FolhaParcelasState extends State<_FolhaParcelas> {
+  late int _n = widget.atual;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = widget.total;
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          TatuMedidas.margem,
+          10,
+          TatuMedidas.margem,
+          TatuMedidas.base,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const AlcaFolha(),
+            const SizedBox(height: 22),
+            Text('Parcelar ${reais(t)}', style: TatuTexto.tituloFolha),
+            const SizedBox(height: TatuMedidas.entreItens + 4),
+            for (final n in RegrasValor.opcoesParcelas) ...[
+              OpcaoSelecionavel(
+                selecionado: _n == n,
+                onTap: () => setState(() => _n = n),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  child: Row(
+                    children: [
+                      BolinhaEscolha(selecionado: _n == n),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              n == 1 ? 'À vista' : '${n}x',
+                              style: const TextStyle(fontSize: 17),
+                            ),
+                            Text(
+                              n == 1
+                                  ? reais(t)
+                                  : '$n parcelas de ${reais(t / n)}',
+                              style: TatuTexto.nota,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+            Text(
+              'Parcelamento a partir de '
+              '${reais(RegrasValor.parcelarAPartirDe)}.',
+              style: TatuTexto.nota,
+            ),
+            const SizedBox(height: TatuMedidas.entreItens + 4),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(_n),
+              child: Text(_n == 1 ? 'Pagar à vista' : 'Usar ${_n}x'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 /// C17 · Cartão do valor que o profissional enviou: total, forma de
 /// pagamento (com "Trocar"), "Reservamos agora. Só cobramos no fim.",
@@ -29,11 +137,15 @@ class CartaoValorRecebido extends StatelessWidget {
     required this.onConfirmar,
     required this.onTrocar,
     required this.onPedirOutro,
+    this.onParcelas,
   });
 
   final ValorProposta valor;
   final VoidCallback onConfirmar;
   final VoidCallback onTrocar;
+
+  /// RN-91: "Mudar" o número de parcelas (só a partir do mínimo).
+  final VoidCallback? onParcelas;
 
   /// null = já usou as 3 rodadas.
   final VoidCallback? onPedirOutro;
@@ -84,6 +196,15 @@ class CartaoValorRecebido extends StatelessWidget {
             ),
           ),
         ),
+        if (onParcelas != null && RegrasValor.podeParcelar(valor.total)) ...[
+          const SizedBox(height: 8),
+          _LinhaAcao(
+            texto: textoParcelas(valor.total, valor.parcelas),
+            acao: 'Mudar',
+            rotulo: 'Mudar parcelas',
+            onTap: onParcelas!,
+          ),
+        ],
         const SizedBox(height: TatuMedidas.entreItens),
         const Text(
           'Reservamos agora. Só cobramos no fim.',
@@ -132,6 +253,11 @@ class CartaoValorConfirmado extends StatelessWidget {
         const SizedBox(height: 6),
         _Total(valor.total),
         Text(detalheValor(valor), style: TatuTexto.detalhe),
+        if (valor.parcelas > 1)
+          Text(
+            textoParcelas(valor.total, valor.parcelas),
+            style: TatuTexto.detalhe,
+          ),
         const SizedBox(height: TatuMedidas.entreItens),
         Text(
           'Reservado ${cartao == null ? '' : 'no ${cartao.curto}'}. '
@@ -371,4 +497,56 @@ class _FolhaPedirState extends State<_FolhaPedir> {
       ),
     );
   }
+}
+
+/// Linha cinza com texto e ação azul à direita ("Em 6x de R$ 200,00 ·
+/// Mudar").
+class _LinhaAcao extends StatelessWidget {
+  const _LinhaAcao({
+    required this.texto,
+    required this.acao,
+    required this.rotulo,
+    required this.onTap,
+  });
+
+  final String texto;
+  final String acao;
+  final String rotulo;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: rotulo,
+    child: GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: TatuColors.fill,
+          borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                texto,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 15),
+              ),
+            ),
+            Text(
+              acao,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: TatuColors.verified,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }

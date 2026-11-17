@@ -204,7 +204,10 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
     return TelaInterna(
       titulo: 'Pedido',
       fundoCinza: true,
-      direita: p == null ? null : BotaoEscudo(servico: Atendimento.doPedido(p)),
+      // RN-98: à distância não tem botão de segurança.
+      direita: p == null || p.distancia
+          ? null
+          : BotaoEscudo(servico: Atendimento.doPedido(p)),
       corpo: p == null
           ? const SizedBox.shrink()
           : ListView(
@@ -285,14 +288,16 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
                               },
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: _BotaoContato(
-                              icone: TablerIcons.phone,
-                              texto: 'Ligar',
-                              onTap: () => emBreve('Ligar'),
+                          if (!p.distancia) ...[
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _BotaoContato(
+                                icone: TablerIcons.phone,
+                                texto: 'Ligar',
+                                onTap: () => emBreve('Ligar'),
+                              ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ],
@@ -301,14 +306,21 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
                 const SizedBox(height: TatuMedidas.entreItens + 4),
                 _CartaoBranco(
                   child: LinhaDoTempo(
-                    etapas: etapasPedido,
+                    etapas: p.etapas,
                     feitas: p.etapasFeitas,
                   ),
                 ),
                 const SizedBox(height: TatuMedidas.entreItens + 4),
                 GrupoCartao(
                   linhas: [
-                    LinhaRotuloValor(rotulo: 'Endereço', valor: p.endereco),
+                    // RN-93: à distância, o endereço não conta.
+                    if (p.distancia)
+                      const LinhaRotuloValor(
+                        rotulo: 'Atendimento',
+                        valor: 'À distância',
+                      )
+                    else
+                      LinhaRotuloValor(rotulo: 'Endereço', valor: p.endereco),
                     LinhaRotuloValor(rotulo: 'Valor combinado', valor: p.valor),
                     LinhaRotuloValor(rotulo: 'Pagamento', valor: p.pagamento),
                   ],

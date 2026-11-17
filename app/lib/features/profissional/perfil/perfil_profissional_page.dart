@@ -195,7 +195,9 @@ class PerfilProfissionalPage extends StatelessWidget {
                         ItemLista(
                           icone: TablerIcons.tools,
                           texto: 'Profissões',
-                          valor: p.profissoes.map((e) => e.nome).join(', '),
+                          valor: p.profissoes.length > 1
+                              ? '${p.profissoes.first.nome} +${p.profissoes.length - 1}'
+                              : p.profissoes.map((e) => e.nome).join(', '),
                           onTap: () => _abrir(
                             context,
                             const ProfissoesPage(doPerfil: true),

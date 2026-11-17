@@ -19,7 +19,11 @@ class ServicoAceito {
     this.bairro = 'Vila Mariana, São Paulo',
     this.celularCliente = '(11) 9••••-7777',
     this.pedido = 'TT-48213',
+    this.distancia = false,
   });
+
+  /// RN-95: serviço à distância (sem visita, rota, "Cheguei" nem porta).
+  final bool distancia;
 
   /// Bairro e cidade (para ler ao 190).
   final String bairro;
@@ -55,6 +59,19 @@ class ServicoAceito {
 /// Serviço de exemplo para a demonstração.
 const servicoExemplo = ServicoAceito();
 
+/// Serviço à distância de exemplo (RN-95).
+const servicoDistanciaExemplo = ServicoAceito(
+  cliente: 'Ana Martins',
+  descricao: 'Logo para loja de bolos',
+  valor: 250,
+  visita: 0,
+  rua: '',
+  referencia: '',
+  distanciaKm: 0,
+  minutos: 0,
+  distancia: true,
+);
+
 /// Chamado que chega para o profissional aceitar ou recusar.
 /// O endereço exato só aparece depois do valor confirmado.
 @immutable
@@ -77,9 +94,13 @@ class ChamadoNovo {
     this.estimativaMax = 250,
     this.temFoto = true,
     this.feminino = true,
+    this.distancia = false,
   });
 
   final bool feminino;
+
+  /// RN-93: chamado à distância (cliente de qualquer cidade, sem visita).
+  final bool distancia;
 
   final String profissao;
   final String titulo;
@@ -109,6 +130,26 @@ class ChamadoNovo {
 
 /// Chamado de exemplo para a demonstração.
 const chamadoExemplo = ChamadoNovo();
+
+/// Chamado à distância de exemplo (RN-93).
+const chamadoDistanciaExemplo = ChamadoNovo(
+  profissao: 'Designer',
+  titulo: 'Logo para loja de bolos',
+  descricao:
+      'Preciso de um logo simples e colorido para a minha loja de bolos.',
+  resumo: 'Logo para loja de bolos',
+  distanciaKm: 0,
+  minutos: 0,
+  urgente: false,
+  bairro: '',
+  rua: '',
+  complemento: '',
+  cidade: '',
+  estimativaMin: 150,
+  estimativaMax: 600,
+  temFoto: false,
+  distancia: true,
+);
 
 /// Segundos para aceitar um chamado (provisório: prazo em aberto).
 const segundosParaAceitar = 30;

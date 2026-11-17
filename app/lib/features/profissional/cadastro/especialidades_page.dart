@@ -7,6 +7,7 @@ import '../../../data/profissional.dart';
 import '../../../data/servicos.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/tatu_chip.dart';
+import 'como_atende_page.dart';
 import 'profissoes_page.dart';
 
 /// P05 · Passo 2: especialidades de uma profissão (até 3).
@@ -44,16 +45,24 @@ class _EspecialidadesPageState extends State<EspecialidadesPage> {
     final total = profissional.profissoes.length;
     if (widget.edicao) {
       Navigator.of(context).pop();
-    } else if (widget.indice < total - 1) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => EspecialidadesPage(indice: widget.indice + 1),
-        ),
-      );
-    } else {
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => const ProfissoesPage()));
+      return;
     }
+    final nav = Navigator.of(context);
+    // RN-97: depois das especialidades, como atende nesta profissão.
+    nav.push(
+      MaterialPageRoute(
+        builder: (_) => ComoAtendePage(
+          indice: widget.indice,
+          onContinuar: () => nav.push(
+            MaterialPageRoute(
+              builder: (_) => widget.indice < total - 1
+                  ? EspecialidadesPage(indice: widget.indice + 1)
+                  : const ProfissoesPage(),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   String get _botao {

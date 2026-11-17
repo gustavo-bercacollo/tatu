@@ -37,6 +37,9 @@ class _MensagensProfissionalPageState extends State<MensagensProfissionalPage> {
         builder: (_) => ChatProfissionalPage(
           chamado: c.chamado,
           concluidoPor: c.concluidaPor,
+          concluidoEm: c.concluidaEm,
+          depois: c.depois,
+          diaDepois: c.diaDepois,
         ),
       ),
     );

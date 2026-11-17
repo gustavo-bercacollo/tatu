@@ -19,16 +19,21 @@ import '../../../shared/widgets/tatu_chip.dart';
 Future<String?> escolherOutroServico(
   BuildContext context, {
   bool profissional = false,
+  bool distancia = false,
 }) => mostrarFolha<String>(
   context,
   alturaRelativa: 0.93,
-  builder: (_) => _FolhaOutros(profissional: profissional),
+  builder: (_) =>
+      _FolhaOutros(profissional: profissional, distancia: distancia),
 );
 
 class _FolhaOutros extends StatefulWidget {
-  const _FolhaOutros({this.profissional = false});
+  const _FolhaOutros({this.profissional = false, this.distancia = false});
 
   final bool profissional;
+
+  /// RN-92: cliente no modo à distância vê só serviços à distância.
+  final bool distancia;
 
   @override
   State<_FolhaOutros> createState() => _FolhaOutrosState();
@@ -126,27 +131,32 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
               bottom: TatuMedidas.entreSecoes,
             ),
             children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(
-                  16,
-                  0,
-                  16,
-                  TatuMedidas.tituloSecao,
+              if (!widget.distancia) ...[
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    0,
+                    16,
+                    TatuMedidas.tituloSecao,
+                  ),
+                  child: Text(
+                    'MAIS PEDIDOS PERTO DE VOCÊ',
+                    style: TatuTexto.secao,
+                  ),
                 ),
-                child: Text(
-                  'MAIS PEDIDOS PERTO DE VOCÊ',
-                  style: TatuTexto.secao,
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final s in maisPedidos)
+                      TatuChip(label: s, onTap: () => _escolher(s)),
+                  ],
                 ),
-              ),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  for (final s in maisPedidos)
-                    TatuChip(label: s, onTap: () => _escolher(s)),
-                ],
-              ),
-              for (final (titulo, lista) in gruposServicos) ...[
+              ],
+              for (final (titulo, lista) in [
+                if (!widget.distancia) ...gruposServicos,
+                if (widget.distancia || widget.profissional) grupoDistancia,
+              ]) ...[
                 const SizedBox(height: TatuMedidas.entreSecoes),
                 GrupoLista(
                   titulo: titulo,

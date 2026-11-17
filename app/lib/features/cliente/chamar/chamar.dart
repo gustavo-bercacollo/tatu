@@ -14,11 +14,16 @@ import 'procurando_page.dart';
 
 /// "Chamar (serviço)": antes de procurar, confere localização, região,
 /// celular para contato e se já há um pedido igual a caminho.
-Future<void> chamarProfissional(BuildContext context, String servico) async {
+/// Com [distancia] (RN-93), endereço e localização não contam.
+Future<void> chamarProfissional(
+  BuildContext context,
+  String servico, {
+  bool distancia = false,
+}) async {
   final nav = Navigator.of(context);
 
   // 1. Sem localização não achamos profissionais perto.
-  if (!enderecos.localizacaoPermitida) {
+  if (!distancia && !enderecos.localizacaoPermitida) {
     final usarSalvo = await nav.push<bool>(
       MaterialPageRoute(builder: (_) => const LocalizacaoChamarPage()),
     );
@@ -27,7 +32,7 @@ Future<void> chamarProfissional(BuildContext context, String servico) async {
   }
 
   // 2. Região ainda não atendida.
-  if (!chamado.regiaoAtendida) {
+  if (!distancia && !chamado.regiaoAtendida) {
     final mudar = await nav.push<bool>(
       MaterialPageRoute(builder: (_) => const ForaDaAreaPage()),
     );
@@ -47,9 +52,12 @@ Future<void> chamarProfissional(BuildContext context, String servico) async {
   if (atual != null && atual.servico == servico && context.mounted) {
     final chamarOutro = await perguntar(
       context,
-      titulo: 'Já tem um ${servico.toLowerCase()} a caminho',
-      texto:
-          'A ${atual.primeiroNome} chega em ${atual.chegaEm}.\nQuer chamar outro mesmo assim?',
+      titulo: atual.distancia
+          ? 'Já tem um ${servico.toLowerCase()} atendendo'
+          : 'Já tem um ${servico.toLowerCase()} a caminho',
+      texto: atual.distancia
+          ? '${atual.artigoNome} está com o seu pedido.\nQuer chamar outro mesmo assim?'
+          : 'A ${atual.primeiroNome} chega em ${atual.chegaEm}.\nQuer chamar outro mesmo assim?',
       confirmar: 'Chamar outro',
       cancelar: 'Ver pedido atual',
       destacarCancelar: true,
@@ -64,8 +72,11 @@ Future<void> chamarProfissional(BuildContext context, String servico) async {
   // 5. Procura: pedido vai a todos os ativos por perto.
   nav.push(
     MaterialPageRoute(
-      builder: (_) =>
-          ProcurandoPage(servico: servico, endereco: enderecos.atual.rua),
+      builder: (_) => ProcurandoPage(
+        servico: servico,
+        endereco: distancia ? 'À distância' : enderecos.atual.rua,
+        distancia: distancia,
+      ),
     ),
   );
 }

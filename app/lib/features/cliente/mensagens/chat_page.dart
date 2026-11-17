@@ -59,9 +59,19 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
-  void _trocarPagamento() => Navigator.of(
-    context,
-  ).push(MaterialPageRoute(builder: (_) => const PagamentoPage()));
+  /// RN-91: escolhe em quantas vezes paga.
+  Future<void> _parcelas(ValorProposta v) async {
+    final n = await escolherParcelas(
+      context,
+      total: v.total,
+      atual: v.parcelas,
+    );
+    if (n != null && mounted) conversas.escolherParcelas(_c, n);
+  }
+
+  void _trocarPagamento() =>
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => const PagamentoPage()));
 
   Future<void> _pedirOutro() async {
     final v = _c.valor;
@@ -80,10 +90,13 @@ class _ChatPageState extends State<ChatPage> {
 
   List<Widget> _valor() {
     final v = _c.valor;
-    if (v == null || _c.encerrada) return const [];
+    if (v == null) return const [];
     return [
       const SizedBox(height: TatuMedidas.entreSecoes),
-      NotaChat('${_c.primeiroNome} enviou um valor'),
+      // RN-87: numa conversa que já teve serviço, é um valor novo.
+      NotaChat(
+        '${_c.primeiroNome} enviou ${v.novo ? 'um novo valor' : 'um valor'}',
+      ),
       const SizedBox(height: TatuMedidas.entreItens),
       switch (v.situacao) {
         SituacaoValor.aguardandoVoce => CartaoValorRecebido(
@@ -94,8 +107,17 @@ class _ChatPageState extends State<ChatPage> {
             if (pedidos.andamento?.profissional == _c.nome) {
               pedidos.valorConfirmado();
             }
+            // RN-96: à distância, a entrega chega pelo chat (protótipo).
+            if (_c.distancia) {
+              _timer?.cancel();
+              _timer = Timer(
+                widget.resposta * 2,
+                () => conversas.receberEntrega(_c),
+              );
+            }
           },
           onTrocar: _trocarPagamento,
+          onParcelas: () => _parcelas(v),
           onPedirOutro: v.rodada < maxRodadasValor ? _pedirOutro : null,
         ),
         SituacaoValor.pediuOutro => CartaoValorPedido(
@@ -260,54 +282,71 @@ class _ChatPageState extends State<ChatPage> {
             ),
             const SizedBox(height: TatuMedidas.entreItens + 4),
             for (final (i, m) in msgs.indexed)
-              Padding(
-                padding: EdgeInsets.only(
-                  top: espacoAntesDoBalao(
-                    anteriorMinha: i == 0 ? null : msgs[i - 1].minha,
+              if (m.concluido != null)
+                // RN-42: o serviço acabou, a conversa continua.
+                Padding(
+                  padding: const EdgeInsets.only(top: 18),
+                  child: MarcoConcluido(m.concluido!),
+                )
+              else if (m.dia != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 18),
+                  child: SeparadorDia(m.dia!),
+                )
+              else if (m.arquivo != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 18),
+                  child: BalaoArquivo(
+                    nome: m.arquivo!,
+                    detalhe: m.arquivoDetalhe ?? '',
                     minha: m.minha,
                   ),
+                )
+              else
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: _primeiroDoBloco(msgs, i)
+                        ? (i == 0 ? 0 : 18)
+                        : espacoAntesDoBalao(
+                            anteriorMinha: msgs[i - 1].minha,
+                            minha: m.minha,
+                          ),
+                  ),
+                  child: BalaoChat(
+                    texto: m.texto,
+                    minha: m.minha,
+                    outro: '${_c.artigo} ${_c.primeiroNome}',
+                    foto: m.foto,
+                    imagem: m.imagem,
+                    legenda: i == ultimaFotoMinha && m.hora != null
+                        ? 'Enviada · ${m.hora}'
+                        : null,
+                    falhou: m.envio == EnvioMensagem.falhou,
+                    onTentarDeNovo: () => conversas.reenviar(m),
+                  ),
                 ),
-                child: BalaoChat(
-                  texto: m.texto,
-                  minha: m.minha,
-                  outro: '${_c.artigo} ${_c.primeiroNome}',
-                  foto: m.foto,
-                  imagem: m.imagem,
-                  legenda: i == ultimaFotoMinha && m.hora != null
-                      ? 'Enviada · ${m.hora}'
-                      : null,
-                  falhou: m.envio == EnvioMensagem.falhou,
-                  onTentarDeNovo: () => conversas.reenviar(m),
-                ),
-              ),
             ..._valor(),
-            if (_c.encerrada) ...[
-              const SizedBox(height: TatuMedidas.entreSecoes + 8),
-              NotaChat('Serviço concluído em ${_c.concluidoEm}'),
-            ],
           ],
-          rodapeColado: _c.encerrada,
-          rodape: _c.encerrada
-              ? const ConversaEncerrada()
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (conversas.semInternet || algumaFalhou) ...[
-                      const _SemInternet(),
-                      const SizedBox(height: TatuMedidas.entreItens),
-                    ],
-                    // RN-85: contato não passa pelo chat.
-                    BarraMensagem(
-                      controller: _campo,
-                      onEnviar: _enviar,
-                      onCamera: _anexar,
-                      porQue:
-                          'Pelo Tatu o serviço tem garantia. Chame '
-                          '${_c.artigo} ${_c.primeiroNome} de novo pelo app.',
-                    ),
-                  ],
-                ),
+          // RN-42: a conversa nunca fecha.
+          rodape: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (conversas.semInternet || algumaFalhou) ...[
+                const _SemInternet(),
+                const SizedBox(height: TatuMedidas.entreItens),
+              ],
+              // RN-85: contato não passa pelo chat.
+              BarraMensagem(
+                controller: _campo,
+                onEnviar: _enviar,
+                onCamera: _anexar,
+                porQue:
+                    'Pelo Tatu o serviço tem garantia. Chame '
+                    '${_c.artigo} ${_c.primeiroNome} de novo pelo app.',
+              ),
+            ],
+          ),
         );
       },
     );
@@ -410,4 +449,11 @@ class _SemInternet extends StatelessWidget {
       ),
     );
   }
+}
+
+/// O balão vem logo depois de um marco, separador ou arquivo?
+bool _primeiroDoBloco(List<MensagemChat> msgs, int i) {
+  if (i == 0) return true;
+  final a = msgs[i - 1];
+  return a.concluido != null || a.dia != null || a.arquivo != null;
 }

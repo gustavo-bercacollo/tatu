@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/features/profissional/cadastro/como_atende_page.dart';
 import 'package:tatu/features/profissional/chamado/toque_chamado.dart';
 import 'package:tatu/data/conversas_profissional.dart';
 import 'package:tatu/data/atendimento_profissional.dart';
@@ -906,20 +907,83 @@ void main() {
     await _capturar(t, 'chat-nao-enviada', ChatPage(conversa: c));
   });
 
-  testWidgets('chat-encerrado', (t) async {
+  // RN-42: a conversa continua depois do serviço (C125).
+  Conversa conversaContinua({ValorProposta? valor}) {
     final l = ConversasRepo().conversas.first;
-    final c = Conversa(
+    return Conversa(
       nome: l.nome,
       profissao: l.profissao,
       feminino: l.feminino,
       servico: l.servico,
       descricao: l.descricao,
       rua: l.rua,
-      quando: '04 nov',
+      quando: '12 nov',
       concluidoEm: '04 nov',
-      mensagens: l.mensagens,
+      mensagens: [
+        ...l.mensagens,
+        MensagemChat.concluido('Serviço concluído · R\$ 190,00 · 04 nov'),
+        MensagemChat.dia('12 nov'),
+        MensagemChat(
+          texto: 'A torneira do banheiro começou a pingar.',
+          minha: true,
+        ),
+        MensagemChat(texto: 'Consigo passar aí hoje. Já te mando o valor.'),
+      ],
+      valor: valor,
     );
-    await _capturar(t, 'chat-encerrado', ChatPage(conversa: c));
+  }
+
+  testWidgets('chat-conversa-continua', (t) async {
+    await _capturar(
+      t,
+      'chat-conversa-continua',
+      ChatPage(conversa: conversaContinua()),
+    );
+  });
+
+  // RN-87 e RN-91: novo valor na mesma conversa, parcelado (C126–C127).
+  ValorProposta valorNovo() => ValorProposta(
+    visita: 0,
+    servico: 1200,
+    descricao: 'troca da tubulação',
+    novo: true,
+    parcelas: 6,
+  );
+
+  Future<void> rolarAteValor(WidgetTester t) async {
+    await t.scrollUntilVisible(
+      find.text('Pedir outro valor'),
+      300,
+      scrollable: find
+          .descendant(
+            of: find.byType(ListView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await t.pump();
+  }
+
+  testWidgets('chat-novo-valor-parcelado', (t) async {
+    await _capturar(
+      t,
+      'chat-novo-valor-parcelado',
+      ChatPage(conversa: conversaContinua(valor: valorNovo())),
+      preparar: () => rolarAteValor(t),
+    );
+  });
+
+  testWidgets('chat-escolher-parcelas', (t) async {
+    await _capturar(
+      t,
+      'chat-escolher-parcelas',
+      ChatPage(conversa: conversaContinua(valor: valorNovo())),
+      preparar: () async {
+        await rolarAteValor(t);
+        await t.tap(find.text('Mudar'));
+        await t.pumpAndSettle();
+      },
+    );
   });
 
   testWidgets('chat-menu', (t) async {
@@ -2512,11 +2576,194 @@ void main() {
     );
   });
 
-  testWidgets('pro-chat-encerrado', (t) async {
+  // RN-42 e RN-87: conversa contínua do profissional (P77).
+  testWidgets('pro-chat-conversa-continua', (t) async {
     await comDemo(
       t,
-      'pro-chat-encerrado',
-      const ChatProfissionalPage(concluidoPor: 150),
+      'pro-chat-conversa-continua',
+      const ChatProfissionalPage(
+        concluidoPor: 190,
+        concluidoEm: '04 nov',
+        diaDepois: '12 nov',
+        depois: [
+          ('A torneira do banheiro começou a pingar.', false),
+          ('Consigo passar aí hoje. Já te mando o valor.', true),
+        ],
+      ),
+    );
+  });
+
+  // ---------- À distância (RN-92 a RN-98) ----------
+
+  testWidgets('pro-distancia-como-atende', (t) async {
+    await comDemo(
+      t,
+      'pro-distancia-como-atende',
+      const ComoAtendePage(indice: 1),
+    );
+  });
+
+  testWidgets('pro-distancia-home-online', (t) async {
+    await comDemo(
+      t,
+      'pro-distancia-home-online',
+      const HomeProfissionalPage(chamadoEm: Duration(hours: 1)),
+      depois: () async {
+        profissional.ficarOnline(true);
+        await t.pump();
+      },
+    );
+    profissional.ficarOnline(false);
+  });
+
+  testWidgets('pro-distancia-novo-chamado', (t) async {
+    await comDemo(
+      t,
+      'pro-distancia-novo-chamado',
+      const NovoChamadoPage(chamado: chamadoDistanciaExemplo, restante: 21),
+    );
+  });
+
+  testWidgets('pro-distancia-enviar-valor', (t) async {
+    await comDemo(
+      t,
+      'pro-distancia-enviar-valor',
+      const ChatProfissionalPage(chamado: chamadoDistanciaExemplo),
+      depois: () async {
+        await t.tap(find.text('Enviar valor'));
+        await t.pumpAndSettle();
+        await t.enterText(find.byType(TextField).last, '250');
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-distancia-em-andamento', (t) async {
+    await comDemo(
+      t,
+      'pro-distancia-em-andamento',
+      EmAndamentoPage(
+        servico: servicoDistanciaExemplo,
+        inicio: DateTime(2026, 11, 14, 14, 32),
+      ),
+    );
+  });
+
+  testWidgets('distancia-home', (t) async {
+    await _capturar(
+      t,
+      'distancia-home',
+      const HomeClientePage(distancia: true),
+      preparar: () async {
+        await t.enterText(
+          find.byType(TextField),
+          'preciso de um logo para a minha loja de bolos',
+        );
+        await t.pump(const Duration(milliseconds: 600));
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('distancia-procurando', (t) async {
+    await _capturar(
+      t,
+      'distancia-procurando',
+      const ProcurandoPage(
+        servico: 'Designer',
+        endereco: 'À distância',
+        distancia: true,
+        animar: false,
+      ),
+    );
+  });
+
+  testWidgets('distancia-encontrado', (t) async {
+    await _capturar(
+      t,
+      'distancia-encontrado',
+      const EncontradoPage(
+        servico: 'Designer',
+        endereco: 'À distância',
+        distancia: true,
+        animar: false,
+        restante: 168,
+      ),
+    );
+  });
+
+  Conversa conversaDistancia({bool entregue = false}) {
+    final c = ConversasRepo().comecar(
+      nome: 'Marina Reis',
+      profissao: 'Designer',
+      feminino: true,
+      servico: 'Designer',
+      rua: 'À distância',
+      distancia: true,
+    );
+    return Conversa(
+      nome: c.nome,
+      profissao: c.profissao,
+      feminino: true,
+      servico: 'Designer',
+      descricao: 'Logo para loja de bolos',
+      rua: 'À distância',
+      quando: 'agora',
+      distancia: true,
+      emAndamento: true,
+      mensagens: [
+        MensagemChat(texto: 'Oi, Ana! Que estilo você imagina?'),
+        MensagemChat(texto: 'Algo simples e colorido.', minha: true),
+        MensagemChat(texto: 'Consigo entregar amanhã.'),
+        if (entregue) ...[
+          MensagemChat(arquivo: 'logo-bolos-v1.pdf', arquivoDetalhe: 'PDF · 2,4 MB'),
+          MensagemChat(texto: 'Segue a primeira versão!'),
+          MensagemChat(texto: 'Ficou ótimo, obrigada!', minha: true),
+          MensagemChat.concluido('Serviço concluído · R\$ 250,00 · 15 nov'),
+        ],
+      ],
+      valor: entregue ? null : c.valor,
+    );
+  }
+
+  testWidgets('distancia-chat-valor', (t) async {
+    await _capturar(
+      t,
+      'distancia-chat-valor',
+      ChatPage(conversa: conversaDistancia()),
+    );
+  });
+
+  testWidgets('distancia-pedido-em-andamento', (t) async {
+    await _capturar(
+      t,
+      'distancia-pedido-em-andamento',
+      const PedidoAndamentoPage(),
+      preparar: () async {
+        pedidos.aceitar(
+          const PedidoAndamento(
+            servico: 'Designer',
+            profissao: 'Designer',
+            profissional: 'Marina Reis',
+            nota: '4,9',
+            endereco: 'À distância',
+            valor: r'R$ 250,00',
+            pagamento: 'Visa 4242',
+            etapasFeitas: 3,
+            distancia: true,
+          ),
+        );
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('distancia-chat-entrega', (t) async {
+    await _capturar(
+      t,
+      'distancia-chat-entrega',
+      ChatPage(conversa: conversaDistancia(entregue: true)),
     );
   });
 

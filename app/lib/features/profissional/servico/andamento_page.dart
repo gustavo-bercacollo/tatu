@@ -7,6 +7,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../data/atendimento_profissional.dart';
 import '../../../data/prazos.dart';
+import '../../../data/regras_valor.dart';
 
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
@@ -23,6 +24,7 @@ import '../../../shared/widgets/back_circle_button.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/mapa_falso.dart';
+import '../../../shared/widgets/nota_icone.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import 'rota.dart';
 import '../../entrada/seguranca.dart';
@@ -434,7 +436,8 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
 }
 
 /// P25 · Serviço em andamento: cliente, valor, início, escudo de
-/// segurança no topo e "Concluir e cobrar".
+/// segurança no topo e "Concluir e cobrar". À distância (P111): sem
+/// escudo (RN-98), sem visita e com "Enviar a entrega" (RN-96).
 class EmAndamentoPage extends StatelessWidget {
   const EmAndamentoPage({
     super.key,
@@ -535,12 +538,17 @@ class EmAndamentoPage extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: BotaoEscudo(
-                            servico: Atendimento.doServico(s, chegouAs: hora),
+                        // RN-98: à distância ninguém vai até ninguém.
+                        if (!s.distancia)
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: BotaoEscudo(
+                              servico: Atendimento.doServico(
+                                s,
+                                chegouAs: hora,
+                              ),
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -557,6 +565,15 @@ class EmAndamentoPage extends StatelessWidget {
                     child: ListView(
                       padding: const EdgeInsets.only(top: 10),
                       children: [
+                        // RN-89: valor aberto há mais de 7 dias.
+                        if (RegrasValor.vencido(inicio, DateTime.now())) ...[
+                          const CaixaAviso(
+                            'Este valor está aberto há mais de 7 dias. '
+                            'Conclua o serviço ou divida o trabalho em partes, '
+                            'com um novo valor para cada uma.',
+                          ),
+                          const SizedBox(height: TatuMedidas.entreItens),
+                        ],
                         Container(
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
                           decoration: BoxDecoration(
@@ -604,8 +621,14 @@ class EmAndamentoPage extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      'Iniciado às $hora',
-                                      style: TatuTexto.detalhe,
+                                      s.distancia
+                                          ? 'À distância · iniciado às $hora'
+                                          : 'Iniciado às $hora',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: s.distancia
+                                          ? TatuTexto.nota
+                                          : TatuTexto.detalhe,
                                     ),
                                   ),
                                   const SizedBox(
@@ -619,8 +642,8 @@ class EmAndamentoPage extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  const Text(
-                                    'Em serviço',
+                                  Text(
+                                    s.distancia ? 'Em andamento' : 'Em serviço',
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
@@ -633,6 +656,16 @@ class EmAndamentoPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: TatuMedidas.entreItens + 8),
+                        if (s.distancia) ...[
+                          // RN-96: a entrega é pelo chat, com arquivos.
+                          CartaoAcao(
+                            icone: const Icon(TablerIcons.upload, size: 22),
+                            titulo: 'Enviar a entrega',
+                            detalhe: 'Mande os arquivos pelo chat.',
+                            onTap: () => _emBreve(context, 'Chat'),
+                          ),
+                          const SizedBox(height: TatuMedidas.entreItens),
+                        ],
                         CartaoAcao(
                           icone: const Icon(TablerIcons.pencil, size: 22),
                           titulo: 'Precisa mudar o valor?',

@@ -80,6 +80,11 @@ const _especialidades = {
   'Ar-condicionado': ['Instalação', 'Limpeza', 'Manutenção', 'Recarga de gás'],
   'Jardinagem': ['Corte de grama', 'Poda', 'Paisagismo', 'Limpeza de terreno'],
   'Limpeza': ['Residencial', 'Pós-obra', 'Vidros', 'Estofados'],
+  'Designer': ['Logos', 'Identidade visual', 'Posts', 'Cardápios', 'Embalagens'],
+  'Programador': ['Sites', 'Aplicativos', 'Planilhas', 'Automação'],
+  'Professor': ['Reforço escolar', 'Inglês', 'Matemática', 'Redação'],
+  'Contador': ['MEI', 'Imposto de renda', 'Abertura de empresa', 'Folha'],
+  'Advogado': ['Contratos', 'Trabalhista', 'Família', 'Consumidor'],
 };
 
 /// Especialidades que dá para escolher em cada profissão.
@@ -95,14 +100,59 @@ String profissaoNoGenero(String p, {required bool feminino}) {
   return p;
 }
 
+/// RN-97: como o profissional atende em cada profissão.
+enum ModoAtendimento { local, distancia, ambos }
+
+extension ModoAtendimentoTexto on ModoAtendimento {
+  String get nome => switch (this) {
+    ModoAtendimento.local => 'No local',
+    ModoAtendimento.distancia => 'À distância',
+    ModoAtendimento.ambos => 'Os dois',
+  };
+
+  bool get local => this != ModoAtendimento.distancia;
+  bool get remoto => this != ModoAtendimento.local;
+}
+
+/// Profissões que costumam ser à distância (escolha inicial em "Como você
+/// atende?"; exemplos, decisão em aberto).
+const profissoesDistancia = [
+  'Designer',
+  'Programador',
+  'Professor',
+  'Contador',
+  'Advogado',
+  'Tradutor',
+  'Redator',
+  'Editor de vídeo',
+  'Social media',
+];
+
+/// Modo sugerido para uma profissão nova.
+ModoAtendimento modoSugerido(String profissao) =>
+    profissoesDistancia.contains(profissao)
+    ? ModoAtendimento.distancia
+    : ModoAtendimento.local;
+
 @immutable
 class ProfissaoEscolhida {
-  const ProfissaoEscolhida(this.nome, [this.especialidades = const []]);
+  const ProfissaoEscolhida(
+    this.nome, [
+    this.especialidades = const [],
+    this.modo = ModoAtendimento.local,
+  ]);
 
   final String nome;
   final List<String> especialidades;
 
-  ProfissaoEscolhida com(List<String> esp) => ProfissaoEscolhida(nome, esp);
+  /// RN-97: no local, à distância ou os dois.
+  final ModoAtendimento modo;
+
+  ProfissaoEscolhida com(List<String> esp) =>
+      ProfissaoEscolhida(nome, esp, modo);
+
+  ProfissaoEscolhida comModo(ModoAtendimento m) =>
+      ProfissaoEscolhida(nome, especialidades, m);
 }
 
 enum TipoPix { cpf, celular, email, aleatoria }
@@ -296,6 +346,7 @@ class ProfissionalRepo extends ChangeNotifier {
     celular = '';
     feminino = false;
     profissoes = [];
+    _chamadosDe = null;
     pixTipo = null;
     pixChave = null;
     verificacao = Verificacao.naoEnviada;
@@ -320,7 +371,14 @@ class ProfissionalRepo extends ChangeNotifier {
     feminino = true;
     profissoes = const [
       ProfissaoEscolhida('Encanador', ['Reparos', 'Instalações', 'Esgoto']),
+      // RN-97: uma profissão à distância para a demonstração.
+      ProfissaoEscolhida(
+        'Designer',
+        ['Logos', 'Identidade visual', 'Posts'],
+        ModoAtendimento.distancia,
+      ),
     ];
+    _chamadosDe = null;
     pixTipo = comPix ? TipoPix.cpf : null;
     pixChave = comPix ? cpf : null;
     verificacao = aprovada ? Verificacao.aprovada : Verificacao.emAnalise;
@@ -346,6 +404,42 @@ class ProfissionalRepo extends ChangeNotifier {
     profissoes = List.of(lista);
     notifyListeners();
   }
+
+  /// RN-97: muda como atende numa profissão.
+  void definirModo(String profissao, ModoAtendimento modo) {
+    profissoes = [
+      for (final p in profissoes) p.nome == profissao ? p.comModo(modo) : p,
+    ];
+    notifyListeners();
+  }
+
+  /// RN-11: profissões em que recebe chamados agora (nulo = todas).
+  List<String>? _chamadosDe;
+
+  List<String> get chamadosDe => [
+    for (final p in profissoes)
+      if (_chamadosDe == null || _chamadosDe!.contains(p.nome)) p.nome,
+  ];
+
+  /// Liga ou desliga uma profissão; pelo menos uma continua ligada.
+  void alternarChamadosDe(String profissao) {
+    final atual = chamadosDe;
+    if (atual.contains(profissao)) {
+      if (atual.length == 1) return;
+      _chamadosDe = [...atual]..remove(profissao);
+    } else {
+      _chamadosDe = [...atual, profissao];
+    }
+    notifyListeners();
+  }
+
+  /// Profissões ligadas em que atende no local / à distância (RN-93).
+  bool get recebeNoLocal => profissoes.any(
+    (p) => chamadosDe.contains(p.nome) && p.modo.local,
+  );
+  bool get recebeDistancia => profissoes.any(
+    (p) => chamadosDe.contains(p.nome) && p.modo.remoto,
+  );
 
   void definirEspecialidades(String profissao, List<String> esp) {
     profissoes = [

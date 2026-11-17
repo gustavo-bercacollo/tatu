@@ -11,6 +11,7 @@ import '../../../data/servico_profissional.dart';
 import '../../../data/servicos.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
+import '../cadastro/especialidades_page.dart' show EtiquetaCinza;
 import 'chat_profissional_page.dart';
 import 'toque_chamado.dart';
 
@@ -170,18 +171,33 @@ class _NovoChamadoPageState extends State<NovoChamadoPage> {
                           ],
                         ],
                       ),
+                      if (c.distancia) ...[
+                        // RN-93/RN-95: chamado à distância, sem visita.
+                        const SizedBox(height: TatuMedidas.entreItens),
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: EtiquetaCinza(
+                            icone: TablerIcons.world,
+                            texto: 'À distância',
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: TatuMedidas.entreItens + 4),
                       const Divider(height: 1),
                       IntrinsicHeight(
                         child: Row(
                           children: [
-                            _Dado('${c.minutos} min', '$km km'),
-                            const VerticalDivider(
-                              width: 1,
-                              indent: 12,
-                              endIndent: 12,
-                            ),
-                            _Dado(c.bairro, 'região'),
+                            if (c.distancia)
+                              const _Dado('Sem visita', 'tudo pelo chat')
+                            else ...[
+                              _Dado('${c.minutos} min', '$km km'),
+                              const VerticalDivider(
+                                width: 1,
+                                indent: 12,
+                                endIndent: 12,
+                              ),
+                              _Dado(c.bairro, 'região'),
+                            ],
                             const VerticalDivider(
                               width: 1,
                               indent: 12,
@@ -194,7 +210,8 @@ class _NovoChamadoPageState extends State<NovoChamadoPage> {
                       const Divider(height: 1),
                       const SizedBox(height: TatuMedidas.entreItens),
                       Text(
-                        'Estimativa na região: R\$ ${c.estimativaMin} a '
+                        '${c.distancia ? 'Estimativa' : 'Estimativa na região'}: '
+                        'R\$ ${c.estimativaMin} a '
                         'R\$ ${c.estimativaMax}',
                         textAlign: TextAlign.center,
                         style: TatuTexto.nota,

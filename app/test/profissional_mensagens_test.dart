@@ -32,13 +32,16 @@ void main() {
     expect(find.text('Nenhuma conversa ainda'), findsOneWidget);
   });
 
-  testWidgets('Conversa anterior fica encerrada', (t) async {
+  // RN-42 e RN-87: a conversa continua e dá para enviar um novo valor.
+  testWidgets('Conversa anterior continua: Enviar novo valor', (t) async {
     await _abrir(t);
     await t.tap(find.text('Júlia Costa'));
     await t.pumpAndSettle();
-    expect(find.text('Serviço concluído · R\$ 120,00'), findsOneWidget);
-    expect(find.text('Esta conversa foi encerrada'), findsOneWidget);
-    expect(find.text('Enviar valor'), findsNothing);
+    expect(find.text('Serviço concluído · R\$ 120,00 · 04 nov'), findsOneWidget);
+    expect(find.text('12 nov'), findsOneWidget);
+    expect(find.text('Esta conversa foi encerrada'), findsNothing);
+    expect(find.text('Enviar novo valor'), findsOneWidget);
+    expect(find.text('Estou a caminho'), findsNothing);
   });
 
   testWidgets('Opções: denunciar a cliente', (t) async {

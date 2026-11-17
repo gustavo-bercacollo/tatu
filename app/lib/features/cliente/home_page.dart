@@ -15,6 +15,7 @@ import '../../data/servicos.dart';
 import '../../data/sugestao_servico.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import '../../shared/widgets/conta_pausada.dart';
+import '../../shared/widgets/segmento.dart';
 import '../../data/ajuda.dart';
 import 'ajuda/abrir_ajuda.dart';
 import '../../data/prazos.dart';
@@ -32,9 +33,16 @@ import 'perfil_page.dart';
 
 /// Home do cliente: descreve o problema, escolhe (ou a IA marca) o serviço e chama.
 class HomeClientePage extends StatefulWidget {
-  const HomeClientePage({super.key, this.ia = const SugestaoServicoMock()});
+  const HomeClientePage({
+    super.key,
+    this.ia = const SugestaoServicoMock(),
+    this.distancia = false,
+  });
 
   final SugestaoServico ia;
+
+  /// Abre já no modo "À distância" (fluxograma e testes).
+  final bool distancia;
 
   @override
   State<HomeClientePage> createState() => _HomeClientePageState();
@@ -54,6 +62,12 @@ class _HomeClientePageState extends State<HomeClientePage> {
   /// Sugestão da IA pela descrição; só aparece sem escolha manual.
   String? _sugerido;
 
+  /// RN-92: pedido "No local" (padrão) ou "À distância".
+  late bool _distancia = widget.distancia;
+
+  /// Chips da Home no modo atual.
+  List<String> get _chips => _distancia ? servicosDistanciaHome : servicosHome;
+
   String? get _servico => _manual ?? _sugerido;
   bool get _pelaIa => _manual == null && _sugerido != null;
 
@@ -62,7 +76,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
 
   /// Serviço escolhido em "Outros" (fica no lugar do chip "Outros").
   String? get _outro =>
-      _manual != null && !servicosHome.contains(_manual) ? _manual : null;
+      _manual != null && !_chips.contains(_manual) ? _manual : null;
 
   @override
   void initState() {
@@ -89,9 +103,22 @@ class _HomeClientePageState extends State<HomeClientePage> {
     if (_naoSei) setState(() {});
     _espera?.cancel();
     _espera = Timer(const Duration(milliseconds: 500), () {
-      if (mounted) setState(() => _sugerido = widget.ia.sugerir(texto));
+      if (mounted) {
+        setState(
+          () => _sugerido = widget.ia.sugerir(texto, distancia: _distancia),
+        );
+      }
     });
   }
+
+  /// RN-92: troca No local / À distância; a escolha manual não vale para
+  /// o outro modo e a IA sugere de novo entre os serviços dele.
+  void _mudarModo(bool distancia) => setState(() {
+    if (_distancia == distancia) return;
+    _distancia = distancia;
+    _manual = null;
+    _sugerido = widget.ia.sugerir(_descricao.text, distancia: distancia);
+  });
 
   void _tocouServico(String s) => setState(() {
     _manual = _servico == s && !_pelaIa ? null : s;
@@ -99,7 +126,10 @@ class _HomeClientePageState extends State<HomeClientePage> {
   });
 
   Future<void> _outros() async {
-    final escolha = await escolherOutroServico(context);
+    final escolha = await escolherOutroServico(
+      context,
+      distancia: _distancia,
+    );
     if (escolha == null || !mounted) return;
     setState(() => _manual = escolha);
     if (escolha == naoSeiServico && _descricao.text.trim().isEmpty) {
@@ -211,19 +241,35 @@ class _HomeClientePageState extends State<HomeClientePage> {
                         const SizedBox(height: 16),
                         _caixaDescricao(),
                         const SizedBox(height: 22),
-                        const Text(
-                          'Serviço',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: TatuColors.textSecondary,
-                          ),
+                        Row(
+                          children: [
+                            const Expanded(
+                              child: Text(
+                                'Serviço',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: TatuColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                            // RN-92: o cliente escolhe o tipo de pedido.
+                            SizedBox(
+                              width: TatuMedidas.larguraSegmentoPequeno,
+                              child: Segmento(
+                                pequeno: true,
+                                opcoes: const ['No local', 'À distância'],
+                                selecionada: _distancia ? 1 : 0,
+                                onMudar: (i) => _mudarModo(i == 1),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 10),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
                           children: [
-                            for (final s in servicosHome)
+                            for (final s in _chips)
                               TatuChip(
                                 label: s,
                                 selecionado: servico == s,
@@ -287,7 +333,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
                     children: [
                       const EspacoAnuncio(),
                       const SizedBox(height: TatuMedidas.entreSecoes),
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(
@@ -303,7 +349,10 @@ class _HomeClientePageState extends State<HomeClientePage> {
                           SizedBox(width: 8),
                           Flexible(
                             child: Text(
-                              'Profissionais ativos perto de você',
+                              // RN-93: à distância, vale quem está online.
+                              _distancia
+                                  ? 'Profissionais online agora'
+                                  : 'Profissionais ativos perto de você',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -325,10 +374,15 @@ class _HomeClientePageState extends State<HomeClientePage> {
                                   : () => chamarProfissional(
                                       context,
                                       'Profissional',
+                                      distancia: _distancia,
                                     ))
                             : servico == null
                             ? null
-                            : () => chamarProfissional(context, servico),
+                            : () => chamarProfissional(
+                                context,
+                                servico,
+                                distancia: _distancia,
+                              ),
                         child: Text(
                           conta.pausadaPorAusencias
                               ? 'Chamar profissional'
@@ -355,6 +409,16 @@ class _HomeClientePageState extends State<HomeClientePage> {
   Widget _cabecalho() {
     return Row(
       children: [
+        // RN-93: à distância, o endereço não conta.
+        if (_distancia)
+          const Expanded(
+            child: Text(
+              'À distância · de qualquer lugar',
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 15, color: TatuColors.textSecondary),
+            ),
+          )
+        else
         Expanded(
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,

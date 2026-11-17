@@ -10,6 +10,7 @@ import '../../../data/servicos.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
+import 'como_atende_page.dart';
 import 'especialidades_page.dart';
 import 'pix_page.dart';
 import 'servicos_page.dart';
@@ -54,6 +55,11 @@ class ProfissoesPage extends StatelessWidget {
                     builder: (_) => EspecialidadesPage(indice: i, edicao: true),
                   ),
                 ),
+                onModo: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ComoAtendePage(indice: i, edicao: true),
+                  ),
+                ),
               ),
               const SizedBox(height: TatuMedidas.entreItens),
             ],
@@ -84,10 +90,17 @@ class ProfissoesPage extends StatelessWidget {
 }
 
 class _CartaoProfissao extends StatelessWidget {
-  const _CartaoProfissao({required this.profissao, required this.onEditar});
+  const _CartaoProfissao({
+    required this.profissao,
+    required this.onEditar,
+    required this.onModo,
+  });
 
   final ProfissaoEscolhida profissao;
   final VoidCallback onEditar;
+
+  /// RN-97: muda como atende (no local, à distância ou os dois).
+  final VoidCallback onModo;
 
   @override
   Widget build(BuildContext context) {
@@ -119,6 +132,18 @@ class _CartaoProfissao extends StatelessWidget {
                   style: esp.isEmpty
                       ? TatuTexto.nota.copyWith(color: TatuColors.warningTexto)
                       : TatuTexto.nota,
+                ),
+                const SizedBox(height: 4),
+                GestureDetector(
+                  onTap: onModo,
+                  behavior: HitTestBehavior.opaque,
+                  child: Text(
+                    'Atende: ${profissao.modo.nome.toLowerCase()} · Mudar',
+                    style: TatuTexto.nota.copyWith(
+                      color: TatuColors.verified,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ],
             ),

@@ -14,12 +14,14 @@ import '../../../core/theme/tatu_theme.dart';
 import '../../../data/ajuda.dart';
 import '../../../data/prazos.dart';
 import '../../../data/profissional.dart';
+import '../../../data/servico_profissional.dart';
 import '../../../shared/widgets/conta_pausada.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../cliente/ajuda/abrir_ajuda.dart';
 import '../../../shared/widgets/avatar_usuario.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
+import '../../../shared/widgets/tatu_chip.dart';
 import '../abas.dart';
 import '../cadastro/pix_page.dart';
 import '../perfil/perfil_profissional_page.dart';
@@ -68,8 +70,17 @@ class _HomeProfissionalPageState extends State<HomeProfissionalPage> {
     _chamado = Timer(widget.chamadoEm, () {
       if (!mounted || !profissional.online) return;
       if (ModalRoute.of(context)?.isCurrent != true) return;
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => const NovoChamadoPage()));
+      // RN-93: chega um chamado à distância só se ele recebe à distância
+      // e não está recebendo chamados no local.
+      final distancia =
+          profissional.recebeDistancia && !profissional.recebeNoLocal;
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => NovoChamadoPage(
+            chamado: distancia ? chamadoDistanciaExemplo : chamadoExemplo,
+          ),
+        ),
+      );
     });
   }
 
@@ -313,11 +324,44 @@ class _Painel extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                p.online
-                    ? 'Buscando chamados… Mantenha o app aberto.'
-                    : 'Fique online para receber chamados perto de você.',
+                !p.online
+                    ? 'Fique online para receber chamados perto de você.'
+                    : p.profissoes.length > 1
+                    ? 'Buscando chamados de ${_lista(p.chamadosDe)}…'
+                    : 'Buscando chamados… Mantenha o app aberto.',
                 style: TatuTexto.detalhe,
               ),
+              // RN-11: com mais de uma profissão, escolhe em quais recebe.
+              if (p.online && p.profissoes.length > 1) ...[
+                const SizedBox(height: TatuMedidas.entreItens + 4),
+                const Text('RECEBER CHAMADOS DE', style: TatuTexto.secao),
+                const SizedBox(height: TatuMedidas.tituloSecao + 2),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final pr in p.profissoes)
+                      TatuChip(
+                        label: pr.nome,
+                        icone: TablerIcons.check,
+                        selecionado: p.chamadosDe.contains(pr.nome),
+                        onTap: () => p.alternarChamadosDe(pr.nome),
+                      ),
+                  ],
+                ),
+                // RN-93/RN-97: avisa onde é à distância.
+                for (final pr in p.profissoes)
+                  if (pr.modo.remoto && p.chamadosDe.contains(pr.nome)) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      pr.modo == ModoAtendimento.ambos
+                          ? '${pr.nome}: no local e à distância.'
+                          : '${pr.nome}: à distância, chamados de qualquer '
+                                'cidade.',
+                      style: TatuTexto.nota,
+                    ),
+                  ],
+              ],
               if (!p.temPix) ...[
                 const SizedBox(height: TatuMedidas.entreItens + 4),
                 const _LembretePix(),
@@ -529,4 +573,11 @@ Future<bool> podeTrocarParaCliente(BuildContext context) async {
   );
   if (trocar) profissional.ficarOnline(false);
   return trocar;
+}
+
+/// "encanador e designer", "a, b e c".
+String _lista(List<String> nomes) {
+  final n = [for (final s in nomes) s.toLowerCase()];
+  if (n.length <= 1) return n.join();
+  return '${n.sublist(0, n.length - 1).join(', ')} e ${n.last}';
 }

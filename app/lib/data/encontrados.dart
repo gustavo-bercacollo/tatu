@@ -100,10 +100,68 @@ const filaEncontrados = [
   ),
 ];
 
+/// RN-94: fila à distância, sem distância nem chegada; vêm primeiro os
+/// mais bem avaliados que estão online.
+const filaDistancia = [
+  ProfissionalEncontrado(
+    nome: 'Marina Reis',
+    profissao: 'Designer',
+    feminino: true,
+    nota: '4,9',
+    servicos: 128,
+    chegaEm: '',
+    distancia: '',
+    resposta: '5 min',
+    especialidades: ['Logos', 'Identidade visual', 'Posts'],
+    sobre:
+        'Designer há 7 anos. Faço logos, cardápios e artes para pequenos '
+        'negócios.',
+  ),
+  ProfissionalEncontrado(
+    nome: 'Tiago Santos',
+    profissao: 'Designer',
+    feminino: false,
+    nota: '4,8',
+    servicos: 96,
+    chegaEm: '',
+    distancia: '',
+    resposta: '8 min',
+    especialidades: ['Logos', 'Embalagens', 'Ilustração'],
+    sobre: 'Crio identidades visuais e embalagens.',
+  ),
+  ProfissionalEncontrado(
+    nome: 'Julia Prado',
+    profissao: 'Designer',
+    feminino: true,
+    nota: '4,8',
+    servicos: 74,
+    chegaEm: '',
+    distancia: '',
+    resposta: '10 min',
+    especialidades: ['Posts', 'Apresentações', 'Logos'],
+    sobre: 'Artes para redes sociais e apresentações.',
+  ),
+  ProfissionalEncontrado(
+    nome: 'Carla Lima',
+    profissao: 'Designer',
+    feminino: true,
+    nota: '4,7',
+    servicos: 51,
+    chegaEm: '',
+    distancia: '',
+    resposta: '12 min',
+    especialidades: ['Cardápios', 'Convites', 'Logos'],
+    sobre: 'Cardápios, convites e logos com prazo curto.',
+  ),
+];
+
 /// Fila que vale para o cliente: com "Preferir profissionais mulheres",
-/// só profissionais mulheres.
-List<ProfissionalEncontrado> filaPara({required bool soMulheres}) => [
-  for (final p in filaEncontrados)
+/// só profissionais mulheres. Com [distancia], a fila à distância.
+List<ProfissionalEncontrado> filaPara({
+  required bool soMulheres,
+  bool distancia = false,
+}) => [
+  for (final p in distancia ? filaDistancia : filaEncontrados)
     if (!soMulheres || p.feminino) p,
 ];
 
@@ -112,13 +170,20 @@ List<ProfissionalEncontrado> filaPara({required bool soMulheres}) => [
 String estimativaDe(String servico) => switch (servico.toLowerCase()) {
   'eletricista' => r'R$ 90 a R$ 280',
   'pintor' => r'R$ 150 a R$ 600',
+  'designer' => r'R$ 150 a R$ 600',
+  'programador' => r'R$ 300 a R$ 2.000',
+  'professor' => r'R$ 60 a R$ 150',
+  'contador' => r'R$ 150 a R$ 500',
+  'advogado' => r'R$ 200 a R$ 800',
   _ => r'R$ 80 a R$ 250',
 };
 
 /// Perfil que o cliente vê em "Ver perfil" (dados simulados).
 PerfilPublico perfilDe(ProfissionalEncontrado p) => PerfilPublico(
   nome: p.nome,
-  subtitulo: '${p.profissao} · ${p.distancia} de você',
+  subtitulo: p.distancia.isEmpty
+      ? '${p.profissao} · à distância'
+      : '${p.profissao} · ${p.distancia} de você',
   nota: p.nota,
   servicos: p.servicos,
   resposta: p.resposta,

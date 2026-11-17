@@ -11,7 +11,11 @@ class Segmento extends StatelessWidget {
     required this.selecionada,
     required this.onMudar,
     this.icones = const {},
+    this.pequeno = false,
   });
+
+  /// Pílula menor, com texto de 13 (ex.: "No local | À distância").
+  final bool pequeno;
 
   final List<String> opcoes;
 
@@ -23,11 +27,15 @@ class Segmento extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: TatuMedidas.alturaSegmento,
+      height: pequeno
+          ? TatuMedidas.alturaSegmentoPequeno
+          : TatuMedidas.alturaSegmento,
       padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
         color: TatuColors.trilho,
-        borderRadius: BorderRadius.circular(TatuMedidas.raioSegmento),
+        borderRadius: BorderRadius.circular(
+          pequeno ? TatuMedidas.alturaSegmentoPequeno : TatuMedidas.raioSegmento,
+        ),
       ),
       child: Row(
         children: [
@@ -47,7 +55,9 @@ class Segmento extends StatelessWidget {
                           ? TatuColors.bg
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(
-                        TatuMedidas.raioSegmento - 2,
+                        pequeno
+                            ? TatuMedidas.alturaSegmentoPequeno
+                            : TatuMedidas.raioSegmento - 2,
                       ),
                     ),
                     child: Padding(
@@ -61,7 +71,7 @@ class Segmento extends StatelessWidget {
                               opcoes[i],
                               maxLines: 1,
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: pequeno ? 13 : 15,
                                 fontWeight: FontWeight.w600,
                                 color: i == selecionada
                                     ? TatuColors.textPrimary

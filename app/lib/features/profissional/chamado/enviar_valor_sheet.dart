@@ -29,22 +29,30 @@ class ValorProposto {
 }
 
 /// P24 · Folha "Quanto vai custar?". [rodada] é qual dos 3 valores
-/// possíveis este é. Devolve null se fechar sem enviar.
+/// possíveis este é. Com [distancia] (P110, RN-95), só o Serviço.
+/// Devolve null se fechar sem enviar.
 Future<ValorProposto?> pedirValor(
   BuildContext context, {
   required String cliente,
   required int rodada,
+  bool distancia = false,
 }) => mostrarFolha<ValorProposto>(
   context,
-  builder: (_) => _FolhaValor(cliente: cliente, rodada: rodada),
+  builder: (_) =>
+      _FolhaValor(cliente: cliente, rodada: rodada, distancia: distancia),
 );
 
 
 class _FolhaValor extends StatefulWidget {
-  const _FolhaValor({required this.cliente, required this.rodada});
+  const _FolhaValor({
+    required this.cliente,
+    required this.rodada,
+    this.distancia = false,
+  });
 
   final String cliente;
   final int rodada;
+  final bool distancia;
 
   @override
   State<_FolhaValor> createState() => _FolhaValorState();
@@ -77,8 +85,10 @@ class _FolhaValorState extends State<_FolhaValor> {
 
   @override
   Widget build(BuildContext context) {
+    final d = widget.distancia;
     final valor = ValorProposto(
-      visita: _ler(_visita),
+      // RN-95: à distância não tem visita.
+      visita: d ? 0 : _ler(_visita),
       servico: _ler(_servico),
     );
     final total = valor.total;
@@ -105,10 +115,21 @@ class _FolhaValorState extends State<_FolhaValor> {
                 const Text('Quanto vai custar?', style: TatuTexto.tituloFolha),
                 const SizedBox(height: 6),
                 Text(
-                  'A ${widget.cliente} pode aceitar ou propor outro valor.',
+                  d
+                      ? 'À distância não tem visita, só o serviço.'
+                      : 'A ${widget.cliente} pode aceitar ou propor outro valor.',
                   style: TatuTexto.corpo,
                 ),
                 const SizedBox(height: TatuMedidas.entreItens + 4),
+                if (d)
+                  _CampoValor(
+                    rotulo: 'Serviço',
+                    controller: _servico,
+                    foco: _focoServico,
+                    autofocus: true,
+                    onMudar: () => setState(() {}),
+                  )
+                else ...[
                 Row(
                   children: [
                     Expanded(
@@ -136,6 +157,7 @@ class _FolhaValorState extends State<_FolhaValor> {
                   'A visita é sua mesmo se o serviço não acontecer.',
                   style: TatuTexto.nota,
                 ),
+                ],
                 const SizedBox(height: TatuMedidas.entreItens),
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -154,8 +176,10 @@ class _FolhaValorState extends State<_FolhaValor> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      _Recebe('Total · visita + serviço', reais(total)),
-                      const SizedBox(height: 6),
+                      if (!d) ...[
+                        _Recebe('Total · visita + serviço', reais(total)),
+                        const SizedBox(height: 6),
+                      ],
                       _Recebe('Taxa do Tatu ($pct%)', '– ${reais(taxa)}'),
                       const SizedBox(height: 6),
                       _Recebe('No seu Pix', reais(total - taxa), forte: true),
@@ -163,8 +187,10 @@ class _FolhaValorState extends State<_FolhaValor> {
                   ),
                 ),
                 const SizedBox(height: TatuMedidas.entreItens + 4),
-                Text('Valor ${widget.rodada} de 3', style: TatuTexto.detalhe),
-                const SizedBox(height: TatuMedidas.entreItens),
+                if (!d) ...[
+                  Text('Valor ${widget.rodada} de 3', style: TatuTexto.detalhe),
+                  const SizedBox(height: TatuMedidas.entreItens),
+                ],
                 FilledButton(
                   onPressed: total > 0
                       ? () => Navigator.of(context).pop(valor)

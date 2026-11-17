@@ -34,6 +34,8 @@ class TatuMedidas {
   static const alturaChipPequeno = 34.0; // botões dentro de cartões
   static const alturaLinha = 52.0;
   static const alturaSegmento = 36.0;
+  static const alturaSegmentoPequeno = 28.0; // "No local | À distância"
+  static const larguraSegmentoPequeno = 196.0;
 
   /// Largura máxima do conteúdo (no computador a tela não estica).
   static const larguraMax = 430.0;

@@ -33,7 +33,11 @@ class EncontradoPage extends StatefulWidget {
     this.indice = 0,
     this.restante,
     this.animar = true,
+    this.distancia = false,
   });
+
+  /// RN-93/RN-94: profissional online, sem distância nem chegada.
+  final bool distancia;
 
   final String servico;
   final String endereco;
@@ -70,7 +74,10 @@ class _EncontradoPageState extends State<EncontradoPage> {
       _fila[widget.indice % _fila.length];
 
   List<ProfissionalEncontrado> get _fila =>
-      filaPara(soMulheres: seguranca.preferirMulheres);
+      filaPara(
+        soMulheres: seguranca.preferirMulheres,
+        distancia: widget.distancia,
+      );
 
   /// A profissão segue o serviço pedido.
   ProfissionalEncontrado get _p => ProfissionalEncontrado(
@@ -126,11 +133,13 @@ class _EncontradoPageState extends State<EncontradoPage> {
                 servico: widget.servico,
                 endereco: widget.endereco,
                 indice: proximo,
+                distancia: widget.distancia,
               )
             : ProcurandoPage(
                 servico: widget.servico,
                 endereco: widget.endereco,
                 simularAceite: false,
+                distancia: widget.distancia,
               ),
       ),
     );
@@ -144,7 +153,8 @@ class _EncontradoPageState extends State<EncontradoPage> {
       titulo: 'Ver outro profissional?',
       texto:
           '${p.feminino ? 'A' : 'O'} ${p.primeiroNome} será liberad${p.artigo} '
-          'e chamamos outro ${widget.servico.toLowerCase()} perto de você.',
+          'e chamamos outro ${widget.servico.toLowerCase()} '
+          '${widget.distancia ? 'online' : 'perto de você'}.',
       confirmar: 'Ver outro profissional',
       cancelar: 'Ficar com ${p.artigo} ${p.primeiroNome}',
       iconeAviso: false,
@@ -168,6 +178,7 @@ class _EncontradoPageState extends State<EncontradoPage> {
         etapasFeitas: 1,
         chegaEm: p.chegaEm,
         descricao: widget.servico,
+        distancia: widget.distancia,
       ),
     );
     final c = conversas.comecar(
@@ -175,7 +186,8 @@ class _EncontradoPageState extends State<EncontradoPage> {
       profissao: p.profissao,
       feminino: p.feminino,
       servico: widget.servico,
-      rua: widget.endereco,
+      rua: widget.distancia ? 'À distância' : widget.endereco,
+      distancia: widget.distancia,
     );
     final nav = Navigator.of(context);
     irParaAba(context, AbaCliente.mensagens);
@@ -209,12 +221,15 @@ class _EncontradoPageState extends State<EncontradoPage> {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(
-            child: CustomPaint(
-              painter: MapaFalso(),
-              foregroundPainter: _Rota(),
+          if (widget.distancia)
+            Positioned.fill(child: _TopoOnline(nome: p.nome))
+          else
+            const Positioned.fill(
+              child: CustomPaint(
+                painter: MapaFalso(),
+                foregroundPainter: _Rota(),
+              ),
             ),
-          ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(
@@ -373,7 +388,10 @@ class _EncontradoPageState extends State<EncontradoPage> {
             const SizedBox(width: 8),
             _Caixa(valor: servicos, rotulo: 'Serviços'),
             const SizedBox(width: 8),
-            _Caixa(valor: p.chegaEm, rotulo: 'Chega em'),
+            // RN-93: à distância não há chegada; mostra o tempo de resposta.
+            widget.distancia
+                ? _Caixa(valor: p.resposta, rotulo: 'Responde em')
+                : _Caixa(valor: p.chegaEm, rotulo: 'Chega em'),
           ],
         ),
         const SizedBox(height: 14),
@@ -386,8 +404,10 @@ class _EncontradoPageState extends State<EncontradoPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Estimativa na sua região',
+              Text(
+                widget.distancia
+                    ? 'Estimativa para esse serviço'
+                    : 'Estimativa na sua região',
                 style: TextStyle(fontSize: 12, color: TatuColors.textSecondary),
               ),
               const SizedBox(height: 2),
@@ -408,6 +428,95 @@ class _EncontradoPageState extends State<EncontradoPage> {
           onAceitar: _aceitar,
         ),
       ],
+    );
+  }
+}
+
+/// RN-94: topo do encontrado à distância: círculos verdes, o avatar
+/// grande com aro e "Online agora" (sem mapa nem rota).
+class _TopoOnline extends StatelessWidget {
+  const _TopoOnline({required this.nome});
+
+  final String nome;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: TatuColors.surfaceGrouped,
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final centro = Offset(c.maxWidth / 2, c.maxHeight * 0.27);
+          return Stack(
+            children: [
+              for (final r in const [170.0, 115.0])
+                Positioned(
+                  left: centro.dx - r,
+                  top: centro.dy - r,
+                  child: Container(
+                    width: r * 2,
+                    height: r * 2,
+                    decoration: const BoxDecoration(
+                      color: TatuColors.radar,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              Positioned(
+                left: centro.dx - 60,
+                top: centro.dy - 60,
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: TatuColors.radar,
+                    shape: BoxShape.circle,
+                  ),
+                  child: AvatarIniciais(nome: nome, tamanho: 104),
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                top: centro.dy + 66,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: const ShapeDecoration(
+                      color: TatuColors.bg,
+                      shape: StadiumBorder(),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 8,
+                          height: 8,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: TatuColors.online,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 6),
+                        Text(
+                          'Online agora',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

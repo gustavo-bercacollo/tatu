@@ -16,7 +16,19 @@ class ConversaProfissional {
     this.selo = SeloConversa.nenhum,
     this.textoSelo = '',
     this.concluidaPor,
+    this.concluidaEm,
+    this.depois = const [],
+    this.diaDepois,
   });
+
+  /// Dia em que o serviço foi concluído ("04 nov").
+  final String? concluidaEm;
+
+  /// RN-42: mensagens trocadas depois do serviço (texto, minha).
+  final List<(String, bool)> depois;
+
+  /// Dia dessas mensagens ("12 nov").
+  final String? diaDepois;
 
   final ChamadoNovo chamado;
   final String ultima;
@@ -25,10 +37,11 @@ class ConversaProfissional {
   final SeloConversa selo;
   final String textoSelo;
 
-  /// Valor do serviço concluído (conversa encerrada); null = em andamento.
+  /// Valor do último serviço concluído; null = em andamento. RN-42: a
+  /// conversa continua aberta, só vai para "Anteriores".
   final double? concluidaPor;
 
-  bool get encerrada => concluidaPor != null;
+  bool get concluida => concluidaPor != null;
   String get nome => chamado.cliente;
 }
 
@@ -42,12 +55,12 @@ class ConversasProfissionalRepo extends ChangeNotifier {
 
   List<ConversaProfissional> get emAndamento => [
     for (final c in conversas)
-      if (!c.encerrada) c,
+      if (!c.concluida) c,
   ];
 
   List<ConversaProfissional> get anteriores => [
     for (final c in conversas)
-      if (c.encerrada) c,
+      if (c.concluida) c,
   ];
 
   void restaurar() {
@@ -84,9 +97,15 @@ class ConversasProfissionalRepo extends ChangeNotifier {
             bairro: 'Saúde',
             distanciaKm: 3.1,
           ),
-          ultima: 'Obrigada, ficou ótimo!',
+          ultima: 'A torneira do banheiro começou a pingar.',
           quando: 'ontem',
           concluidaPor: 120,
+          concluidaEm: '04 nov',
+          diaDepois: '12 nov',
+          depois: const [
+            ('A torneira do banheiro começou a pingar.', false),
+            ('Consigo passar aí hoje. Já te mando o valor.', true),
+          ],
         ),
         ConversaProfissional(
           chamado: const ChamadoNovo(

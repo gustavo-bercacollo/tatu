@@ -10,7 +10,7 @@ import '../../core/theme/tatu_texto.dart';
 import 'avatar_iniciais.dart';
 
 /// Esqueleto das telas de chat: topo, lista de mensagens e rodapé
-/// (barra de mensagem, aviso de conversa encerrada…).
+/// (barra de mensagem e botões).
 class TelaChat extends StatelessWidget {
   const TelaChat({
     super.key,
@@ -24,7 +24,7 @@ class TelaChat extends StatelessWidget {
   final List<Widget> mensagens;
   final Widget rodape;
 
-  /// Rodapé de largura total, sem margens (ex.: "Esta conversa foi encerrada").
+  /// Rodapé de largura total, sem margens.
   final bool rodapeColado;
 
   @override
@@ -565,21 +565,135 @@ class BarraMensagem extends StatelessWidget {
   }
 }
 
-/// Rodapé de largura total: "Esta conversa foi encerrada".
-class ConversaEncerrada extends StatelessWidget {
-  const ConversaEncerrada({super.key});
+/// RN-42: faixa verde "Serviço concluído · R$ 190,00 · 04 nov" no meio
+/// da conversa, que continua aberta depois dela.
+class MarcoConcluido extends StatelessWidget {
+  const MarcoConcluido(this.texto, {super.key, this.nota = true});
+
+  final String texto;
+
+  /// Mostra embaixo "A conversa continua aberta…".
+  final bool nota;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: TatuMedidas.entreItens),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: TatuColors.trilho)),
-      ),
-      child: const Text(
-        'Esta conversa foi encerrada',
-        textAlign: TextAlign.center,
-        style: TatuTexto.detalhe,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: TatuColors.onlineSoft,
+            borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+          ),
+          child: Row(
+            children: [
+              const Icon(
+                TablerIcons.check,
+                size: 20,
+                color: TatuColors.onlineTexto,
+              ),
+              const SizedBox(width: TatuMedidas.entreItens),
+              Expanded(
+                child: Text(
+                  texto,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: TatuColors.onlineTexto,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (nota) ...[
+          const SizedBox(height: TatuMedidas.entreItens),
+          const NotaChat(
+            'A conversa continua aberta. Precisou de novo, é só chamar por '
+            'aqui.',
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Separador de dia no meio da conversa ("12 nov").
+class SeparadorDia extends StatelessWidget {
+  const SeparadorDia(this.dia, {super.key});
+
+  final String dia;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Text(
+      dia,
+      textAlign: TextAlign.center,
+      style: TatuTexto.nota.copyWith(fontWeight: FontWeight.w600),
+    ),
+  );
+}
+
+/// RN-96: arquivo enviado no chat (entrega à distância).
+class BalaoArquivo extends StatelessWidget {
+  const BalaoArquivo({
+    super.key,
+    required this.nome,
+    required this.detalhe,
+    this.minha = false,
+  });
+
+  final String nome;
+
+  /// "PDF · 2,4 MB".
+  final String detalhe;
+  final bool minha;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: minha ? Alignment.centerRight : Alignment.centerLeft,
+      child: FractionallySizedBox(
+        widthFactor: 0.74,
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: TatuColors.fill,
+            borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: TatuColors.bg,
+                  borderRadius: BorderRadius.circular(TatuMedidas.raioCaixa),
+                ),
+                child: const Icon(TablerIcons.file_text, size: 22),
+              ),
+              const SizedBox(width: TatuMedidas.entreItens),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      nome,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(detalhe, style: TatuTexto.nota),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

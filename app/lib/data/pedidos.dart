@@ -16,6 +16,25 @@ const etapasPedido = [
   'Pagamento',
 ];
 
+/// RN-95/RN-96: etapas do pedido à distância (sem "A caminho"; a entrega
+/// é pelo chat).
+const etapasPedidoDistancia = [
+  'Pedido feito',
+  'Valor combinado',
+  'Em andamento',
+  'Entrega pelo chat',
+  'Pagamento',
+];
+
+/// Nomes curtos das etapas à distância.
+const etapasCurtasDistancia = [
+  'Pedido',
+  'Combinado',
+  'Andamento',
+  'Entrega',
+  'Pagamento',
+];
+
 /// Nomes curtos das etapas (linha do tempo na horizontal).
 const etapasCurtas = [
   'Pedido',
@@ -45,7 +64,16 @@ class PedidoAndamento {
     this.chegouEm,
     this.visita = 40,
     this.codigo = '4821',
+    this.distancia = false,
   });
+
+  /// RN-92: pedido à distância (sem visita, rota, porta nem escudo).
+  final bool distancia;
+
+  /// Etapas deste pedido (no local ou à distância).
+  List<String> get etapas => distancia ? etapasPedidoDistancia : etapasPedido;
+  List<String> get etapasCurtasDoPedido =>
+      distancia ? etapasCurtasDistancia : etapasCurtas;
 
   /// RN-80: quando o profissional tocou em "Cheguei" (nulo antes).
   final DateTime? chegouEm;
@@ -95,6 +123,7 @@ class PedidoAndamento {
     chegouEm: chegouEm ?? this.chegouEm,
     visita: visita,
     codigo: codigo,
+    distancia: distancia,
   );
 
   /// "A Luiza", "O Carlos".
@@ -124,7 +153,7 @@ class PedidoAndamento {
   String get primeiroNome => profissional.split(' ').first;
 
   /// Situação mostrada no selo verde (última etapa feita).
-  String get situacao => naPorta ? 'Chegou' : etapasPedido[etapasFeitas - 1];
+  String get situacao => naPorta ? 'Chegou' : etapas[etapasFeitas - 1];
 }
 
 /// Pedido sem ninguém aceitar ainda: a busca continua em segundo plano.
@@ -390,6 +419,13 @@ class PedidosRepo extends ChangeNotifier {
     final p = andamento;
     if (p == null) return;
     _pararRelogios();
+    // RN-95: à distância, confirmado o valor, vai direto para Em
+    // andamento (sem prazo para sair, rota nem porta).
+    if (p.distancia) {
+      andamento = p.copiar(etapasFeitas: 3);
+      notifyListeners();
+      return;
+    }
     andamento = p.copiar(etapasFeitas: 2, aindaNaoSaiu: false);
     _prazoSaida = Timer(Prazos.naDemo(Prazos.estouACaminho), aindaNaoSaiu);
     notifyListeners();

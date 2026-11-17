@@ -60,10 +60,16 @@ void main() {
     await t.pump();
     expect(find.text('3 de 3 escolhidas'), findsOneWidget);
     await _tocar(t, 'Próximo: Eletricista');
+    // RN-97: como atende em cada profissão (no local por padrão).
+    expect(find.text('Como você atende?'), findsOneWidget);
+    expect(find.text('Profissão: Encanador.\nVocê pode mudar depois no Perfil.'), findsOneWidget);
+    await _tocar(t, 'Continuar');
     await t.tap(find.text('Quadro de luz'));
     await t.pump();
     await _tocar(t, 'Continuar');
+    await _tocar(t, 'Continuar');
     expect(find.text('Suas profissões'), findsOneWidget);
+    expect(find.text('Atende: no local · Mudar'), findsNWidgets(2));
     expect(find.text('Reparos · Instalações · Esgoto'), findsOneWidget);
     expect(find.text('2 de 3 profissões'), findsOneWidget);
     await _tocar(t, 'Continuar');

@@ -89,6 +89,68 @@ const gruposServicos = <(String, List<ServicoCatalogo>)>[
   ),
 ];
 
+/// RN-92: outros serviços à distância (lista "Outros" no modo à distância;
+/// profissões à distância do lançamento ainda são decisão em aberto).
+const grupoDistancia = (
+  'À distância',
+  [
+    ServicoCatalogo(
+      'Designer',
+      TablerIcons.palette,
+      detalhe: 'Logos, artes e identidade visual',
+      palavras: ['logo', 'arte'],
+    ),
+    ServicoCatalogo(
+      'Programador',
+      TablerIcons.code,
+      detalhe: 'Sites, apps e planilhas',
+      palavras: ['site', 'app', 'sistema'],
+    ),
+    ServicoCatalogo(
+      'Professor',
+      TablerIcons.school,
+      detalhe: 'Aulas e reforço online',
+      palavras: ['aula', 'reforco'],
+    ),
+    ServicoCatalogo(
+      'Contador',
+      TablerIcons.calculator,
+      detalhe: 'Impostos, MEI e declarações',
+      palavras: ['imposto', 'mei'],
+    ),
+    ServicoCatalogo(
+      'Advogado',
+      TablerIcons.scale,
+      detalhe: 'Contratos e orientação',
+      palavras: ['contrato', 'processo'],
+    ),
+    ServicoCatalogo(
+      'Tradutor',
+      TablerIcons.language,
+      detalhe: 'Textos e documentos',
+      palavras: ['traducao', 'traduzir'],
+    ),
+    ServicoCatalogo(
+      'Redator',
+      TablerIcons.pencil,
+      detalhe: 'Textos para site e redes',
+      palavras: ['texto', 'redacao'],
+    ),
+    ServicoCatalogo(
+      'Editor de vídeo',
+      TablerIcons.movie,
+      detalhe: 'Cortes, legendas e vinhetas',
+      palavras: ['video', 'edicao'],
+    ),
+    ServicoCatalogo(
+      'Social media',
+      TablerIcons.speakerphone,
+      detalhe: 'Posts e anúncios',
+      palavras: ['instagram', 'redes sociais', 'post'],
+    ),
+  ],
+);
+
 /// Atalhos "Mais pedidos perto de você".
 const maisPedidos = ['Chaveiro', 'Limpeza', 'Vidraceiro'];
 
@@ -148,10 +210,15 @@ IconData iconeServico(String nome) {
     'Eletricista': TablerIcons.bolt,
     'Pedreiro': TablerIcons.wall,
     'Pintor': TablerIcons.brush,
+    'Designer': TablerIcons.palette,
+    'Programador': TablerIcons.code,
+    'Professor': TablerIcons.school,
+    'Contador': TablerIcons.calculator,
+    'Advogado': TablerIcons.scale,
   };
   final p = principais[nome];
   if (p != null) return p;
-  for (final (_, lista) in gruposServicos) {
+  for (final (_, lista) in [...gruposServicos, grupoDistancia]) {
     for (final s in lista) {
       if (s.nome == nome) return s.icone;
     }
