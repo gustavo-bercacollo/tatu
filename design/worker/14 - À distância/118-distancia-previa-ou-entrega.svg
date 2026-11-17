@@ -30,12 +30,12 @@
   <rect x="24" y="560" width="345" height="80" rx="16" fill="#EEEEF0"/>
   <g transform="translate(40,588) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z"/><path d="M8 11v-4a4 4 0 1 1 8 0v4"/></g>
   <text x="74" y="594" font-size="16" font-weight="600" fill="#000000" text-anchor="start">Prévia protegida</text>
-  <text x="74" y="616" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="start">Ana só vê no app. Sem baixar, sem print.</text>
+  <text x="74" y="616" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="start">Imagem, vídeo, PDF ou link de teste.</text>
   <text x="353" y="594" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="end">à vontade</text>
   <rect x="24" y="652" width="345" height="80" rx="16" fill="#EEEEF0"/>
   <g transform="translate(40,680) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 9l5 -5l5 5"/><path d="M12 4v12"/></g>
   <text x="74" y="686" font-size="16" font-weight="600" fill="#000000" text-anchor="start">Entrega</text>
-  <text x="74" y="708" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="start">Vale como entrega. Use quando tiver certeza.</text>
+  <text x="74" y="708" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="start">Arquivo, programa ou link do site.</text>
   <text x="353" y="686" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="end">2 restantes</text>
   <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
 </svg>

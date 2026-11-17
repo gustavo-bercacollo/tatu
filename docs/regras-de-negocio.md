@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 17/11/2026 (v13)
+Atualizado em 17/11/2026 (v15)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -148,6 +148,15 @@ A segurança vem de saber quem é cada pessoa, não de confiar no que ela declar
 | RN-60 | Quem usar identidade falsa para chegar a uma mulher é banido e denunciado à polícia. Uma denúncia de "não era mulher" suspende a conta até a análise. |
 | RN-61 | Se não houver mulheres disponíveis, o app pergunta se a cliente quer chamar qualquer profissional. Ele nunca muda a escolha sozinho. |
 | RN-62 | Recusar um chamado por segurança nunca penaliza o profissional. |
+| RN-119 | Na conversa do chat só vale o básico: fotos, vídeos curtos e documentos (PDF, imagens). Nunca link, programa (.apk, .exe, .bat) ou script. Arquivo de trabalho grande vai pela entrega (RN-125), com limite maior (ex.: 100 MB). |
+| RN-120 | Todo arquivo passa por antivírus e por detecção de nudez antes de chegar ao outro lado. Se for barrado, não é entregue e quem enviou vê "Imagem bloqueada · Só você vê este aviso". |
+| RN-121 | Toda imagem e vídeo é comparado com bancos de material de abuso sexual infantil já conhecido (ex.: PhotoDNA, Safer, Content Safety API). Tolerância zero. |
+| RN-122 | Se houver suspeita de abuso infantil: o arquivo é bloqueado, a conta é suspensa na hora sem explicar o motivo, as provas são guardadas em sigilo (não apagar) e o caso é comunicado às autoridades (Polícia Federal), como manda o ECA Digital. Nudez de adulto: arquivo bloqueado e aviso; se repetir, a conta é banida. |
+| RN-123 | Ao segurar o dedo sobre um arquivo, aparece "Denunciar" (nudez ou conteúdo sexual, envolve menor de idade, arquivo suspeito ou vírus, outro). O arquivo some do chat de quem denunciou e vai para o suporte com prioridade máxima. |
+| RN-124 | Links não são permitidos no chat: a mensagem com link não é enviada e aparece "Links não são permitidos no chat. Envie o arquivo direto aqui." Pedidos, descrições e perfis passam por filtro de palavras para impedir anúncio de venda ou troca de arquivos. |
+| RN-125 | O que é arriscado só passa pela entrega à distância, nunca pela conversa. Na entrega, o profissional escolhe Arquivo ou Link do site. Link do site vale para qualquer serviço à distância; programa pronto (.apk, .exe) e script/código-fonte só nas profissões de tecnologia (ex.: Programador). |
+| RN-126 | Proteções da entrega: antivírus em todo arquivo e verificação de site perigoso em todo link, antes de chegar ao cliente; se der problema, a entrega é barrada. O app nunca abre nem roda o arquivo: o cliente só baixa, depois do aviso "Arquivo executável · abra só se você pediu". A entrega fica registrada; se for vírus, a conta é banida (RN-122). |
+| RN-127 | A prévia protegida (RN-99) aceita só imagem, vídeo, PDF ou link de teste. Nada executável. |
 
 ## 7. Bloqueios e penalidades
 
@@ -212,6 +221,7 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 - [ ] **Só menor de idade em casa.** O que o profissional faz quando só um menor abre a porta. Cuidado: profissional pode usar isso como desculpa para cobrar a visita sem trabalhar. Ver mais para frente.
 - [ ] **Conferir a idade pelo CPF.** Escolher o serviço que consulta o CPF na Receita e devolve a data de nascimento (ex.: Consulta CPF do Serpro ou outro fornecedor; custo por consulta).
 - [ ] **Canal do Tatu.** Se a pessoa pode silenciar o canal, quantas mensagens por mês no máximo, e o conteúdo das Dicas Tatu.
+- [ ] **Moderação de arquivos.** Escolher os fornecedores (antivírus, nudez, abuso infantil), quanto tempo guardar as provas e como fazer a comunicação às autoridades. Revisar com advogado.
 - [ ] **Ligação pelo app.** O botão Ligar existe. Decidir se a ligação esconde o número real das partes.
 
 ## 11. Problemas mapeados
@@ -235,11 +245,14 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-13 | Profissional à distância: serviço que não precisa de visita, em que a localização não importa. | Resolvido | RN-92 a RN-98 |
 | P-14 | Serviço à distância malfeito: o cliente não gosta da entrega e quer o dinheiro de volta. | Resolvido | RN-96, RN-99 a RN-106 |
 | P-15 | Menor de idade usando o app, como cliente ou profissional. | Resolvido em parte · "só menor em casa" para depois | RN-110 a RN-112, RN-114 |
+| P-16 | Envio de arquivos maliciosos ou +18, inclusive venda ou troca de material de menores. | Resolvido | RN-119 a RN-124 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 17/11/2026 | RN-119, RN-124 a RN-127 | Sem links no chat. Link do site, programa e script só pela entrega à distância, com antivírus, verificação e aviso. |
+| 17/11/2026 | RN-119 a RN-124 | Arquivos no chat: tipos permitidos, antivírus, nudez bloqueada, abuso infantil com suspensão e comunicação às autoridades, denúncia, links. |
 | 17/11/2026 | RN-115 a RN-118 | Canal oficial do Tatu nas Mensagens: primeira mensagem de boas-vindas, avisos e novidades, atalho para Dicas Tatu. |
 | 17/11/2026 | RN-110 a RN-112, RN-114 | Só maiores de 18: idade descoberta pelo CPF, sem campo de data de nascimento. "Só menor em casa" foi para Decisões em aberto. |
 | 17/11/2026 | RN-107 a RN-109 | Depois das 24 horas: problema entre cliente e profissional, aviso do CDC nos termos, garantia própria do profissional na fase 2. |
