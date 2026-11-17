@@ -6,6 +6,7 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
+import '../../../data/filtro_palavras.dart';
 import '../../../data/profissional.dart';
 import '../../../data/sobre_ia.dart';
 import '../../../shared/widgets/aviso_topo.dart';
@@ -44,6 +45,9 @@ class _SobrePageState extends State<SobrePage> {
   }
 
   bool get _temContato => contatoProibido.hasMatch(_texto.text);
+
+  /// RN-124: filtro de palavras no perfil (venda ou troca de arquivos).
+  String? get _palavraBarrada => FiltroPalavras.barrada(_texto.text);
   bool get _vazio => _texto.text.trim().isEmpty;
 
   Future<void> _melhorar() async {
@@ -71,7 +75,8 @@ class _SobrePageState extends State<SobrePage> {
 
   @override
   Widget build(BuildContext context) {
-    final erro = _temContato;
+    final barrada = _palavraBarrada != null;
+    final erro = _temContato || barrada;
     final cor = erro ? TatuColors.danger : TatuColors.textSecondary;
     return TelaInterna(
       titulo: 'Sobre você',
@@ -148,13 +153,14 @@ class _SobrePageState extends State<SobrePage> {
           ),
           const SizedBox(height: TatuMedidas.entreItens + 4),
           if (erro)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
               child: NotaIcone(
                 icone: TablerIcons.alert_triangle,
-                texto:
-                    'Tire telefone, e-mail e redes sociais.\n'
-                    'O contato com clientes é pelo chat do Tatu.',
+                texto: barrada
+                    ? FiltroPalavras.aviso
+                    : 'Tire telefone, e-mail e redes sociais.\n'
+                          'O contato com clientes é pelo chat do Tatu.',
                 cor: TatuColors.danger,
               ),
             )

@@ -376,10 +376,15 @@ class _NotaContatoOculto extends StatelessWidget {
 
 /// Aviso amarelo acima do campo quando há contato no texto (RN-85).
 class _AvisoContato extends StatelessWidget {
-  const _AvisoContato({required this.titulo, required this.texto});
+  const _AvisoContato({
+    required this.titulo,
+    required this.texto,
+    this.icone = TablerIcons.lock,
+  });
 
   final String titulo;
   final String texto;
+  final IconData icone;
 
   @override
   Widget build(BuildContext context) {
@@ -392,8 +397,8 @@ class _AvisoContato extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            TablerIcons.lock,
+          Icon(
+            icone,
             size: 22,
             color: TatuColors.warningTexto,
           ),
@@ -462,11 +467,18 @@ class BarraMensagem extends StatelessWidget {
             if (contato != null) ...[
               _AvisoContato(
                 titulo: contato.aviso,
-                texto: contato == TipoContato.endereco
-                    // RN-28: o endereço vai sozinho depois do valor.
-                    ? 'O endereço vai pelo app depois que o valor é '
-                          'confirmado.'
-                    : porQue,
+                icone: contato == TipoContato.link
+                    ? TablerIcons.alert_triangle
+                    : TablerIcons.lock,
+                texto: switch (contato) {
+                  // RN-28: o endereço vai sozinho depois do valor.
+                  TipoContato.endereco =>
+                    'O endereço vai pelo app depois que o valor é '
+                        'confirmado.',
+                  // RN-124: arquivo vai direto pelo chat (link, só entrega).
+                  TipoContato.link => 'Envie o arquivo direto aqui.',
+                  _ => porQue,
+                },
               ),
               const SizedBox(height: TatuMedidas.entreItens + 4),
             ],

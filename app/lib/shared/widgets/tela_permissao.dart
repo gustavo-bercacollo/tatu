@@ -21,6 +21,7 @@ class TelaPermissao extends StatelessWidget {
     this.onPrincipal,
     this.aviso = false,
     this.sucesso = false,
+    this.perigo = false,
     this.voltar = true,
     this.extra,
     this.abas,
@@ -53,6 +54,9 @@ class TelaPermissao extends StatelessWidget {
 
   /// Círculo verde claro de sucesso (ex.: "Pedido recebido").
   final bool sucesso;
+
+  /// Círculo vermelho claro (ex.: "Conta suspensa").
+  final bool perigo;
 
   /// Mostra o botão de voltar no topo.
   final bool voltar;
@@ -95,6 +99,7 @@ class TelaPermissao extends StatelessWidget {
                       texto: texto,
                       aviso: aviso,
                       sucesso: sucesso,
+                      perigo: perigo,
                       extra: extra,
                     ),
                   ),

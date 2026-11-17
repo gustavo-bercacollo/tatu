@@ -25,7 +25,15 @@ class MensagemChat {
     this.entrega,
     this.entregueEm,
     this.marcador,
+    this.bloqueada = false,
+    this.link,
   });
+
+  /// RN-120: arquivo barrado; só quem enviou vê o aviso.
+  final bool bloqueada;
+
+  /// RN-125: entrega por link do site (no lugar do arquivo).
+  final String? link;
 
   /// RN-42: marco "Serviço concluído · R$ 190,00 · 04 nov" no meio da
   /// conversa, que continua aberta depois dele.
@@ -87,7 +95,8 @@ class MensagemChat {
       arquivo != null ||
       previaEm != null ||
       entrega != null ||
-      marcador != null;
+      marcador != null ||
+      bloqueada;
 
   final String? texto;
   final bool minha;
@@ -405,21 +414,40 @@ class ConversasRepo extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// RN-100/RN-101: o profissional manda uma entrega (no máximo 2).
-  void receberEntrega(Conversa c, {DateTime? em}) {
+  /// RN-100/RN-101: o profissional manda uma entrega (no máximo 2): um
+  /// arquivo ou, RN-125, o link do site.
+  void receberEntrega(
+    Conversa c, {
+    DateTime? em,
+    String? arquivo,
+    String? detalhe,
+    String? link,
+  }) {
     final e = c.entrega;
     if (e == null || e.ultima) return;
     e
       ..enviadas += 1
       ..situacao = SituacaoEntrega.aguardando;
     c.mensagens.add(
-      MensagemChat.entrega(
-        e.enviadas,
-        arquivo: e.enviadas == 1 ? 'entrega-final.zip' : 'entrega-final-v2.zip',
-        detalhe: 'ZIP · 8 MB',
-        em: em ?? clock.now(),
+      MensagemChat(
+        entrega: e.enviadas,
+        arquivo:
+            link ??
+            arquivo ??
+            (e.enviadas == 1 ? 'entrega-final.zip' : 'entrega-final-v2.zip'),
+        arquivoDetalhe: link != null
+            ? 'Link do site · verificado'
+            : detalhe ?? 'ZIP · 8 MB',
+        entregueEm: em ?? clock.now(),
+        link: link,
       ),
     );
+    notifyListeners();
+  }
+
+  /// RN-123: o arquivo denunciado some do chat de quem denunciou.
+  void ocultar(Conversa c, MensagemChat m) {
+    c.mensagens.remove(m);
     notifyListeners();
   }
 

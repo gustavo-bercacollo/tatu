@@ -3,6 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../cliente/mensagens/entrega_distancia.dart' show LinhaArquivo;
+import '../../entrada/conta_suspensa_page.dart';
+import 'escolher_entrega.dart';
+import '../../entrada/denunciar_arquivo.dart';
+import '../../../data/arquivos_seguros.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/regras_distancia.dart';
 import '../../../data/atendimento_profissional.dart';
@@ -398,19 +402,55 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
 
   /// RN-99: prévia protegida, à vontade.
   void _enviarPrevia() {
+    // RN-127: prévia só com imagem, vídeo, PDF ou link de teste. Protótipo:
+    // a prévia é uma imagem.
+    if (!RegrasArquivo.permitidoNaPrevia('previa.jpg')) return;
     atendimentoProfissional.enviarPrevia();
     setState(() => _mensagens.add(('${_esp}previa', true)));
   }
 
   /// RN-100/RN-101/RN-103: entrega (no máximo 2). Na 1ª, o sinal é
   /// liberado. Protótipo: na 1ª a cliente pede ajuste; na 2ª, aprova.
-  void _enviarEntrega() {
+  Future<void> _enviarEntrega() async {
     final a = atendimentoProfissional;
     if (!a.podeEntregar) return;
+    final c = widget.chamado;
+    // RN-125: link do site ou arquivo (programa só em tecnologia).
+    final escolha = await escolherEntrega(
+      context,
+      numero: a.entregas + 1,
+      cliente: _nome,
+      tecnologia: ehTecnologia(c.profissao),
+    );
+    if (escolha == null || !mounted) return;
+    // RN-126: antivírus em todo arquivo e verificação em todo link.
+    final arquivo = escolha.arquivo;
+    final r = arquivo == null
+        ? await segurancaConteudo.enviarLink(escolha.link!)
+        : await segurancaConteudo.enviarEntrega(
+            arquivo,
+            tecnologia: ehTecnologia(c.profissao),
+          );
+    if (!mounted) return;
+    if (r == ResultadoEnvio.contaBanida || r == ResultadoEnvio.contaSuspensa) {
+      return mostrarContaSuspensa(context, profissional: true);
+    }
+    if (r != ResultadoEnvio.entregue) {
+      setState(
+        () => _mensagens.add((
+          '${_esp}nota:Entrega barrada · não chegou ${c.feminino ? 'à' : 'ao'} $_nome',
+          false,
+        )),
+      );
+      return;
+    }
     a.enviarEntrega();
     final n = a.entregas;
-    final c = widget.chamado;
     final ela = c.feminino ? 'a' : 'o';
+    final nome = escolha.link ?? arquivo!.nome;
+    final detalhe = escolha.link != null
+        ? 'Link do site · verificado'
+        : '${arquivo!.detalhe} · sem vírus';
     setState(() {
       // As prévias anteriores já foram vistas e expiraram.
       for (var i = 0; i < _mensagens.length; i++) {
@@ -419,7 +459,10 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
         }
       }
       _mensagens
-        ..add(('${_esp}entrega:$n', true))
+        ..add((
+          '${_esp}entrega:$n|$nome|$detalhe|${escolha.link != null ? 'link' : ''}',
+          true,
+        ))
         ..add((
           '${_esp}nota:${n == 1 && _meuSinal > 0 ? 'Sinal de ${reaisInteiros(_meuSinal)} liberado · ' : ''}'
               'aguardando $ela $_nome aprovar',
@@ -444,6 +487,15 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     });
   }
 
+  /// RN-123: denúncia de um arquivo recebido; ele some deste chat e vai
+  /// para o suporte com prioridade máxima.
+  Future<void> _denunciarArquivo(String mensagem, String arquivo) async {
+    final motivo = await denunciarArquivo(context);
+    if (motivo == null || !mounted) return;
+    segurancaConteudo.denunciar(arquivo, motivo);
+    setState(() => _mensagens.removeWhere((m) => m.$1 == mensagem));
+  }
+
   /// Balão especial (prévia, entrega, nota, ajuste, aprovada).
   Widget _especial(String t) {
     final c = widget.chamado;
@@ -457,14 +509,30 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
       );
     }
     if (corpo.startsWith('entrega:')) {
-      final n = int.parse(corpo.substring(8));
+      final partes = corpo.substring(8).split('|');
+      final n = int.parse(partes.first);
       final depois = _mensagens.any((m) => m.$1.startsWith('${_esp}ajuste:'));
       if (depois && n == 1) {
         return MarcadorChat('Entrega $n de $max enviada');
       }
       return _CartaoEntregaEnviada(
         numero: n,
-        arquivo: n == 1 ? 'entrega-final.zip' : 'entrega-final-v2.zip',
+        arquivo: partes.length > 1 ? partes[1] : 'entrega-final.zip',
+        detalhe: partes.length > 2 ? partes[2] : 'ZIP · 8 MB',
+        link: partes.length > 3 && partes[3] == 'link',
+      );
+    }
+    // RN-120: arquivo barrado; só quem enviou vê.
+    if (corpo == 'bloqueada') return const BalaoBloqueado();
+    // RN-123: arquivo recebido do cliente; segurar o dedo denuncia.
+    if (corpo.startsWith('arquivo:')) {
+      final p = corpo.substring(8).split('|');
+      return GestureDetector(
+        onLongPress: () => _denunciarArquivo(t, p.first),
+        child: BalaoArquivo(
+          nome: p.first,
+          detalhe: p.length > 1 ? p[1] : '',
+        ),
       );
     }
     if (corpo.startsWith('nota:')) return MarcadorChat(corpo.substring(5));
@@ -1024,7 +1092,8 @@ class _FolhaAnexo extends StatelessWidget {
             opcao(
               icone: TablerIcons.lock,
               titulo: 'Prévia protegida',
-              detalhe: '$cliente só vê no app. Sem baixar, sem print.',
+              // RN-127: só imagem, vídeo, PDF ou link de teste.
+              detalhe: 'Imagem, vídeo, PDF ou link de teste.',
               lado: 'à vontade',
               onTap: () => onEscolher('previa'),
             ),
@@ -1032,7 +1101,8 @@ class _FolhaAnexo extends StatelessWidget {
             opcao(
               icone: TablerIcons.upload,
               titulo: 'Entrega',
-              detalhe: 'Vale como entrega. Use quando tiver certeza.',
+              // RN-125: arquivo, programa ou link do site.
+              detalhe: 'Arquivo, programa ou link do site.',
               lado: restantes == 1 ? '1 restante' : '$restantes restantes',
               onTap: restantes > 0 ? () => onEscolher('entrega') : null,
             ),
@@ -1045,10 +1115,17 @@ class _FolhaAnexo extends StatelessWidget {
 
 /// P113 · Cartão preto da entrega enviada (RN-100).
 class _CartaoEntregaEnviada extends StatelessWidget {
-  const _CartaoEntregaEnviada({required this.numero, required this.arquivo});
+  const _CartaoEntregaEnviada({
+    required this.numero,
+    required this.arquivo,
+    this.detalhe = 'ZIP · 8 MB',
+    this.link = false,
+  });
 
   final int numero;
   final String arquivo;
+  final String detalhe;
+  final bool link;
 
   @override
   Widget build(BuildContext context) {
@@ -1072,7 +1149,12 @@ class _CartaoEntregaEnviada extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              LinhaArquivo(nome: arquivo, detalhe: 'ZIP · 8 MB', escuro: true),
+              LinhaArquivo(
+                nome: arquivo,
+                detalhe: detalhe,
+                escuro: true,
+                icone: link ? TablerIcons.location : TablerIcons.file_text,
+              ),
             ],
           ),
         ),

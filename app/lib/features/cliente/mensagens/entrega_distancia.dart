@@ -10,6 +10,7 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/conta.dart';
+import '../../../data/arquivos_seguros.dart';
 import '../../../data/conversas.dart';
 import '../../../data/regras_distancia.dart';
 import '../../../shared/formatadores.dart';
@@ -280,10 +281,14 @@ class LinhaArquivo extends StatelessWidget {
     required this.nome,
     required this.detalhe,
     this.escuro = false,
+    this.icone = TablerIcons.file_text,
   });
 
   final String nome;
   final String detalhe;
+
+  /// Ícone à esquerda (arquivo ou, no link do site, navegação).
+  final IconData icone;
 
   /// No cartão preto do profissional.
   final bool escuro;
@@ -299,7 +304,7 @@ class LinhaArquivo extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(TablerIcons.file_text, size: 22, color: cor),
+          Icon(icone, size: 22, color: cor),
           const SizedBox(width: TatuMedidas.entreItens),
           Expanded(
             child: Column(
@@ -342,11 +347,15 @@ class CartaoEntregaRecebida extends StatelessWidget {
     required this.restante,
     required this.onAprovar,
     required this.onOutro,
+    this.link = false,
   });
 
   final int numero;
   final String arquivo;
   final String detalhe;
+
+  /// RN-125: entrega por link do site.
+  final bool link;
   final double restante;
   final VoidCallback onAprovar;
 
@@ -381,12 +390,38 @@ class CartaoEntregaRecebida extends StatelessWidget {
                     style: TatuTexto.nota,
                   ),
                   const SizedBox(height: 10),
-                  LinhaArquivo(nome: arquivo, detalhe: detalhe),
-                  const SizedBox(height: TatuMedidas.entreItens),
-                  Text(
-                    'Aprove para pagar o restante de ${reais(restante)}.',
-                    style: TatuTexto.nota,
+                  LinhaArquivo(
+                    nome: arquivo,
+                    detalhe: detalhe,
+                    icone: link ? TablerIcons.location : TablerIcons.file_text,
                   ),
+                  const SizedBox(height: TatuMedidas.entreItens),
+                  if (!link && executavel(arquivo))
+                    // RN-126: o app só baixa; avisa antes.
+                    Row(
+                      children: [
+                        const Icon(
+                          TablerIcons.alert_triangle,
+                          size: 16,
+                          color: TatuColors.warningTexto,
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            'Arquivo executável · abra só se você pediu',
+                            style: TatuTexto.nota.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: TatuColors.warningTexto,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    Text(
+                      'Aprove para pagar o restante de ${reais(restante)}.',
+                      style: TatuTexto.nota,
+                    ),
                   const SizedBox(height: TatuMedidas.entreItens),
                   Row(
                     children: [
@@ -422,7 +457,13 @@ class CartaoEntregaRecebida extends StatelessWidget {
         ),
         const SizedBox(height: TatuMedidas.entreItens + 4),
         NotaChat(
-          _ultima
+          link
+              // RN-124/RN-125: link só pela entrega.
+              ? 'Links só podem ser enviados como entrega.'
+              : executavel(arquivo)
+              // RN-126: o Tatu nunca abre nem roda.
+              ? 'O Tatu não abre nem roda este arquivo. Só baixa.'
+              : _ultima
               ? 'Última entrega. Não gostou? Peça reembolso.'
               : 'Sem resposta em ${horas}h, a entrega é aprovada.',
         ),

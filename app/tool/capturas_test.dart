@@ -3,6 +3,7 @@
 //   flutter test tool/capturas_test.dart --update-goldens
 import 'dart:io';
 
+import 'package:tatu/features/entrada/conta_suspensa_page.dart';
 import 'package:tatu/data/consulta_cpf.dart';
 import 'package:tatu/features/entrada/menor_de_idade_page.dart';
 import 'package:tatu/features/entrada/canal_tatu_page.dart';
@@ -2731,12 +2732,25 @@ void main() {
     await t.pumpAndSettle();
   }
 
-  Future<void> proAnexo(WidgetTester t, String o) async {
+  Future<void> proAnexo(
+    WidgetTester t,
+    String o, {
+    bool concluir = true,
+  }) async {
     await t.tap(find.bySemanticsLabel('Enviar foto'));
     await t.pumpAndSettle();
     if (o.isEmpty) return;
     await t.tap(find.text(o));
     await t.pumpAndSettle();
+    // RN-125: na entrega, escolhe um arquivo e envia.
+    if (o == 'Entrega' && concluir) {
+      await t.tap(find.text('Arquivo'));
+      await t.pump();
+      await t.tap(find.text('entrega-final.zip'));
+      await t.pump();
+      await t.tap(find.widgetWithText(FilledButton, 'Enviar entrega'));
+      await t.pumpAndSettle();
+    }
   }
 
   // RN-99/RN-101: prévia ou entrega (P112).
@@ -2789,6 +2803,67 @@ void main() {
         await t.drag(find.byType(ListView).first, const Offset(0, -800));
         await t.pumpAndSettle();
       },
+    );
+  });
+
+  // RN-125/RN-126: entrega por link do site (P119).
+  testWidgets('pro-distancia-entrega-por-link', (t) async {
+    await comDemo(
+      t,
+      'pro-distancia-entrega-por-link',
+      const ChatProfissionalPage(
+        chamado: chamadoDistanciaExemplo,
+        resposta: Duration(seconds: 1),
+      ),
+      depois: () async {
+        await proCombinado(t);
+        await proAnexo(t, 'Entrega', concluir: false);
+        await t.enterText(find.byType(TextField).last, 'padariadaana.com.br');
+        await t.pump();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  // RN-120/RN-124: arquivo bloqueado e link no chat do profissional (P57).
+  testWidgets('pro-chat-arquivo-bloqueado', (t) async {
+    await comDemo(
+      t,
+      'pro-chat-arquivo-bloqueado',
+      const ChatProfissionalPage(depois: [('\u0001bloqueada', true)]),
+      depois: () async {
+        await t.enterText(find.byType(TextField).last, 'www.meusite.com.br');
+        await t.pump();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-123: denunciar arquivo (P58).
+  testWidgets('pro-chat-denunciar-arquivo', (t) async {
+    await comDemo(
+      t,
+      'pro-chat-denunciar-arquivo',
+      const ChatProfissionalPage(
+        depois: [('\u0001arquivo:fotos.pdf|PDF · 2 MB', false)],
+      ),
+      depois: () async {
+        await t.longPress(find.text('fotos.pdf'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Envolve menor de idade'));
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-122: conta suspensa (P59).
+  testWidgets('pro-conta-suspensa', (t) async {
+    await comDemo(
+      t,
+      'pro-conta-suspensa',
+      const ContaSuspensaPage(profissional: true),
     );
   });
 
@@ -3020,6 +3095,96 @@ void main() {
       'distancia-reembolso-em-analise',
       ChatPage(conversa: c),
     );
+  });
+
+  /// Conversa com um programador à distância (C177, C178).
+  Conversa conversaDiego(String pedido, String fala) {
+    final r = ConversasRepo();
+    final c = r.comecar(
+      nome: 'Diego Rocha',
+      profissao: 'Programador',
+      feminino: false,
+      servico: 'Programador',
+      rua: 'À distância',
+      distancia: true,
+    );
+    final d = Conversa(
+      nome: c.nome,
+      profissao: c.profissao,
+      feminino: false,
+      servico: 'Programador',
+      descricao: pedido,
+      rua: 'À distância',
+      quando: 'agora',
+      distancia: true,
+      emAndamento: true,
+      mensagens: [MensagemChat(texto: fala)],
+      valor: c.valor,
+    );
+    r.confirmarValor(d);
+    d.mensagens.removeLast(); // o marcador não aparece nos desenhos
+    return d;
+  }
+
+  // RN-125: entrega por link do site (C177).
+  testWidgets('distancia-entrega-link-site', (t) async {
+    final c = conversaDiego('Site para a padaria', 'Site no ar! Confere aí.');
+    ConversasRepo().receberEntrega(c, link: 'padariadaana.com.br');
+    await _capturar(t, 'distancia-entrega-link-site', ChatPage(conversa: c));
+  });
+
+  // RN-126: entrega de programa: só baixa, com aviso (C178).
+  testWidgets('distancia-entrega-executavel', (t) async {
+    final c = conversaDiego('App para a padaria', 'Segue o app para instalar.');
+    ConversasRepo().receberEntrega(
+      c,
+      arquivo: 'app-padaria.apk',
+      detalhe: 'APK · 32 MB · sem vírus',
+    );
+    await _capturar(t, 'distancia-entrega-executavel', ChatPage(conversa: c));
+  });
+
+  // RN-120/RN-124: arquivo bloqueado e link no chat (C160).
+  testWidgets('chat-arquivo-bloqueado', (t) async {
+    final c = ConversasRepo().conversas.first
+      ..valor = null
+      ..mensagens.add(MensagemChat(minha: true, bloqueada: true));
+    await _capturar(
+      t,
+      'chat-arquivo-bloqueado',
+      ChatPage(conversa: c),
+      preparar: () async {
+        await t.enterText(find.byType(TextField), 'www.meusite.com.br');
+        await t.pump();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-123: denunciar arquivo (C161).
+  testWidgets('chat-denunciar-arquivo', (t) async {
+    final c = ConversasRepo().conversas.first
+      ..valor = null
+      ..mensagens.add(
+        MensagemChat(arquivo: 'fotos.pdf', arquivoDetalhe: 'PDF · 2 MB'),
+      );
+    await _capturar(
+      t,
+      'chat-denunciar-arquivo',
+      ChatPage(conversa: c),
+      preparar: () async {
+        await t.longPress(find.text('fotos.pdf'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Envolve menor de idade'));
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-122: conta suspensa (C162).
+  testWidgets('conta-suspensa', (t) async {
+    await _capturar(t, 'conta-suspensa', const ContaSuspensaPage());
   });
 
   // RN-105: prazo acabou sem entrega (C167).

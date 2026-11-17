@@ -10,7 +10,9 @@ extension TipoContatoTexto on TipoContato {
     TipoContato.telefone => 'Telefone não é enviado pelo chat',
     TipoContato.email => 'E-mail não é enviado pelo chat',
     TipoContato.endereco => 'Endereço não é enviado pelo chat',
-    TipoContato.rede || TipoContato.link => 'Contato não é enviado pelo chat',
+    TipoContato.rede => 'Contato não é enviado pelo chat',
+    // RN-124: links não são permitidos no chat.
+    TipoContato.link => 'Links não são permitidos no chat.',
   };
 }
 

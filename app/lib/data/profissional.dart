@@ -129,6 +129,14 @@ const profissoesDistancia = [
   'Social media',
 ];
 
+/// RN-125: profissões de tecnologia: só nelas a entrega pode ter programa
+/// pronto (.apk, .exe) e script/código-fonte.
+const profissoesTecnologia = {'Programador'};
+
+bool ehTecnologia(String profissao) =>
+    profissoesTecnologia.contains(profissao) ||
+    profissoesTecnologia.contains(profissao.replaceFirst(RegExp(r'a$'), ''));
+
 /// Modo sugerido para uma profissão nova.
 ModoAtendimento modoSugerido(String profissao) =>
     profissoesDistancia.contains(profissao)

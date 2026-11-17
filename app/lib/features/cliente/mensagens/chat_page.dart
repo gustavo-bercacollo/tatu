@@ -24,7 +24,10 @@ import '../atividade/pedido_concluido_page.dart';
 import '../pagamento/pagamento_page.dart';
 import 'package:clock/clock.dart';
 
+import '../../../data/arquivos_seguros.dart';
 import '../../../data/regras_distancia.dart';
+import '../../entrada/conta_suspensa_page.dart';
+import '../../entrada/denunciar_arquivo.dart';
 import '../atividade/avaliar_page.dart';
 import 'cartao_valor.dart';
 import 'denunciar_page.dart';
@@ -158,6 +161,7 @@ class _ChatPageState extends State<ChatPage> {
             numero: m.entrega!,
             arquivo: m.arquivo ?? '',
             detalhe: m.arquivoDetalhe ?? '',
+            link: m.link != null,
             restante: v.restante,
             onAprovar: _aprovar,
             onOutro: e.ultima ? _reembolso : _ajuste,
@@ -316,8 +320,48 @@ class _ChatPageState extends State<ChatPage> {
     _campo.clear();
   }
 
+  /// RN-119 a RN-122: o arquivo passa pela moderação antes de chegar.
+  Future<void> _enviarArquivo(ArquivoEnviado a, MensagemChat m) async {
+    final r = await segurancaConteudo.enviarNoChat(a);
+    if (!mounted) return;
+    switch (r) {
+      case ResultadoEnvio.entregue:
+        conversas.enviar(_c, m);
+      case ResultadoEnvio.barrado:
+        conversas.enviar(_c, MensagemChat(minha: true, bloqueada: true));
+      case ResultadoEnvio.contaSuspensa || ResultadoEnvio.contaBanida:
+        mostrarContaSuspensa(context);
+      case ResultadoEnvio.tipoNaoPermitido || ResultadoEnvio.grandeDemais:
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(
+                r == ResultadoEnvio.grandeDemais
+                    ? 'Arquivo grande demais para o chat '
+                          '(até ${RegrasArquivo.limiteChatMb} MB).'
+                    : 'No chat vão só fotos, vídeos curtos e PDF.',
+              ),
+            ),
+          );
+    }
+  }
+
+  /// RN-123: segurar o dedo sobre um arquivo recebido abre a denúncia.
+  Future<void> _denunciar(MensagemChat m) async {
+    final motivo = await denunciarArquivo(context);
+    if (motivo == null || !mounted) return;
+    segurancaConteudo.denunciar(m.arquivo ?? 'foto', motivo);
+    conversas.ocultar(_c, m);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(content: Text('Denúncia enviada ao suporte.')),
+      );
+  }
+
   Future<void> _anexar() async {
-    final origem = await mostrarFolha<OrigemFoto>(
+    final origem = await mostrarFolha<Object>(
       context,
       builder: (ctx) => FolhaOpcoes(
         itens: [
@@ -333,15 +377,34 @@ class _ChatPageState extends State<ChatPage> {
             seta: false,
             onTap: () => Navigator.of(ctx).pop(OrigemFoto.galeria),
           ),
+          // RN-119: documento (PDF). Protótipo: um PDF de exemplo.
+          ItemLista(
+            icone: TablerIcons.file_text,
+            texto: 'Documento (PDF)',
+            seta: false,
+            onTap: () => Navigator.of(ctx).pop('documento'),
+          ),
         ],
       ),
     );
     if (origem == null || !mounted) return;
+    if (origem == 'documento') {
+      const a = ArquivoEnviado('documento.pdf', mb: 1.2);
+      return _enviarArquivo(
+        a,
+        MensagemChat(
+          minha: true,
+          arquivo: a.nome,
+          arquivoDetalhe: a.detalhe,
+          hora: horaAgora(),
+        ),
+      );
+    }
     try {
-      final imagem = await perfil.pedirImagem(origem);
+      final imagem = await perfil.pedirImagem(origem as OrigemFoto);
       if (imagem == null || !mounted) return;
-      conversas.enviar(
-        _c,
+      await _enviarArquivo(
+        const ArquivoEnviado('foto.jpg', mb: 2),
         MensagemChat(
           minha: true,
           foto: true,
@@ -473,6 +536,12 @@ class _ChatPageState extends State<ChatPage> {
                   padding: const EdgeInsets.only(top: 18),
                   child: SeparadorDia(m.dia!),
                 )
+              else if (m.bloqueada)
+                // RN-120: barrado; só quem enviou vê.
+                const Padding(
+                  padding: EdgeInsets.only(top: 18),
+                  child: BalaoBloqueado(),
+                )
               else if (m.marcador != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 18),
@@ -500,15 +569,21 @@ class _ChatPageState extends State<ChatPage> {
               else if (m.entrega != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 18),
-                  child: _entrega(m),
+                  child: GestureDetector(
+                    onLongPress: () => _denunciar(m),
+                    child: _entrega(m),
+                  ),
                 )
               else if (m.arquivo != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 18),
-                  child: BalaoArquivo(
-                    nome: m.arquivo!,
-                    detalhe: m.arquivoDetalhe ?? '',
-                    minha: m.minha,
+                  child: GestureDetector(
+                    onLongPress: m.minha ? null : () => _denunciar(m),
+                    child: BalaoArquivo(
+                      nome: m.arquivo!,
+                      detalhe: m.arquivoDetalhe ?? '',
+                      minha: m.minha,
+                    ),
                   ),
                 )
               else
@@ -521,17 +596,23 @@ class _ChatPageState extends State<ChatPage> {
                             minha: m.minha,
                           ),
                   ),
-                  child: BalaoChat(
-                    texto: m.texto,
-                    minha: m.minha,
-                    outro: '${_c.artigo} ${_c.primeiroNome}',
-                    foto: m.foto,
-                    imagem: m.imagem,
-                    legenda: i == ultimaFotoMinha && m.hora != null
-                        ? 'Enviada · ${m.hora}'
+                  child: GestureDetector(
+                    // RN-123: foto recebida pode ser denunciada.
+                    onLongPress: !m.minha && m.foto
+                        ? () => _denunciar(m)
                         : null,
-                    falhou: m.envio == EnvioMensagem.falhou,
-                    onTentarDeNovo: () => conversas.reenviar(m),
+                    child: BalaoChat(
+                      texto: m.texto,
+                      minha: m.minha,
+                      outro: '${_c.artigo} ${_c.primeiroNome}',
+                      foto: m.foto,
+                      imagem: m.imagem,
+                      legenda: i == ultimaFotoMinha && m.hora != null
+                          ? 'Enviada · ${m.hora}'
+                          : null,
+                      falhou: m.envio == EnvioMensagem.falhou,
+                      onTentarDeNovo: () => conversas.reenviar(m),
+                    ),
                   ),
                 ),
             ..._valor(),

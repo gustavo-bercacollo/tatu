@@ -63,6 +63,14 @@ Future<void> _rolar(WidgetTester t, Finder f) => t.scrollUntilVisible(
       .first,
 );
 
+/// RN-125: na folha "Escolha como entregar", manda um link do site.
+Future<void> _entregarLink(WidgetTester t) async {
+  await t.enterText(find.byType(TextField).last, 'padariadaana.com.br');
+  await t.pump();
+  await t.tap(find.widgetWithText(FilledButton, 'Enviar entrega'));
+  await t.pumpAndSettle();
+}
+
 void main() {
   ProtecaoTela.ativa = false;
   setUpAll(_carregarInter);
@@ -312,6 +320,7 @@ void main() {
     await t.pumpAndSettle();
     await t.tap(find.text('Entrega'));
     await t.pumpAndSettle();
+    await _entregarLink(t);
     expect(atendimentoProfissional.entregas, 1);
     expect(atendimentoProfissional.sinalLiberado, isTrue);
     expect(find.text('Entrega 1 de 2'), findsOneWidget);
@@ -324,6 +333,7 @@ void main() {
     expect(find.text('Entrega 1 de 2 enviada'), findsOneWidget);
     await t.tap(find.text('Enviar entrega 2'));
     await t.pumpAndSettle();
+    await _entregarLink(t);
     expect(atendimentoProfissional.entregas, 2);
     expect(atendimentoProfissional.podeEntregar, isFalse);
     await t.pump(const Duration(seconds: 1));
