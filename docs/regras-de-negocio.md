@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 17/11/2026 (v10)
+Atualizado em 17/11/2026 (v11)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -116,6 +116,9 @@ Quem cancela ou falha não transfere o custo para o outro lado nem para o Tatu.
 | RN-47 | O suporte decide pelo chat e pelas fotos: o profissional refaz sem custo, reembolso parcial ou reembolso total. O valor devolvido sai do repasse do profissional, nunca do Tatu. |
 | RN-48 | O profissional pode contestar uma avaliação injusta. O suporte revisa em até 3 dias úteis e, se for injusta, ela sai da nota. |
 | RN-49 | Quem contesta demais e sem razão, cliente ou profissional, perde o direito à garantia ou a conta. |
+| RN-107 | A garantia do Tatu é de 24 horas (RN-45). Depois disso o dinheiro já foi para o profissional e o problema é entre cliente e profissional: o cliente chama o mesmo profissional pelo chat, que continua aberto (RN-42), e ele refaz de graça ou manda um novo valor; ou o cliente faz um pedido novo com outro profissional. |
+| RN-108 | Os termos de uso deixam claro que o Tatu intermedia e que a garantia do Tatu é de 24 horas. A garantia legal do serviço (Código de Defesa do Consumidor, 90 dias para serviço durável) é do profissional. Revisar com advogado antes do lançamento. |
+| RN-109 | **(fase 2)** O profissional pode informar no perfil uma garantia própria (ex.: 30 dias). Dentro desse prazo, o cliente que chamar de volta pelo mesmo chat não paga o reparo. A garantia aparece na busca e no perfil. |
 | RN-76 | Depois de combinar o valor, o profissional tem 10 minutos para tocar "Estou a caminho". Sem isso, o app pergunta "Ainda vai?" e o cliente vê "Ainda não saiu". |
 | RN-77 | Sem resposta ao "Ainda vai?" em 5 minutos, ou com "Não consigo ir", o pedido volta à busca automaticamente e nada é cobrado do cliente. Isso conta como abandono para o profissional. |
 | RN-78 | Se o profissional passar do dobro do tempo previsto de chegada, o cliente pode chamar outro sem pagar nada, nem a visita. |
@@ -210,7 +213,7 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-02 | O profissional chega e o cliente não está. | Resolvido | RN-80 a RN-82 |
 | P-03 | Cliente e profissional fecham por fora na próxima vez, sem o app. | Decidido · fase 2 | RN-83 a RN-86 |
 | P-04 | O profissional quebra algo na casa durante o serviço. | Adiado: fora do escopo por enquanto | — |
-| P-05 | O problema volta dias depois do serviço (a contestação vale só 24 horas). | Adiado | — |
+| P-05 | O problema volta dias depois do serviço (a contestação vale só 24 horas). | Decidido · garantia própria na fase 2 | RN-107 a RN-109 |
 | P-06 | Preço abusivo, principalmente em emergência. | A resolver | — |
 | P-07 | Material comprado no meio do serviço, fora do combinado. | A resolver | — |
 | P-08 | Cartão recusado na hora da cobrança final. | A resolver | — |
@@ -225,6 +228,7 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 17/11/2026 | RN-107 a RN-109 | Depois das 24 horas: problema entre cliente e profissional, aviso do CDC nos termos, garantia própria do profissional na fase 2. |
 | 17/11/2026 | RN-96, RN-99 a RN-106 | Entrega à distância malfeita: prévia protegida, até 2 entregas, cliente aprova, sinal, reembolso pelo suporte, pausa por sinais sem entrega. |
 | 14/11/2026 | RN-92 a RN-98 | Serviço à distância: seletor No local / À distância na Home, busca sem raio, sem visita, entrega pelo chat. |
 | 14/11/2026 | RN-42, RN-87 a RN-91 | A conversa não fecha mais depois do serviço. Cada valor combinado é um pagamento, com comissão em cada um. Limite de 7 dias por valor. Parcelamento. |

@@ -7,9 +7,11 @@ class Documento {
   final List<(String titulo, String texto)> secoes;
 }
 
+// TODO(jurídico): revisar os Termos de uso com advogado antes do
+// lançamento, principalmente as seções 4 e 5 (RN-108).
 const termosDeUso = Documento(
   'Termos de uso',
-  'Atualizado em 1 de outubro de 2026',
+  'Atualizado em 17 de novembro de 2026',
   [
     (
       '1. O que é o Tatu',
@@ -22,6 +24,22 @@ const termosDeUso = Documento(
     (
       '3. Pedidos e pagamentos',
       'O valor é combinado entre cliente e profissional. O pagamento pode ser pelo app ou direto, e a comissão vale só no app.',
+    ),
+    // RN-108: o Tatu intermedia.
+    (
+      '4. O papel do Tatu',
+      'O Tatu intermedia: conecta cliente e profissional e processa o '
+          'pagamento. Quem presta o serviço é o profissional.',
+    ),
+    // RN-45, RN-107 e RN-108: garantia do Tatu de 24 horas; a garantia
+    // legal do serviço é do profissional.
+    (
+      '5. Garantia',
+      'A garantia do Tatu é de 24 horas depois que o serviço é concluído. '
+          'Nesse prazo, você pode contestar pelo app e o suporte decide. '
+          'Depois disso, a garantia legal do serviço é do profissional '
+          '(pelo Código de Defesa do Consumidor, 90 dias para serviços '
+          'duráveis). Fale com ele pelo mesmo chat do pedido.',
     ),
   ],
 );

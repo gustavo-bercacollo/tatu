@@ -359,9 +359,10 @@ class _NotaContatoOculto extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
+                  // RN-107: a garantia do Tatu é de 24 horas por serviço.
                   outro == null
-                      ? 'Chame de novo pelo app, com garantia.'
-                      : 'Chame $outro de novo pelo app, com garantia.',
+                      ? 'Chame de novo pelo app, com garantia de 24h.'
+                      : 'Chame $outro de novo pelo app, com garantia de 24h.',
                   style: TatuTexto.nota,
                 ),
               ],
@@ -435,7 +436,7 @@ class BarraMensagem extends StatelessWidget {
     required this.onEnviar,
     required this.onCamera,
     this.bloquearContato = true,
-    this.porQue = 'Pelo Tatu o serviço tem garantia.',
+    this.porQue = 'Pelo Tatu o serviço tem garantia de 24h.',
   });
 
   final TextEditingController controller;

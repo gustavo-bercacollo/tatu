@@ -552,7 +552,8 @@ class _ChatPageState extends State<ChatPage> {
                 onEnviar: _enviar,
                 onCamera: _anexar,
                 porQue:
-                    'Pelo Tatu o serviço tem garantia. Chame '
+                    // RN-107: garantia de 24 horas por serviço.
+                    'Pelo Tatu o serviço tem garantia de 24h. Chame '
                     '${_c.artigo} ${_c.primeiroNome} de novo pelo app.',
               ),
             ],

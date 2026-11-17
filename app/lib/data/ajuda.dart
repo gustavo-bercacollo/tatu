@@ -56,6 +56,27 @@ const artigoPagamento = Artigo(
   ],
 );
 
+/// RN-45 e RN-107: a garantia do Tatu é de 24 horas; depois, o problema é
+/// entre cliente e profissional, pelo mesmo chat.
+const artigoReembolso = Artigo(
+  'Como pedir reembolso?',
+  resumo: 'A garantia do Tatu vale por 24 horas depois do serviço.',
+  secoes: [
+    (
+      'Em até 24 horas',
+      'Toque em “Algo errado?” no pedido concluído, conte o que houve e '
+          'mande fotos. O suporte olha o chat e decide: o profissional '
+          'refaz sem custo, reembolso parcial ou total.',
+    ),
+    (
+      'Depois de 24 horas',
+      'O pagamento já foi para o profissional. Fale com ele pelo mesmo '
+          'chat, que continua aberto: ele pode refazer ou mandar um novo '
+          'valor. Se preferir, faça um pedido novo com outro profissional.',
+    ),
+  ],
+);
+
 const assuntosAjuda = [
   AssuntoAjuda('Pedidos e profissionais', TablerIcons.tool, [
     Artigo('O profissional não apareceu'),
@@ -68,7 +89,7 @@ const assuntosAjuda = [
       artigoPagamento,
       Artigo('Posso pagar direto ao profissional?'),
       Artigo('Cobraram o valor errado'),
-      Artigo('Como pedir reembolso?'),
+      artigoReembolso,
       Artigo('Como adicionar ou trocar cartão?'),
       Artigo('Pagar com Pix'),
     ],
