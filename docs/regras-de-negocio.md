@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 17/11/2026 (v11)
+Atualizado em 17/11/2026 (v13)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -36,6 +36,10 @@ Uma pessoa tem uma conta só, que pode ter os dois perfis: cliente e profissiona
 | RN-14 | Encerrar o perfil profissional mantém a conta de cliente. Para voltar, ele refaz a verificação. |
 | RN-15 | Excluir a conta apaga os dois perfis. Fica bloqueado enquanto houver pedido em andamento ou dinheiro a receber. |
 | RN-97 | No cadastro de cada profissão, o profissional marca como atende: no local, à distância ou os dois. Pode mudar depois no Perfil. |
+| RN-110 | O Tatu é só para maiores de 18 anos, cliente e profissional. Não existe conta de menor nem "permissão dos pais": o adulto pede pela conta dele, com o endereço e o cartão dele. |
+| RN-111 | No cadastro, o cliente informa nome completo e CPF. Não pedimos data de nascimento: o app descobre a idade consultando o CPF. Menor de 18 vê "O Tatu é para maiores de 18 anos" e não entra. O cartão também precisa ser de um adulto (CPF do titular). |
+| RN-112 | O profissional passa pela mesma consulta do CPF no passo 1 e vê a mesma tela de bloqueio se for menor de 18. A verificação com documento confirma a idade. |
+| RN-114 | O cadastro atende ao ECA Digital (Lei 15.211/2025, em vigor desde 17/03/2026): a idade é verificada de forma confiável, não só declarada. Revisar com advogado junto com os termos (RN-108). |
 
 ## 2. Pedido e busca
 
@@ -170,6 +174,10 @@ As penalidades existem para impedir abuso, nunca para punir quem se protegeu.
 | RN-71 | O espaço de anúncio mede 353 × 76 e leva o selo "Patrocinado". Sem anúncio, o espaço some. Na Home, some também enquanto o cliente digita. |
 | RN-83 | **(fase 2)** Em Atividade, "Seus profissionais" mostra quem já atendeu o cliente, com o botão Chamar quando a pessoa está online. Chamar por ali manda o pedido direto para ela. |
 | RN-84 | **(fase 2)** Só serviços feitos pelo app contam para a nota do profissional e para a posição dele nos chamados. |
+| RN-115 | Toda conta tem uma conversa oficial com o Tatu, com selo de verificado, fixada no topo de Mensagens, para cliente e profissional. Ela não pode ser apagada. |
+| RN-116 | A primeira mensagem que a pessoa recebe no app é a do Tatu: boas-vindas e um atalho para as Dicas Tatu. Ela chega logo depois do cadastro, antes de qualquer pedido ou chamado. |
+| RN-117 | A conversa do Tatu é o canal principal de comunicação do Tatu, como o canal oficial de uma empresa no WhatsApp: novidades, mudanças nas regras e avisos importantes chegam por ela. Só o Tatu envia; a pessoa não responde por ali (suporte continua na Ajuda). |
+| RN-118 | Dicas Tatu é um espaço de dicas de boa convivência, boa negociação e segurança. Por enquanto mostra "Em breve" e avisa pelo canal do Tatu quando abrir. |
 
 ## 9. Privacidade e dados (LGPD)
 
@@ -201,6 +209,9 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 - [ ] **Arquivos e links no chat à distância.** Como conviver com o contato oculto (RN-85, fase 2).
 - [ ] **Print no iPhone.** O Android bloqueia print de verdade. O iPhone não deixa bloquear, só esconder o conteúdo no print e na gravação. Foto com outro celular sempre funciona, por isso a marca d'água com o nome do cliente.
 - [ ] **Números do serviço à distância.** Sinal de até 30%, prévia de 24 horas, aprovação automática em 48 horas, resposta do suporte em 2 dias úteis: todos são exemplos.
+- [ ] **Só menor de idade em casa.** O que o profissional faz quando só um menor abre a porta. Cuidado: profissional pode usar isso como desculpa para cobrar a visita sem trabalhar. Ver mais para frente.
+- [ ] **Conferir a idade pelo CPF.** Escolher o serviço que consulta o CPF na Receita e devolve a data de nascimento (ex.: Consulta CPF do Serpro ou outro fornecedor; custo por consulta).
+- [ ] **Canal do Tatu.** Se a pessoa pode silenciar o canal, quantas mensagens por mês no máximo, e o conteúdo das Dicas Tatu.
 - [ ] **Ligação pelo app.** O botão Ligar existe. Decidir se a ligação esconde o número real das partes.
 
 ## 11. Problemas mapeados
@@ -223,11 +234,14 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-12 | Serviço que leva vários dias, semanas ou meses. | Resolvido | RN-42, RN-87 a RN-91 |
 | P-13 | Profissional à distância: serviço que não precisa de visita, em que a localização não importa. | Resolvido | RN-92 a RN-98 |
 | P-14 | Serviço à distância malfeito: o cliente não gosta da entrega e quer o dinheiro de volta. | Resolvido | RN-96, RN-99 a RN-106 |
+| P-15 | Menor de idade usando o app, como cliente ou profissional. | Resolvido em parte · "só menor em casa" para depois | RN-110 a RN-112, RN-114 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 17/11/2026 | RN-115 a RN-118 | Canal oficial do Tatu nas Mensagens: primeira mensagem de boas-vindas, avisos e novidades, atalho para Dicas Tatu. |
+| 17/11/2026 | RN-110 a RN-112, RN-114 | Só maiores de 18: idade descoberta pelo CPF, sem campo de data de nascimento. "Só menor em casa" foi para Decisões em aberto. |
 | 17/11/2026 | RN-107 a RN-109 | Depois das 24 horas: problema entre cliente e profissional, aviso do CDC nos termos, garantia própria do profissional na fase 2. |
 | 17/11/2026 | RN-96, RN-99 a RN-106 | Entrega à distância malfeita: prévia protegida, até 2 entregas, cliente aprova, sinal, reembolso pelo suporte, pausa por sinais sem entrega. |
 | 14/11/2026 | RN-92 a RN-98 | Serviço à distância: seletor No local / À distância na Home, busca sem raio, sem visita, entrega pelo chat. |

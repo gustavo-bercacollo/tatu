@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Dicas Tatu · em breve</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#F2F2F7"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="40" cy="82" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,73) scale(0.75)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></g>
+  <text x="196.5" y="88" font-size="17" font-weight="600" fill="#000000" text-anchor="middle">Dicas Tatu</text>
+  <circle cx="196.5" cy="210" r="44" fill="#fff"/>
+  <g transform="translate(174.5,188) scale(1.8333333333333333)" fill="none" stroke="#000000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m0 -12a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m-7 12a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6"/></g>
+  <text x="196.5" y="296" font-size="26" font-weight="700" fill="#000000" text-anchor="middle" letter-spacing="-0.4">Em breve</text>
+  <text x="196.5" y="326" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="middle">Dicas para uma boa convivência</text>
+  <text x="196.5" y="347" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="middle">e boas negociações no Tatu.</text>
+  <rect x="20" y="390" width="353" height="72" rx="16" fill="#fff"/>
+  <g transform="translate(36,414) scale(1.0)" fill="none" stroke="#8E8E93" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/><path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/></g>
+  <text x="72" y="422" font-size="16" font-weight="600" fill="#8E8E93" text-anchor="start">Boa convivência</text>
+  <text x="72" y="442" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">Na casa do cliente e no chat</text>
+  <text x="357" y="430" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="end">em breve</text>
+  <rect x="20" y="474" width="353" height="72" rx="16" fill="#fff"/>
+  <g transform="translate(36,498) scale(1.0)" fill="none" stroke="#8E8E93" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12"/><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4"/></g>
+  <text x="72" y="506" font-size="16" font-weight="600" fill="#8E8E93" text-anchor="start">Boa negociação</text>
+  <text x="72" y="526" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">Como combinar o valor certo</text>
+  <text x="357" y="514" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="end">em breve</text>
+  <rect x="20" y="558" width="353" height="72" rx="16" fill="#fff"/>
+  <g transform="translate(36,582) scale(1.0)" fill="none" stroke="#8E8E93" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/><path d="M9 12l2 2l4 -4"/></g>
+  <text x="72" y="590" font-size="16" font-weight="600" fill="#8E8E93" text-anchor="start">Segurança</text>
+  <text x="72" y="610" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">Cuidados antes, durante e depois</text>
+  <text x="357" y="598" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="end">em breve</text>
+  <text x="196.5" y="680" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="middle">Avisamos pelo chat do Tatu quando abrir.</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>
