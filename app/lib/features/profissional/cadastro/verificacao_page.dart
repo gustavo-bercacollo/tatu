@@ -6,6 +6,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
+import '../../../data/canal_tatu.dart';
 import '../../../data/profissional.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/nota_icone.dart';
@@ -208,6 +209,13 @@ class _CameraVerificacaoPageState extends State<CameraVerificacaoPage> {
     }
     if (widget.refazendo || _selfie) {
       profissional.enviarVerificacao();
+      // RN-115/RN-116: cadastro concluído: o canal do Tatu dá as
+      // boas-vindas (só na primeira vez).
+      if (!widget.refazendo) {
+        canalTatu.profissional.comecar(
+          boasVindasProfissional(profissional.primeiroNome),
+        );
+      }
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const EmAnalisePage()),
         (r) => r.isFirst,

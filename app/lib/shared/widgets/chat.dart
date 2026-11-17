@@ -844,9 +844,17 @@ class LinhaConversa extends StatelessWidget {
     this.naoLidas = 0,
     this.online = false,
     this.selo,
+    this.avatar,
+    this.titulo,
   });
 
   final String nome;
+
+  /// Avatar próprio no lugar das iniciais (ex.: o "T" do Tatu).
+  final Widget? avatar;
+
+  /// Título próprio no lugar do [nome] (ex.: "Tatu ✓ · Fixada").
+  final Widget? titulo;
 
   /// Nome usado para as iniciais do avatar.
   final String iniciais;
@@ -869,7 +877,7 @@ class LinhaConversa extends StatelessWidget {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                AvatarIniciais(nome: iniciais, tamanho: 48),
+                avatar ?? AvatarIniciais(nome: iniciais, tamanho: 48),
                 if (online)
                   Positioned(
                     right: 0,
@@ -907,13 +915,14 @@ class LinhaConversa extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            nome,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                          titulo ??
+                              Text(
+                                nome,
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                           const SizedBox(height: 2),
                           Text(
                             ultima,

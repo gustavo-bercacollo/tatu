@@ -21,6 +21,14 @@ class ContaRepo extends ChangeNotifier {
   String? celular;
   String? email;
 
+  /// RN-111: CPF (só dígitos); a idade vem dele.
+  String? cpf;
+
+  void definirCpf(String texto) {
+    cpf = soDigitos(texto);
+    notifyListeners();
+  }
+
   /// Pedido em andamento impede excluir a conta.
   bool pedidoEmAndamento = false;
 
@@ -66,6 +74,7 @@ class ContaRepo extends ChangeNotifier {
     email = 'ana@email.com';
     pedidoEmAndamento = false;
     ausencias = [];
+    cpf = null;
     notifyListeners();
   }
 

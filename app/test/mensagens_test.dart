@@ -118,6 +118,11 @@ void main() {
     conversas.limpar();
     await t.tap(find.bySemanticsLabel('Voltar'));
     await t.pumpAndSettle();
-    expect(find.text('Nenhuma conversa ainda'), findsOneWidget);
+    // RN-115: sem conversas, o canal do Tatu continua fixado.
+    expect(find.text('Tatu'), findsOneWidget);
+    expect(
+      find.text('Quando você aceitar um profissional,\na conversa aparece aqui.'),
+      findsOneWidget,
+    );
   });
 }

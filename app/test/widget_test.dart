@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:tatu/data/consulta_cpf.dart';
 import 'package:tatu/main.dart';
 
 void main() {
+  // RN-111: consulta de CPF sem espera nos testes.
+  consultaCpf = ConsultaCpfMock(demora: Duration.zero);
   testWidgets('Boas-vindas mostra as duas opções e o Entrar', (tester) async {
     await tester.pumpWidget(const TatuApp());
 
@@ -75,10 +78,11 @@ void main() {
 
     await tester.tap(find.text('Continuar'));
     await tester.pumpAndSettle();
-    expect(find.text('Como podemos\nte chamar?'), findsOneWidget);
+    expect(find.text('Seus dados'), findsOneWidget);
   });
 
-  testWidgets('Nome: Continuar só com nome; sobrenome é opcional', (
+  // RN-111: nome completo e CPF; a idade vem do CPF.
+  testWidgets('Seus dados: nome completo e CPF válido; cria a conta', (
     tester,
   ) async {
     await tester.pumpWidget(const TatuApp());
@@ -93,20 +97,23 @@ void main() {
     await tester.tap(find.text('Continuar'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Como podemos\nte chamar?'), findsOneWidget);
+    expect(find.text('Seus dados'), findsOneWidget);
+    expect(find.text('Usamos o CPF para confirmar sua idade.'), findsOneWidget);
     FilledButton botao() =>
         tester.widget(find.widgetWithText(FilledButton, 'Continuar'));
     expect(botao().onPressed, isNull);
 
-    await tester.enterText(find.byType(TextField).first, '   ');
-    await tester.pump();
-    expect(botao().onPressed, isNull);
-
     await tester.enterText(find.byType(TextField).first, 'Ana');
+    await tester.enterText(find.byType(TextField).last, '12345678909');
+    await tester.pump();
+    expect(botao().onPressed, isNull); // falta o sobrenome
+
+    await tester.enterText(find.byType(TextField).first, 'Ana Martins');
     await tester.pump();
     expect(botao().onPressed, isNotNull);
 
     await tester.tap(find.text('Continuar'));
+    await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
     expect(find.text('Oi, Ana'), findsOneWidget);
     expect(find.text('Do que você precisa?'), findsOneWidget);

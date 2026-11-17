@@ -8,7 +8,7 @@ import '../../core/theme/tatu_medidas.dart';
 import '../../data/conta.dart';
 import '../../shared/widgets/cadastro_scaffold.dart';
 import '../cliente/home_page.dart';
-import 'nome_page.dart';
+import 'dados_cliente_page.dart';
 
 /// Cadastro · código de 6 dígitos, enviado por SMS ou por e-mail.
 class CodigoPage extends StatefulWidget {
@@ -109,7 +109,9 @@ class _CodigoPageState extends State<CodigoPage> {
       email: widget.porEmail ? widget.destino : null,
     );
     Navigator.of(context)
-        .pushReplacement(MaterialPageRoute(builder: (_) => const NomePage()));
+        .pushReplacement(
+          MaterialPageRoute(builder: (_) => const DadosClientePage()),
+        );
   }
 
   String get _tempo =>

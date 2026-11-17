@@ -29,7 +29,14 @@ void main() {
     expect(find.text('Ana Martins'), findsNothing);
     conversasProfissional.limpar();
     await t.pump();
-    expect(find.text('Nenhuma conversa ainda'), findsOneWidget);
+    // RN-115: sem conversas, o canal do Tatu continua fixado.
+    expect(find.text('Tatu'), findsOneWidget);
+    expect(
+      find.text(
+        'Quando você aceitar um chamado,\na conversa com o cliente aparece aqui.',
+      ),
+      findsOneWidget,
+    );
   });
 
   // RN-42 e RN-87: a conversa continua e dá para enviar um novo valor.

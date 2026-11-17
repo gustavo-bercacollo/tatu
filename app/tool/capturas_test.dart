@@ -3,6 +3,10 @@
 //   flutter test tool/capturas_test.dart --update-goldens
 import 'dart:io';
 
+import 'package:tatu/data/consulta_cpf.dart';
+import 'package:tatu/features/entrada/menor_de_idade_page.dart';
+import 'package:tatu/features/entrada/canal_tatu_page.dart';
+import 'package:tatu/data/canal_tatu.dart';
 import 'package:tatu/core/protecao_tela.dart';
 import 'package:tatu/features/cliente/mensagens/entrega_distancia.dart';
 import 'package:clock/clock.dart';
@@ -123,7 +127,7 @@ import 'package:tatu/features/profissional/cadastro/boas_vindas_profissional_pag
 import 'package:tatu/features/entrada/celular_page.dart';
 import 'package:tatu/features/entrada/codigo_page.dart';
 import 'package:tatu/features/entrada/email_page.dart';
-import 'package:tatu/features/entrada/nome_page.dart';
+import 'package:tatu/features/entrada/dados_cliente_page.dart';
 
 Future<void> _carregarFontes() async {
   final inter = FontLoader('Inter');
@@ -169,6 +173,7 @@ Future<void> _capturar(
   seguranca.restaurar();
   avaliacoesProfissional.restaurar();
   atendimentoProfissional.restaurar();
+  canalTatu.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -195,6 +200,7 @@ Future<void> _capturar(
 }
 
 void main() {
+  consultaCpf = ConsultaCpfMock(demora: Duration.zero);
   ProtecaoTela.ativa = false;
   ToqueChamado.ativo = false;
   SomEncontrado.ativo = false;
@@ -840,16 +846,51 @@ void main() {
     await _capturar(t, 'mensagens-lista', const MensagensPage());
   });
 
-  testWidgets('mensagens-vazio', (t) async {
+  // RN-115/RN-116: primeiro acesso: só o Tatu, fixado (C122).
+  testWidgets('mensagens-primeiro-acesso-tatu', (t) async {
     await _capturar(
       t,
-      'mensagens-vazio',
+      'mensagens-primeiro-acesso-tatu',
       const MensagensPage(),
       preparar: () async {
         conversas.limpar();
+        canalTatu.cliente.comecar(boasVindasCliente('Ana'));
         await t.pump();
       },
     );
+  });
+
+  // RN-116: boas-vindas no canal do Tatu (C124).
+  testWidgets('chat-tatu-boas-vindas', (t) async {
+    await _capturar(
+      t,
+      'chat-tatu-boas-vindas',
+      CanalTatuPage(
+        canal: canalTatu.cliente,
+        onDestino: abrirDestinoTatuCliente,
+      ),
+      preparar: () async {
+        canalTatu.cliente.comecar(boasVindasCliente('Ana'));
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-117: novidade pelo canal (C125).
+  testWidgets('chat-tatu-novidade', (t) async {
+    await _capturar(
+      t,
+      'chat-tatu-novidade',
+      CanalTatuPage(
+        canal: canalTatu.cliente,
+        onDestino: abrirDestinoTatuCliente,
+      ),
+    );
+  });
+
+  // RN-118: Dicas Tatu em breve (C126).
+  testWidgets('dicas-tatu-em-breve', (t) async {
+    await _capturar(t, 'dicas-tatu-em-breve', const DicasTatuPage());
   });
 
   testWidgets('chat', (t) async {
@@ -1397,17 +1438,23 @@ void main() {
     );
   });
 
-  testWidgets('nome', (t) async {
+  // RN-111: nome completo e CPF (C09).
+  testWidgets('cadastro-dados', (t) async {
     await _capturar(
       t,
-      'nome',
-      const NomePage(),
+      'cadastro-dados',
+      const DadosClientePage(),
       preparar: () async {
-        await t.enterText(find.byType(TextField).first, 'Ana');
-        await t.enterText(find.byType(TextField).last, 'Martins');
+        await t.enterText(find.byType(TextField).first, 'Ana Martins');
+        await t.enterText(find.byType(TextField).last, '12345678909');
         await t.pump();
       },
     );
+  });
+
+  // RN-110: menor de 18 não entra (C10).
+  testWidgets('cadastro-menor-de-idade', (t) async {
+    await _capturar(t, 'cadastro-menor-de-idade', const MenorDeIdadePage());
   });
 
   // ── Profissional ──────────────────────────────────────────────
@@ -1951,7 +1998,7 @@ void main() {
     await _capturar(
       t,
       'pro-em-andamento',
-      EmAndamentoPage(inicio: DateTime(2026, 11, 10, 14, 32)),
+      EmAndamentoPage(inicio: _hojeAs1432()),
     );
   });
 
@@ -1959,7 +2006,7 @@ void main() {
     await _capturar(
       t,
       'pro-so-visita',
-      EmAndamentoPage(inicio: DateTime(2026, 11, 10, 14, 32)),
+      EmAndamentoPage(inicio: _hojeAs1432()),
       preparar: () async {
         await t.tap(find.text('Encerrar e cobrar só a visita'));
         await t.pumpAndSettle();
@@ -1976,7 +2023,7 @@ void main() {
     await _capturar(
       t,
       'pro-seguranca',
-      EmAndamentoPage(inicio: DateTime(2026, 11, 10, 14, 32)),
+      EmAndamentoPage(inicio: _hojeAs1432()),
       preparar: () => abrirSegurancaCap(t),
     );
   });
@@ -1985,7 +2032,7 @@ void main() {
     await _capturar(
       t,
       'pro-alerta-ativo',
-      EmAndamentoPage(inicio: DateTime(2026, 11, 10, 14, 32)),
+      EmAndamentoPage(inicio: _hojeAs1432()),
       preparar: () async {
         seguranca.acionarAlerta(cliente: false);
         await t.pump();
@@ -1997,7 +2044,7 @@ void main() {
     await _capturar(
       t,
       'pro-sair-atendimento',
-      EmAndamentoPage(inicio: DateTime(2026, 11, 10, 14, 32)),
+      EmAndamentoPage(inicio: _hojeAs1432()),
       preparar: () async {
         await abrirSegurancaCap(t);
         await t.tap(find.text('Sair agora'));
@@ -2541,13 +2588,31 @@ void main() {
     await comDemo(t, 'pro-mensagens', const MensagensProfissionalPage());
   });
 
-  testWidgets('pro-mensagens-vazio', (t) async {
+  // RN-115/RN-116: primeiro acesso do profissional (P73).
+  testWidgets('pro-mensagens-primeiro-acesso-tatu', (t) async {
     await comDemo(
       t,
-      'pro-mensagens-vazio',
+      'pro-mensagens-primeiro-acesso-tatu',
       const MensagensProfissionalPage(),
       depois: () async {
         conversasProfissional.limpar();
+        canalTatu.profissional.comecar(boasVindasProfissional('Luiza'));
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-116: boas-vindas do profissional (P75).
+  testWidgets('pro-chat-tatu-boas-vindas', (t) async {
+    await comDemo(
+      t,
+      'pro-chat-tatu-boas-vindas',
+      CanalTatuPage(
+        canal: canalTatu.profissional,
+        onDestino: (_, _) {},
+      ),
+      depois: () async {
+        canalTatu.profissional.comecar(boasVindasProfissional('Luiza'));
         await t.pump();
       },
     );
@@ -3164,4 +3229,11 @@ void main() {
   testWidgets('pro-excluir-saldo', (t) async {
     await comDemo(t, 'pro-excluir-saldo', const ExcluirComSaldoPage());
   });
+}
+
+/// Hoje às 14:32 (início do serviço nas capturas; fica dentro dos 7 dias
+/// da RN-89).
+DateTime _hojeAs1432() {
+  final h = DateTime.now();
+  return DateTime(h.year, h.month, h.day, 14, 32);
 }

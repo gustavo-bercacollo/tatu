@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_medidas.dart';
+import '../../../data/consulta_cpf.dart';
 import '../../../data/profissional.dart';
+import '../../entrada/menor_de_idade_page.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/tatu_field.dart';
@@ -37,7 +39,21 @@ class _DadosProfissionalPageState extends State<DadosProfissionalPage> {
   bool get _cpfOk => cpfValido(_cpf.text);
   bool get _celularOk => soDigitos(_celular.text).length == 11;
 
-  void _continuar() {
+  bool _consultando = false;
+
+  Future<void> _continuar() async {
+    if (_consultando) return;
+    // RN-112: mesma consulta do CPF do cliente; menor de 18 não segue.
+    setState(() => _consultando = true);
+    final maior = await cpfDeMaior(_cpf.text);
+    if (!mounted) return;
+    setState(() => _consultando = false);
+    if (!maior) {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const MenorDeIdadePage()),
+      );
+      return;
+    }
     profissional.salvarDados(
       nome: _nome.text,
       cpf: _cpf.text,

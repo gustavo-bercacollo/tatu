@@ -6,6 +6,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_theme.dart';
+import '../../../data/consulta_cpf.dart';
 import '../../../data/pagamentos.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/tatu_field.dart';
@@ -57,7 +58,18 @@ class _NovoCartaoPageState extends State<NovoCartaoPage> {
       _nome.text.trim().isNotEmpty &&
       soDigitos(_cpf.text).length == 11;
 
-  void _salvar() {
+  /// RN-111: o titular do cartão também precisa ter 18 anos.
+  String? _erroCpf;
+
+  Future<void> _salvar() async {
+    final maior = await cpfDeMaior(_cpf.text);
+    if (!mounted) return;
+    if (!maior) {
+      setState(
+        () => _erroCpf = 'O titular do cartão precisa ter 18 anos ou mais.',
+      );
+      return;
+    }
     final erro = pagamentos.adicionar(
       numero: soDigitos(_numero.text),
       validade: _validade.text,
@@ -156,12 +168,13 @@ class _NovoCartaoPageState extends State<NovoCartaoPage> {
             label: 'CPF do titular',
             hintText: '000.000.000-00',
             controller: _cpf,
+            errorText: _erroCpf,
             keyboardType: TextInputType.number,
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
               MascaraFormatter('###.###.###-##'),
             ],
-            onChanged: (_) => setState(() {}),
+            onChanged: (_) => setState(() => _erroCpf = null),
           ),
           if (!recusado) ...[
             const SizedBox(height: TatuMedidas.entreSecoes),

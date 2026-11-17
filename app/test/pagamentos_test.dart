@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/consulta_cpf.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/pagamentos.dart';
 import 'package:tatu/features/cliente/pagamento/novo_cartao_page.dart';
@@ -27,6 +28,8 @@ FilledButton _botao(WidgetTester t, String texto) =>
     t.widget(find.widgetWithText(FilledButton, texto));
 
 void main() {
+  // RN-111: consulta de CPF sem espera nos testes.
+  consultaCpf = ConsultaCpfMock(demora: Duration.zero);
   testWidgets('Perfil → Pagamento mostra os cartões e o padrão', (t) async {
     await _abrir(t, const PerfilClientePage());
     expect(find.text('Visa 4242'), findsOneWidget);

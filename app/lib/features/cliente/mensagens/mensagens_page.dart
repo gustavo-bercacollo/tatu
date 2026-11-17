@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
+import '../../../data/canal_tatu.dart';
 import '../../../data/conversas.dart';
+import '../../entrada/canal_tatu_page.dart';
+import '../home_page.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/campo_busca.dart';
 import '../../../shared/widgets/chat.dart';
-import '../../../shared/widgets/estado_vazio.dart';
 import '../abas.dart';
 import 'chat_page.dart';
 
@@ -29,6 +30,16 @@ class _MensagensPageState extends State<MensagensPage> {
     _busca.dispose();
     super.dispose();
   }
+
+  /// RN-115 a RN-118: abre o canal do Tatu.
+  void _abrirTatu() => Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (_) => CanalTatuPage(
+        canal: canalTatu.cliente,
+        onDestino: abrirDestinoTatuCliente,
+      ),
+    ),
+  );
 
   void _abrir(Conversa c) {
     conversas.marcarLida(c);
@@ -66,16 +77,24 @@ class _MensagensPageState extends State<MensagensPage> {
       ),
       child: Text('Mensagens', style: TatuTexto.tituloGrande),
     );
+    // RN-115: o canal do Tatu fica fixado no topo; Mensagens nunca fica
+    // vazia (as telas de vazio ficam para quando não houver canal).
+    final tatu = LinhaCanalTatu(canal: canalTatu.cliente, onTap: _abrirTatu);
     if (conversas.conversas.isEmpty) {
-      return const Column(
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           titulo,
-          Expanded(
-            child: EstadoVazio(
-              icone: TablerIcons.message_circle,
-              titulo: 'Nenhuma conversa ainda',
-              texto: 'Quando você aceitar um profissional,\na conversa aparece aqui.',
+          const SizedBox(height: TatuMedidas.entreItens),
+          tatu,
+          const Expanded(
+            child: Center(
+              child: Text(
+                'Quando você aceitar um profissional,\n'
+                'a conversa aparece aqui.',
+                textAlign: TextAlign.center,
+                style: TatuTexto.detalhe,
+              ),
             ),
           ),
         ],
@@ -102,6 +121,7 @@ class _MensagensPageState extends State<MensagensPage> {
             child: _CobrancaPendente(conversa: cobranca),
           ),
           const SizedBox(height: TatuMedidas.entreSecoes),
+          tatu,
           for (final c in conversas.conversas)
             _LinhaConversa(conversa: c, onTap: () => _abrir(c)),
         ] else ...[
@@ -113,6 +133,10 @@ class _MensagensPageState extends State<MensagensPage> {
               onChanged: (_) => setState(() {}),
             ),
           ),
+          if (termo.isEmpty || 'tatu'.contains(termo)) ...[
+            const SizedBox(height: 8),
+            tatu,
+          ],
           if (andamento.isNotEmpty) ...[
             const _Grupo('Em andamento'),
             for (final c in andamento)
@@ -213,5 +237,21 @@ class _CobrancaPendente extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// Destinos dos botões do Tatu no modo cliente (RN-117, RN-118).
+void abrirDestinoTatuCliente(BuildContext context, String destino) {
+  final nav = Navigator.of(context);
+  switch (destino) {
+    case DestinoTatu.dicas:
+      nav.push(MaterialPageRoute(builder: (_) => const DicasTatuPage()));
+    case DestinoTatu.distancia:
+      nav.pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => const HomeClientePage(distancia: true),
+        ),
+        (_) => false,
+      );
   }
 }

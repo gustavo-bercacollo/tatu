@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/consulta_cpf.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/profissional.dart';
 import 'package:tatu/features/profissional/cadastro/dados_page.dart';
@@ -24,6 +25,8 @@ Future<void> _tocar(WidgetTester t, String texto) async {
 }
 
 void main() {
+  // RN-111: consulta de CPF sem espera nos testes.
+  consultaCpf = ConsultaCpfMock(demora: Duration.zero);
   CameraVerificacaoPage.cameraAoVivo = false;
   setUp(profissional.restaurar);
 
