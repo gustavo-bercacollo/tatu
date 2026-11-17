@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
-  <title>À distância · enviar valor</title>
+  <title>À distância · ajuste pedido</title>
   <rect x="0" y="0" width="393" height="852" rx="0" fill="#fff"/>
   <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
   <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
@@ -23,22 +23,21 @@
   <text x="120.125" y="251" font-size="15" font-weight="400" fill="#fff" text-anchor="start">Oi, Ana! Que estilo você imagina?</text>
   <rect x="20" y="282" width="202.03125" height="44" rx="20" fill="#EEEEF0"/>
   <text x="36" y="309" font-size="15" font-weight="400" fill="#000000" text-anchor="start">Algo simples e colorido.</text>
-  <rect x="0" y="0" width="393" height="852" rx="0" fill="#000" opacity="0.38"/>
-  <rect x="0" y="400" width="393" height="482" rx="30" fill="#fff"/>
-  <rect x="178.5" y="408" width="36" height="5" rx="2.5" fill="#C7C7CC"/>
-  <text x="24" y="456" font-size="22" font-weight="700" fill="#000000" text-anchor="start">Quanto vai custar?</text>
-  <text x="24" y="482" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="start">À distância não tem visita, só o serviço.</text>
-  <rect x="24" y="502" width="345" height="76" rx="16" fill="#EEEEF0"/>
-  <rect x="24" y="502" width="345" height="76" rx="16" fill="none" stroke="#000" stroke-width="1.5"/>
-  <text x="40" y="524" font-size="13" font-weight="500" fill="#8E8E93" text-anchor="start">Serviço</text>
-  <text x="40" y="560" font-size="26" font-weight="700" fill="#000000" text-anchor="start" letter-spacing="-0.5">R$ 250</text>
-  <rect x="24" y="594" width="345" height="94" rx="16" fill="#F2F2F7"/>
-  <text x="40" y="620" font-size="13" font-weight="600" fill="#000000" text-anchor="start">Você recebe</text>
-  <text x="40" y="646" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="start">Taxa do Tatu (10%)</text>
-  <text x="353" y="646" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="end">− R$ 25,00</text>
-  <text x="40" y="670" font-size="14" font-weight="600" fill="#000000" text-anchor="start">No seu Pix</text>
-  <text x="353" y="670" font-size="14" font-weight="600" fill="#000000" text-anchor="end">R$ 225,00</text>
-  <rect x="24" y="712" width="345" height="56" rx="28.0" fill="#1C1C1E"/>
-  <text x="196.5" y="746.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Enviar para Ana</text>
+  <rect x="118.03125" y="342" width="156.9375" height="26" rx="13" fill="#F2F2F7"/>
+  <text x="196.5" y="359" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="middle">Entrega 1 de 2 enviada</text>
+  <rect x="20" y="384" width="320" height="150" rx="20" fill="#FFF4E0"/>
+  <g transform="translate(36,404) scale(0.8333333333333334)" fill="none" stroke="#A85F00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/></g>
+  <text x="66" y="420" font-size="15" font-weight="700" fill="#A85F00" text-anchor="start">Ana pediu um ajuste</text>
+  <text x="36" y="452" font-size="15" font-weight="400" fill="#000000" text-anchor="start">“Quero as letras maiores e o rosa</text>
+  <text x="36" y="473" font-size="15" font-weight="400" fill="#000000" text-anchor="start">um pouco mais claro.”</text>
+  <text x="36" y="514" font-size="12" font-weight="500" fill="#A85F00" text-anchor="start">Você tem mais 1 entrega. É a última.</text>
+  <rect x="20" y="554" width="150" height="44" rx="22.0" fill="#EEEEF0"/>
+  <text x="95.0" y="582.0" font-size="17" font-weight="600" fill="#000000" text-anchor="middle">Enviar prévia</text>
+  <rect x="178" y="554" width="195" height="44" rx="22.0" fill="#1C1C1E"/>
+  <text x="275.5" y="582.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Enviar entrega 2</text>
+  <circle cx="36" cy="799" r="18" fill="#EEEEF0"/>
+  <g transform="translate(27,790) scale(0.75)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"/><path d="M12 13m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/></g>
+  <rect x="62" y="781" width="311" height="38" rx="19" fill="#EEEEF0"/>
+  <text x="78" y="805" font-size="16" font-weight="400" fill="#8E8E93" text-anchor="start">Mensagem</text>
   <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
 </svg>

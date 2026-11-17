@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>À distância · prévia protegida</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#000"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#FFFFFF" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#FFFFFF"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#FFFFFF"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#FFFFFF"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#FFFFFF"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#FFFFFF"/>
+  <circle cx="40" cy="82" r="18" fill="#2C2C2E"/>
+  <g transform="translate(32,74) scale(0.6666666666666666)" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></g>
+  <text x="196.5" y="80" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Prévia da Marina</text>
+  <text x="196.5" y="100" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="middle">Expira em 23 h</text>
+  <rect x="20" y="150" width="353" height="420" rx="20" fill="#F7E8EE"/>
+  <circle cx="196" cy="320" r="78" fill="#E85D8A"/>
+  <text x="196" y="312" font-size="30" font-weight="700" fill="#fff" text-anchor="middle">Doces</text>
+  <text x="196" y="346" font-size="22" font-weight="500" fill="#fff" text-anchor="middle">da Ana</text>
+  <g opacity=".22" transform="rotate(-28 196 360)" font-family="-apple-system,Inter,sans-serif" font-size="15" font-weight="600" fill="#000"><text x="-120" y="160">Ana Martins · Tatu · prévia</text><text x="140" y="160">Ana Martins · Tatu · prévia</text><text x="-120" y="230">Ana Martins · Tatu · prévia</text><text x="140" y="230">Ana Martins · Tatu · prévia</text><text x="-120" y="300">Ana Martins · Tatu · prévia</text><text x="140" y="300">Ana Martins · Tatu · prévia</text><text x="-120" y="370">Ana Martins · Tatu · prévia</text><text x="140" y="370">Ana Martins · Tatu · prévia</text><text x="-120" y="440">Ana Martins · Tatu · prévia</text><text x="140" y="440">Ana Martins · Tatu · prévia</text><text x="-120" y="510">Ana Martins · Tatu · prévia</text><text x="140" y="510">Ana Martins · Tatu · prévia</text><text x="-120" y="580">Ana Martins · Tatu · prévia</text><text x="140" y="580">Ana Martins · Tatu · prévia</text></g>
+  <g transform="translate(86.5,618) scale(0.75)" fill="none" stroke="#AEAEB2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z"/><path d="M8 11v-4a4 4 0 1 1 8 0v4"/></g>
+  <text x="112.5" y="632" font-size="14" font-weight="400" fill="#AEAEB2" text-anchor="start">Não dá para baixar nem salvar.</text>
+  <text x="196.5" y="656" font-size="14" font-weight="400" fill="#AEAEB2" text-anchor="middle">Print e gravação de tela ficam pretos.</text>
+  <rect x="20" y="756" width="353" height="56" rx="28.0" fill="#2C2C2E"/>
+  <text x="196.5" y="790.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Voltar ao chat</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#FFFFFF"/>
+</svg>

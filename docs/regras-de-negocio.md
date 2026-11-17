@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 14/11/2026 (v9)
+Atualizado em 17/11/2026 (v10)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -93,8 +93,15 @@ Do valor confirmado até a avaliação, o atendimento segue sempre a mesma ordem
 | RN-41 | Ao concluir, os dois se avaliam. O cliente pode editar a avaliação até 7 dias depois. |
 | RN-42 | Depois de concluído, a conversa continua aberta. Cliente e profissional voltam a se falar por ela quando quiserem, sem fazer um pedido novo. |
 | RN-95 | Serviço à distância não tem Visita, rota, "Cheguei" nem código na porta. O valor tem só o Serviço. Confirmado o valor, o pedido vai direto para Em andamento. |
-| RN-96 | A entrega à distância é feita pelo chat, com arquivos. O profissional toca em Concluir serviço, o cliente é cobrado e a contestação em 24 horas vale igual. |
+| RN-96 | A entrega à distância é feita pelo chat, com arquivos. O profissional toca em "Enviar entrega", mas quem conclui é o cliente (RN-100). |
 | RN-98 | Serviço à distância não mostra o botão de segurança (ninguém vai até ninguém). Denúncia continua pelo menu do chat. |
+| RN-99 | À distância, o profissional pode mandar prévias protegidas à vontade, antes da entrega. A prévia abre só no app: não dá para baixar nem encaminhar, print e gravação de tela ficam pretos e a imagem leva uma marca d'água com o nome do cliente. Expira em 24 horas (exemplo). |
+| RN-100 | À distância, quem conclui é o cliente. Em cada entrega ele escolhe Aprovar (é cobrado o restante) ou, conforme a entrega, Pedir ajuste ou Pedir reembolso. Sem resposta em 48 horas (exemplo), a entrega é aprovada sozinha. |
+| RN-101 | São no máximo 2 entregas por valor. Depois da 1ª: Aprovar ou Pedir ajuste. Depois da 2ª: Aprovar ou Pedir reembolso. |
+| RN-102 | Ao enviar o valor à distância, o profissional pode pedir um sinal de até 30% (exemplo). O sinal paga o tempo dele, como a visita no serviço no local. |
+| RN-103 | O sinal é cobrado quando o cliente confirma o valor e fica guardado. Vai para o profissional quando ele manda a 1ª entrega, mesmo que o cliente não aprove. |
+| RN-104 | No pedido de reembolso, o suporte decide pelo chat (pedido, prévias, ajustes, entregas) em até 2 dias úteis (exemplo): devolve tudo, parte ou nada do restante. O restante fica guardado até a decisão. O sinal fica com o profissional. |
+| RN-105 | Se o prazo do valor (RN-89) acabar sem nenhuma entrega, o cliente pode tocar em "Pedir sinal de volta". O pedido vai para o suporte e, sem entrega, o sinal volta para o cliente. O Tatu não paga nada: o sinal ainda estava guardado. |
 
 ## 5. Cancelamentos e contestação
 
@@ -147,6 +154,7 @@ As penalidades existem para impedir abuso, nunca para punir quem se protegeu.
 | RN-66 | Banimento é para fraude, identidade falsa e assédio comprovado. |
 | RN-79 | Três abandonos em 30 dias pausam a conta do profissional até ele falar com o suporte. |
 | RN-82 | Três ausências em 30 dias pausam a conta do cliente até ele falar com o suporte. |
+| RN-106 | O app acompanha sinais sem entrega e reembolsos à distância. Exemplo: 3 sinais sem entrega em 30 dias pausam a conta do profissional até falar com o suporte. Entregas vazias só para liberar o sinal contam igual. |
 
 ## 8. Avaliações, perfil e anúncios
 
@@ -188,6 +196,8 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 - [ ] **Abandono à distância.** O que acontece quando o profissional aceita e não responde no chat. Sugestão: mesmo "Ainda vai?" da RN-77 e contar como abandono.
 - [ ] **Profissões à distância no lançamento.** As telas usam Designer, Programador, Professor, Contador e Advogado como exemplo.
 - [ ] **Arquivos e links no chat à distância.** Como conviver com o contato oculto (RN-85, fase 2).
+- [ ] **Print no iPhone.** O Android bloqueia print de verdade. O iPhone não deixa bloquear, só esconder o conteúdo no print e na gravação. Foto com outro celular sempre funciona, por isso a marca d'água com o nome do cliente.
+- [ ] **Números do serviço à distância.** Sinal de até 30%, prévia de 24 horas, aprovação automática em 48 horas, resposta do suporte em 2 dias úteis: todos são exemplos.
 - [ ] **Ligação pelo app.** O botão Ligar existe. Decidir se a ligação esconde o número real das partes.
 
 ## 11. Problemas mapeados
@@ -209,11 +219,13 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-11 | Sem internet no local para tocar "Concluir serviço". | A resolver | — |
 | P-12 | Serviço que leva vários dias, semanas ou meses. | Resolvido | RN-42, RN-87 a RN-91 |
 | P-13 | Profissional à distância: serviço que não precisa de visita, em que a localização não importa. | Resolvido | RN-92 a RN-98 |
+| P-14 | Serviço à distância malfeito: o cliente não gosta da entrega e quer o dinheiro de volta. | Resolvido | RN-96, RN-99 a RN-106 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 17/11/2026 | RN-96, RN-99 a RN-106 | Entrega à distância malfeita: prévia protegida, até 2 entregas, cliente aprova, sinal, reembolso pelo suporte, pausa por sinais sem entrega. |
 | 14/11/2026 | RN-92 a RN-98 | Serviço à distância: seletor No local / À distância na Home, busca sem raio, sem visita, entrega pelo chat. |
 | 14/11/2026 | RN-42, RN-87 a RN-91 | A conversa não fecha mais depois do serviço. Cada valor combinado é um pagamento, com comissão em cada um. Limite de 7 dias por valor. Parcelamento. |
 | 14/11/2026 | — | P-04 (dano na casa) e P-05 (problema volta dias depois) adiados. |

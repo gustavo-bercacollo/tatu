@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
-  <title>À distância · valor no chat</title>
+  <title>À distância · sem entrega</title>
   <rect x="0" y="0" width="393" height="852" rx="0" fill="#fff"/>
   <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
   <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
@@ -25,20 +25,21 @@
   <text x="36" y="251" font-size="15" font-weight="400" fill="#000000" text-anchor="start">Oi, Ana! Que estilo você imagina?</text>
   <rect x="170.96875" y="282" width="202.03125" height="44" rx="20" fill="#1C1C1E"/>
   <text x="186.96875" y="309" font-size="15" font-weight="400" fill="#fff" text-anchor="start">Algo simples e colorido.</text>
-  <rect x="20" y="340" width="219.40625" height="44" rx="20" fill="#EEEEF0"/>
-  <text x="36" y="367" font-size="15" font-weight="400" fill="#000000" text-anchor="start">Consigo entregar amanhã.</text>
-  <text x="196.5" y="414" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="middle">Marina enviou um valor</text>
-  <rect x="20" y="430" width="300" height="232" rx="20" fill="none" stroke="#1C1C1E" stroke-width="1.5"/>
-  <text x="38" y="458" font-size="13" font-weight="500" fill="#8E8E93" text-anchor="start">Serviço · sem visita</text>
-  <text x="38" y="494" font-size="32" font-weight="700" fill="#000000" text-anchor="start" letter-spacing="-1">R$ 250,00</text>
-  <rect x="38" y="508" width="264" height="38" rx="10" fill="#F2F2F7"/>
-  <g transform="translate(50,518) scale(0.75)" fill="none" stroke="#000000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-18a1 1 0 0 1 -1 -1v-12a1 1 0 0 1 1 -1z"/><path d="M2 10h20"/><path d="M6 15h3"/></g>
-  <text x="76" y="532" font-size="14" font-weight="500" fill="#000000" text-anchor="start">Visa final 4242</text>
-  <text x="290" y="532" font-size="14" font-weight="600" fill="#007AFF" text-anchor="end">Trocar</text>
-  <text x="38" y="566" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="start">Reservamos agora. Só cobramos no fim.</text>
-  <rect x="38" y="578" width="264" height="44" rx="22.0" fill="#1C1C1E"/>
-  <text x="170.0" y="606.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Confirmar valor</text>
-  <text x="170" y="644" font-size="14" font-weight="600" fill="#007AFF" text-anchor="middle">Pedir outro valor</text>
+  <rect x="71.8046875" y="350" width="249.390625" height="26" rx="13" fill="#F2F2F7"/>
+  <text x="196.5" y="367" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="middle">Valor confirmado · sinal de R$ 75 pago</text>
+  <text x="196.5" y="404" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="middle">há 7 dias</text>
+  <rect x="188.5625" y="418" width="184.4375" height="44" rx="20" fill="#1C1C1E"/>
+  <text x="204.5625" y="445" font-size="15" font-weight="400" fill="#fff" text-anchor="start">Oi, alguma novidade?</text>
+  <rect x="20" y="486" width="353" height="190" rx="18" fill="#F2F2F7"/>
+  <g transform="translate(36,506) scale(0.8333333333333334)" fill="none" stroke="#000000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/><path d="M12 16h.01"/></g>
+  <text x="66" y="522" font-size="15" font-weight="700" fill="#000000" text-anchor="start">A Marina não enviou nada</text>
+  <text x="66" y="544" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">O prazo acabou. O sinal de R$ 75</text>
+  <text x="66" y="562" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">está guardado e pode voltar para você.</text>
+  <rect x="36" y="588" width="120" height="44" rx="22.0" fill="#EEEEF0"/>
+  <text x="96.0" y="616.0" font-size="17" font-weight="600" fill="#000000" text-anchor="middle">Esperar mais</text>
+  <rect x="164" y="588" width="193" height="44" rx="22.0" fill="#1C1C1E"/>
+  <text x="260.5" y="616.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Pedir sinal de volta</text>
+  <text x="196.5" y="656" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="middle">O pedido vai para o suporte.</text>
   <circle cx="36" cy="799" r="18" fill="#EEEEF0"/>
   <g transform="translate(27,790) scale(0.75)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"/><path d="M12 13m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/></g>
   <rect x="62" y="781" width="311" height="38" rx="19" fill="#EEEEF0"/>
