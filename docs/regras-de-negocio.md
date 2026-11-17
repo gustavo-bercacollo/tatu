@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 17/11/2026 (v15)
+Atualizado em 17/11/2026 (v16)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -235,7 +235,7 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-03 | Cliente e profissional fecham por fora na próxima vez, sem o app. | Decidido · fase 2 | RN-83 a RN-86 |
 | P-04 | O profissional quebra algo na casa durante o serviço. | Adiado: fora do escopo por enquanto | — |
 | P-05 | O problema volta dias depois do serviço (a contestação vale só 24 horas). | Decidido · garantia própria na fase 2 | RN-107 a RN-109 |
-| P-06 | Preço abusivo, principalmente em emergência. | A resolver | — |
+| P-06 | Preço abusivo, principalmente em emergência. | Adiado · decidir depois | — |
 | P-07 | Material comprado no meio do serviço, fora do combinado. | A resolver | — |
 | P-08 | Cartão recusado na hora da cobrança final. | A resolver | — |
 | P-09 | Avaliações falsas para inflar a nota. | A resolver | — |
@@ -251,6 +251,7 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 17/11/2026 | — | P-06 (preço abusivo) adiado: a proposta não foi aprovada, decidir depois. |
 | 17/11/2026 | RN-119, RN-124 a RN-127 | Sem links no chat. Link do site, programa e script só pela entrega à distância, com antivírus, verificação e aviso. |
 | 17/11/2026 | RN-119 a RN-124 | Arquivos no chat: tipos permitidos, antivírus, nudez bloqueada, abuso infantil com suspensão e comunicação às autoridades, denúncia, links. |
 | 17/11/2026 | RN-115 a RN-118 | Canal oficial do Tatu nas Mensagens: primeira mensagem de boas-vindas, avisos e novidades, atalho para Dicas Tatu. |
