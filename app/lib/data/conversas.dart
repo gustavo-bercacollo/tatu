@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import 'regras_distancia.dart';
 import 'regras_valor.dart';
+import 'suspensao.dart';
 
 /// Situação de uma mensagem enviada pela pessoa.
 enum EnvioMensagem { enviada, falhou }
@@ -217,13 +218,24 @@ class Conversa {
     required this.rua,
     required this.quando,
     required this.mensagens,
-    this.emAndamento = false,
+    bool emAndamento = false,
     this.online = false,
     this.naoLidas = 0,
     this.concluidoEm,
     this.valor,
     this.distancia = false,
-  });
+  // ignore: prefer_initializing_formals (parâmetro com nome não pode ser privado)
+  }) : _emAndamento = emAndamento;
+
+  /// RN-129 a RN-132: o Tatu encerrou este atendimento porque uma das
+  /// contas foi suspensa. O chat fica só para leitura e o histórico
+  /// fica guardado como prova.
+  Encerramento? encerramento;
+
+  bool get encerrada => encerramento != null;
+
+  /// RN-132: o nome some e vira "Conta indisponível".
+  String get nomeVisivel => encerrada ? 'Conta indisponível' : nome;
 
   /// RN-92: pedido à distância.
   final bool distancia;
@@ -244,7 +256,10 @@ class Conversa {
   final String rua;
   final String quando;
   final List<MensagemChat> mensagens;
-  final bool emAndamento;
+  final bool _emAndamento;
+
+  /// RN-129: encerrada pelo Tatu, sai de "Em andamento".
+  bool get emAndamento => _emAndamento && !encerrada;
   final bool online;
   int naoLidas;
 
@@ -443,6 +458,64 @@ class ConversasRepo extends ChangeNotifier {
       ),
     );
     notifyListeners();
+  }
+
+  // ---------- Conta suspensa (RN-128 a RN-132) ----------
+
+  /// Em que ponto está o atendimento desta conversa ([ponto] vem do
+  /// pedido em andamento quando o profissional já saiu).
+  AtendimentoAberto atendimentoDe(Conversa c, {PontoAtendimento? ponto}) {
+    final v = c.valor;
+    final confirmado = v?.situacao == SituacaoValor.confirmado;
+    return AtendimentoAberto(
+      ponto:
+          ponto ??
+          (confirmado
+              ? PontoAtendimento.confirmado
+              : PontoAtendimento.combinando),
+      visita: v?.visita ?? 0,
+      servico: v?.servico ?? 0,
+      sinal: confirmado ? (v?.sinal ?? 0) : 0,
+      entregas: c.entrega?.enviadas ?? 0,
+      parcelas: v?.parcelas ?? 1,
+      feminino: c.feminino,
+    );
+  }
+
+  /// RN-129/RN-130: o profissional desta conversa foi suspenso. A reserva
+  /// é liberada, o sinal sem entrega volta e o Tatu avisa no chat.
+  Encerramento profissionalSuspenso(
+    Conversa c, {
+    PontoAtendimento? ponto,
+    DateTime? agora,
+  }) {
+    final e = RegrasSuspensao.profissionalSuspenso(
+      atendimentoDe(c, ponto: ponto),
+      agora ?? clock.now(),
+    );
+    c.encerramento = e;
+    notifyListeners();
+    return e;
+  }
+
+  /// RN-129/RN-131: a conta do cliente (esta) foi suspensa. Todos os
+  /// atendimentos em andamento são encerrados; o profissional recebe pelo
+  /// que já fez. Devolve o encerramento de cada um.
+  /// [pontos]: ponto de cada atendimento pelo nome do profissional (vem
+  /// do pedido em andamento).
+  List<Encerramento> clienteSuspenso({
+    Map<String, PontoAtendimento> pontos = const {},
+  }) {
+    final r = <Encerramento>[];
+    for (final c in conversas.where((c) => c.emAndamento).toList()) {
+      final e = RegrasSuspensao.clienteSuspenso(
+        atendimentoDe(c, ponto: pontos[c.nome]),
+      );
+      c.encerramento = e;
+      r.add(e);
+    }
+    notifyListeners();
+    return r;
   }
 
   /// RN-123: o arquivo denunciado some do chat de quem denunciou.

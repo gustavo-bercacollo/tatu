@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../cliente/mensagens/entrega_distancia.dart' show LinhaArquivo;
+import '../../entrada/chat_encerrado.dart';
 import '../../entrada/conta_suspensa_page.dart';
 import 'escolher_entrega.dart';
 import '../../entrada/denunciar_arquivo.dart';
@@ -56,7 +57,11 @@ class ChatProfissionalPage extends StatefulWidget {
     this.concluidoEm,
     this.depois = const [],
     this.diaDepois,
+    this.mensagens,
   });
+
+  /// Mensagens do começo da conversa (texto, minha); nulo = as de exemplo.
+  final List<(String, bool)>? mensagens;
 
   final ChamadoNovo chamado;
   final Duration resposta;
@@ -83,7 +88,9 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
 
   /// (texto, minha): conversa de exemplo.
   late final _mensagens = <(String, bool)>[
-    if (widget.chamado.distancia) ...[
+    if (widget.mensagens != null)
+      ...widget.mensagens!
+    else if (widget.chamado.distancia) ...[
       ('Oi, ${widget.chamado.primeiroNome}! Que estilo você imagina?', true),
       ('Algo simples e colorido.', false),
     ] else ...[
@@ -570,11 +577,21 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: atendimentoProfissional,
+    builder: (context, _) => _tela(context),
+  );
+
+  Widget _tela(BuildContext context) {
     final c = widget.chamado;
     final km = c.distanciaKm.toStringAsFixed(1).replaceAll('.', ',');
+    // RN-131/RN-132: o cliente foi suspenso e o Tatu encerrou.
+    final fim = atendimentoProfissional.encerrados[c.cliente];
     return TelaChat(
-      topo: Row(
+      rodapeColado: fim != null,
+      topo: fim != null
+          ? const TopoContaIndisponivel(detalhe: 'Cliente')
+          : Row(
         children: [
           const BackCircleButton(),
           Expanded(
@@ -630,7 +647,8 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
           lado: c.distancia ? 'À distância' : '${c.bairro} · $km km',
         ),
         const SizedBox(height: TatuMedidas.entreSecoes),
-        const NotaChat('Você aceitou o chamado. Combinem o valor por aqui.'),
+        if (fim == null)
+          const NotaChat('Você aceitou o chamado. Combinem o valor por aqui.'),
         const SizedBox(height: TatuMedidas.entreItens + 4),
         for (final (i, m) in _mensagens.indexed) ...[
           if (_concluida && i == _antes) ..._marco(),
@@ -655,6 +673,14 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
         ],
         if (_concluida && _mensagens.length == _antes) ..._marco(),
         const SizedBox(height: TatuMedidas.entreSecoes),
+        if (fim != null) ...[
+          // RN-131: o Tatu avisa o que o profissional recebe.
+          CartaoTatuChat(texto: fim.mensagem),
+          if (fim.nota != null) ...[
+            const SizedBox(height: TatuMedidas.entreSecoes),
+            NotaChat(fim.nota!),
+          ],
+        ] else
         ...switch (_estado) {
             EstadoValor.inicio => const <Widget>[],
             EstadoValor.aguardando => [
@@ -694,8 +720,11 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
           },
         const SizedBox(height: TatuMedidas.entreItens),
       ],
-      // RN-42: a conversa nunca fecha.
-      rodape: Column(
+      // RN-132: só leitura depois que o Tatu encerra.
+      // RN-42: fora isso, a conversa nunca fecha.
+      rodape: fim != null
+          ? const RodapeConversaEncerrada()
+          : Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

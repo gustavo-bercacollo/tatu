@@ -13,6 +13,7 @@ import '../../../shared/widgets/campo_busca.dart';
 import '../../../shared/widgets/chat.dart';
 import '../abas.dart';
 import 'chat_page.dart';
+import '../../entrada/chat_encerrado.dart';
 
 /// Aba Mensagens: conversas com os profissionais.
 class MensagensPage extends StatefulWidget {
@@ -178,12 +179,16 @@ class _LinhaConversa extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => LinhaConversa(
-    nome: conversa.nome,
+    // RN-132: conta suspensa vira "Conta indisponível".
+    nome: conversa.nomeVisivel,
     iniciais: conversa.primeiroNome,
+    avatar: conversa.encerrada
+        ? const AvatarIndisponivel(tamanho: 48)
+        : null,
     ultima: conversa.ultima,
     quando: conversa.quando,
     naoLidas: conversa.naoLidas,
-    online: conversa.online,
+    online: conversa.online && !conversa.encerrada,
     onTap: onTap,
   );
 }

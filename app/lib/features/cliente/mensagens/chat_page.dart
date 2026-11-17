@@ -26,7 +26,9 @@ import 'package:clock/clock.dart';
 
 import '../../../data/arquivos_seguros.dart';
 import '../../../data/regras_distancia.dart';
+import '../../entrada/chat_encerrado.dart';
 import '../../entrada/conta_suspensa_page.dart';
+import '../chamar/procurando_page.dart';
 import '../../entrada/denunciar_arquivo.dart';
 import '../atividade/avaliar_page.dart';
 import 'cartao_valor.dart';
@@ -502,6 +504,19 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  /// RN-130: "Chamar outro profissional" abre a busca com o mesmo pedido.
+  void _chamarOutro() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => ProcurandoPage(
+          servico: _c.servico,
+          endereco: _c.rua,
+          distancia: _c.distancia,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -510,8 +525,13 @@ class _ChatPageState extends State<ChatPage> {
         final msgs = _c.mensagens;
         final ultimaFotoMinha = msgs.lastIndexWhere((m) => m.minha && m.foto);
         final algumaFalhou = msgs.any((m) => m.envio == EnvioMensagem.falhou);
+        final fim = _c.encerramento;
         return TelaChat(
-          topo: _Topo(conversa: _c, onMenu: _menu),
+          // RN-132: encerrada pelo Tatu, o nome vira "Conta indisponível".
+          topo: fim != null
+              ? TopoContaIndisponivel(detalhe: _c.servico)
+              : _Topo(conversa: _c, onMenu: _menu),
+          rodapeColado: fim != null,
           mensagens: [
             CartaoPedidoChat(
               servico: _c.servico,
@@ -519,10 +539,11 @@ class _ChatPageState extends State<ChatPage> {
               lado: _c.rua,
             ),
             const SizedBox(height: TatuMedidas.entreSecoes),
-            NotaChat(
-              'Você aceitou ${_c.artigo} ${_c.primeiroNome}. '
-              'Combinem os detalhes e o valor por aqui.',
-            ),
+            if (fim == null)
+              NotaChat(
+                'Você aceitou ${_c.artigo} ${_c.primeiroNome}. '
+                'Combinem os detalhes e o valor por aqui.',
+              ),
             const SizedBox(height: TatuMedidas.entreItens + 4),
             for (final (i, m) in msgs.indexed)
               if (m.concluido != null)
@@ -615,11 +636,28 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                 ),
-            ..._valor(),
-            ..._semEntrega(),
+            if (fim != null) ...[
+              // RN-130: o Tatu avisa e oferece outro profissional.
+              const SizedBox(height: TatuMedidas.entreSecoes),
+              CartaoTatuChat(
+                texto: fim.mensagem,
+                botao: fim.chamarOutro ? 'Chamar outro profissional' : null,
+                onBotao: _chamarOutro,
+              ),
+              if (fim.nota != null) ...[
+                const SizedBox(height: TatuMedidas.entreSecoes),
+                NotaChat(fim.nota!),
+              ],
+            ] else ...[
+              ..._valor(),
+              ..._semEntrega(),
+            ],
           ],
-          // RN-42: a conversa nunca fecha.
-          rodape: Column(
+          // RN-132: só leitura depois que o Tatu encerra.
+          // RN-42: fora isso, a conversa nunca fecha.
+          rodape: fim != null
+              ? const RodapeConversaEncerrada()
+              : Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

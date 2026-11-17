@@ -1,7 +1,10 @@
 import 'package:flutter/foundation.dart';
 
+import 'package:clock/clock.dart';
+
 import 'regras_distancia.dart';
 import 'servico_profissional.dart';
+import 'suspensao.dart';
 
 /// Em que ponto está o chamado que o profissional aceitou.
 enum EtapaAtendimento { combinando, aCaminho, noLocal, emServico }
@@ -54,14 +57,71 @@ class AtendimentoProfissionalRepo extends ChangeNotifier {
 
   bool get ativo => chamado != null || servico != null;
 
+  /// RN-131/RN-132: chats encerrados pelo Tatu porque o cliente foi
+  /// suspenso, pelo nome do cliente. Só leitura; o histórico fica.
+  final encerrados = <String, Encerramento>{};
+
+  /// Ponto do atendimento atual (RN-131: a visita conta a partir do "a
+  /// caminho").
+  PontoAtendimento get ponto => switch (etapa) {
+    EtapaAtendimento.combinando =>
+      servico == null ? PontoAtendimento.combinando : PontoAtendimento.confirmado,
+    EtapaAtendimento.aCaminho => PontoAtendimento.aCaminho,
+    EtapaAtendimento.noLocal => PontoAtendimento.noLocal,
+    EtapaAtendimento.emServico => PontoAtendimento.emServico,
+  };
+
+  AtendimentoAberto get _aberto {
+    final s = servico;
+    return AtendimentoAberto(
+      ponto: ponto,
+      visita: s?.visita ?? 0,
+      servico: s?.valor ?? 0,
+      sinal: s?.sinal ?? 0,
+      entregas: entregas,
+    );
+  }
+
+  /// RN-129/RN-131: o cliente deste atendimento foi suspenso. O Tatu
+  /// encerra o atendimento; o profissional recebe pelo que já fez e pode
+  /// ficar online de novo.
+  Encerramento? clienteSuspenso() {
+    final cliente = chamado?.cliente ?? servico?.cliente;
+    if (cliente == null) return null;
+    final e = RegrasSuspensao.clienteSuspenso(_aberto);
+    _limpar();
+    encerrados[cliente] = e;
+    notifyListeners();
+    return e;
+  }
+
+  /// RN-129/RN-130: a conta deste profissional foi suspensa: o
+  /// atendimento acaba na hora (reserva liberada, sinal sem entrega
+  /// devolvido ao cliente).
+  Encerramento? profissionalSuspenso({DateTime? agora}) {
+    if (!ativo) return null;
+    final e = RegrasSuspensao.profissionalSuspenso(
+      _aberto,
+      agora ?? clock.now(),
+    );
+    restaurar();
+    return e;
+  }
+
   void restaurar() {
+    encerrados.clear();
+    _limpar();
+    notifyListeners();
+  }
+
+  /// Sem atendimento em andamento (os encerrados ficam).
+  void _limpar() {
     chamado = null;
     servico = null;
     etapa = EtapaAtendimento.combinando;
     inicio = null;
     entregas = 0;
     previas = 0;
-    notifyListeners();
   }
 
   /// RN-99: mandou uma prévia protegida.
@@ -109,7 +169,8 @@ class AtendimentoProfissionalRepo extends ChangeNotifier {
   /// Cancelou, saiu, não houve acordo ou terminou.
   void encerrar() {
     if (!ativo) return;
-    restaurar();
+    _limpar();
+    notifyListeners();
   }
 }
 

@@ -12,6 +12,8 @@ import '../../../shared/widgets/chat.dart';
 import '../../../shared/widgets/linha_do_tempo.dart';
 import '../abas.dart';
 import '../chamado/chat_profissional_page.dart';
+import '../../entrada/chat_encerrado.dart';
+import '../../../data/atendimento_profissional.dart';
 
 /// Aba Mensagens do profissional: conversas em andamento e anteriores.
 class MensagensProfissionalPage extends StatefulWidget {
@@ -132,13 +134,17 @@ class _MensagensProfissionalPageState extends State<MensagensProfissionalPage> {
     final andamento = conversasProfissional.emAndamento.where(combina);
     final anteriores = conversasProfissional.anteriores.where(combina);
 
+    // RN-132: cliente suspenso vira "Conta indisponível".
+    bool encerrada(ConversaProfissional c) =>
+        atendimentoProfissional.encerrados.containsKey(c.nome);
     Widget linha(ConversaProfissional c) => LinhaConversa(
-      nome: c.nome,
+      nome: encerrada(c) ? contaIndisponivel : c.nome,
       iniciais: c.nome,
+      avatar: encerrada(c) ? const AvatarIndisponivel(tamanho: 48) : null,
       ultima: c.ultima,
       quando: c.quando,
       naoLidas: c.naoLidas,
-      selo: switch (c.selo) {
+      selo: encerrada(c) ? null : switch (c.selo) {
         SeloConversa.nenhum => null,
         SeloConversa.combinado => SeloVerde(c.textoSelo, pequeno: true),
         SeloConversa.proposta => SeloVerde(

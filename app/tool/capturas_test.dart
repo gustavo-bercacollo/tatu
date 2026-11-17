@@ -2867,6 +2867,27 @@ void main() {
     );
   });
 
+  // RN-131/RN-132: cliente suspenso; o Tatu encerra o chamado (P60).
+  testWidgets('pro-chat-encerrado-pelo-tatu', (t) async {
+    await comDemo(
+      t,
+      'pro-chat-encerrado-pelo-tatu',
+      const ChatProfissionalPage(
+        mensagens: [
+          ('Oi! A pia não para de vazar.', false),
+          ('Estou a caminho.', true),
+        ],
+      ),
+      depois: () async {
+        atendimentoProfissional
+          ..aceitar(chamadoExemplo)
+          ..irAteCliente(const ServicoAceito());
+        atendimentoProfissional.clienteSuspenso();
+        await t.pump();
+      },
+    );
+  });
+
   // RN-106: conta pausada por sinais sem entrega (P115).
   testWidgets('pro-distancia-conta-pausada-sinais', (t) async {
     await comDemo(
@@ -3180,6 +3201,14 @@ void main() {
         await t.pump();
       },
     );
+  });
+
+  // RN-130/RN-132: profissional suspensa; o Tatu encerra o pedido (C163).
+  testWidgets('chat-encerrado-pelo-tatu', (t) async {
+    final r = ConversasRepo();
+    final c = r.conversas.first..mensagens.removeLast();
+    r.profissionalSuspenso(c);
+    await _capturar(t, 'chat-encerrado-pelo-tatu', ChatPage(conversa: c));
   });
 
   // RN-122: conta suspensa (C162).
