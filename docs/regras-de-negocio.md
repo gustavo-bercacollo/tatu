@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 17/11/2026 (v16)
+Atualizado em 17/11/2026 (v17)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -171,6 +171,11 @@ As penalidades existem para impedir abuso, nunca para punir quem se protegeu.
 | RN-79 | Três abandonos em 30 dias pausam a conta do profissional até ele falar com o suporte. |
 | RN-82 | Três ausências em 30 dias pausam a conta do cliente até ele falar com o suporte. |
 | RN-106 | O app acompanha sinais sem entrega e reembolsos à distância. Exemplo: 3 sinais sem entrega em 30 dias pausam a conta do profissional até falar com o suporte. Entregas vazias só para liberar o sinal contam igual. |
+| RN-128 | Pausa (abandonos, ausências, sinais sem entrega, etc.) só impede novos pedidos ou chamados. O que já está em andamento continua normal até o fim. |
+| RN-129 | Suspensão (casos graves: abuso, violência, golpe, vírus) encerra na hora todos os atendimentos em andamento da conta suspensa. Ela vê só "Conta suspensa", sem o motivo. |
+| RN-130 | Profissional suspenso: o cliente recebe do Tatu no chat "A profissional não pode mais continuar este atendimento. Nada foi cobrado." e o botão "Chamar outro profissional", que abre a busca com o mesmo pedido preenchido. Valor reservado é liberado; sinal guardado (sem entrega) volta ao cliente; repasse de serviço concluído há menos de 24 horas fica preso até o suporte decidir. |
+| RN-131 | Cliente suspenso: o profissional recebe do Tatu "Este atendimento foi encerrado pelo Tatu" e recebe pelo que já fez, tirado da reserva do cartão do cliente: a visita se já estava a caminho ou no local; o serviço se já concluiu. O Tatu não paga nada. |
+| RN-132 | Nos dois casos o chat fica só para leitura, o nome vira "Conta indisponível" e o histórico é guardado como prova. Parcelas futuras de serviços longos são canceladas; o que já foi pago pelo trabalho feito continua valendo. |
 
 ## 8. Avaliações, perfil e anúncios
 
@@ -246,11 +251,13 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-14 | Serviço à distância malfeito: o cliente não gosta da entrega e quer o dinheiro de volta. | Resolvido | RN-96, RN-99 a RN-106 |
 | P-15 | Menor de idade usando o app, como cliente ou profissional. | Resolvido em parte · "só menor em casa" para depois | RN-110 a RN-112, RN-114 |
 | P-16 | Envio de arquivos maliciosos ou +18, inclusive venda ou troca de material de menores. | Resolvido | RN-119 a RN-124 |
+| P-17 | Conta suspensa com atendimentos ainda em andamento. | Resolvido | RN-128 a RN-132 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 17/11/2026 | RN-128 a RN-132 | Conta pausada ou suspensa com atendimentos em andamento: pausa não afeta, suspensão encerra com regras de dinheiro para cada lado. |
 | 17/11/2026 | — | P-06 (preço abusivo) adiado: a proposta não foi aprovada, decidir depois. |
 | 17/11/2026 | RN-119, RN-124 a RN-127 | Sem links no chat. Link do site, programa e script só pela entrega à distância, com antivírus, verificação e aviso. |
 | 17/11/2026 | RN-119 a RN-124 | Arquivos no chat: tipos permitidos, antivírus, nudez bloqueada, abuso infantil com suspensão e comunicação às autoridades, denúncia, links. |

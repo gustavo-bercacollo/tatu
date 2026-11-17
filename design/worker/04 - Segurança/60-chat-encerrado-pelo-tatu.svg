@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Chat do profissional · atendimento encerrado pelo Tatu</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#fff"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="40" cy="82" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,73) scale(0.75)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></g>
+  <circle cx="146.5" cy="82" r="16" fill="#EEEEF0"/>
+  <g transform="translate(137.5,73) scale(0.75)" fill="none" stroke="#8E8E93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></g>
+  <text x="168.5" y="80" font-size="16" font-weight="600" fill="#8E8E93" text-anchor="start">Conta indisponível</text>
+  <text x="168.5" y="96" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="start">Cliente</text>
+  <rect x="20" y="118" width="353" height="56" rx="14" fill="#F2F2F7"/>
+  <text x="34" y="142" font-size="13" font-weight="600" fill="#000000" text-anchor="start">Chamado · Encanador</text>
+  <text x="34" y="162" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">Vazamento na pia da cozinha</text>
+  <text x="359" y="152" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="end">Vila Mariana · 1,2 km</text>
+  <rect x="20" y="224" width="226.875" height="44" rx="20" fill="#EEEEF0"/>
+  <text x="36" y="251" font-size="15" font-weight="400" fill="#000000" text-anchor="start">Oi! A pia não para de vazar.</text>
+  <rect x="219.59375" y="282" width="153.40625" height="44" rx="20" fill="#1C1C1E"/>
+  <text x="235.59375" y="309" font-size="15" font-weight="400" fill="#fff" text-anchor="start">Estou a caminho.</text>
+  <rect x="20" y="350" width="353" height="110" rx="18" fill="#F2F2F7"/>
+  <circle cx="44" cy="378" r="12" fill="#1C1C1E"/>
+  <text x="44" y="382.32" font-size="12.600000000000001" font-weight="800" fill="#fff" text-anchor="middle">T</text>
+  <text x="64" y="383" font-size="13" font-weight="700" fill="#000000" text-anchor="start">Tatu</text>
+  <circle cx="102.125" cy="378" r="6" fill="#007AFF"/>
+  <g transform="translate(98.525,374.4) scale(0.3)" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></g>
+  <text x="36" y="412" font-size="15" font-weight="400" fill="#000000" text-anchor="start">Este atendimento foi encerrado pelo</text>
+  <text x="36" y="432" font-size="15" font-weight="400" fill="#000000" text-anchor="start">Tatu. Você recebe a visita de R$ 40,00.</text>
+  <text x="196.5" y="488" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="middle">Pode ficar online para novos chamados.</text>
+  <rect x="0" y="762" width="393" height="90" rx="0" fill="#F2F2F7"/>
+  <text x="196.5" y="796" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="middle">Esta conversa foi encerrada.</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>
