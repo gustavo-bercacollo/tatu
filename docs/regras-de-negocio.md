@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 17/11/2026 (v21)
+Atualizado em 18/11/2026 (v22)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -86,6 +86,12 @@ Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do própri
 | RN-141 | Gorjeta ("pagar um café") é opcional e só aparece na tela de avaliação, depois do serviço concluído: R$ 2, R$ 5, R$ 10 ou outro valor (até R$ 100, exemplo). Nunca no chat nem antes do serviço. |
 | RN-142 | A gorjeta é cobrada no mesmo cartão, junto com o envio da avaliação. O Tatu não cobra comissão: 100% vai para o profissional, descontada só a taxa do cartão. Vai no Pix com o próximo repasse. |
 | RN-143 | A gorjeta não muda a nota e não aparece para outros clientes. O profissional é avisado por notificação ("Ana deixou R$ 5 de gorjeta"). |
+| RN-144 | Plano fixo: o cliente toca em "Tornar [nome] fixa" (menu do chat) e escolhe Mensal ou Semanal, 1 ou 2 vezes por semana, dia e horário. O profissional responde com o valor por visita uma única vez; o cliente confirma e o plano fica ativo. Ninguém renegocia a cada visita. |
+| RN-145 | Limite legal: a mesma profissional vai no máximo 2 vezes por semana ao mesmo endereço pelo Tatu, somando plano fixo e pedidos avulsos, para qualquer serviço na casa. A 3ª visita na semana é bloqueada com o aviso: "Pelo Tatu, a mesma profissional pode vir até 2 vezes por semana. Para mais que isso, a lei exige contratação com carteira assinada." (Lei Complementar 150.) |
+| RN-146 | O valor do plano é de pacote de visitas (valor por visita × visitas do período), combinado entre cliente e profissional; o Tatu não define. A cobrança é automática no fim de cada período (semana ou mês), só pelas visitas feitas. Comissão normal do Tatu em cada cobrança. |
+| RN-147 | O profissional pode avisar "Não vou nesta semana" sem penalidade: a visita não é cobrada e o Tatu avisa o cliente pelo canal oficial. Faltar sem avisar segue as regras de abandono (RN-76 a RN-79). |
+| RN-148 | Cliente e profissional podem pausar ou cancelar o plano quando quiserem, valendo a partir do próximo período. Mudar o valor exige nova proposta do profissional e aceite do cliente. |
+| RN-149 | Nos termos de uso, o cliente declara que contrata um serviço autônomo, que o Tatu só intermedia e que está ciente do limite de 2 visitas por semana. Revisar com advogado trabalhista. |
 
 ## 4. Atendimento
 
@@ -243,6 +249,8 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
   - Aviso de acessibilidade no perfil (opcional): "Sou surdo(a) · prefiro mensagens", "Tenho baixa visão", "Uso cadeira de rodas · posso demorar para abrir a porta". Aparece para o outro lado no pedido e no chat; quem demora para abrir a porta ganha mais tempo antes de contar ausência (ex.: 20 min em vez de 10).
   - Base técnica: leitor de tela (VoiceOver/TalkBack) com nome em todos os botões, inclusive mapa e contadores; respeitar o tamanho de letra e o alto contraste do celular; botões grandes; avisos importantes também vibram.
 - [ ] **Perfil por seções e certificações (adiado).** Perfil do profissional estilo LinkedIn: cada seção (sobre, especialidades, fotos, certificações) só aparece se estiver preenchida; avaliações e verificação sempre aparecem. Certificações com selo "Informado pelo profissional" ou "Conferido pelo Tatu". Telas de prévia feitas em 17/11/2026, não aprovadas para agora.
+- [ ] **Contas com CNPJ (adiado).** Proposta: a conta continua sendo de uma pessoa verificada (CPF); o CNPJ entra como dado opcional. Profissional MEI/CNPJ recebe no Pix do CNPJ e emite nota (selo "Emite nota fiscal"); cliente pode pedir nota para CNPJ (condomínio, loja). Profissional sem CNPJ: avisar "Este profissional não emite nota fiscal". Empresa com equipe e conta de empresa com vários usuários: fase 2. Nota do serviço é do profissional; o Tatu emite só a da comissão. Confirmar com contador.
+- [ ] **Plano fixo · detalhes.** Comissão menor no plano fixo como incentivo? Quanto tempo dura uma pausa? O que acontece com o plano se o cartão for recusado (P-08)?
 - [ ] **Ligação pelo app.** Escolher como fazer a ligação sem mostrar o número: pela internet (mais barato) ou número intermediário (custo por minuto).
 
 ## 11. Problemas mapeados
@@ -272,11 +280,13 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-19 | Acessibilidade. | Em parte · ditado feito; outras ideias em Decisões em aberto | RN-137, RN-138 |
 | P-20 | Troca de contato por telefone e anexos na descrição do pedido. | Resolvido | RN-139, RN-140 |
 | P-21 | Gorjeta para o profissional. | Resolvido | RN-141 a RN-143 |
+| P-22 | Contrato fixo (semanal ou mensal) com um profissional, sem virar vínculo de emprego. | Resolvido | RN-144 a RN-149 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 18/11/2026 | RN-144 a RN-149 | Plano fixo: "Tornar fixa", valor definido uma vez, cobrança automática no fim do período, limite de 2 visitas por semana no mesmo endereço. |
 | 17/11/2026 | RN-141 a RN-143 | Gorjeta opcional na avaliação, 100% para o profissional (só a taxa do cartão). |
 | 17/11/2026 | RN-137 a RN-140 | Ditado (fala vira texto) na descrição e no chat, sem mensagem de áudio. Anexos (galeria e arquivo) na descrição. Ligação pelo app só entre a confirmação do valor e a conclusão. |
 | 17/11/2026 | RN-133 a RN-136 | Denúncias: pessoa pelo menu do chat (motivos atualizados), mensagem ao segurar, análise do suporte. Ver perfil do profissional pelo topo do chat. |

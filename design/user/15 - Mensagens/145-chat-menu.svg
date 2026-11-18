@@ -29,11 +29,14 @@
   <rect x="20" y="340" width="170" height="44" rx="20" fill="#EEEEF0"/>
   <text x="36" y="367" font-size="15" font-weight="400" fill="#000000" text-anchor="start">Chego em 12 min.</text>
   <rect x="0" y="0" width="393" height="852" rx="0" fill="#000" opacity="0.38"/>
-  <rect x="0" y="470" width="393" height="412" rx="30" fill="#fff"/>
-  <rect x="178.5" y="478" width="36" height="5" rx="2.5" fill="#C7C7CC"/>
-  <rect x="20" y="506" width="353" height="208" rx="16" fill="#EEEEF0"/>
-  <g transform="translate(38,521) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></g>
-  <text x="74" y="538" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Ver perfil da Luiza</text>
+  <rect x="0" y="418" width="393" height="464" rx="30" fill="#fff"/>
+  <rect x="178.5" y="426" width="36" height="5" rx="2.5" fill="#C7C7CC"/>
+  <rect x="20" y="454" width="353" height="260" rx="16" fill="#EEEEF0"/>
+  <g transform="translate(38,469) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></g>
+  <text x="74" y="486" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Ver perfil da Luiza</text>
+  <line x1="74" y1="506" x2="373" y2="506" stroke="#D9D9DC" stroke-width="0.5"/>
+  <g transform="translate(38,521) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/></g>
+  <text x="74" y="538" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Tornar Luiza fixa</text>
   <line x1="74" y1="558" x2="373" y2="558" stroke="#D9D9DC" stroke-width="0.5"/>
   <g transform="translate(38,573) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 7v5l3 3"/></g>
   <text x="74" y="590" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Ver pedido</text>
