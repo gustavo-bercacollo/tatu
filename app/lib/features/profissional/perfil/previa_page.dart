@@ -34,6 +34,11 @@ class PreviaPage extends StatelessWidget {
         barrasNotas: p.barrasNotas,
         avaliacoes: p.avaliacoes,
         feminino: p.feminino,
+        // RN-159: só os registros conferidos aparecem para o cliente.
+        registros: [
+          for (final r in p.registros.values)
+            if (r.status == StatusRegistro.conferido) r.rotulo,
+        ],
       ),
       avatar: AvatarUsuario(nome: p.nome, tamanho: 96),
       faixa: Container(

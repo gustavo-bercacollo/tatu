@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../shared/formatadores.dart';
+import 'consulta_registro.dart';
 import 'prazos.dart';
+import 'profissoes_reguladas.dart';
 import 'regras_distancia.dart';
 
 /// Profissões que aparecem como atalho no cadastro ("Outros" abre a lista).
@@ -164,6 +166,69 @@ class ProfissaoEscolhida {
       ProfissaoEscolhida(nome, especialidades, m);
 }
 
+/// RN-157: situação do registro de uma profissão regulada.
+enum StatusRegistro { emAnalise, conferido, naoEncontrado, suspenso }
+
+/// Documento usado na verificação (lido pela foto; RN-156: a CNH serve
+/// de registro para frete e motorista).
+enum DocumentoVerificacao { rg, cnh }
+
+/// RN-156 a RN-160: prazos e números de exemplo do registro.
+abstract final class RegrasRegistro {
+  /// RN-157: o Tatu confere em até 2 dias úteis (exemplo).
+  static const diasUteisConferencia = 2;
+
+  /// RN-160: confere de novo de tempos em tempos (exemplo).
+  static const rechecarACada = Duration(days: 90);
+
+  /// RN-160: e antes do vencimento (exemplo).
+  static const antesDoVencimento = Duration(days: 30);
+
+  static const ufs = [
+    'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS',
+    'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC',
+    'SP', 'SE', 'TO',
+  ];
+}
+
+String _nomeComparavel(String s) {
+  const de = 'áàâãäéèêëíìîïóòôõöúùûüç';
+  const para = 'aaaaaeeeeiiiiooooouuuuc';
+  final b = StringBuffer();
+  for (final ch in s.trim().toLowerCase().split('')) {
+    final i = de.indexOf(ch);
+    b.write(i < 0 ? ch : para[i]);
+  }
+  return b.toString().replaceAll(RegExp(r'\s+'), ' ');
+}
+
+/// RN-156: registro informado para uma profissão regulada.
+class RegistroProfissional {
+  RegistroProfissional({
+    required this.profissao,
+    required this.conselho,
+    required this.uf,
+    required this.numero,
+  });
+
+  final String profissao;
+  final String conselho;
+  String uf;
+  String numero;
+  StatusRegistro status = StatusRegistro.emAnalise;
+
+  /// Por que não conferiu (não achado, nome diferente, cancelado…).
+  String? motivo;
+  DateTime? conferidoEm;
+  DateTime? validade;
+
+  /// RN-159: "CREF 012345-G/SP".
+  String get rotulo => '$conselho $numero/$uf';
+
+  /// CNH ainda sem número (documento da verificação foi o RG).
+  bool get faltaNumero => numero.trim().isEmpty;
+}
+
 enum TipoPix { cpf, celular, email, aleatoria }
 
 extension TipoPixTexto on TipoPix {
@@ -233,6 +298,15 @@ class ProfissionalRepo extends ChangeNotifier {
 
   /// O app sempre abre offline.
   bool online = false;
+
+  /// RN-156/RN-157: registro de cada profissão regulada, pelo nome.
+  final registros = <String, RegistroProfissional>{};
+
+  /// Documento da verificação (mock: o app ainda não lê a foto).
+  DocumentoVerificacao documentoVerificacao = DocumentoVerificacao.rg;
+
+  /// RN-156: número da CNH lido no documento (quando foi a CNH).
+  String? cnhDoDocumento;
 
   /// A dica "Pronta para começar?" já foi vista.
   bool dicaVista = false;
@@ -389,6 +463,9 @@ class ProfissionalRepo extends ChangeNotifier {
     feminino = false;
     profissoes = [];
     _chamadosDe = null;
+    registros.clear();
+    documentoVerificacao = DocumentoVerificacao.rg;
+    cnhDoDocumento = null;
     pixTipo = null;
     pixChave = null;
     verificacao = Verificacao.naoEnviada;
@@ -446,7 +523,133 @@ class ProfissionalRepo extends ChangeNotifier {
 
   void definirProfissoes(List<ProfissaoEscolhida> lista) {
     profissoes = List.of(lista);
+    // Profissão que saiu leva o registro junto.
+    registros.removeWhere((k, _) => !profissoes.any((p) => p.nome == k));
     notifyListeners();
+  }
+
+  // ---------- Profissões reguladas (RN-156 a RN-160) ----------
+
+  /// RN-156: a profissão exige registro?
+  bool exigeRegistro(String profissao) =>
+      profissoesReguladas.regulada(profissao);
+
+  /// RN-157: só a profissão regulada com registro conferido recebe
+  /// chamados; as livres recebem sempre.
+  bool podeReceberChamadosDe(String profissao) =>
+      !exigeRegistro(profissao) ||
+      registros[profissao]?.status == StatusRegistro.conferido;
+
+  /// RN-156: informa conselho, estado e número (sem foto). Fica em análise.
+  RegistroProfissional enviarRegistro({
+    required String profissao,
+    required String conselho,
+    required String uf,
+    required String numero,
+  }) {
+    final r = RegistroProfissional(
+      profissao: profissao,
+      conselho: conselho,
+      uf: uf,
+      numero: numero.trim(),
+    );
+    registros[profissao] = r;
+    notifyListeners();
+    return r;
+  }
+
+  /// RN-156: CNH (frete, motorista): lida do documento da verificação; se
+  /// o documento foi o RG, fica esperando o número.
+  RegistroProfissional registrarCnh(String profissao) {
+    final doc = documentoVerificacao == DocumentoVerificacao.cnh
+        ? (cnhDoDocumento ?? '')
+        : '';
+    return enviarRegistro(
+      profissao: profissao,
+      conselho: 'CNH',
+      uf: 'BR',
+      numero: doc,
+    );
+  }
+
+  /// RN-157/RN-158/RN-160: confere na consulta pública. O nome do
+  /// registro precisa ser o mesmo do documento; cancelado, suspenso ou
+  /// vencido não confere.
+  Future<StatusRegistro> conferirRegistro(
+    String profissao, {
+    DateTime? agora,
+  }) async {
+    final r = registros[profissao];
+    if (r == null || r.faltaNumero) return StatusRegistro.emAnalise;
+    final c = consultaRegistro;
+    if (c is ConsultaRegistroMock) c.nomePadrao = nome;
+    final res = await c.consultar(
+      conselho: r.conselho,
+      uf: r.uf,
+      numero: r.numero,
+    );
+    final hoje = agora ?? clock.now();
+    if (!res.encontrado) {
+      r
+        ..status = StatusRegistro.naoEncontrado
+        ..motivo = 'não encontrado';
+    } else if (_nomeComparavel(res.nome ?? '') != _nomeComparavel(nome)) {
+      r
+        ..status = StatusRegistro.naoEncontrado
+        ..motivo = 'nome diferente do documento';
+    } else if (res.situacao != SituacaoRegistro.ativo ||
+        (res.validade != null && res.validade!.isBefore(hoje))) {
+      r
+        ..status = StatusRegistro.suspenso
+        ..motivo = res.situacao == SituacaoRegistro.ativo
+            ? 'vencido'
+            : res.situacao.name;
+    } else {
+      r
+        ..status = StatusRegistro.conferido
+        ..motivo = null
+        ..conferidoEm = hoje
+        ..validade = res.validade;
+    }
+    notifyListeners();
+    return r.status;
+  }
+
+  /// RN-158: corrigir o número ou o estado volta para "em análise".
+  void corrigirRegistro(String profissao, {required String uf, required String numero}) {
+    final r = registros[profissao];
+    if (r == null) return;
+    r
+      ..uf = uf
+      ..numero = numero.trim()
+      ..status = StatusRegistro.emAnalise
+      ..motivo = null;
+    notifyListeners();
+  }
+
+  /// RN-160: registros conferidos que precisam de nova conferência
+  /// (periódica ou perto do vencimento).
+  List<RegistroProfissional> paraRechecar([DateTime? agora]) {
+    final hoje = agora ?? clock.now();
+    return [
+      for (final r in registros.values)
+        if (r.status == StatusRegistro.conferido &&
+            ((r.conferidoEm != null &&
+                    hoje.difference(r.conferidoEm!) >=
+                        RegrasRegistro.rechecarACada) ||
+                (r.validade != null &&
+                    r.validade!.difference(hoje) <=
+                        RegrasRegistro.antesDoVencimento)))
+          r,
+    ];
+  }
+
+  /// RN-160: confere de novo; cancelado, suspenso ou vencido pausa só
+  /// aquela profissão.
+  Future<void> rechecarRegistros([DateTime? agora]) async {
+    for (final r in paraRechecar(agora)) {
+      await conferirRegistro(r.profissao, agora: agora);
+    }
   }
 
   /// RN-97: muda como atende numa profissão.
@@ -460,9 +663,12 @@ class ProfissionalRepo extends ChangeNotifier {
   /// RN-11: profissões em que recebe chamados agora (nulo = todas).
   List<String>? _chamadosDe;
 
+  /// RN-157: profissão regulada sem registro conferido fica de fora.
   List<String> get chamadosDe => [
     for (final p in profissoes)
-      if (_chamadosDe == null || _chamadosDe!.contains(p.nome)) p.nome,
+      if ((_chamadosDe == null || _chamadosDe!.contains(p.nome)) &&
+          podeReceberChamadosDe(p.nome))
+        p.nome,
   ];
 
   /// Liga ou desliga uma profissão; pelo menos uma continua ligada.

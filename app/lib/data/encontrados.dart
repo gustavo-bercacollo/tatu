@@ -17,7 +17,11 @@ class ProfissionalEncontrado {
     this.resposta = '5 min',
     this.especialidades = const ['Vazamentos', 'Registros', 'Pias'],
     this.sobre = '',
+    this.registros = const [],
   });
+
+  /// RN-159: registros conferidos pelo Tatu.
+  final List<String> registros;
 
   /// Distância até o cliente ("1,2 km").
   final String distancia;
@@ -191,6 +195,7 @@ PerfilPublico perfilDe(ProfissionalEncontrado p) => PerfilPublico(
   sobre: p.sobre,
   verificado: true,
   feminino: p.feminino,
+  registros: p.registros,
   fotos: const [null, null, null, null],
   barrasNotas: const [0.9, 0.08, 0.02],
   avaliacoes: const [

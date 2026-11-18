@@ -3,6 +3,11 @@
 //   flutter test tool/capturas_test.dart --update-goldens
 import 'dart:io';
 
+import 'package:tatu/shared/widgets/avatar_iniciais.dart';
+import 'package:tatu/features/entrada/perfil_publico_page.dart';
+import 'package:tatu/data/encontrados.dart';
+import 'package:tatu/features/profissional/cadastro/registro_page.dart';
+import 'package:tatu/data/profissoes_reguladas.dart';
 import 'package:tatu/features/profissional/cadastro/aceite_page.dart';
 import 'package:tatu/features/entrada/documentos_legais_page.dart';
 import 'package:tatu/data/documentos_legais.dart';
@@ -212,6 +217,8 @@ Future<void> _capturar(
 void main() {
   setUpAll(() async {
     await documentosLegais.carregarTodos();
+    await profissoesReguladas.carregar();
+    demoConferencia = null;
   });
   consultaCpf = ConsultaCpfMock(demora: Duration.zero);
   ProtecaoTela.ativa = false;
@@ -3848,6 +3855,155 @@ void main() {
           ),
         );
       },
+    );
+  });
+
+  /// Profissional com uma profissão livre e uma regulada (P06 a P10).
+  void cadastroComRegistro({StatusRegistro? status}) {
+    profissional
+      ..salvarDados(
+        nome: 'Renato Teixeira',
+        cpf: '12345678909',
+        celular: '11988887777',
+      )
+      ..definirProfissoes(const [
+        ProfissaoEscolhida('Professor particular', ['Matemática', 'Física']),
+        ProfissaoEscolhida('Personal trainer', ['Musculação', 'Funcional']),
+      ]);
+    if (status == null) return;
+    final r = profissional.enviarRegistro(
+      profissao: 'Personal trainer',
+      conselho: 'CREF',
+      uf: 'SP',
+      numero: '012345-G',
+    );
+    r.status = status;
+  }
+
+  // RN-156: registro profissional, sem foto (P06).
+  testWidgets('pro-registro-profissional', (t) async {
+    await comDemo(
+      t,
+      'pro-registro-profissional',
+      const SizedBox(),
+      depois: () async {
+        cadastroComRegistro();
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: RegistroProfissionalPage(
+              profissao: 'Personal trainer',
+              onEnviar: () {},
+            ),
+          ),
+        );
+        await t.enterText(find.byType(TextField).last, '012345-G');
+        await t.pump();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-157: registro em análise (P08).
+  testWidgets('pro-suas-profissoes-registro-em-analise', (t) async {
+    await comDemo(
+      t,
+      'pro-suas-profissoes-registro-em-analise',
+      const SizedBox(),
+      depois: () async {
+        cadastroComRegistro(status: StatusRegistro.emAnalise);
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: const ProfissoesPage(),
+          ),
+        );
+      },
+    );
+  });
+
+  // RN-158: registro não encontrado (P09).
+  testWidgets('pro-registro-nao-encontrado', (t) async {
+    await comDemo(
+      t,
+      'pro-registro-nao-encontrado',
+      const SizedBox(),
+      depois: () async {
+        cadastroComRegistro(status: StatusRegistro.naoEncontrado);
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: const RegistroNaoEncontradoPage(profissao: 'Personal trainer'),
+          ),
+        );
+      },
+    );
+  });
+
+  // RN-159: registro conferido (P10).
+  testWidgets('pro-registro-conferido', (t) async {
+    await comDemo(
+      t,
+      'pro-registro-conferido',
+      const SizedBox(),
+      depois: () async {
+        cadastroComRegistro(status: StatusRegistro.conferido);
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: const ProfissoesPage(),
+          ),
+        );
+      },
+    );
+  });
+
+  // RN-159: selo no perfil que o cliente vê (C85).
+  testWidgets('encontrado-perfil-registro-conferido', (t) async {
+    await _capturar(
+      t,
+      'encontrado-perfil-registro-conferido',
+      PerfilPublicoPage(
+        perfil: perfilDe(
+          const ProfissionalEncontrado(
+            nome: 'Renato Teixeira',
+            profissao: 'Personal trainer',
+            feminino: false,
+            nota: '4,8',
+            servicos: 96,
+            chegaEm: '6 min',
+            distancia: '1,8 km',
+            resposta: '6 min',
+            especialidades: ['Musculação', 'Funcional'],
+            sobre: 'Personal trainer há 8 anos. Treinos em casa ou no parque.',
+            registros: ['CREF 012345-G/SP'],
+          ),
+        ),
+        avatar: const AvatarIniciais(nome: 'Renato Teixeira', tamanho: 96),
+        rodape: Row(
+          children: [
+            Expanded(
+              child: FilledButton(
+                style: tatuBotaoSecundario(),
+                onPressed: () {},
+                child: const Text('Ver outro'),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: FilledButton(
+                onPressed: () {},
+                child: const Text('Aceitar Renato'),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   });
 

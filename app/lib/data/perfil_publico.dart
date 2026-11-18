@@ -18,7 +18,11 @@ class PerfilPublico {
     required this.barrasNotas,
     required this.avaliacoes,
     this.feminino = true,
+    this.registros = const [],
   });
+
+  /// RN-159: registros conferidos ("CREF 012345-G/SP").
+  final List<String> registros;
 
   /// Para "Bem avaliada" / "Bem avaliado".
   final bool feminino;

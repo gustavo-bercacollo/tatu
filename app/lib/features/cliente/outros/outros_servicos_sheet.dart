@@ -53,7 +53,7 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
   @override
   Widget build(BuildContext context) {
     final termo = _busca.text.trim();
-    final achados = buscarServicos(termo);
+    final achados = buscarServicos(termo, profissional: widget.profissional);
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: Padding(
@@ -156,6 +156,9 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
               for (final (titulo, lista) in [
                 if (!widget.distancia) ...gruposServicos,
                 if (widget.distancia || widget.profissional) grupoDistancia,
+                // RN-156: profissões com registro (conferido pelo Tatu).
+                if (widget.profissional)
+                  ('Com registro profissional', servicosRegulados),
               ]) ...[
                 const SizedBox(height: TatuMedidas.entreSecoes),
                 GrupoLista(

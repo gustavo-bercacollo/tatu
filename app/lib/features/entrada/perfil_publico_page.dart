@@ -113,6 +113,16 @@ class _PerfilPublicoPageState extends State<PerfilPublicoPage> {
                         ),
                       ),
                       const Divider(height: 1),
+                      // RN-159: registro conferido no conselho pelo Tatu.
+                      if (p.registros.isNotEmpty) ...[
+                        const SizedBox(height: TatuMedidas.entreItens + 4),
+                        const _Titulo('Registro profissional'),
+                        const SizedBox(height: 6),
+                        for (final r in p.registros) ...[
+                          SeloRegistroConferido(r),
+                          const SizedBox(height: 8),
+                        ],
+                      ],
                       const SizedBox(height: TatuMedidas.entreItens + 4),
                       Wrap(
                         spacing: 8,
@@ -469,6 +479,60 @@ class _CartaoAvaliacao extends StatelessWidget {
           ),
         ),
       ],
+    ),
+  );
+}
+
+/// RN-159: cartão verde "CREF 012345-G/SP · Conferido no conselho pelo
+/// Tatu".
+class SeloRegistroConferido extends StatelessWidget {
+  const SeloRegistroConferido(this.rotulo, {super.key});
+
+  final String rotulo;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: 'Registro conferido, $rotulo',
+    excludeSemantics: true,
+    child: Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: TatuColors.onlineSoft,
+        borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+      ),
+      child: Row(
+        children: [
+          const CircleAvatar(
+            radius: 15,
+            backgroundColor: TatuColors.bg,
+            child: Icon(
+              TablerIcons.check,
+              size: 16,
+              color: TatuColors.onlineTexto,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  rotulo,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: TatuColors.onlineTexto,
+                  ),
+                ),
+                const Text(
+                  'Conferido no conselho pelo Tatu',
+                  style: TextStyle(fontSize: 13, color: TatuColors.onlineTexto),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     ),
   );
 }

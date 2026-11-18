@@ -82,6 +82,7 @@ flutter:
     # RN-150: Termos e Política vêm de docs/ (fonte única).
     - ../docs/termos-de-uso.md
     - ../docs/politica-de-privacidade.md
+    - ../docs/profissoes-reguladas.md
 
   # To add assets to your application, add an assets section, like this:
   # assets:

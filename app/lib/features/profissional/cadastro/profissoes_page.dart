@@ -14,6 +14,7 @@ import 'como_atende_page.dart';
 import 'especialidades_page.dart';
 import 'pix_page.dart';
 import 'servicos_page.dart';
+import 'registro_page.dart';
 
 /// P06 · Passo 2: resumo das profissões, com "Editar" e "Adicionar outra".
 /// Com [doPerfil], vem do Perfil: o botão é "Pronto" e só volta.
@@ -62,6 +63,17 @@ class ProfissoesPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: TatuMedidas.entreItens),
+            ],
+            // RN-157: prazo da conferência do registro.
+            if (profissional.registros.values.any(
+              (r) => r.status == StatusRegistro.emAnalise && !r.faltaNumero,
+            )) ...[
+              Text(
+                'Conferimos em até ${RegrasRegistro.diasUteisConferencia} '
+                'dias úteis.',
+                style: TatuTexto.nota,
+              ),
+              const SizedBox(height: TatuMedidas.entreItens + 4),
             ],
             if (lista.length < maxProfissoes)
               OutlinedButton.icon(
@@ -133,6 +145,34 @@ class _CartaoProfissao extends StatelessWidget {
                       ? TatuTexto.nota.copyWith(color: TatuColors.warningTexto)
                       : TatuTexto.nota,
                 ),
+                // RN-157/RN-159: situação do registro desta profissão.
+                if (profissional.registros[profissao.nome] case final r?) ...[
+                  const SizedBox(height: 8),
+                  SeloRegistro(
+                    registro: r,
+                    onTap: switch (r.status) {
+                      StatusRegistro.naoEncontrado => () =>
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => RegistroNaoEncontradoPage(
+                              profissao: profissao.nome,
+                            ),
+                          ),
+                        ),
+                      StatusRegistro.emAnalise when r.faltaNumero => () =>
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (ctx) => RegistroProfissionalPage(
+                              profissao: profissao.nome,
+                              passo: null,
+                              onEnviar: () => Navigator.of(ctx).pop(),
+                            ),
+                          ),
+                        ),
+                      _ => null,
+                    },
+                  ),
+                ],
                 const SizedBox(height: 4),
                 GestureDetector(
                   onTap: onModo,

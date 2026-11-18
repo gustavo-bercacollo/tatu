@@ -9,6 +9,8 @@ import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/tatu_chip.dart';
 import 'como_atende_page.dart';
 import 'profissoes_page.dart';
+import '../../../data/profissoes_reguladas.dart';
+import 'registro_page.dart';
 
 /// P05 · Passo 2: especialidades de uma profissão (até 3).
 /// Com [edicao], o botão é "Salvar" e volta para quem abriu.
@@ -40,24 +42,65 @@ class _EspecialidadesPageState extends State<EspecialidadesPage> {
     }
   });
 
+  /// RN-156: profissão regulada ainda sem registro informado.
+  bool get _pedeRegistro =>
+      profissional.exigeRegistro(_prof.nome) &&
+      !profissional.registros.containsKey(_prof.nome);
+
+  /// RN-156: a CNH vem do documento da verificação; os outros registros
+  /// abrem a tela "Registro profissional".
+  void _registro(NavigatorState nav, VoidCallback depois) {
+    if (!_pedeRegistro) return depois();
+    if (profissoesReguladas.porNome(_prof.nome)?.usaCnh ?? false) {
+      profissional.registrarCnh(_prof.nome);
+      return depois();
+    }
+    nav.push(
+      MaterialPageRoute(
+        builder: (_) => RegistroProfissionalPage(
+          profissao: _prof.nome,
+          onEnviar: depois,
+        ),
+      ),
+    );
+  }
+
   void _seguir() {
     profissional.definirEspecialidades(_prof.nome, _escolhidas);
     final total = profissional.profissoes.length;
+    final nav = Navigator.of(context);
     if (widget.edicao) {
-      Navigator.of(context).pop();
+      // Profissão nova vinda de "Adicionar outra": pede o registro.
+      if (_pedeRegistro &&
+          !(profissoesReguladas.porNome(_prof.nome)?.usaCnh ?? false)) {
+        nav.pushReplacement(
+          MaterialPageRoute(
+            builder: (ctx) => RegistroProfissionalPage(
+              profissao: _prof.nome,
+              passo: null,
+              onEnviar: () => Navigator.of(ctx).pop(),
+            ),
+          ),
+        );
+        return;
+      }
+      if (_pedeRegistro) profissional.registrarCnh(_prof.nome);
+      nav.pop();
       return;
     }
-    final nav = Navigator.of(context);
     // RN-97: depois das especialidades, como atende nesta profissão.
     nav.push(
       MaterialPageRoute(
         builder: (_) => ComoAtendePage(
           indice: widget.indice,
-          onContinuar: () => nav.push(
-            MaterialPageRoute(
-              builder: (_) => widget.indice < total - 1
-                  ? EspecialidadesPage(indice: widget.indice + 1)
-                  : const ProfissoesPage(),
+          onContinuar: () => _registro(
+            nav,
+            () => nav.push(
+              MaterialPageRoute(
+                builder: (_) => widget.indice < total - 1
+                    ? EspecialidadesPage(indice: widget.indice + 1)
+                    : const ProfissoesPage(),
+              ),
             ),
           ),
         ),

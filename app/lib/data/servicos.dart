@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'profissoes_reguladas.dart';
 
 /// Serviço do catálogo "Outros serviços".
 @immutable
@@ -187,16 +188,35 @@ String _simples(String s) {
   return b.toString();
 }
 
+/// RN-156: profissões reguladas aceitas, para a lista do profissional.
+List<ServicoCatalogo> get servicosRegulados => [
+  for (final p in profissoesReguladas.reguladasAceitas)
+    ServicoCatalogo(
+      p.nome,
+      TablerIcons.certificate,
+      detalhe: 'Exige registro no ${p.conselho}',
+      palavras: [for (final a in p.apelidos) a.toLowerCase()],
+    ),
+];
+
 /// Busca por nome ou palavra (sem diferenciar acentos e maiúsculas).
-List<ServicoCatalogo> buscarServicos(String termo) {
+/// Com [profissional], inclui as profissões reguladas (RN-156) e nunca
+/// mostra as "fora do Tatu" (RN-160).
+List<ServicoCatalogo> buscarServicos(String termo, {bool profissional = false}) {
   final t = _simples(termo.trim());
   if (t.isEmpty) return const [];
   final todos = [
     for (final (_, lista) in gruposServicos) ...lista,
     ..._soNaBusca,
-  ];
+    if (profissional) ...servicosRegulados,
+  ].where((s) => profissoesReguladas.permitida(s.nome));
+  // Mesmo nome duas vezes (ex.: Advogado): fica a versão com registro.
+  final porNome = <String, ServicoCatalogo>{};
+  for (final s in todos) {
+    porNome[normalizarProfissao(s.nome)] = s;
+  }
   return [
-    for (final s in todos)
+    for (final s in porNome.values)
       if (_simples(s.nome).contains(t) ||
           s.palavras.any((p) => _simples(p).startsWith(t) || t.startsWith(p)))
         s,

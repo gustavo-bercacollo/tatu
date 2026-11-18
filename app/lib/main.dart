@@ -4,12 +4,15 @@ import 'core/som/som.dart';
 import 'core/theme/tatu_theme.dart';
 import 'features/entrada/boas_vindas_page.dart';
 import 'data/documentos_legais.dart';
+import 'data/profissoes_reguladas.dart';
 
 void main() {
   // Os assets só podem ser lidos depois que o Flutter inicia.
   WidgetsFlutterBinding.ensureInitialized();
   // RN-150/RN-151: Termos e Política vêm dos .md de docs/.
   documentosLegais.carregarTodos().ignore();
+  // RN-156: lista de profissões reguladas de docs/.
+  profissoesReguladas.carregar().ignore();
   runApp(const TatuApp());
 }
 
