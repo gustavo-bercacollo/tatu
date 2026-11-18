@@ -3,6 +3,7 @@
 //   flutter test tool/capturas_test.dart --update-goldens
 import 'dart:io';
 
+import 'package:tatu/features/cliente/atividade/gorjeta.dart';
 import 'package:tatu/features/entrada/ligacao_page.dart';
 import 'package:tatu/data/ditado.dart';
 import 'package:tatu/features/entrada/conta_suspensa_page.dart';
@@ -1543,6 +1544,55 @@ void main() {
         await t.tap(find.text('Educada'));
         await t.pump();
       },
+    );
+  });
+
+  // RN-141/RN-142: avaliação com gorjeta de R$ 5 (C111).
+  testWidgets('avaliacao-com-gorjeta', (t) async {
+    await _capturar(
+      t,
+      'avaliacao-com-gorjeta',
+      AvaliarPage(pedido: PedidosRepo().concluidos.first),
+      preparar: () async {
+        await t.tap(find.bySemanticsLabel('5 estrelas'));
+        await t.tap(find.text('Pontual'));
+        await t.tap(find.text('Educada'));
+        await t.tap(find.text('R\$ 5'));
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-141: outro valor, até R$ 100 (C112).
+  testWidgets('gorjeta-outro-valor', (t) async {
+    await _capturar(
+      t,
+      'gorjeta-outro-valor',
+      AvaliarPage(pedido: PedidosRepo().concluidos.first),
+      preparar: () async {
+        await t.tap(find.bySemanticsLabel('5 estrelas'));
+        await t.tap(find.text('Pontual'));
+        await t.tap(find.text('Educada'));
+        await t.tap(find.text('Outro'));
+        await t.pumpAndSettle();
+        await t.enterText(find.byType(TextField).last, '15');
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-142: avaliação e café enviados (C113).
+  testWidgets('gorjeta-enviada', (t) async {
+    await _capturar(
+      t,
+      'gorjeta-enviada',
+      GorjetaEnviadaPage(
+        nome: 'Luiza',
+        feminino: true,
+        valor: 5,
+        cartao: 'Visa 4242',
+        onInicio: () {},
+      ),
     );
   });
 

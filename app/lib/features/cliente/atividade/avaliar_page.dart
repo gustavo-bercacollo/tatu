@@ -4,12 +4,19 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
+import '../../../data/conta.dart';
+import '../../../data/gorjeta.dart';
+import '../../../data/pagamentos.dart';
 import '../../../data/pedidos.dart';
+import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/aviso_topo.dart';
 import '../../../shared/widgets/estrelas.dart';
 import '../../../shared/widgets/tatu_chip.dart';
 import '../../../shared/widgets/tela_interna.dart';
+import '../../../shared/widgets/abas_cliente.dart';
+import '../abas.dart';
+import 'gorjeta.dart';
 
 /// Tamanho do avatar no topo das telas de avaliação.
 const _avatar = 80.0;
@@ -49,6 +56,13 @@ class _AvaliarPageState extends State<AvaliarPage> {
     text: _anterior?.comentario ?? '',
   );
 
+  /// RN-141: gorjeta escolhida (nula = só a avaliação).
+  double? _gorjeta;
+
+  /// RN-141: só na primeira avaliação, depois do serviço concluído, e
+  /// com um cartão para cobrar (RN-142).
+  bool get _temGorjeta => _anterior == null && pagamentos.padrao != null;
+
   @override
   void dispose() {
     _comentario.dispose();
@@ -57,6 +71,7 @@ class _AvaliarPageState extends State<AvaliarPage> {
 
   void _enviar() {
     final p = widget.pedido;
+    // RN-143: a gorjeta não entra na avaliação (nem na nota).
     pedidos.avaliar(
       p,
       AvaliacaoEnviada(
@@ -69,6 +84,33 @@ class _AvaliarPageState extends State<AvaliarPage> {
       ),
     );
     final nav = Navigator.of(context);
+    // RN-142: a gorjeta é cobrada no cartão padrão, no mesmo toque.
+    final valor = _gorjeta;
+    final cartao = pagamentos.padrao?.curto;
+    final g = valor == null || !_temGorjeta
+        ? null
+        : gorjetas.cobrar(
+            cliente: conta.nome,
+            profissional: p.profissional,
+            valor: valor,
+            cartao: cartao,
+            // PedidoConcluido: o serviço já terminou.
+            servicoConcluido: true,
+          );
+    if (g != null) {
+      nav.pushReplacement(
+        MaterialPageRoute(
+          builder: (ctx) => GorjetaEnviadaPage(
+            nome: p.primeiroNome,
+            feminino: p.feminino,
+            valor: g.valor,
+            cartao: g.cartao,
+            onInicio: () => irParaAba(ctx, AbaCliente.inicio),
+          ),
+        ),
+      );
+      return;
+    }
     mostrarAvisoTopo(
       context,
       titulo: _anterior == null ? 'Avaliação enviada' : 'Avaliação editada',
@@ -152,8 +194,19 @@ class _AvaliarPageState extends State<AvaliarPage> {
             ),
           ),
           const SizedBox(height: TatuMedidas.entreSecoes),
+          if (_temGorjeta) ...[
+            CartaoGorjeta(
+              nome: p.primeiroNome,
+              feminino: p.feminino,
+              valor: _gorjeta,
+              onValor: (v) => setState(() => _gorjeta = v),
+            ),
+            const SizedBox(height: TatuMedidas.entreSecoes),
+          ],
           Text(
-            '${p.feminino ? 'A' : 'O'} ${p.primeiroNome} também avalia você.',
+            _gorjeta != null && _temGorjeta
+                ? 'Cobrado no ${pagamentos.padrao!.curto} junto com a avaliação.'
+                : '${p.feminino ? 'A' : 'O'} ${p.primeiroNome} também avalia você.',
             textAlign: TextAlign.center,
             style: TatuTexto.nota,
           ),
@@ -162,7 +215,12 @@ class _AvaliarPageState extends State<AvaliarPage> {
       rodape: FilledButton(
         onPressed: _nota == 0 ? null : _enviar,
         child: Text(
-          _anterior == null ? 'Enviar avaliação' : 'Salvar avaliação',
+          _anterior != null
+              ? 'Salvar avaliação'
+              // RN-142: com gorjeta, o botão diz o valor.
+              : _gorjeta != null && _temGorjeta
+              ? 'Enviar avaliação e ${reaisInteiros(_gorjeta!)}'
+              : 'Enviar avaliação',
         ),
       ),
     );
