@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 18/11/2026 (v25)
+Atualizado em 18/11/2026 (v26)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -45,6 +45,8 @@ Uma pessoa tem uma conta só, que pode ter os dois perfis: cliente e profissiona
 | RN-158 | Registro não encontrado: o profissional vê "Não encontramos seu registro" e pode corrigir o número ou falar com o suporte. |
 | RN-159 | Registro conferido aparece no perfil para o cliente: "Registro conferido · [conselho] [número]/[UF]". |
 | RN-160 | Registro cancelado, suspenso ou vencido (ex.: CNH) pausa só aquela profissão. O Tatu confere de novo periodicamente e antes do vencimento. Profissões da seção "Fora do Tatu por enquanto" não podem ser cadastradas. |
+| RN-161 | No cadastro, a escolha da profissão segue o mesmo padrão do pedido do cliente: as principais aparecem como botões e "Outros" abre todas as profissões do Tatu separadas por segmento, com as mais procuradas no topo e busca (aceita sinônimos, ex.: "bombeiro hidráulico" → Encanador). A lista vem de `docs/catalogo-de-servicos.md`. |
+| RN-162 | Não achou a profissão: "Não achei a minha · Sugerir uma profissão ao Tatu". A sugestão fica em análise (até 2 dias úteis, exemplo) e, aprovada, entra no catálogo para todos. |
 | RN-114 | O cadastro atende ao ECA Digital (Lei 15.211/2025, em vigor desde 17/03/2026): a idade é verificada de forma confiável, não só declarada. Revisar com advogado junto com os termos (RN-108). |
 
 ## 2. Pedido e busca
@@ -296,11 +298,13 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-22 | Contrato fixo (semanal ou mensal) com um profissional, sem virar vínculo de emprego. | Resolvido | RN-144 a RN-149 |
 | P-23 | Termos de Uso e Política de Privacidade completos e sempre atualizados. | Rascunho v1.0 feito · revisão jurídica pendente | RN-150, RN-151 |
 | P-24 | Profissões que exigem registro ou documentação. | Resolvido | RN-156 a RN-160 |
+| P-25 | Poucas opções de profissões no cadastro do profissional. | Resolvido | RN-161, RN-162 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 18/11/2026 | RN-161, RN-162 | "Outros" no cadastro do profissional igual ao do pedido do cliente (por segmento, com busca) e sugestão de profissão. Especialidades continuam até 3. |
 | 18/11/2026 | RN-156 a RN-160 | Profissões reguladas: registro sem foto, conferido na consulta pública, selo no perfil. |
 | 18/11/2026 | RN-155 | Contador de mensagens não lidas na aba Mensagens e no ícone do app. |
 | 18/11/2026 | RN-150, RN-151 | Termos de Uso e Política de Privacidade em docs/, leitura no app, aceite de nova versão. |
