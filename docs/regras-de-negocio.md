@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 17/11/2026 (v18)
+Atualizado em 17/11/2026 (v20)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -160,6 +160,7 @@ A segurança vem de saber quem é cada pessoa, não de confiar no que ela declar
 | RN-133 | Cliente e profissional podem denunciar um ao outro pelo menu do chat ("Denunciar" / "Denunciar cliente"). Motivos: comportamento inadequado, assédio ou discriminação, golpe ou pagamento por fora, perfil falso, outro. Dá para contar mais (opcional). A denúncia não é mostrada para o denunciado. |
 | RN-134 | Qualquer mensagem pode ser denunciada: segurar a mensagem → "Denunciar mensagem". Motivos: assédio ou ofensa, conteúdo sexual, ameaça ou chantagem, golpe ou pagamento por fora, outro. A mensagem some da conversa de quem denunciou (vira "Mensagem denunciada · em análise") e o suporte recebe a mensagem com o contexto da conversa. |
 | RN-135 | O suporte analisa toda denúncia. Assédio ou discriminação segue a RN-56 (bloqueio imediato entre os dois). Várias denúncias confirmadas levam a pausa ou suspensão (RN-128 a RN-132). Denúncia falsa feita de propósito e repetida também pune quem denunciou. |
+| RN-136 | No chat, tocar no nome ou na foto do profissional (no topo) abre o perfil dele, com "Voltar para a conversa". O mesmo atalho fica no menu do chat ("Ver perfil da Luiza"). |
 
 ## 7. Bloqueios e penalidades
 
@@ -195,6 +196,10 @@ As penalidades existem para impedir abuso, nunca para punir quem se protegeu.
 | RN-116 | A primeira mensagem que a pessoa recebe no app é a do Tatu: boas-vindas e um atalho para as Dicas Tatu. Ela chega logo depois do cadastro, antes de qualquer pedido ou chamado. |
 | RN-117 | A conversa do Tatu é o canal principal de comunicação do Tatu, como o canal oficial de uma empresa no WhatsApp: novidades, mudanças nas regras e avisos importantes chegam por ela. Só o Tatu envia; a pessoa não responde por ali (suporte continua na Ajuda). |
 | RN-118 | Dicas Tatu é um espaço de dicas de boa convivência, boa negociação e segurança. Por enquanto mostra "Em breve" e avisa pelo canal do Tatu quando abrir. |
+| RN-137 | Acessibilidade · ditado na descrição do pedido: o microfone (à direita na caixa) transforma a fala em texto, que aparece enquanto a pessoa fala; ela confere e edita antes de chamar. Nenhum áudio é enviado. A sugestão de serviço usa o texto. |
+| RN-138 | Acessibilidade · ditado no chat (cliente e profissional): o microfone ao lado do campo transforma a fala em texto no próprio campo; a pessoa confere e envia como mensagem de texto. O chat não tem mensagem de áudio. |
+| RN-139 | Na descrição do pedido, a caixa tem câmera e clipe à esquerda e microfone à direita. O clipe abre "Escolher da galeria" ou "Arquivo (PDF, documento)". Fotos e arquivos aparecem como miniaturas com X para excluir. Até 5 anexos por pedido (exemplo). Valem os tipos e as verificações do chat (RN-119 a RN-122). O profissional vê os anexos no Novo chamado. |
+| RN-140 | Ligação só pelo app e só durante o atendimento: o botão de ligar aparece no topo do chat quando o valor é confirmado e some quando o serviço é concluído. Antes disso não existe botão de ligar (nem no menu do chat). A ligação não mostra o número de ninguém (internet ou número intermediário). |
 
 ## 9. Privacidade e dados (LGPD)
 
@@ -230,7 +235,11 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 - [ ] **Conferir a idade pelo CPF.** Escolher o serviço que consulta o CPF na Receita e devolve a data de nascimento (ex.: Consulta CPF do Serpro ou outro fornecedor; custo por consulta).
 - [ ] **Canal do Tatu.** Se a pessoa pode silenciar o canal, quantas mensagens por mês no máximo, e o conteúdo das Dicas Tatu.
 - [ ] **Moderação de arquivos.** Escolher os fornecedores (antivírus, nudez, abuso infantil), quanto tempo guardar as provas e como fazer a comunicação às autoridades. Revisar com advogado.
-- [ ] **Ligação pelo app.** O botão Ligar existe. Decidir se a ligação esconde o número real das partes.
+- [ ] **Acessibilidade · próximas ideias** (registradas, não implementar agora):
+  - "Ouvir mensagem": ao segurar uma mensagem, o celular lê em voz alta (baixa visão, dificuldade de leitura).
+  - Aviso de acessibilidade no perfil (opcional): "Sou surdo(a) · prefiro mensagens", "Tenho baixa visão", "Uso cadeira de rodas · posso demorar para abrir a porta". Aparece para o outro lado no pedido e no chat; quem demora para abrir a porta ganha mais tempo antes de contar ausência (ex.: 20 min em vez de 10).
+  - Base técnica: leitor de tela (VoiceOver/TalkBack) com nome em todos os botões, inclusive mapa e contadores; respeitar o tamanho de letra e o alto contraste do celular; botões grandes; avisos importantes também vibram.
+- [ ] **Ligação pelo app.** Escolher como fazer a ligação sem mostrar o número: pela internet (mais barato) ou número intermediário (custo por minuto).
 
 ## 11. Problemas mapeados
 
@@ -256,12 +265,15 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-16 | Envio de arquivos maliciosos ou +18, inclusive venda ou troca de material de menores. | Resolvido | RN-119 a RN-124 |
 | P-17 | Conta suspensa com atendimentos ainda em andamento. | Resolvido | RN-128 a RN-132 |
 | P-18 | Denunciar profissional, cliente e mensagem. | Resolvido | RN-133 a RN-135 |
+| P-19 | Acessibilidade. | Em parte · ditado feito; outras ideias em Decisões em aberto | RN-137, RN-138 |
+| P-20 | Troca de contato por telefone e anexos na descrição do pedido. | Resolvido | RN-139, RN-140 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
-| 17/11/2026 | RN-133 a RN-135 | Denúncias: pessoa pelo menu do chat (motivos atualizados), mensagem ao segurar, análise do suporte. |
+| 17/11/2026 | RN-137 a RN-140 | Ditado (fala vira texto) na descrição e no chat, sem mensagem de áudio. Anexos (galeria e arquivo) na descrição. Ligação pelo app só entre a confirmação do valor e a conclusão. |
+| 17/11/2026 | RN-133 a RN-136 | Denúncias: pessoa pelo menu do chat (motivos atualizados), mensagem ao segurar, análise do suporte. Ver perfil do profissional pelo topo do chat. |
 | 17/11/2026 | RN-128 a RN-132 | Conta pausada ou suspensa com atendimentos em andamento: pausa não afeta, suspensão encerra com regras de dinheiro para cada lado. |
 | 17/11/2026 | — | P-06 (preço abusivo) adiado: a proposta não foi aprovada, decidir depois. |
 | 17/11/2026 | RN-119, RN-124 a RN-127 | Sem links no chat. Link do site, programa e script só pela entrega à distância, com antivírus, verificação e aviso. |

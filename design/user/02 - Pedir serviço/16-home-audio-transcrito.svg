@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
-  <title>Home · vazia</title>
+  <title>Home · áudio transcrito</title>
   <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
   <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
   <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
@@ -16,30 +16,38 @@
   <text x="20" y="142" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="start">Oi, Ana</text>
   <text x="20" y="182" font-size="30" font-weight="700" fill="#000000" text-anchor="start" letter-spacing="-0.6">Do que você precisa?</text>
   <rect x="20" y="204" width="353" height="150" rx="18" fill="#EEEEF0"/>
-  <text x="36" y="236" font-size="17" font-weight="400" fill="#8E8E93" text-anchor="start">O que está acontecendo?</text>
+  <text x="36" y="236" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Minha pia da cozinha tá vazando</text>
+  <text x="36" y="260" font-size="17" font-weight="400" fill="#000000" text-anchor="start">embaixo e molhou tudo.</text>
   <circle cx="50" cy="324" r="18" fill="#E4E4E7"/>
   <g transform="translate(40,314) scale(0.8333333333333334)" fill="none" stroke="#000000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"/><path d="M12 13m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/></g>
+  <circle cx="96" cy="324" r="18" fill="#E4E4E7"/>
+  <g transform="translate(86,314) scale(0.8333333333333334)" fill="none" stroke="#000000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7l-6.5 6.5a1.5 1.5 0 0 0 3 3l6.5 -6.5a3 3 0 0 0 -6 -6l-6.5 6.5a4.5 4.5 0 0 0 9 9l6.5 -6.5"/></g>
+  <circle cx="345" cy="324" r="18" fill="#E4E4E7"/>
+  <g transform="translate(335,314) scale(0.8333333333333334)" fill="none" stroke="#000000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2m0 3a3 3 0 0 1 3 -3h0a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3h0a3 3 0 0 1 -3 -3z"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M8 21l8 0"/><path d="M12 17l0 4"/></g>
   <text x="20" y="388" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">Serviço</text>
   <rect x="177" y="368" width="196" height="28" rx="14" fill="#E3E3E8"/>
   <rect x="179" y="370" width="94" height="24" rx="12" fill="#fff"/>
   <text x="226" y="387" font-size="12" font-weight="600" fill="#000000" text-anchor="middle">No local</text>
   <text x="324" y="387" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="middle">À distância</text>
-  <rect x="20" y="408" width="109.96875" height="38" rx="19.0" fill="#EEEEF0"/>
-  <text x="36" y="432.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Encanador</text>
-  <rect x="137.96875" y="408" width="104.0625" height="38" rx="19.0" fill="#EEEEF0"/>
-  <text x="153.96875" y="432.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Eletricista</text>
-  <rect x="250.03125" y="408" width="92.984375" height="38" rx="19.0" fill="#EEEEF0"/>
-  <text x="266.03125" y="432.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Pedreiro</text>
+  <rect x="20" y="408" width="131.96875" height="38" rx="19.0" fill="#1C1C1E"/>
+  <g transform="translate(36,419.0) scale(0.6666666666666666)" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m0 -12a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m-7 12a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6"/></g>
+  <text x="58" y="432.0" font-size="15" font-weight="600" fill="#fff" text-anchor="start">Encanador</text>
+  <rect x="159.96875" y="408" width="104.0625" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="175.96875" y="432.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Eletricista</text>
+  <rect x="272.03125" y="408" width="92.984375" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="288.03125" y="432.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Pedreiro</text>
   <rect x="20" y="454" width="75.015625" height="38" rx="19.0" fill="#EEEEF0"/>
   <text x="36" y="478.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Pintor</text>
   <rect x="103.015625" y="454" width="102.578125" height="38" rx="19.0" fill="#EEEEF0"/>
   <text x="119.015625" y="478.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Montador</text>
   <rect x="213.59375" y="454" width="81.015625" height="38" rx="19.0" fill="#EEEEF0"/>
   <text x="229.59375" y="478.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Outros</text>
+  <g transform="translate(20,494) scale(0.5833333333333334)" fill="none" stroke="#8E8E93" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m0 -12a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m-7 12a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6"/></g>
+  <text x="40" y="506" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">Sugerido pela descrição. Toque em outro para trocar.</text>
   <circle cx="88.8046875" cy="679" r="4" fill="#34C759"/>
   <text x="100.8046875" y="684" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">Profissionais ativos perto de você</text>
-  <rect x="20" y="696" width="353" height="56" rx="28.0" fill="#EEEEF0"/>
-  <text x="196.5" y="730.0" font-size="17" font-weight="600" fill="#B0B0B5" text-anchor="middle">Escolha um serviço</text>
+  <rect x="20" y="696" width="353" height="56" rx="28.0" fill="#1C1C1E"/>
+  <text x="196.5" y="730.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Chamar encanador</text>
   <rect x="0" y="769" width="393" height="83" rx="0" fill="#F9F9F9"/>
   <line x1="0" y1="769" x2="393" y2="769" stroke="#D9D9DC" stroke-width="0.5"/>
   <g transform="translate(53.5,778) scale(1.0)" fill="none" stroke="#000000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></g>
@@ -49,4 +57,5 @@
   <g transform="translate(315.5,778) scale(1.0)" fill="none" stroke="#8E8E93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"/></g>
   <text x="327.5" y="817" font-size="11" font-weight="500" fill="#8E8E93" text-anchor="middle">Mensagens</text>
   <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+  <text x="128" y="330" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="start">Transcrito do áudio · confira</text>
 </svg>
