@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 18/11/2026 (v22)
+Atualizado em 18/11/2026 (v23)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -12,6 +12,7 @@ Este documento é a fonte única das regras do Tatu: o que o app faz, o que perm
 - Problemas que o Tatu pode ter ficam em Problemas mapeados. Quando um é resolvido, as regras entram nas seções e o problema é marcado como resolvido.
 - Valores marcados como exemplo (taxa de 10%, prazos) são provisórios até a decisão final.
 - Regras marcadas com **(fase 2)** já estão decididas, mas só entram no app depois da primeira versão.
+- Termos de Uso (`docs/termos-de-uso.md`) e Política de Privacidade (`docs/politica-de-privacidade.md`) são escritos a partir destas regras. Toda mudança de regra que afete cliente ou profissional atualiza esses documentos na mesma mudança (RN-150).
 - Princípio que vale para tudo: o Tatu é prático e rápido. Menos telas, menos toques; caso raro se resolve dentro da tela que já existe.
 
 ## 1. Contas e cadastro
@@ -222,6 +223,8 @@ Cada dado é usado só para o motivo pelo qual foi pedido.
 | RN-75 | Telefone, e-mail e CPF de uma parte nunca aparecem para a outra. O contato acontece pelo chat do Tatu. |
 | RN-85 | **(fase 2)** No chat, telefone, e-mail, @ de rede social e links aparecem como "contato oculto". Quem tenta enviar vê o aviso de que o contato não é enviado e por quê. |
 | RN-86 | **(fase 2)** O Tatu não pune quem fecha por fora, porque não dá para provar. Ele torna o app a opção mais vantajosa: garantia só pelo app, pagamento garantido ao profissional e "Seus profissionais" em um toque. |
+| RN-150 | Os Termos de Uso e a Política de Privacidade ficam em `docs/` (fonte única) e são lidos no app em Perfil → Privacidade e termos, para cliente e profissional: versão e data, "O essencial em 1 minuto", índice e cada seção. O aceite é ativo: no cadastro do cliente, caixa desmarcada "Li e concordo com os Termos de Uso e a Política de Privacidade" (com links) e o resumo "O essencial do Tatu"; o botão só libera depois de marcar. O profissional confirma de novo no fim da verificação, com os pontos principais (autônomo, taxa, Pix em 24h, pagamento só pelo app). Versão e data do aceite ficam registradas. |
+| RN-151 | Mudança relevante nos documentos é avisada pelo canal oficial do Tatu com pelo menos 15 dias de antecedência (salvo exigência legal ou de segurança). Ao abrir o app depois da data, a pessoa vê "Atualizamos os Termos de uso" com o que mudou e só continua depois de "Concordo e continuar". Pedidos em andamento seguem a versão em que foram feitos. |
 
 ## 10. Decisões em aberto
 
@@ -251,6 +254,8 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 - [ ] **Perfil por seções e certificações (adiado).** Perfil do profissional estilo LinkedIn: cada seção (sobre, especialidades, fotos, certificações) só aparece se estiver preenchida; avaliações e verificação sempre aparecem. Certificações com selo "Informado pelo profissional" ou "Conferido pelo Tatu". Telas de prévia feitas em 17/11/2026, não aprovadas para agora.
 - [ ] **Contas com CNPJ (adiado).** Proposta: a conta continua sendo de uma pessoa verificada (CPF); o CNPJ entra como dado opcional. Profissional MEI/CNPJ recebe no Pix do CNPJ e emite nota (selo "Emite nota fiscal"); cliente pode pedir nota para CNPJ (condomínio, loja). Profissional sem CNPJ: avisar "Este profissional não emite nota fiscal". Empresa com equipe e conta de empresa com vários usuários: fase 2. Nota do serviço é do profissional; o Tatu emite só a da comissão. Confirmar com contador.
 - [ ] **Plano fixo · detalhes.** Comissão menor no plano fixo como incentivo? Quanto tempo dura uma pausa? O que acontece com o plano se o cartão for recusado (P-08)?
+- [ ] **Cartão recusado na cobrança (P-08, adiado).** Proposta: renovar a reserva sozinho em serviço longo; se a cobrança falhar, tentar de novo (ex.: 3 vezes em 3 dias) e mostrar "Pagamento pendente · Atualizar cartão" na Home; com pendência o cliente não faz pedido novo e o profissional vê "Pagamento em processamento" (o Tatu não adianta); plano fixo pausa sozinho até pagar; 7 dias sem pagar bloqueia a conta.
+- [ ] **Termos e Política · dados para publicar.** Razão social, CNPJ, endereço, e-mails de suporte e do encarregado (DPO), fornecedores (pagamento, consulta de CPF, verificação, moderação, ditado, ligação, nuvem), prazos de guarda e URL pública. Revisão por advogado antes de publicar.
 - [ ] **Ligação pelo app.** Escolher como fazer a ligação sem mostrar o número: pela internet (mais barato) ou número intermediário (custo por minuto).
 
 ## 11. Problemas mapeados
@@ -266,7 +271,7 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-05 | O problema volta dias depois do serviço (a contestação vale só 24 horas). | Decidido · garantia própria na fase 2 | RN-107 a RN-109 |
 | P-06 | Preço abusivo, principalmente em emergência. | Adiado · decidir depois | — |
 | P-07 | Material comprado no meio do serviço, fora do combinado. | A resolver | — |
-| P-08 | Cartão recusado na hora da cobrança final. | A resolver | — |
+| P-08 | Cartão recusado na hora da cobrança final. | Adiado · proposta registrada | — |
 | P-09 | Avaliações falsas para inflar a nota. | A resolver | — |
 | P-10 | Fraude no cadastro do profissional (documento de outra pessoa). | A resolver | — |
 | P-11 | Sem internet no local para tocar "Concluir serviço". | A resolver | — |
@@ -281,11 +286,13 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-20 | Troca de contato por telefone e anexos na descrição do pedido. | Resolvido | RN-139, RN-140 |
 | P-21 | Gorjeta para o profissional. | Resolvido | RN-141 a RN-143 |
 | P-22 | Contrato fixo (semanal ou mensal) com um profissional, sem virar vínculo de emprego. | Resolvido | RN-144 a RN-149 |
+| P-23 | Termos de Uso e Política de Privacidade completos e sempre atualizados. | Rascunho v1.0 feito · revisão jurídica pendente | RN-150, RN-151 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 18/11/2026 | RN-150, RN-151 | Termos de Uso e Política de Privacidade em docs/, leitura no app, aceite de nova versão. |
 | 18/11/2026 | RN-144 a RN-149 | Plano fixo: "Tornar fixa", valor definido uma vez, cobrança automática no fim do período, limite de 2 visitas por semana no mesmo endereço. |
 | 17/11/2026 | RN-141 a RN-143 | Gorjeta opcional na avaliação, 100% para o profissional (só a taxa do cartão). |
 | 17/11/2026 | RN-137 a RN-140 | Ditado (fala vira texto) na descrição e no chat, sem mensagem de áudio. Anexos (galeria e arquivo) na descrição. Ligação pelo app só entre a confirmação do valor e a conclusão. |

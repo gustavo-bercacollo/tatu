@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
-  <title>Cadastro · seus dados</title>
+  <title>Cadastro · seus dados (aceite desmarcado)</title>
   <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
   <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
   <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
@@ -16,12 +16,24 @@
   <text x="40" y="263" font-size="13" font-weight="500" fill="#8E8E93" text-anchor="start">Nome completo</text>
   <text x="40" y="286" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Ana Martins</text>
   <rect x="24" y="314" width="345" height="62" rx="16" fill="#EEEEF0"/>
-  <rect x="24" y="314" width="345" height="62" rx="16" fill="none" stroke="#000" stroke-width="1.5"/>
   <text x="40" y="337" font-size="13" font-weight="500" fill="#8E8E93" text-anchor="start">CPF</text>
   <text x="40" y="360" font-size="17" font-weight="400" fill="#000000" text-anchor="start">123.456.789-00</text>
-  <text x="24" y="406" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="start">Ao continuar, você aceita os Termos de Uso</text>
-  <text x="24" y="422" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="start">e a Política de Privacidade.</text>
-  <rect x="24" y="756" width="345" height="56" rx="28.0" fill="#1C1C1E"/>
-  <text x="196.5" y="790.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Continuar</text>
+  <rect x="24" y="404" width="345" height="140" rx="16" fill="#F2F2F7"/>
+  <text x="40" y="432" font-size="14" font-weight="700" fill="#000000" text-anchor="start">O essencial do Tatu</text>
+  <circle cx="44" cy="452" r="2.5" fill="#8E8E93"/>
+  <text x="54" y="457" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">O Tatu conecta, não presta o serviço.</text>
+  <circle cx="44" cy="474" r="2.5" fill="#8E8E93"/>
+  <text x="54" y="479" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">Pagamento só pelo app. Nada por fora.</text>
+  <circle cx="44" cy="496" r="2.5" fill="#8E8E93"/>
+  <text x="54" y="501" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">Cobrado só quando o serviço termina.</text>
+  <circle cx="44" cy="518" r="2.5" fill="#8E8E93"/>
+  <text x="54" y="523" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">24 horas para avisar se algo deu errado.</text>
+  <rect x="24" y="566" width="24" height="24" rx="7" fill="#fff" stroke="#C7C7CC" stroke-width="1.5"/>
+  <text x="60" y="582" font-size="14" font-weight="400" fill="#000000" text-anchor="start">Li e concordo com os</text>
+  <text x="206.703125" y="582" font-size="14" font-weight="600" fill="#007AFF" text-anchor="start">Termos de Uso</text>
+  <text x="60" y="602" font-size="14" font-weight="400" fill="#000000" text-anchor="start">e a</text>
+  <text x="83.953125" y="602" font-size="14" font-weight="600" fill="#007AFF" text-anchor="start">Política de Privacidade.</text>
+  <rect x="24" y="756" width="345" height="56" rx="28" fill="#E4E4E7"/>
+  <text x="196.5" y="790" font-size="17" font-weight="600" fill="#AEAEB2" text-anchor="middle">Continuar</text>
   <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
 </svg>
