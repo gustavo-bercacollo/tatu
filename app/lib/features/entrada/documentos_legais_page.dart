@@ -8,6 +8,7 @@ import '../../data/aceites.dart';
 import '../../data/canal_tatu.dart';
 import '../../data/conta.dart';
 import '../../data/documentos_legais.dart';
+import '../../shared/widgets/estado_vazio.dart';
 import '../../shared/widgets/folha.dart';
 import '../../shared/widgets/nota_icone.dart';
 import '../../shared/widgets/tela_interna.dart';
@@ -22,22 +23,47 @@ void abrirDocumento(BuildContext context, TipoDocumento tipo) =>
       MaterialPageRoute(builder: (_) => DocumentoLegalPage(tipo: tipo)),
     );
 
-/// Espera o documento carregar (do `.md` empacotado).
-class _ComDocumento extends StatelessWidget {
+/// Espera o documento carregar (do `.md` empacotado). Se falhar, avisa e
+/// deixa tentar de novo.
+class _ComDocumento extends StatefulWidget {
   const _ComDocumento({required this.tipo, required this.builder});
 
   final TipoDocumento tipo;
   final Widget Function(DocumentoLegal d) builder;
 
   @override
+  State<_ComDocumento> createState() => _ComDocumentoState();
+}
+
+class _ComDocumentoState extends State<_ComDocumento> {
+  late Future<DocumentoLegal> _leitura = documentosLegais.carregar(widget.tipo);
+
+  @override
   Widget build(BuildContext context) {
-    final pronto = documentosLegais.doc(tipo);
-    if (pronto != null) return builder(pronto);
+    final pronto = documentosLegais.doc(widget.tipo);
+    if (pronto != null) return widget.builder(pronto);
     return FutureBuilder<DocumentoLegal>(
-      future: documentosLegais.carregar(tipo),
-      builder: (context, s) => s.hasData
-          ? builder(s.data!)
-          : const Center(child: CircularProgressIndicator()),
+      future: _leitura,
+      builder: (context, s) {
+        if (s.hasData) return widget.builder(s.data!);
+        if (s.hasError) {
+          return TelaInterna(
+            titulo: widget.tipo.titulo,
+            corpo: EstadoVazio(
+              icone: TablerIcons.wifi_off,
+              titulo: 'Não deu para abrir',
+              texto: 'Confira a internet e tente de novo.',
+              acao: FilledButton(
+                onPressed: () => setState(() {
+                  _leitura = documentosLegais.carregar(widget.tipo);
+                }),
+                child: const Text('Tentar de novo'),
+              ),
+            ),
+          );
+        }
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      },
     );
   }
 }

@@ -191,4 +191,38 @@ void main() {
       expect(nova.versaoEm(DateTime(2026, 12, 4)), '1.1');
     });
   });
+
+  testWidgets('falha ao ler: avisa e "Tentar de novo" carrega', (t) async {
+    final fonte = _FonteQueFalha();
+    documentosLegais
+      ..restaurar()
+      ..fonte = fonte;
+    addTearDown(() {
+      documentosLegais
+        ..restaurar()
+        ..definir(termos)
+        ..definir(politica);
+    });
+    await _abrir(t, const DocumentoLegalPage(tipo: TipoDocumento.termos));
+    await t.pumpAndSettle();
+    expect(find.text('Não deu para abrir'), findsOneWidget);
+    await t.tap(find.text('Tentar de novo'));
+    await t.pumpAndSettle();
+    expect(fonte.leituras, 2);
+    expect(find.text('Não deu para abrir'), findsNothing);
+    expect(find.text('O essencial em 1 minuto'), findsOneWidget);
+    expect(fonte.leituras, 2);
+  });
+}
+
+/// Falha na 1ª leitura (como antes de o Flutter iniciar) e depois lê.
+class _FonteQueFalha implements FonteDocumentos {
+  int leituras = 0;
+
+  @override
+  Future<String> ler(TipoDocumento tipo) async {
+    leituras++;
+    if (leituras == 1) throw StateError('ainda não iniciou');
+    return '## O essencial em 1 minuto\n\n- Item.\n\n## 1. Seção\n\nTexto.';
+  }
 }

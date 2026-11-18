@@ -6,8 +6,10 @@ import 'features/entrada/boas_vindas_page.dart';
 import 'data/documentos_legais.dart';
 
 void main() {
+  // Os assets só podem ser lidos depois que o Flutter inicia.
+  WidgetsFlutterBinding.ensureInitialized();
   // RN-150/RN-151: Termos e Política vêm dos .md de docs/.
-  documentosLegais.carregarTodos();
+  documentosLegais.carregarTodos().ignore();
   runApp(const TatuApp());
 }
 

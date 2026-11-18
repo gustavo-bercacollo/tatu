@@ -222,7 +222,9 @@ class FonteDocumentosAssets implements FonteDocumentos {
   const FonteDocumentosAssets();
 
   @override
-  Future<String> ler(TipoDocumento tipo) => rootBundle.loadString(tipo.arquivo);
+  // Sem cache do Flutter: ele guardaria até uma leitura que falhou.
+  Future<String> ler(TipoDocumento tipo) =>
+      rootBundle.loadString(tipo.arquivo, cache: false);
 }
 
 /// Documentos carregados. Versão simulada com cache em memória.
