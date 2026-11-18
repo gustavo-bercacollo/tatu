@@ -45,6 +45,12 @@ class TatuTexto {
   );
 
   /// Avisos e dicas pequenas (cadeado, "Toque para editar"…).
+  /// Legenda pequena cinza (ex.: "Transcrito do áudio · confira").
+  static const legenda = TextStyle(
+    fontSize: 12,
+    color: TatuColors.textSecondary,
+  );
+
   static const nota = TextStyle(
     fontSize: 13,
     height: 1.35,

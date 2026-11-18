@@ -57,7 +57,8 @@ void main() {
     await t.pumpAndSettle();
     await t.tap(find.bySemanticsLabel(RegExp('Opções da conversa')));
     await t.pumpAndSettle();
-    expect(find.text('Ligar para Ana'), findsOneWidget);
+    // RN-140: sem valor confirmado não existe ligar.
+    expect(find.text('Ligar para Ana'), findsNothing);
     await t.tap(find.text('Denunciar cliente'));
     await t.pumpAndSettle();
     expect(find.text('Denunciar Ana'), findsOneWidget);

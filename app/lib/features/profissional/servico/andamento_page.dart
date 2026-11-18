@@ -29,6 +29,7 @@ import '../../../shared/widgets/nota_icone.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import 'rota.dart';
 import '../../entrada/seguranca.dart';
+import '../../entrada/ligacao_page.dart';
 
 void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
   ..hideCurrentSnackBar()
@@ -425,7 +426,13 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
           Expanded(
             child: FilledButton.icon(
               style: tatuBotaoSecundario(),
-              onPressed: () => _emBreve(context, 'Ligar'),
+              // RN-140: a caminho, no local ou em serviço: ainda não
+              // concluiu, então dá para ligar pelo Tatu.
+              onPressed: () => ligarPeloTatu(
+                context,
+                atendimentoProfissional.servico?.cliente ?? 'Cliente',
+                profissional: true,
+              ),
               icon: const Icon(TablerIcons.phone, size: 20),
               label: const Text('Ligar'),
             ),

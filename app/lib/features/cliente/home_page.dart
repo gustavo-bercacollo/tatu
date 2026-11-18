@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -7,9 +6,15 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
 import '../../core/theme/tatu_texto.dart';
+import '../../data/anexos.dart';
+import '../../data/arquivos_seguros.dart';
+import '../../data/ditado.dart';
 import '../../data/filtro_palavras.dart';
+import '../../shared/widgets/miniatura_anexo.dart';
+import '../../shared/widgets/ditado.dart';
+import 'dart:typed_data';
+import '../entrada/conta_suspensa_page.dart';
 import '../../data/conta.dart';
-import '../../data/chamado.dart';
 import '../../data/enderecos.dart';
 import '../../data/perfil.dart';
 import '../../data/servicos.dart';
@@ -23,7 +28,6 @@ import '../../data/prazos.dart';
 import '../../shared/widgets/espaco_anuncio.dart';
 import '../../shared/widgets/avatar_usuario.dart';
 import '../../shared/widgets/folha.dart';
-import '../../shared/widgets/lista_agrupada.dart';
 import '../../shared/widgets/tatu_chip.dart';
 import 'abas.dart';
 import 'chamar/chamar.dart';
@@ -53,8 +57,17 @@ class _HomeClientePageState extends State<HomeClientePage> {
   final _descricao = TextEditingController();
   final _focoDescricao = FocusNode();
 
-  /// Fotos do problema (até [maxFotosChamado]).
-  final _fotos = <Uint8List>[];
+  /// RN-139: fotos e arquivos do pedido (até [RegrasAnexo.maxPorPedido]).
+  final _anexos = AnexosPedido();
+
+  /// RN-137: ditado na descrição. [_gravando]: ouvindo agora;
+  /// [_transcrito]: o texto veio do ditado e a pessoa ainda não mexeu.
+  bool _gravando = false;
+  bool _transcrito = false;
+  String _parcial = '';
+  int _segundos = 0;
+  Timer? _relogio;
+  StreamSubscription<String>? _ouvindo;
   Timer? _espera;
 
   /// Escolha da pessoa; nunca é trocada pela IA.
@@ -92,6 +105,10 @@ class _HomeClientePageState extends State<HomeClientePage> {
 
   @override
   void dispose() {
+    _relogio?.cancel();
+    _ouvindo?.cancel();
+    if (_gravando) ditado.parar();
+    _anexos.dispose();
     _espera?.cancel();
     conta.removeListener(_contaMudou);
     _descricao.dispose();
@@ -100,6 +117,8 @@ class _HomeClientePageState extends State<HomeClientePage> {
   }
 
   void _descreveu(String texto) {
+    // RN-137: mexeu no texto, já conferiu.
+    if (_transcrito) setState(() => _transcrito = false);
     // "Não sei": o botão depende de ter descrição.
     if (_naoSei) setState(() {});
     _espera?.cancel();
@@ -149,37 +168,114 @@ class _HomeClientePageState extends State<HomeClientePage> {
     }
   }
 
-  Future<void> _anexarFoto() async {
-    final origem = await mostrarFolha<OrigemFoto>(
-      context,
-      builder: (ctx) => FolhaOpcoes(
-        itens: [
-          ItemLista(
-            icone: TablerIcons.camera,
-            texto: 'Tirar foto',
-            seta: false,
-            onTap: () => Navigator.of(ctx).pop(OrigemFoto.camera),
-          ),
-          ItemLista(
-            icone: TablerIcons.photo,
-            texto: 'Escolher da galeria',
-            seta: false,
-            onTap: () => Navigator.of(ctx).pop(OrigemFoto.galeria),
-          ),
-        ],
+  /// RN-139: anexa e mostra o motivo quando não dá.
+  Future<void> _anexar(ArquivoEnviado a, {Uint8List? imagem}) async {
+    final r = await _anexos.adicionar(a, imagem: imagem);
+    if (!mounted) return;
+    final aviso = switch (r) {
+      ResultadoAnexo.anexado => null,
+      ResultadoAnexo.limite =>
+        'Até ${RegrasAnexo.maxPorPedido} anexos por pedido.',
+      ResultadoAnexo.tipoNaoPermitido => 'Vão só fotos, vídeos curtos e PDF.',
+      ResultadoAnexo.grandeDemais =>
+        'Arquivo grande demais (até ${RegrasArquivo.limiteChatMb} MB).',
+      ResultadoAnexo.barrado => 'Este arquivo foi bloqueado.',
+      ResultadoAnexo.contaSuspensa => null,
+    };
+    if (r == ResultadoAnexo.contaSuspensa) return mostrarContaSuspensa(context);
+    if (aviso == null) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(aviso)));
+  }
+
+  void _cheio() => ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text('Até ${RegrasAnexo.maxPorPedido} anexos por pedido.'),
       ),
     );
-    if (origem == null || !mounted) return;
+
+  /// Câmera: tira a foto do problema.
+  Future<void> _foto(OrigemFoto origem) async {
+    if (_anexos.cheio) return _cheio();
     try {
       final imagem = await perfil.pedirImagem(origem);
       if (imagem == null || !mounted) return;
-      setState(() => _fotos.add(imagem));
+      await _anexar(const ArquivoEnviado('foto.jpg', mb: 2), imagem: imagem);
     } on CameraNegada {
       if (!mounted) return;
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => const CameraDesativadaPage(semAvatar: true),
         ),
+      );
+    }
+  }
+
+  /// C89 · RN-139: clipe → "Escolher da galeria" ou "Arquivo".
+  Future<void> _clipe() async {
+    if (_anexos.cheio) return _cheio();
+    final escolha = await mostrarFolha<int>(
+      context,
+      builder: (ctx) => FolhaAnexar(onEscolha: (i) => Navigator.of(ctx).pop(i)),
+    );
+    if (escolha == null || !mounted) return;
+    if (escolha == 0) return _foto(OrigemFoto.galeria);
+    final a = await seletorArquivo.escolher();
+    if (a == null || !mounted) return;
+    await _anexar(a);
+  }
+
+  // ---------- Ditado (RN-137) ----------
+
+  Future<void> _ditar() async {
+    // Permissão do microfone só no primeiro toque.
+    if (!await ditado.permitir()) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('Permita o microfone nas configurações para ditar.'),
+          ),
+        );
+      return;
+    }
+    if (!mounted) return;
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _gravando = true;
+      _parcial = '';
+      _segundos = 0;
+    });
+    _relogio = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => setState(() => _segundos++),
+    );
+    _ouvindo = ditado.ouvir().listen((t) => setState(() => _parcial = t));
+  }
+
+  /// ✓: o texto vai para a descrição (editável) e a IA sugere o serviço.
+  Future<void> _pararDitado({required bool usar}) async {
+    _relogio?.cancel();
+    unawaited(_ouvindo?.cancel());
+    await ditado.parar();
+    if (!mounted) return;
+    final texto = _parcial.trim();
+    setState(() {
+      _gravando = false;
+      if (usar && texto.isNotEmpty) {
+        _descricao.text = texto;
+        _transcrito = true;
+      }
+    });
+    if (usar && texto.isNotEmpty) {
+      _transcrito = true;
+      _espera?.cancel();
+      setState(
+        () => _sugerido = widget.ia.sugerir(texto, distancia: _distancia),
       );
     }
   }
@@ -469,138 +565,181 @@ class _HomeClientePageState extends State<HomeClientePage> {
   }
 
   Widget _caixaDescricao() {
-    return Container(
-      height: 150,
-      decoration: BoxDecoration(
-        color: TatuColors.fill,
-        borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
-        border: Border.all(
-          color: _focoDescricao.hasFocus
-              ? TatuColors.textPrimary
-              : Colors.transparent,
-          width: 1.5,
+    final gravando = _gravando;
+    return ListenableBuilder(
+      listenable: _anexos,
+      builder: (context, _) => Container(
+        height: TatuMedidas.alturaDescricao,
+        decoration: BoxDecoration(
+          color: TatuColors.fill,
+          borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+          border: Border.all(
+            color: gravando
+                ? TatuColors.danger
+                : _focoDescricao.hasFocus
+                ? TatuColors.textPrimary
+                : Colors.transparent,
+            width: 1.5,
+          ),
         ),
-      ),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 52),
-              child: TextField(
-                controller: _descricao,
-                focusNode: _focoDescricao,
-                onChanged: _descreveu,
-                maxLines: null,
-                expands: true,
-                textCapitalization: TextCapitalization.sentences,
-                cursorColor: TatuColors.textPrimary,
-                style: const TextStyle(fontSize: 17, height: 24 / 17),
-                decoration: const InputDecoration.collapsed(
-                  hintText: 'O que está acontecendo?',
-                  hintStyle: TextStyle(
-                    fontSize: 17,
-                    color: TatuColors.textSecondary,
-                  ),
-                ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 52),
+                child: gravando ? _ouvindoAgora() : _campoDescricao(),
               ),
             ),
+            Positioned(
+              left: 12,
+              right: 10,
+              bottom: 12,
+              child: gravando ? _barraGravando() : _barraAnexos(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _campoDescricao() => TextField(
+    controller: _descricao,
+    focusNode: _focoDescricao,
+    onChanged: _descreveu,
+    maxLines: null,
+    expands: true,
+    textCapitalization: TextCapitalization.sentences,
+    cursorColor: TatuColors.textPrimary,
+    style: const TextStyle(fontSize: 17, height: 24 / 17),
+    decoration: const InputDecoration.collapsed(
+      hintText: 'O que está acontecendo?',
+      hintStyle: TextStyle(fontSize: 17, color: TatuColors.textSecondary),
+    ),
+  );
+
+  /// C15 · "Gravando · 0:07" e o texto aparecendo enquanto a pessoa fala.
+  Widget _ouvindoAgora() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      RotuloOuvindo('Gravando · ${tempoDitado(_segundos)}'),
+      const SizedBox(height: 8),
+      Expanded(
+        child: Text(
+          _parcial.isEmpty ? 'Pode falar…' : '$_parcial…',
+          overflow: TextOverflow.fade,
+          style: const TextStyle(
+            fontSize: 17,
+            height: 24 / 17,
+            color: TatuColors.textSecondary,
           ),
-          Positioned(
-            left: 12,
-            right: 12,
-            bottom: 12,
+        ),
+      ),
+    ],
+  );
+
+  Widget _barraGravando() => Row(
+    children: [
+      _BotaoCaixa(
+        icone: TablerIcons.trash,
+        rotulo: 'Descartar ditado',
+        fundo: TatuColors.bg,
+        cor: TatuColors.danger,
+        onTap: () => _pararDitado(usar: false),
+      ),
+      const SizedBox(width: 16),
+      const Expanded(child: OndaDitado()),
+      const SizedBox(width: 16),
+      _BotaoCaixa(
+        icone: TablerIcons.check,
+        rotulo: 'Usar o texto',
+        fundo: TatuColors.action,
+        cor: TatuColors.onAction,
+        tamanho: 40,
+        onTap: () => _pararDitado(usar: true),
+      ),
+    ],
+  );
+
+  Widget _barraAnexos() {
+    final itens = _anexos.itens;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        _BotaoCaixa(
+          icone: TablerIcons.camera,
+          rotulo: 'Tirar foto',
+          onTap: () => _foto(OrigemFoto.camera),
+        ),
+        const SizedBox(width: 10),
+        _BotaoCaixa(
+          icone: TablerIcons.paperclip,
+          rotulo: 'Anexar',
+          onTap: _clipe,
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                if (_fotos.length < maxFotosChamado)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: Semantics(
-                      button: true,
-                      label: 'Enviar foto',
-                      child: GestureDetector(
-                        onTap: _anexarFoto,
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: const BoxDecoration(
-                            color: TatuColors.circle,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(TablerIcons.camera, size: 20),
-                        ),
-                      ),
-                    ),
-                  ),
-                for (final (i, f) in _fotos.indexed)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: _Miniatura(
-                      imagem: f,
-                      onRemover: () => setState(() => _fotos.removeAt(i)),
+                for (final (i, a) in itens.indexed) ...[
+                  MiniaturaAnexo(anexo: a, onRemover: () => _anexos.remover(i)),
+                  const SizedBox(width: 12),
+                ],
+                // RN-137: o texto veio do ditado; a pessoa confere.
+                if (_transcrito)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: Text(
+                      'Transcrito do áudio · confira',
+                      style: TatuTexto.legenda,
                     ),
                   ),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 8),
+        // RN-137: microfone à direita; nome "Ditar" no leitor de tela.
+        _BotaoCaixa(icone: TablerIcons.microphone, rotulo: 'Ditar', onTap: _ditar),
+      ],
     );
   }
 }
 
-/// Miniatura de foto anexada, com o "x" para tirar.
-class _Miniatura extends StatelessWidget {
-  const _Miniatura({required this.imagem, required this.onRemover});
+/// Botão redondo da caixa de descrição.
+class _BotaoCaixa extends StatelessWidget {
+  const _BotaoCaixa({
+    required this.icone,
+    required this.rotulo,
+    required this.onTap,
+    this.fundo = TatuColors.circle,
+    this.cor = TatuColors.textPrimary,
+    this.tamanho = 36,
+  });
 
-  final Uint8List imagem;
-  final VoidCallback onRemover;
+  final IconData icone;
+  final String rotulo;
+  final VoidCallback onTap;
+  final Color fundo;
+  final Color cor;
+  final double tamanho;
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 50,
-      height: 50,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(TatuMedidas.raioCodigo),
-            child: Image.memory(
-              imagem,
-              width: 46,
-              height: 46,
-              fit: BoxFit.cover,
-              gaplessPlayback: true,
-            ),
-          ),
-          Positioned(
-            right: -4,
-            top: -8,
-            child: Semantics(
-              button: true,
-              label: 'Tirar foto',
-              child: GestureDetector(
-                onTap: onRemover,
-                child: Container(
-                  width: 22,
-                  height: 22,
-                  decoration: BoxDecoration(
-                    color: TatuColors.action,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: TatuColors.bg, width: 1.5),
-                  ),
-                  child: const Icon(
-                    TablerIcons.x,
-                    size: 12,
-                    color: TatuColors.onAction,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: rotulo,
+    excludeSemantics: true,
+    child: GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: tamanho,
+        height: tamanho,
+        decoration: BoxDecoration(color: fundo, shape: BoxShape.circle),
+        child: Icon(icone, size: 20, color: cor),
       ),
-    );
-  }
+    ),
+  );
 }

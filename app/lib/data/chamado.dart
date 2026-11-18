@@ -30,8 +30,6 @@ class ChamadoRepo extends ChangeNotifier {
   }
 }
 
-/// Fotos que podem ir junto com a descrição do problema.
-const maxFotosChamado = 3;
 
 /// Instância única usada pelo app enquanto não há backend.
 final chamado = ChamadoRepo();

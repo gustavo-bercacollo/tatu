@@ -39,6 +39,7 @@ import '../../../data/denuncias.dart';
 import '../../../data/encontrados.dart';
 import '../../entrada/denunciar_mensagem.dart';
 import '../../entrada/perfil_publico_page.dart';
+import '../../entrada/ligacao_page.dart';
 
 void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
   ..hideCurrentSnackBar()
@@ -460,19 +461,22 @@ class _ChatPageState extends State<ChatPage> {
         void ir(int i) => Navigator.of(ctx).pop(i);
         return FolhaOpcoes(
           itens: [
-            ItemLista(
-              icone: TablerIcons.phone,
-              texto: 'Ligar para ${_c.primeiroNome}',
-              seta: false,
-              onTap: () => ir(0),
-            ),
-            // Pedido do Gustavo: ver o perfil pelo nome e foto do topo.
+            // RN-136: ver o perfil pelo nome e pela foto do topo.
             ItemLista(
               icone: TablerIcons.user,
-              texto: 'Ver perfil',
+              texto: 'Ver perfil ${_c.artigo == 'a' ? 'da' : 'do'} '
+                  '${_c.primeiroNome}',
               seta: false,
               onTap: () => ir(4),
             ),
+            // RN-140: ligar só existe durante o atendimento.
+            if (_c.podeLigar)
+              ItemLista(
+                icone: TablerIcons.phone,
+                texto: 'Ligar para ${_c.primeiroNome}',
+                seta: false,
+                onTap: () => ir(0),
+              ),
             ItemLista(
               icone: TablerIcons.clock,
               texto: 'Ver pedido',
@@ -500,7 +504,7 @@ class _ChatPageState extends State<ChatPage> {
     final nav = Navigator.of(context);
     switch (escolha) {
       case 0:
-        _emBreve(context, 'Ligar');
+        _ligar();
       case 1:
         _verPedido();
       case 2:
@@ -516,6 +520,13 @@ class _ChatPageState extends State<ChatPage> {
       case 4:
         _verPerfil();
     }
+  }
+
+  /// RN-140: ligação pelo Tatu, sem mostrar o número.
+  void _ligar() {
+    if (!_c.podeLigar) return;
+    conversas.verDicaLigar(_c);
+    ligarPeloTatu(context, _c.nome);
   }
 
   /// Perfil do profissional (C14–C15) a partir do chat.
@@ -601,7 +612,13 @@ class _ChatPageState extends State<ChatPage> {
           // RN-132: encerrada pelo Tatu, o nome vira "Conta indisponível".
           topo: fim != null
               ? TopoContaIndisponivel(detalhe: _c.servico)
-              : _Topo(conversa: _c, onMenu: _menu),
+              : _Topo(conversa: _c, onMenu: _menu, onLigar: _ligar),
+          // C104 · RN-140: o ligar acabou de ser liberado.
+          sobre: _c.podeLigar && !_c.dicaLigarVista
+              ? BalaoLigarLiberado(
+                  onFechar: () => conversas.verDicaLigar(_c),
+                )
+              : null,
           rodapeColado: fim != null,
           mensagens: [
             CartaoPedidoChat(
@@ -765,10 +782,15 @@ class _ChatPageState extends State<ChatPage> {
 }
 
 class _Topo extends StatelessWidget {
-  const _Topo({required this.conversa, required this.onMenu});
+  const _Topo({
+    required this.conversa,
+    required this.onMenu,
+    required this.onLigar,
+  });
 
   final Conversa conversa;
   final VoidCallback onMenu;
+  final VoidCallback onLigar;
 
   @override
   Widget build(BuildContext context) {
@@ -811,6 +833,12 @@ class _Topo extends StatelessWidget {
                               color: TatuColors.verified,
                               semanticLabel: 'Verificada',
                             ),
+                            const SizedBox(width: 2),
+                            const Icon(
+                              TablerIcons.chevron_right,
+                              size: 14,
+                              color: TatuColors.textSecondary,
+                            ),
                           ],
                         ),
                         Text(conversa.profissao, style: TatuTexto.nota),
@@ -822,14 +850,12 @@ class _Topo extends StatelessWidget {
             ),
           ),
         ),
-        Semantics(
-          button: true,
-          label: 'Ligar',
-          child: IconButton(
-            onPressed: () => _emBreve(context, 'Ligar'),
-            icon: const Icon(TablerIcons.phone, size: 22),
-          ),
-        ),
+        // RN-140: o telefone só aparece com o valor confirmado e some
+        // quando o serviço é concluído.
+        if (conversa.podeLigar)
+          BotaoLigar(onTap: onLigar)
+        else
+          const SizedBox(width: 48),
       ],
     );
   }

@@ -8,6 +8,9 @@ import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
 import '../../core/theme/tatu_texto.dart';
 import 'avatar_iniciais.dart';
+import 'dart:async';
+import '../../data/ditado.dart';
+import 'ditado.dart';
 
 /// Esqueleto das telas de chat: topo, lista de mensagens e rodapé
 /// (barra de mensagem e botões).
@@ -18,7 +21,12 @@ class TelaChat extends StatelessWidget {
     required this.mensagens,
     required this.rodape,
     this.rodapeColado = false,
+    this.sobre,
   });
+
+  /// Por cima da conversa, abaixo do canto direito do topo (ex.: balão
+  /// "Agora dá para ligar pelo Tatu", RN-140).
+  final Widget? sobre;
 
   final Widget topo;
   final List<Widget> mensagens;
@@ -34,7 +42,9 @@ class TelaChat extends StatelessWidget {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: TatuMedidas.larguraMax),
-            child: Column(
+            child: Stack(
+              children: [
+            Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
@@ -67,6 +77,14 @@ class TelaChat extends StatelessWidget {
                     ),
                     child: rodape,
                   ),
+              ],
+            ),
+            if (sobre != null)
+              Positioned(
+                top: TatuMedidas.topo + 40,
+                right: TatuMedidas.margem,
+                child: sobre!,
+              ),
               ],
             ),
           ),
@@ -434,7 +452,7 @@ class _AvisoContato extends StatelessWidget {
 /// Barra embaixo do chat: câmera e campo "Mensagem". Com
 /// [bloquearContato], telefone, e-mail, endereço, @ e links não são
 /// enviados: a borda fica preta e aparece o aviso amarelo (RN-85).
-class BarraMensagem extends StatelessWidget {
+class BarraMensagem extends StatefulWidget {
   const BarraMensagem({
     super.key,
     required this.controller,
@@ -453,12 +471,89 @@ class BarraMensagem extends StatelessWidget {
   final String porQue;
 
   @override
+  State<BarraMensagem> createState() => _BarraMensagemState();
+}
+
+class _BarraMensagemState extends State<BarraMensagem> {
+  /// RN-138: ouvindo agora (o texto aparece no próprio campo).
+  bool _ouvindo = false;
+
+  /// RN-138: o texto do campo veio do ditado; a pessoa confere e envia.
+  bool _ditado = false;
+  int _segundos = 0;
+  Timer? _relogio;
+  StreamSubscription<String>? _fala;
+
+  TextEditingController get _campo => widget.controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _campo.addListener(_mudou);
+  }
+
+  @override
+  void dispose() {
+    _campo.removeListener(_mudou);
+    _relogio?.cancel();
+    _fala?.cancel();
+    if (_ouvindo) ditado.parar();
+    super.dispose();
+  }
+
+  /// Enviou ou apagou: o aviso de ditado some.
+  void _mudou() {
+    if (_ditado && !_ouvindo && _campo.text.isEmpty) {
+      setState(() => _ditado = false);
+    }
+  }
+
+  Future<void> _ditar() async {
+    // Permissão do microfone só no primeiro toque.
+    if (!await ditado.permitir()) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('Permita o microfone nas configurações para ditar.'),
+          ),
+        );
+      return;
+    }
+    if (!mounted) return;
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _ouvindo = true;
+      _ditado = true;
+      _segundos = 0;
+    });
+    _relogio = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => setState(() => _segundos++),
+    );
+    _fala = ditado.ouvir().listen((t) => _campo.text = t);
+  }
+
+  /// Parar: o texto fica no campo para conferir e enviar como texto.
+  Future<void> _parar() async {
+    _relogio?.cancel();
+    unawaited(_fala?.cancel());
+    await ditado.parar();
+    if (!mounted) return;
+    setState(() {
+      _ouvindo = false;
+      _ditado = _campo.text.trim().isNotEmpty;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: controller,
+      listenable: _campo,
       builder: (context, _) {
-        final contato = bloquearContato
-            ? contatoNoTexto(controller.text)
+        final contato = widget.bloquearContato
+            ? contatoNoTexto(_campo.text)
             : null;
         return Column(
           mainAxisSize: MainAxisSize.min,
@@ -477,7 +572,7 @@ class BarraMensagem extends StatelessWidget {
                         'confirmado.',
                   // RN-124: arquivo vai direto pelo chat (link, só entrega).
                   TipoContato.link => 'Envie o arquivo direto aqui.',
-                  _ => porQue,
+                  _ => widget.porQue,
                 },
               ),
               const SizedBox(height: TatuMedidas.entreItens + 4),
@@ -489,90 +584,151 @@ class BarraMensagem extends StatelessWidget {
     );
   }
 
+  Widget _botao({
+    required String rotulo,
+    required Color fundo,
+    required Widget icone,
+    VoidCallback? onTap,
+    double tamanho = 36,
+  }) => Semantics(
+    button: true,
+    label: rotulo,
+    excludeSemantics: true,
+    child: Material(
+      color: fundo,
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: SizedBox(
+          width: tamanho,
+          height: tamanho,
+          child: Center(child: icone),
+        ),
+      ),
+    ),
+  );
+
   Widget _linha(BuildContext context, {required bool bloqueado}) {
     void enviar() {
-      if (!bloqueado) onEnviar();
+      if (!bloqueado) widget.onEnviar();
     }
 
+    final temTexto = _campo.text.trim().isNotEmpty;
+    // Campo alto quando há ditado (rótulo + texto), como nos desenhos.
+    final alto = _ouvindo || _ditado;
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Semantics(
-          button: true,
-          label: 'Enviar foto',
-          child: Material(
-            color: TatuColors.fill,
-            shape: const CircleBorder(),
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: onCamera,
-              child: const SizedBox(
-                width: 36,
-                height: 36,
-                child: Icon(TablerIcons.camera, size: 20),
-              ),
-            ),
-          ),
+        _botao(
+          rotulo: 'Enviar foto',
+          fundo: TatuColors.fill,
+          icone: const Icon(TablerIcons.camera, size: 20),
+          onTap: widget.onCamera,
         ),
         const SizedBox(width: 8),
         Expanded(
           child: Container(
-            height: TatuMedidas.alturaChip,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            alignment: Alignment.centerLeft,
-            decoration: ShapeDecoration(
-              color: bloqueado ? TatuColors.bg : TatuColors.fill,
-              shape: StadiumBorder(
-                side: bloqueado
-                    ? const BorderSide(color: TatuColors.action, width: 1.5)
-                    : BorderSide.none,
-              ),
+            constraints: const BoxConstraints(
+              minHeight: TatuMedidas.alturaChip,
             ),
-            child: TextField(
-              controller: controller,
-              onSubmitted: (_) => enviar(),
-              textInputAction: TextInputAction.send,
-              cursorColor: TatuColors.textPrimary,
-              style: const TextStyle(fontSize: 17),
-              decoration: const InputDecoration.collapsed(
-                hintText: 'Mensagem',
-                hintStyle: TextStyle(
-                  fontSize: 17,
-                  color: TatuColors.textSecondary,
+            padding: alto
+                ? const EdgeInsets.fromLTRB(16, 10, 16, 10)
+                : const EdgeInsets.symmetric(horizontal: 16),
+            alignment: Alignment.centerLeft,
+            decoration: BoxDecoration(
+              color: bloqueado ? TatuColors.bg : TatuColors.fill,
+              borderRadius: BorderRadius.circular(TatuMedidas.alturaChip / 2),
+              border: _ouvindo
+                  ? Border.all(color: TatuColors.danger, width: 1.5)
+                  : bloqueado
+                  ? Border.all(color: TatuColors.action, width: 1.5)
+                  : null,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_ouvindo) ...[
+                  RotuloOuvindo(
+                    'Ouvindo · ${tempoDitado(_segundos)}',
+                    pequeno: true,
+                  ),
+                  const SizedBox(height: 4),
+                ],
+                TextField(
+                  controller: _campo,
+                  readOnly: _ouvindo,
+                  onSubmitted: (_) => enviar(),
+                  textInputAction: TextInputAction.send,
+                  minLines: 1,
+                  maxLines: alto ? 4 : 1,
+                  cursorColor: TatuColors.textPrimary,
+                  style: TextStyle(
+                    fontSize: alto ? 15 : 17,
+                    color: _ouvindo
+                        ? TatuColors.textSecondary
+                        : TatuColors.textPrimary,
+                  ),
+                  decoration: InputDecoration.collapsed(
+                    hintText: _ouvindo ? 'Pode falar…' : 'Mensagem',
+                    hintStyle: const TextStyle(
+                      fontSize: 17,
+                      color: TatuColors.textSecondary,
+                    ),
+                  ),
                 ),
-              ),
+                // RN-138: confere antes de enviar; vai como texto.
+                if (_ditado && !_ouvindo) ...[
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Ditado · confira antes de enviar',
+                    style: TatuTexto.legenda,
+                  ),
+                ],
+              ],
             ),
           ),
         ),
         const SizedBox(width: 8),
-        // Enviar (como no WhatsApp): preto quando há texto que pode ir.
-        Builder(
-          builder: (context) {
-            final temTexto = controller.text.trim().isNotEmpty && !bloqueado;
-            return Semantics(
-              button: true,
-              label: 'Enviar mensagem',
-              child: Material(
-                color: temTexto ? TatuColors.action : TatuColors.fill,
-                shape: const CircleBorder(),
-                child: InkWell(
-                  customBorder: const CircleBorder(),
-                  onTap: temTexto ? enviar : null,
-                  child: SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: Icon(
-                      TablerIcons.send,
-                      size: 18,
-                      color: temTexto
-                          ? TatuColors.onAction
-                          : TatuColors.textSecondary,
-                    ),
-                  ),
-                ),
+        if (_ouvindo)
+          _botao(
+            rotulo: 'Parar ditado',
+            fundo: TatuColors.danger,
+            tamanho: 40,
+            icone: Container(
+              width: 14,
+              height: 14,
+              decoration: BoxDecoration(
+                color: TatuColors.onAction,
+                borderRadius: BorderRadius.circular(3),
               ),
-            );
-          },
-        ),
+            ),
+            onTap: _parar,
+          )
+        else if (temTexto || bloqueado)
+          // Enviar (como no WhatsApp): preto quando há texto que pode ir.
+          _botao(
+            rotulo: 'Enviar mensagem',
+            fundo: temTexto && !bloqueado ? TatuColors.action : TatuColors.fill,
+            tamanho: alto ? 40 : 36,
+            icone: Icon(
+              TablerIcons.send,
+              size: 18,
+              color: temTexto && !bloqueado
+                  ? TatuColors.onAction
+                  : TatuColors.textSecondary,
+            ),
+            onTap: temTexto && !bloqueado ? enviar : null,
+          )
+        else
+          // RN-138: campo vazio mostra o microfone ("Ditar").
+          _botao(
+            rotulo: 'Ditar',
+            fundo: TatuColors.fill,
+            icone: const Icon(TablerIcons.microphone, size: 20),
+            onTap: _ditar,
+          ),
       ],
     );
   }

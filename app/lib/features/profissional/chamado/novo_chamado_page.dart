@@ -14,6 +14,7 @@ import '../../../shared/widgets/mapa_falso.dart';
 import '../cadastro/especialidades_page.dart' show EtiquetaCinza;
 import 'chat_profissional_page.dart';
 import 'toque_chamado.dart';
+import '../../../shared/widgets/miniatura_anexo.dart';
 
 /// P22 · Novo chamado: painel sobre o mapa, com a contagem para aceitar.
 /// Sem resposta até o fim da contagem, o chamado passa para outro.
@@ -153,24 +154,23 @@ class _NovoChamadoPageState extends State<NovoChamadoPage> {
                               ),
                             ),
                           ),
-                          if (c.temFoto) ...[
-                            const SizedBox(width: TatuMedidas.entreItens),
-                            Container(
-                              width: 64,
-                              height: 64,
-                              decoration: BoxDecoration(
-                                color: TatuColors.fillStrong,
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: const Icon(
-                                TablerIcons.photo,
-                                color: TatuColors.textSecondary,
-                                semanticLabel: 'Foto do problema',
-                              ),
-                            ),
-                          ],
                         ],
                       ),
+                      // RN-139: o profissional vê os anexos da descrição.
+                      if (c.anexos.isNotEmpty) ...[
+                        const SizedBox(height: TatuMedidas.entreItens),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              for (final a in c.anexos)
+                                MiniaturaAnexo(anexo: a),
+                            ],
+                          ),
+                        ),
+                      ],
                       if (c.distancia) ...[
                         // RN-93/RN-95: chamado à distância, sem visita.
                         const SizedBox(height: TatuMedidas.entreItens),

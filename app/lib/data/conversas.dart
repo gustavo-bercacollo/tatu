@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'regras_distancia.dart';
 import 'regras_valor.dart';
 import 'suspensao.dart';
+import 'ligacao.dart';
 
 /// Situação de uma mensagem enviada pela pessoa.
 enum EnvioMensagem { enviada, falhou }
@@ -238,6 +239,19 @@ class Conversa {
 
   bool get encerrada => encerramento != null;
 
+  /// RN-140: o serviço do valor atual terminou (some o ligar).
+  bool servicoConcluido = false;
+
+  /// RN-140: o balão "Agora dá para ligar pelo Tatu" já foi visto.
+  bool dicaLigarVista = false;
+
+  /// RN-140: ligar só do valor confirmado até o serviço ser concluído.
+  bool get podeLigar => RegrasLigacao.disponivel(
+    valorConfirmado: valor?.situacao == SituacaoValor.confirmado,
+    concluido: servicoConcluido,
+    encerrado: encerrada,
+  );
+
   /// RN-132: o nome some e vira "Conta indisponível".
   String get nomeVisivel => encerrada ? 'Conta indisponível' : nome;
 
@@ -412,6 +426,8 @@ class ConversasRepo extends ChangeNotifier {
   void confirmarValor(Conversa c) {
     final v = c.valor;
     v?.situacao = SituacaoValor.confirmado;
+    // RN-140: valor novo confirmado, a ligação volta a existir.
+    c.servicoConcluido = false;
     if (c.distancia && v != null) {
       c.entrega = EntregaDistancia(confirmadoEm: clock.now());
       c.mensagens.add(
@@ -520,6 +536,18 @@ class ConversasRepo extends ChangeNotifier {
     }
     notifyListeners();
     return r;
+  }
+
+  /// RN-140: o serviço foi concluído; a ligação deixa de existir.
+  void concluirServico(Conversa c) {
+    c.servicoConcluido = true;
+    notifyListeners();
+  }
+
+  /// RN-140: o balão do ligar aparece uma vez.
+  void verDicaLigar(Conversa c) {
+    c.dicaLigarVista = true;
+    notifyListeners();
   }
 
   /// RN-134: a mensagem denunciada some só da conversa de quem denunciou.

@@ -245,7 +245,7 @@ void main() {
     await _abrir(t, ChatPage(conversa: conversas.conversas.first));
     await t.tap(find.bySemanticsLabel(RegExp('^Opções da conversa')));
     await t.pumpAndSettle();
-    await t.tap(find.text('Ver perfil'));
+    await t.tap(find.text('Ver perfil da Luiza'));
     await t.pumpAndSettle();
     expect(find.byType(PerfilPublicoPage), findsOneWidget);
     await t.tap(find.text('Voltar para a conversa'));

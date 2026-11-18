@@ -3,6 +3,8 @@
 //   flutter test tool/capturas_test.dart --update-goldens
 import 'dart:io';
 
+import 'package:tatu/features/entrada/ligacao_page.dart';
+import 'package:tatu/data/ditado.dart';
 import 'package:tatu/features/entrada/conta_suspensa_page.dart';
 import 'package:tatu/data/consulta_cpf.dart';
 import 'package:tatu/features/entrada/menor_de_idade_page.dart';
@@ -917,9 +919,65 @@ void main() {
   });
 
   testWidgets('chat-valor-confirmado', (t) async {
-    final c = ConversasRepo().conversas.first;
+    final c = ConversasRepo().conversas.first
+      ..dicaLigarVista = true;
     c.valor!.situacao = SituacaoValor.confirmado;
     await _capturar(t, 'chat-valor-confirmado', ChatPage(conversa: c));
+  });
+
+  // RN-140: valor confirmado libera o ligar pelo Tatu (C104).
+  testWidgets('chat-ligar-liberado', (t) async {
+    final r = ConversasRepo();
+    final c = r.conversas.first;
+    r.confirmarValor(c);
+    await _capturar(t, 'chat-ligar-liberado', ChatPage(conversa: c));
+  });
+
+  // RN-140: ligação pelo app, sem número (C105).
+  testWidgets('ligacao-pelo-app', (t) async {
+    await _capturar(t, 'ligacao-pelo-app', const LigacaoPage(nome: 'Luiza Souza'));
+  });
+
+  // RN-138: ditando no chat (C137).
+  testWidgets('chat-ditando', (t) async {
+    ditado = DitadoMock(
+      frase: 'Pode vir agora, o registro fica embaixo da pia',
+      passo: const Duration(milliseconds: 100),
+    );
+    final c = ConversasRepo().conversas.first..valor = null;
+    await _capturar(
+      t,
+      'chat-ditando',
+      ChatPage(conversa: c),
+      preparar: () async {
+        await t.tap(find.bySemanticsLabel('Ditar'));
+        await t.pump();
+        await t.pump(const Duration(milliseconds: 7050));
+      },
+    );
+    ditado = DitadoMock();
+  });
+
+  // RN-138: ditado pronto para conferir e enviar como texto (C138).
+  testWidgets('chat-ditado-pronto', (t) async {
+    ditado = DitadoMock(
+      frase: 'Pode vir agora, o registro fica embaixo da pia, do lado esquerdo.',
+      passo: const Duration(milliseconds: 10),
+    );
+    final c = ConversasRepo().conversas.first..valor = null;
+    await _capturar(
+      t,
+      'chat-ditado-pronto',
+      ChatPage(conversa: c),
+      preparar: () async {
+        await t.tap(find.bySemanticsLabel('Ditar'));
+        await t.pump();
+        await t.pump(const Duration(milliseconds: 500));
+        await t.tap(find.bySemanticsLabel('Parar ditado'));
+        await t.pumpAndSettle();
+      },
+    );
+    ditado = DitadoMock();
   });
 
   testWidgets('chat-anexar', (t) async {
@@ -1122,7 +1180,7 @@ void main() {
         perfil.escolherImagem = (_) async => bytes;
         await descrever(t);
         for (var i = 0; i < 2; i++) {
-          await t.tap(find.bySemanticsLabel('Enviar foto'));
+          await t.tap(find.bySemanticsLabel('Anexar'));
           await t.pumpAndSettle();
           await t.tap(find.text('Escolher da galeria'));
           await t.pumpAndSettle();
@@ -1131,6 +1189,86 @@ void main() {
         await t.pump();
       },
     );
+  });
+
+  // RN-139: o clipe abre galeria ou arquivo (C89).
+  testWidgets('chamar-anexar', (t) async {
+    await _capturar(
+      t,
+      'chamar-anexar',
+      const HomeClientePage(),
+      preparar: () async {
+        await descrever(t);
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.pump();
+        await t.tap(find.bySemanticsLabel('Anexar'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  // RN-139: foto e PDF anexados (C90).
+  testWidgets('chamar-com-arquivo', (t) async {
+    final bytes = File('assets/avatares/avatar-2.png').readAsBytesSync();
+    await _capturar(
+      t,
+      'chamar-com-arquivo',
+      const HomeClientePage(),
+      preparar: () async {
+        perfil.escolherImagem = (_) async => bytes;
+        await descrever(t);
+        await t.tap(find.bySemanticsLabel('Anexar'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Escolher da galeria'));
+        await t.pumpAndSettle();
+        await t.tap(find.bySemanticsLabel('Anexar'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Arquivo (PDF, documento)'));
+        await t.pumpAndSettle();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-137: ditando a descrição (C15).
+  testWidgets('home-gravando-audio', (t) async {
+    ditado = DitadoMock(
+      frase: 'minha pia da cozinha tá vazando embaixo e molhou tudo',
+      passo: const Duration(milliseconds: 100),
+    );
+    await _capturar(
+      t,
+      'home-gravando-audio',
+      const HomeClientePage(),
+      preparar: () async {
+        await t.tap(find.bySemanticsLabel('Ditar'));
+        await t.pump();
+        await t.pump(const Duration(milliseconds: 7050));
+      },
+    );
+    ditado = DitadoMock();
+  });
+
+  // RN-137: texto do ditado na descrição, para conferir (C16).
+  testWidgets('home-audio-transcrito', (t) async {
+    ditado = DitadoMock(
+      frase: 'Minha pia da cozinha tá vazando embaixo e molhou tudo.',
+      passo: const Duration(milliseconds: 10),
+    );
+    await _capturar(
+      t,
+      'home-audio-transcrito',
+      const HomeClientePage(),
+      preparar: () async {
+        await t.tap(find.bySemanticsLabel('Ditar'));
+        await t.pump();
+        await t.pump(const Duration(milliseconds: 500));
+        await t.tap(find.bySemanticsLabel('Usar o texto'));
+        await t.pumpAndSettle();
+      },
+    );
+    ditado = DitadoMock();
   });
 
   testWidgets('chamar-celular', (t) async {
@@ -3335,6 +3473,55 @@ void main() {
   });
 
   // RN-134: motivos da denúncia de mensagem (P85).
+  // RN-140: ligação pelo app, lado do profissional (P32).
+  testWidgets('pro-ligacao-pelo-app', (t) async {
+    await comDemo(
+      t,
+      'pro-ligacao-pelo-app',
+      const LigacaoPage(nome: 'Ana Martins', profissional: true),
+    );
+  });
+
+  // RN-138: ditando no chat do profissional (P88).
+  testWidgets('pro-chat-ditando', (t) async {
+    ditado = DitadoMock(
+      frase: 'Combinado, chego em 12 minutos',
+      passo: const Duration(milliseconds: 180),
+    );
+    await comDemo(
+      t,
+      'pro-chat-ditando',
+      const ChatProfissionalPage(),
+      depois: () async {
+        await t.tap(find.bySemanticsLabel('Ditar'));
+        await t.pump();
+        await t.pump(const Duration(milliseconds: 7050));
+      },
+    );
+    ditado = DitadoMock();
+  });
+
+  // RN-138: ditado pronto no chat do profissional (P89).
+  testWidgets('pro-chat-ditado-pronto', (t) async {
+    ditado = DitadoMock(
+      frase: 'Combinado, chego em 12 minutos.',
+      passo: const Duration(milliseconds: 10),
+    );
+    await comDemo(
+      t,
+      'pro-chat-ditado-pronto',
+      const ChatProfissionalPage(),
+      depois: () async {
+        await t.tap(find.bySemanticsLabel('Ditar'));
+        await t.pump();
+        await t.pump(const Duration(milliseconds: 500));
+        await t.tap(find.bySemanticsLabel('Parar ditado'));
+        await t.pumpAndSettle();
+      },
+    );
+    ditado = DitadoMock();
+  });
+
   testWidgets('pro-chat-denunciar-mensagem', (t) async {
     await comDemo(
       t,

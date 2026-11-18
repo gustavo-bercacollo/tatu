@@ -145,14 +145,15 @@ void main() {
     final bytes = File('assets/avatares/avatar-2.png').readAsBytesSync();
     perfil.escolherImagem = (_) async => bytes;
     await _homePronta(t);
-    await t.tap(find.bySemanticsLabel('Enviar foto'));
+    // RN-139: o clipe abre galeria ou arquivo.
+    await t.tap(find.bySemanticsLabel('Anexar'));
     await t.pumpAndSettle();
     await t.tap(find.text('Escolher da galeria'));
     await t.pumpAndSettle();
-    expect(find.bySemanticsLabel('Tirar foto'), findsOneWidget);
-    await t.tap(find.bySemanticsLabel('Tirar foto'));
+    expect(find.bySemanticsLabel(RegExp('^Foto anexada')), findsOneWidget);
+    await t.tap(find.bySemanticsLabel('Excluir anexo'));
     await t.pump();
-    expect(find.bySemanticsLabel('Tirar foto'), findsNothing);
+    expect(find.bySemanticsLabel(RegExp('^Foto anexada')), findsNothing);
   });
 
   testWidgets('Imprevisto → chamando outro → cancelar', (t) async {

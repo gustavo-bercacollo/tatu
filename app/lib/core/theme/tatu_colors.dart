@@ -44,6 +44,7 @@ class TatuColors {
   static const preferenciaSoft = Color(0xFFFCE7F3); // fundo do selo
   static const avisoEscuro = Color(0xFF1C1C1E); // aviso fixo no topo do mapa
   static const avisoEscuroTexto = Color(0xFFAEAEB2); // texto menor nele
+  static const ligacaoBotao = Color(0xFF3A3A3C); // Mudo e Viva-voz na ligação (RN-140)
 
   /// Editor de foto (tela escura).
   static const editorFundo = Color(0xFF2C2C2E);

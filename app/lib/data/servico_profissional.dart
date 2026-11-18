@@ -1,3 +1,4 @@
+import 'anexos.dart';
 import 'package:flutter/foundation.dart';
 
 /// Serviço aceito pelo profissional (endereço já revelado, valor
@@ -97,7 +98,7 @@ class ChamadoNovo {
     this.notaCliente = 4.8,
     this.estimativaMin = 80,
     this.estimativaMax = 250,
-    this.temFoto = true,
+    this.anexos = const [AnexoPedido('foto.jpg')],
     this.feminino = true,
     this.distancia = false,
   });
@@ -130,7 +131,9 @@ class ChamadoNovo {
   /// Estimativa da plataforma (região + serviço), nunca o preço final.
   final int estimativaMin;
   final int estimativaMax;
-  final bool temFoto;
+
+  /// RN-139: fotos e arquivos que o cliente anexou à descrição.
+  final List<AnexoPedido> anexos;
 }
 
 /// Chamado de exemplo para a demonstração.
@@ -152,7 +155,7 @@ const chamadoDistanciaExemplo = ChamadoNovo(
   cidade: '',
   estimativaMin: 150,
   estimativaMax: 600,
-  temFoto: false,
+  anexos: [],
   distancia: true,
 );
 

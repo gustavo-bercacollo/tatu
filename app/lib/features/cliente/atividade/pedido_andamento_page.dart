@@ -21,6 +21,8 @@ import '../chamar/procurando_page.dart';
 import '../mensagens/chat_page.dart';
 import 'na_porta_page.dart';
 import 'pedido_cancelado_page.dart';
+import '../../entrada/ligacao_page.dart';
+import '../../../data/ligacao.dart';
 
 /// Pedido em andamento: profissional, etapas, dados e "Cancelar pedido".
 /// Mostra também quando o profissional não aparece: "Ainda não saiu"
@@ -289,13 +291,20 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
                               },
                             ),
                           ),
-                          if (!p.distancia) ...[
+                          // RN-140: ligar só do valor confirmado até
+                          // o serviço ser concluído.
+                          if (!p.distancia &&
+                              RegrasLigacao.disponivel(
+                                valorConfirmado: p.etapasFeitas >= 2,
+                                concluido: p.etapasFeitas >= 5,
+                              )) ...[
                             const SizedBox(width: 8),
                             Expanded(
                               child: _BotaoContato(
                                 icone: TablerIcons.phone,
                                 texto: 'Ligar',
-                                onTap: () => emBreve('Ligar'),
+                                onTap: () =>
+                                    ligarPeloTatu(context, p.profissional),
                               ),
                             ),
                           ],

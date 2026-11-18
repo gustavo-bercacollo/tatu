@@ -36,6 +36,8 @@ import '../servico/andamento_page.dart';
 import 'enviar_valor_sheet.dart';
 import '../../../data/denuncias.dart';
 import '../../entrada/denunciar_mensagem.dart';
+import '../../entrada/ligacao_page.dart';
+import '../../../data/ligacao.dart';
 
 /// Cada lado pode propor até 3 valores.
 const maxRodadas = 3;
@@ -152,7 +154,8 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
         return FolhaOpcoes(
           fechar: 'Fechar',
           itens: [
-            item(TablerIcons.phone, 'Ligar para $_nome'),
+            // RN-140: ligar só existe durante o atendimento.
+            if (_podeLigar) item(TablerIcons.phone, 'Ligar para $_nome'),
             item(TablerIcons.file_text, 'Ver chamado'),
             item(TablerIcons.help_circle, 'Ajuda'),
             if (!_concluida || _estado != EstadoValor.inicio)
@@ -187,8 +190,26 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
           ),
         );
       default:
-        _emBreve(escolha.startsWith('Ligar') ? 'Ligar' : escolha);
+        if (escolha.startsWith('Ligar')) return _ligar();
+        _emBreve(escolha);
     }
+  }
+
+  /// RN-140: do valor combinado (confirmado pelo cliente) até concluir.
+  bool get _podeLigar => RegrasLigacao.disponivel(
+    valorConfirmado: _estado == EstadoValor.combinado,
+    concluido: false,
+    encerrado:
+        atendimentoProfissional.encerrados.containsKey(widget.chamado.cliente),
+  );
+
+  /// RN-140: o balão aparece uma vez, quando o ligar é liberado.
+  bool _dicaLigarVista = false;
+
+  void _ligar() {
+    if (!_podeLigar) return;
+    setState(() => _dicaLigarVista = true);
+    ligarPeloTatu(context, widget.chamado.cliente, profissional: true);
   }
 
   Future<void> _cancelar() async {
@@ -627,6 +648,12 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     final fim = atendimentoProfissional.encerrados[c.cliente];
     return TelaChat(
       rodapeColado: fim != null,
+      // P31 · RN-140: o ligar acabou de ser liberado.
+      sobre: _podeLigar && !_dicaLigarVista
+          ? BalaoLigarLiberado(
+              onFechar: () => setState(() => _dicaLigarVista = true),
+            )
+          : null,
       topo: fim != null
           ? const TopoContaIndisponivel(detalhe: 'Cliente')
           : Row(
@@ -667,14 +694,11 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
               ),
             ),
           ),
-          Semantics(
-            button: true,
-            label: 'Ligar',
-            child: IconButton(
-              onPressed: () => _emBreve('Ligar'),
-              icon: const Icon(TablerIcons.phone, size: 22),
-            ),
-          ),
+          // RN-140: o telefone só aparece com o valor confirmado.
+          if (_podeLigar)
+            BotaoLigar(onTap: _ligar)
+          else
+            const SizedBox(width: 48),
         ],
       ),
       mensagens: [

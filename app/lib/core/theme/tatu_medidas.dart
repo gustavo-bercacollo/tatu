@@ -30,6 +30,7 @@ class TatuMedidas {
   static const alturaBotao = 56.0;
   static const alturaCampo = 62.0;
   static const alturaBusca = 48.0;
+  static const alturaDescricao = 150.0; // caixa "O que está acontecendo?" (Home)
   static const alturaChip = 38.0;
   static const alturaChipPequeno = 34.0; // botões dentro de cartões
   static const alturaBotaoCartao = 44.0; // botão preto dentro de cartão (RN-130)
