@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 18/11/2026 (v24)
+Atualizado em 18/11/2026 (v25)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -40,6 +40,11 @@ Uma pessoa tem uma conta só, que pode ter os dois perfis: cliente e profissiona
 | RN-110 | O Tatu é só para maiores de 18 anos, cliente e profissional. Não existe conta de menor nem "permissão dos pais": o adulto pede pela conta dele, com o endereço e o cartão dele. |
 | RN-111 | No cadastro, o cliente informa nome completo e CPF. Não pedimos data de nascimento: o app descobre a idade consultando o CPF. Menor de 18 vê "O Tatu é para maiores de 18 anos" e não entra. O cartão também precisa ser de um adulto (CPF do titular). |
 | RN-112 | O profissional passa pela mesma consulta do CPF no passo 1 e vê a mesma tela de bloqueio se for menor de 18. A verificação com documento confirma a idade. |
+| RN-156 | Profissões reguladas (lista em `docs/profissoes-reguladas.md`) exigem registro no conselho ou órgão competente. Ao escolher uma delas, o profissional informa conselho, estado e número. Não pedimos foto da carteirinha. |
+| RN-157 | O Tatu confere o registro na consulta pública do conselho (até 2 dias úteis, exemplo). Até conferir, a profissão fica "Em análise" e não recebe chamados; as outras profissões dele seguem ativas. O nome do registro precisa ser o mesmo do documento da verificação. |
+| RN-158 | Registro não encontrado: o profissional vê "Não encontramos seu registro" e pode corrigir o número ou falar com o suporte. |
+| RN-159 | Registro conferido aparece no perfil para o cliente: "Registro conferido · [conselho] [número]/[UF]". |
+| RN-160 | Registro cancelado, suspenso ou vencido (ex.: CNH) pausa só aquela profissão. O Tatu confere de novo periodicamente e antes do vencimento. Profissões da seção "Fora do Tatu por enquanto" não podem ser cadastradas. |
 | RN-114 | O cadastro atende ao ECA Digital (Lei 15.211/2025, em vigor desde 17/03/2026): a idade é verificada de forma confiável, não só declarada. Revisar com advogado junto com os termos (RN-108). |
 
 ## 2. Pedido e busca
@@ -258,6 +263,7 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 - [ ] **Cartão recusado na cobrança (P-08, adiado).** Proposta: renovar a reserva sozinho em serviço longo; se a cobrança falhar, tentar de novo (ex.: 3 vezes em 3 dias) e mostrar "Pagamento pendente · Atualizar cartão" na Home; com pendência o cliente não faz pedido novo e o profissional vê "Pagamento em processamento" (o Tatu não adianta); plano fixo pausa sozinho até pagar; 7 dias sem pagar bloqueia a conta.
 - [ ] **Termos e Política · dados para publicar.** Razão social, CNPJ, endereço, e-mails de suporte e do encarregado (DPO), fornecedores (pagamento, consulta de CPF, verificação, moderação, ditado, ligação, nuvem), prazos de guarda e URL pública. Revisão por advogado antes de publicar.
 - [ ] **Entrar com Google e Apple (adiado).** Proposta: "Continuar com Google" e "Continuar com Apple" (a Apple exige a dela se houver login social), aproveitando nome, e-mail confirmado e foto; falta só CPF e aceite; celular confirmado antes do primeiro pedido; e-mail que já tem conta vincula com código, sem duplicar. Layout das telas ainda não aprovado (opções A: folha na boas-vindas, B: tela com 3 botões, C: celular com ícones).
+- [ ] **Antecedentes criminais (adiado).** Pedir certidão de antecedentes de quem cuida de criança, idoso ou pessoa com deficiência, ou de todos que vão até a casa do cliente. Atualizar a Política de Privacidade se for adotado.
 - [ ] **Ligação pelo app.** Escolher como fazer a ligação sem mostrar o número: pela internet (mais barato) ou número intermediário (custo por minuto).
 
 ## 11. Problemas mapeados
@@ -289,11 +295,13 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-21 | Gorjeta para o profissional. | Resolvido | RN-141 a RN-143 |
 | P-22 | Contrato fixo (semanal ou mensal) com um profissional, sem virar vínculo de emprego. | Resolvido | RN-144 a RN-149 |
 | P-23 | Termos de Uso e Política de Privacidade completos e sempre atualizados. | Rascunho v1.0 feito · revisão jurídica pendente | RN-150, RN-151 |
+| P-24 | Profissões que exigem registro ou documentação. | Resolvido | RN-156 a RN-160 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 18/11/2026 | RN-156 a RN-160 | Profissões reguladas: registro sem foto, conferido na consulta pública, selo no perfil. |
 | 18/11/2026 | RN-155 | Contador de mensagens não lidas na aba Mensagens e no ícone do app. |
 | 18/11/2026 | RN-150, RN-151 | Termos de Uso e Política de Privacidade em docs/, leitura no app, aceite de nova versão. |
 | 18/11/2026 | RN-144 a RN-149 | Plano fixo: "Tornar fixa", valor definido uma vez, cobrança automática no fim do período, limite de 2 visitas por semana no mesmo endereço. |

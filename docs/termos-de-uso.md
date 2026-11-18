@@ -83,7 +83,7 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 6.1. **Verificação.** Antes de receber chamados, o Profissional envia documento com foto e uma selfie. Podemos recusar o cadastro, pedir novo envio ou recusar de forma definitiva. Nome, CPF e data de nascimento vêm do documento e não podem ser alterados sem novo documento.
 
-6.2. **Profissões.** O Profissional pode ter até 3 profissões, com até 3 especialidades cada, e informa se atende no local, à distância ou dos dois jeitos. Ele declara que tem a qualificação, as licenças e os registros exigidos para cada profissão que cadastrar.
+6.2. **Profissões.** O Profissional pode ter até 3 profissões, com até 3 especialidades cada, e informa se atende no local, à distância ou dos dois jeitos. Ele declara que tem a qualificação, as licenças e os registros exigidos para cada profissão que cadastrar. Profissões reguladas (lista em `profissoes-reguladas.md`) só recebem chamados depois de o Tatu conferir o registro no conselho; algumas profissões não podem ser oferecidas no Tatu.
 
 6.3. **Perfil.** "Sobre você" (até 300 caracteres) e fotos de trabalhos (até 12, revisadas antes de aparecer) não podem ter telefone, e-mail, redes sociais, links, rosto de outras pessoas ou endereços.
 
