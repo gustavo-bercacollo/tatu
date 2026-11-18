@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/documentos_legais.dart';
 import 'package:tatu/data/consulta_cpf.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/profissional.dart';
@@ -25,6 +26,11 @@ Future<void> _tocar(WidgetTester t, String texto) async {
 }
 
 void main() {
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    // RN-150: os documentos já lidos (o cadastro registra as versões).
+    await documentosLegais.carregarTodos();
+  });
   // RN-111: consulta de CPF sem espera nos testes.
   consultaCpf = ConsultaCpfMock(demora: Duration.zero);
   CameraVerificacaoPage.cameraAoVivo = false;
@@ -106,6 +112,17 @@ void main() {
       expect(find.text('Ficou boa?'), findsOneWidget);
       await _tocar(t, 'Usar esta foto');
     }
+    // RN-150: "Antes de enviar": só envia com a caixa marcada.
+    expect(find.text('Antes de enviar'), findsOneWidget);
+    expect(
+      t.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Enviar para análise'),
+      ).onPressed,
+      isNull,
+    );
+    await t.tap(find.bySemanticsLabel(RegExp('^Li e concordo')).first);
+    await t.pump();
+    await _tocar(t, 'Enviar para análise');
     expect(profissional.fotoFrente, isNotNull);
     expect(profissional.fotoVerso, isNotNull);
     expect(profissional.selfie, isNotNull);

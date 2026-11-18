@@ -12,6 +12,7 @@ Ao abrir uma sessão nova: ler este arquivo e o `PROGRESSO.md`, e continuar de o
 1. `docs/guia-de-design.md`: princípios, cores, tipografia, medidas, tema em Dart (`TatuColors` / `tatuTheme()`), componentes, mapa de telas (C1–C13 cliente, P1–P13 profissional), regras de negócio, textos, decisões em aberto. **Ler inteiro antes de construir telas.**
 2. `design/user/` (28 telas do cliente) e `design/worker/` (32 do profissional): SVGs 393×852, numerados na ordem do fluxo. `design/index.html` mostra todas lado a lado.
 3. `docs/Manifesto-Tatu.pdf`: visão, mercado, negócio.
+4. `docs/termos-de-uso.md` e `docs/politica-de-privacidade.md`: fonte única dos textos legais; o app lê esses arquivos (nunca copiar o texto à mão para o código). Toda mudança de regra que afete cliente ou profissional atualiza os dois documentos na mesma mudança e sobe a versão (RN-150, RN-151).
 
 SVG e guia divergem → regras do guia, visual do SVG. Dúvida real → perguntar ao Gustavo.
 Figma: https://www.figma.com/design/zprQlhIOqkpKJ5esa3zean/Tatu (telas originais; as novas só existem nos SVGs).

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/documentos_legais.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/perfil.dart';
 import 'package:tatu/features/cliente/perfil_page.dart';
@@ -19,6 +20,11 @@ Future<void> _abrir(WidgetTester t) async {
 }
 
 void main() {
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    // RN-150: os documentos já lidos (o cadastro registra as versões).
+    await documentosLegais.carregarTodos();
+  });
   setUp(perfil.restaurar);
 
   testWidgets('Documentos: termos e política com link para seus dados', (
@@ -27,12 +33,18 @@ void main() {
     await _abrir(t);
     await t.tap(find.text('Termos de uso'));
     await t.pumpAndSettle();
-    expect(find.text('1. O que é o Tatu'), findsOneWidget);
+    // RN-150: lido de docs/termos-de-uso.md.
+    expect(find.text('O essencial em 1 minuto'), findsOneWidget);
     await t.tap(find.bySemanticsLabel('Voltar'));
     await t.pumpAndSettle();
 
     await t.tap(find.text('Política de privacidade'));
     await t.pumpAndSettle();
+    await t.scrollUntilVisible(
+      find.text('Ver seus dados e direitos'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     await t.tap(find.text('Ver seus dados e direitos'));
     await t.pumpAndSettle();
     expect(find.text('Baixar meus dados'), findsOneWidget);

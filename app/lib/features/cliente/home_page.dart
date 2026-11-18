@@ -35,6 +35,8 @@ import 'foto/camera_desativada_page.dart';
 import 'outros/outros_servicos_sheet.dart';
 import 'endereco/onde_sheet.dart';
 import 'perfil_page.dart';
+import '../../data/aceites.dart';
+import '../entrada/documentos_legais_page.dart';
 
 /// Home do cliente: descreve o problema, escolhe (ou a IA marca) o serviço e chama.
 class HomeClientePage extends StatefulWidget {
@@ -97,6 +99,10 @@ class _HomeClientePageState extends State<HomeClientePage> {
     super.initState();
     _focoDescricao.addListener(() => setState(() {}));
     conta.addListener(_contaMudou);
+    // RN-151: versão nova dos documentos bloqueia até aceitar.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) verificarDocumentos(context, tipo: TipoAceite.cliente);
+    });
   }
 
   void _contaMudou() {

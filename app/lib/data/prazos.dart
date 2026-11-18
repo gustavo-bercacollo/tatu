@@ -26,6 +26,9 @@ abstract final class Prazos {
   static const ausenciasParaPausar = 3;
   static const janelaAusencias = Duration(days: 30);
 
+  /// RN-35: retenção antes do repasse ao profissional (Pix em 24 horas).
+  static const repasse = Duration(hours: 24);
+
   /// Protótipo: os relógios andam [aceleracao] vezes mais rápido, para a
   /// demo não esperar 10 minutos de verdade (1 s real = 20 s no app).
   /// Nos testes fica 1 (tempo real, controlado pelo teste).

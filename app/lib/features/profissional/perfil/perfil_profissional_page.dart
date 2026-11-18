@@ -32,6 +32,7 @@ import 'preferencias_atendimento_page.dart';
 import 'previa_page.dart';
 import 'regiao_page.dart';
 import 'sobre_page.dart';
+import '../../cliente/privacidade/privacidade_page.dart';
 
 /// P31 · Perfil do profissional.
 class PerfilProfissionalPage extends StatelessWidget {
@@ -302,7 +303,11 @@ class PerfilProfissionalPage extends StatelessWidget {
                           icone: TablerIcons.shield_lock,
                           texto: 'Privacidade e termos',
                           onTap: () =>
-                              _emBreve(context, 'Privacidade e termos'),
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const PrivacidadePage(),
+                                ),
+                              ),
                         ),
                       ],
                     ),

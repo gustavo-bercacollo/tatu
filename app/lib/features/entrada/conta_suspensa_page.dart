@@ -4,11 +4,11 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_theme.dart';
 import '../../data/ajuda.dart';
-import '../../data/documentos.dart';
 import '../../data/suspender_conta.dart';
 import '../../shared/widgets/tela_permissao.dart';
 import '../cliente/ajuda/abrir_ajuda.dart';
-import '../cliente/privacidade/documento_page.dart';
+import '../../data/documentos_legais.dart';
+import 'documentos_legais_page.dart';
 
 /// C162/P59 · Conta suspensa (RN-122, RN-129): não diz o motivo. Vale
 /// para os dois modos. É a única tela que a conta suspensa vê.
@@ -34,7 +34,7 @@ class ContaSuspensaPage extends StatelessWidget {
       estiloPrincipal: tatuBotaoSecundario(),
       onPrincipal: () => Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => const DocumentoPage(documento: termosDeUso),
+          builder: (_) => const DocumentoLegalPage(tipo: TipoDocumento.termos),
         ),
       ),
       alternativa: 'Falar com o suporte',

@@ -13,6 +13,7 @@ import '../../../shared/widgets/nota_icone.dart';
 import '../../../data/seguranca.dart';
 import '../../cliente/verificar_identidade_page.dart';
 import 'resultado_page.dart';
+import 'aceite_page.dart';
 
 /// P12 · Passo 4: o que vai ser pedido na verificação.
 class VerificacaoIntroPage extends StatelessWidget {
@@ -207,27 +208,38 @@ class _CameraVerificacaoPageState extends State<CameraVerificacaoPage> {
       case EtapaFoto.selfie:
         profissional.selfie = foto;
     }
-    if (widget.refazendo || _selfie) {
-      profissional.enviarVerificacao();
-      // RN-115/RN-116: cadastro concluído: o canal do Tatu dá as
-      // boas-vindas (só na primeira vez).
-      if (!widget.refazendo) {
-        canalTatu.profissional.comecar(
-          boasVindasProfissional(profissional.primeiroNome),
-        );
-      }
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const EmAnalisePage()),
-        (r) => r.isFirst,
+    if (_selfie && !widget.refazendo) {
+      // RN-150: aceite ativo antes de enviar para análise.
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => AceiteProfissionalPage(onEnviar: _enviarAnalise),
+        ),
       );
       return;
     }
+    if (widget.refazendo) return _enviarAnalise();
     // Próxima foto na mesma tela, com a câmera já ligada.
     setState(() {
       _foto = null;
       _etapa = _etapa == EtapaFoto.frente ? EtapaFoto.verso : EtapaFoto.selfie;
     });
     if (_selfie) _ligarCamera();
+  }
+
+  /// Envia para análise e abre "Em análise".
+  void _enviarAnalise() {
+    profissional.enviarVerificacao();
+    // RN-115/RN-116: cadastro concluído: o canal do Tatu dá as
+    // boas-vindas (só na primeira vez).
+    if (!widget.refazendo) {
+      canalTatu.profissional.comecar(
+        boasVindasProfissional(profissional.primeiroNome),
+      );
+    }
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const EmAnalisePage()),
+      (r) => r.isFirst,
+    );
   }
 
   String get _topo => switch (_etapa) {

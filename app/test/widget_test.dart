@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:tatu/data/documentos_legais.dart';
 import 'package:tatu/data/consulta_cpf.dart';
 import 'package:tatu/main.dart';
 
 void main() {
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    // RN-150: os documentos já lidos (o cadastro registra as versões).
+    await documentosLegais.carregarTodos();
+  });
   // RN-111: consulta de CPF sem espera nos testes.
   consultaCpf = ConsultaCpfMock(demora: Duration.zero);
   testWidgets('Boas-vindas mostra as duas opções e o Entrar', (tester) async {
@@ -109,6 +115,12 @@ void main() {
     expect(botao().onPressed, isNull); // falta o sobrenome
 
     await tester.enterText(find.byType(TextField).first, 'Ana Martins');
+    await tester.pump();
+    // RN-150: sem marcar a caixa de aceite, não avança.
+    expect(botao().onPressed, isNull);
+    await tester.ensureVisible(find.bySemanticsLabel(RegExp('^Li e concordo')).first);
+    await tester.pump();
+    await tester.tap(find.bySemanticsLabel(RegExp('^Li e concordo')).first);
     await tester.pump();
     expect(botao().onPressed, isNotNull);
 

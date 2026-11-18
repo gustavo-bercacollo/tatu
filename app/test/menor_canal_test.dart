@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/documentos_legais.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/canal_tatu.dart';
 import 'package:tatu/data/consulta_cpf.dart';
@@ -40,6 +41,11 @@ const _cpfMenor = '52998224725';
 const _cpfAdulto = '12345678909';
 
 void main() {
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    // RN-150: os documentos já lidos (o cadastro registra as versões).
+    await documentosLegais.carregarTodos();
+  });
   setUpAll(_carregarInter);
   setUp(() {
     consultaCpf = ConsultaCpfMock(demora: Duration.zero);
@@ -87,6 +93,8 @@ void main() {
     await t.enterText(find.byType(TextField).first, 'Pedro Martins');
     await t.enterText(find.byType(TextField).last, _cpfMenor);
     await t.pump();
+    await t.tap(find.bySemanticsLabel(RegExp('^Li e concordo')).first);
+    await t.pump();
     await t.tap(find.text('Continuar'));
     await t.pumpAndSettle();
     expect(find.byType(MenorDeIdadePage), findsOneWidget);
@@ -101,6 +109,8 @@ void main() {
     await _abrir(t, const DadosClientePage());
     await t.enterText(find.byType(TextField).first, 'Bia Souza');
     await t.enterText(find.byType(TextField).last, _cpfAdulto);
+    await t.pump();
+    await t.tap(find.bySemanticsLabel(RegExp('^Li e concordo')).first);
     await t.pump();
     await t.tap(find.text('Continuar'));
     await t.pumpAndSettle();

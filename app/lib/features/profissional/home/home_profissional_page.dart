@@ -27,6 +27,8 @@ import '../abas.dart';
 import '../cadastro/pix_page.dart';
 import '../perfil/perfil_profissional_page.dart';
 import '../chamado/novo_chamado_page.dart';
+import '../../../data/aceites.dart';
+import '../../entrada/documentos_legais_page.dart';
 
 /// P19–P21 · Home do profissional: mapa e painel offline/online.
 /// O app sempre abre offline. Na primeira vez, mostra a dica do botão.
@@ -52,6 +54,10 @@ class _HomeProfissionalPageState extends State<HomeProfissionalPage> {
     super.initState();
     profissional.addListener(_mudou);
     _mudou();
+    // RN-151: versão nova dos documentos bloqueia até aceitar.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) verificarDocumentos(context, tipo: TipoAceite.profissional);
+    });
   }
 
   @override

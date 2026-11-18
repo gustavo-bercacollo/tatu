@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'core/som/som.dart';
 import 'core/theme/tatu_theme.dart';
 import 'features/entrada/boas_vindas_page.dart';
+import 'data/documentos_legais.dart';
 
 void main() {
+  // RN-150/RN-151: Termos e Política vêm dos .md de docs/.
+  documentosLegais.carregarTodos();
   runApp(const TatuApp());
 }
 

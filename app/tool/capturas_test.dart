@@ -3,6 +3,10 @@
 //   flutter test tool/capturas_test.dart --update-goldens
 import 'dart:io';
 
+import 'package:tatu/features/profissional/cadastro/aceite_page.dart';
+import 'package:tatu/features/entrada/documentos_legais_page.dart';
+import 'package:tatu/data/documentos_legais.dart';
+import 'package:tatu/data/aceites.dart';
 import 'package:tatu/features/profissional/plano_fixo/plano_fixo_profissional.dart';
 import 'package:tatu/features/cliente/plano_fixo/plano_fixo.dart';
 import 'package:tatu/data/plano_fixo.dart';
@@ -89,9 +93,7 @@ import 'package:tatu/features/cliente/preferencias_cliente_page.dart';
 import 'package:tatu/features/cliente/verificar_identidade_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_cancelado_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_concluido_page.dart';
-import 'package:tatu/data/documentos.dart';
 import 'package:tatu/features/cliente/privacidade/baixar_dados_page.dart';
-import 'package:tatu/features/cliente/privacidade/documento_page.dart';
 import 'package:tatu/features/cliente/privacidade/permissoes_page.dart';
 import 'package:tatu/features/cliente/privacidade/privacidade_page.dart';
 import 'package:tatu/features/cliente/privacidade/seus_dados_page.dart';
@@ -208,6 +210,9 @@ Future<void> _capturar(
 }
 
 void main() {
+  setUpAll(() async {
+    await documentosLegais.carregarTodos();
+  });
   consultaCpf = ConsultaCpfMock(demora: Duration.zero);
   ProtecaoTela.ativa = false;
   ToqueChamado.ativo = false;
@@ -696,23 +701,54 @@ void main() {
     await _capturar(t, 'privacidade', const PrivacidadePage());
   });
 
+  // RN-150: Termos de uso lidos de docs/termos-de-uso.md (C71).
   testWidgets('termos-de-uso', (t) async {
     await _capturar(
       t,
       'termos-de-uso',
-      const DocumentoPage(documento: termosDeUso),
+      const DocumentoLegalPage(tipo: TipoDocumento.termos),
     );
   });
 
+  // RN-150: uma seção, com anterior e próxima (C72).
+  testWidgets('termos-secao', (t) async {
+    final d = documentosLegais.termos!;
+    await _capturar(
+      t,
+      'termos-secao',
+      SecaoDocumentoPage(
+        documento: d,
+        indice: d.secoes.indexWhere((s) => s.numero == '8'),
+      ),
+    );
+  });
+
+  // RN-150: Política de privacidade lida de docs/ (C73).
   testWidgets('politica-privacidade', (t) async {
     await _capturar(
       t,
       'politica-privacidade',
-      const DocumentoPage(
-        documento: politicaDePrivacidade,
-        linkSeusDados: true,
-      ),
+      DocumentoLegalPage(tipo: TipoDocumento.politica, onSeusDados: () {}),
     );
+  });
+
+  // RN-151: versão nova bloqueia até aceitar (C74). Demonstração: uma
+  // versão 1.1 dos Termos, já vigente.
+  testWidgets('termos-atualizados-aceite', (t) async {
+    final atual = documentosLegais.termos!;
+    documentosLegais.definir(versaoNovaDemo(atual));
+    await _capturar(
+      t,
+      'termos-atualizados-aceite',
+      TermosAtualizadosPage(
+        documento: documentosLegais.termos!,
+        tipo: TipoAceite.cliente,
+      ),
+      preparar: () async {
+        await t.pumpAndSettle();
+      },
+    );
+    documentosLegais.definir(atual);
   });
 
   testWidgets('permissoes', (t) async {
@@ -1799,11 +1835,43 @@ void main() {
         await t.enterText(find.byType(TextField).first, 'Ana Martins');
         await t.enterText(find.byType(TextField).last, '12345678909');
         await t.pump();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.pump();
       },
     );
   });
 
-  // RN-110: menor de 18 não entra (C10).
+  // RN-150: caixa de aceite marcada; "Continuar" liberado (C10).
+  testWidgets('cadastro-dados-aceite', (t) async {
+    await _capturar(
+      t,
+      'cadastro-dados-aceite',
+      const DadosClientePage(),
+      preparar: () async {
+        await t.enterText(find.byType(TextField).first, 'Ana Martins');
+        await t.enterText(find.byType(TextField).last, '12345678909');
+        await t.pump();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.tap(find.bySemanticsLabel(RegExp('^Li e concordo')).first);
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-150: "Antes de enviar", com a caixa marcada (P15).
+  testWidgets('pro-passo4-aceite', (t) async {
+    await _capturar(
+      t,
+      'pro-passo4-aceite',
+      AceiteProfissionalPage(onEnviar: () {}),
+      preparar: () async {
+        await t.tap(find.bySemanticsLabel(RegExp('^Li e concordo')).first);
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-110: menor de 18 não entra (C11).
   testWidgets('cadastro-menor-de-idade', (t) async {
     await _capturar(t, 'cadastro-menor-de-idade', const MenorDeIdadePage());
   });

@@ -107,16 +107,7 @@ class BoasVindasPage extends StatelessWidget {
               color: TatuColors.textSecondary,
             ),
           ),
-          const SizedBox(height: 14),
-          const Text(
-            'Ao continuar, você aceita os Termos de Uso e a Política de Privacidade.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              height: 16 / 12,
-              color: TatuColors.textSecondary,
-            ),
-          ),
+          // RN-150: o aceite é ativo, na tela "Seus dados".
           const SizedBox(height: 36),
         ],
       ),

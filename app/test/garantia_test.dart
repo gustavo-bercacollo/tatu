@@ -2,16 +2,23 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/data/ajuda.dart';
-import 'package:tatu/data/documentos.dart';
+import 'package:tatu/data/documentos_legais.dart';
 
 /// Garantia do Tatu de 24 horas (RN-45, RN-107, RN-108).
 void main() {
   test('RN-108: termos dizem que o Tatu intermedia e a garantia é de 24 h', () {
-    final texto = termosDeUso.secoes.map((s) => '${s.$1} ${s.$2}').join(' ');
-    expect(texto, contains('O Tatu intermedia'));
-    expect(texto, contains('A garantia do Tatu é de 24 horas'));
-    expect(texto, contains('garantia legal do serviço é do profissional'));
-    expect(texto, contains('Código de Defesa do Consumidor'));
+    // RN-150: o texto vem de docs/termos-de-uso.md.
+    final d = DocumentoLegal.ler(
+      TipoDocumento.termos,
+      File('../docs/termos-de-uso.md').readAsStringSync(),
+    );
+    final texto = [
+      ...d.essencial,
+      for (final s in d.secoes) '${s.titulo} ${s.corpo}',
+    ].join(' ').replaceAll('**', '');
+    expect(texto, contains('plataforma de intermediação'));
+    expect(texto, contains('24 horas'));
+    expect(texto, contains('garantia legal do serviço, que é do profissional'));
   });
 
   test('RN-107: depois de 24 h, chama o profissional pelo mesmo chat', () {
