@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -207,15 +209,44 @@ class BotaoLigar extends StatelessWidget {
 }
 
 /// C104/P31 · RN-140: balão preto apontando para o telefone, quando o
-/// valor é confirmado. Toque fecha.
-class BalaoLigarLiberado extends StatelessWidget {
+/// valor é confirmado. Some sozinho em [duracao] ou com um toque.
+class BalaoLigarLiberado extends StatefulWidget {
   const BalaoLigarLiberado({super.key, required this.onFechar});
+
+  /// Quanto tempo o balão fica na tela.
+  static const duracao = Duration(seconds: 2);
 
   final VoidCallback onFechar;
 
   @override
+  State<BalaoLigarLiberado> createState() => _BalaoLigarLiberadoState();
+}
+
+class _BalaoLigarLiberadoState extends State<BalaoLigarLiberado> {
+  late final Timer _tempo;
+  var _fechado = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tempo = Timer(BalaoLigarLiberado.duracao, _fechar);
+  }
+
+  @override
+  void dispose() {
+    _tempo.cancel();
+    super.dispose();
+  }
+
+  void _fechar() {
+    if (_fechado || !mounted) return;
+    _fechado = true;
+    widget.onFechar();
+  }
+
+  @override
   Widget build(BuildContext context) => GestureDetector(
-    onTap: onFechar,
+    onTap: _fechar,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
