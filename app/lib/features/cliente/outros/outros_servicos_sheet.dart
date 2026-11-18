@@ -11,6 +11,10 @@ import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/lista_agrupada.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import '../../../shared/widgets/tatu_chip.dart';
+import '../../../data/profissional.dart';
+import '../../../data/sugestoes_profissao.dart';
+import '../../../shared/widgets/botao_tracejado.dart';
+import '../../../shared/widgets/tatu_field.dart';
 
 /// Folha "Outros serviços": lista por grupos, busca e "Não sei qual
 /// serviço". Devolve o nome escolhido ou [naoSeiServico].
@@ -132,15 +136,17 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
             ),
             children: [
               if (!widget.distancia) ...[
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
                     16,
                     0,
                     16,
                     TatuMedidas.tituloSecao,
                   ),
                   child: Text(
-                    'MAIS PEDIDOS PERTO DE VOCÊ',
+                    widget.profissional
+                        ? 'MAIS PROCURADAS'
+                        : 'MAIS PEDIDOS PERTO DE VOCÊ',
                     style: TatuTexto.secao,
                   ),
                 ),
@@ -148,18 +154,31 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    for (final s in maisPedidos)
+                    for (final s in widget.profissional
+                        ? maisProcuradas
+                        : maisPedidos)
                       TatuChip(label: s, onTap: () => _escolher(s)),
                   ],
                 ),
               ],
+              // RN-161: segmentos de docs/catalogo-de-servicos.md.
               for (final (titulo, lista) in [
-                if (!widget.distancia) ...gruposServicos,
-                if (widget.distancia || widget.profissional) grupoDistancia,
-                // RN-156: profissões com registro (conferido pelo Tatu).
-                if (widget.profissional)
-                  ('Com registro profissional', servicosRegulados),
-              ]) ...[
+                if (widget.profissional) ...[
+                  ...gruposProfissoes,
+                  // RN-156: reguladas que não estão no catálogo.
+                  ('Com registro profissional', [
+                    for (final s in servicosRegulados)
+                      if (!gruposProfissoes.any(
+                        (g) => g.$2.any((x) => x.nome == s.nome),
+                      ))
+                        s,
+                  ]),
+                ] else ...[
+                  if (!widget.distancia) ...gruposServicos,
+                  if (widget.distancia) grupoDistancia,
+                ],
+              ])
+                if (lista.isNotEmpty) ...[
                 const SizedBox(height: TatuMedidas.entreSecoes),
                 GrupoLista(
                   titulo: titulo,
@@ -178,14 +197,22 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
             ],
           ),
         ),
-        if (!widget.profissional) ...[
-          const Divider(height: 1),
-          const SizedBox(height: TatuMedidas.entreItens + 4),
+        const Divider(height: 1),
+        const SizedBox(height: TatuMedidas.entreItens + 4),
+        if (widget.profissional)
+          _NaoAchei(onTap: _sugerir)
+        else
           _NaoSei(onTap: () => _escolher(naoSeiServico)),
-          const SizedBox(height: TatuMedidas.base),
-        ],
+        const SizedBox(height: TatuMedidas.base),
       ],
     );
+  }
+
+  /// RN-162: "Não achei a minha": sugere a profissão ao Tatu.
+  Future<void> _sugerir() async {
+    final nome = await sugerirProfissao(context, inicial: _busca.text.trim());
+    if (nome == null || !mounted) return;
+    Navigator.of(context).pop();
   }
 
   Widget _resultados(List<ServicoCatalogo> achados) {
@@ -206,10 +233,11 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
               ),
           ],
         ),
-        if (!widget.profissional) ...[
-          const SizedBox(height: TatuMedidas.entreSecoes),
+        const SizedBox(height: TatuMedidas.entreSecoes),
+        if (widget.profissional)
+          _NaoAchei(onTap: _sugerir)
+        else
           _NaoSei(onTap: () => _escolher(naoSeiServico)),
-        ],
       ],
     );
   }
@@ -258,11 +286,13 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
             widget.profissional
                 ? 'Sugerir essa profissão ao Tatu'
                 : 'Sugerir esse serviço ao Tatu',
-            onTap: () => mostrarAvisoTopo(
-              context,
-              titulo: 'Sugestão enviada',
-              texto: 'Obrigado! Vamos avaliar esse serviço.',
-            ),
+            onTap: widget.profissional
+                ? _sugerir
+                : () => mostrarAvisoTopo(
+                    context,
+                    titulo: 'Sugestão enviada',
+                    texto: 'Obrigado! Vamos avaliar esse serviço.',
+                  ),
           ),
         ),
       ],
@@ -308,6 +338,114 @@ class _NaoSei extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// RN-162: rodapé "Não achei a minha · Sugerir uma profissão ao Tatu".
+class _NaoAchei extends StatelessWidget {
+  const _NaoAchei({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => BotaoTracejado(
+    texto: 'Não achei a minha',
+    detalhe: 'Sugerir uma profissão ao Tatu',
+    onTap: onTap,
+  );
+}
+
+/// C13 · RN-162: "Sugerir profissão": o nome vai para a fila do suporte e
+/// fica em análise no perfil do profissional. Devolve o nome enviado.
+Future<String?> sugerirProfissao(BuildContext context, {String inicial = ''}) =>
+    mostrarFolha<String>(
+      context,
+      builder: (_) => _FolhaSugerir(inicial: inicial),
+    );
+
+class _FolhaSugerir extends StatefulWidget {
+  const _FolhaSugerir({this.inicial = ''});
+
+  final String inicial;
+
+  @override
+  State<_FolhaSugerir> createState() => _FolhaSugerirState();
+}
+
+class _FolhaSugerirState extends State<_FolhaSugerir> {
+  late final _nome = TextEditingController(text: widget.inicial);
+
+  @override
+  void dispose() {
+    _nome.dispose();
+    super.dispose();
+  }
+
+  void _enviar() {
+    final s = sugestoesProfissao.sugerir(
+      _nome.text,
+      profissional: profissional.nome,
+    );
+    if (s == null) return;
+    Navigator.of(context).pop(s.nome);
+    mostrarAvisoTopo(
+      context,
+      titulo: 'Sugestão enviada',
+      texto: '${s.nome} fica em análise.',
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ok = _nome.text.trim().length >= RegrasSugestao.minimoLetras;
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            TatuMedidas.margemCadastro,
+            10,
+            TatuMedidas.margemCadastro,
+            TatuMedidas.base,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const AlcaFolha(),
+              const SizedBox(height: 22),
+              const Text('Sugerir profissão', style: TatuTexto.tituloFolha),
+              const SizedBox(height: 4),
+              const Text(
+                'Analisamos e colocamos no Tatu.',
+                style: TatuTexto.nota,
+              ),
+              const SizedBox(height: TatuMedidas.entreItens + 4),
+              TatuField(
+                label: 'Nome da profissão',
+                controller: _nome,
+                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
+                onChanged: (_) => setState(() {}),
+                onSubmitted: (_) => _enviar(),
+              ),
+              const SizedBox(height: TatuMedidas.entreItens + 4),
+              const Text(
+                // RN-162.
+                'Fica em análise por até ${RegrasSugestao.diasUteis} dias úteis.',
+                style: TatuTexto.nota,
+              ),
+              const SizedBox(height: TatuMedidas.entreItens + 4),
+              FilledButton(
+                onPressed: ok ? _enviar : null,
+                child: const Text('Enviar sugestão'),
               ),
             ],
           ),

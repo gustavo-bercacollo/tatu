@@ -3,13 +3,22 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
+import '../../core/theme/tatu_texto.dart';
 
 /// Botão com contorno tracejado para "adicionar" (ex.: Adicionar endereço).
 class BotaoTracejado extends StatelessWidget {
-  const BotaoTracejado({super.key, required this.texto, required this.onTap});
+  const BotaoTracejado({
+    super.key,
+    required this.texto,
+    required this.onTap,
+    this.detalhe,
+  });
 
   final String texto;
   final VoidCallback onTap;
+
+  /// Linha cinza embaixo (com ela, o cartão ganha fundo cinza).
+  final String? detalhe;
 
   @override
   Widget build(BuildContext context) {
@@ -20,22 +29,41 @@ class BotaoTracejado extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         child: CustomPaint(
           painter: const _Tracejado(),
-          child: SizedBox(
-            height: TatuMedidas.alturaBotao,
+          child: Container(
+            constraints: const BoxConstraints(
+              minHeight: TatuMedidas.alturaBotao,
+            ),
+            decoration: detalhe == null
+                ? null
+                : BoxDecoration(
+                    color: TatuColors.fill,
+                    borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
+                  ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: detalhe == null ? 0 : 14,
+              ),
               child: Row(
                 children: [
                   const Icon(TablerIcons.plus, size: 22),
                   const SizedBox(width: 14),
                   Flexible(
-                    child: Text(
-                      texto,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          texto,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (detalhe != null)
+                          Text(detalhe!, style: TatuTexto.nota),
+                      ],
                     ),
                   ),
                 ],

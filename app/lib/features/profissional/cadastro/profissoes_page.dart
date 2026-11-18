@@ -7,6 +7,7 @@ import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/profissional.dart';
 import '../../../data/servicos.dart';
+import '../../../data/sugestoes_profissao.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
@@ -35,9 +36,10 @@ class ProfissoesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: profissional,
+      listenable: Listenable.merge([profissional, sugestoesProfissao]),
       builder: (context, _) {
         final lista = profissional.profissoes;
+        final sugestoes = sugestoesProfissao.de(profissional.nome);
         final completas = lista.every((p) => p.especialidades.isNotEmpty);
         return CadastroScaffold(
           passo: doPerfil ? null : 2,
@@ -72,6 +74,42 @@ class ProfissoesPage extends StatelessWidget {
                 'Conferimos em até ${RegrasRegistro.diasUteisConferencia} '
                 'dias úteis.',
                 style: TatuTexto.nota,
+              ),
+              const SizedBox(height: TatuMedidas.entreItens + 4),
+            ],
+            // RN-162: profissões sugeridas ao Tatu ficam em análise aqui.
+            if (sugestoes.isNotEmpty) ...[
+              GrupoCartao(
+                titulo: 'Sugestões',
+                nota:
+                    'Analisamos em até ${RegrasSugestao.diasUteis} dias úteis.',
+                linhas: [
+                  for (final s in sugestoes)
+                    SizedBox(
+                      height: TatuMedidas.alturaLinha,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                s.nome,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            const EtiquetaCinza(
+                              icone: TablerIcons.clock,
+                              texto: 'Em análise',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(height: TatuMedidas.entreItens + 4),
             ],

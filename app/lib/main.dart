@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'core/som/som.dart';
 import 'core/theme/tatu_theme.dart';
 import 'features/entrada/boas_vindas_page.dart';
+import 'data/catalogo_servicos.dart';
 import 'data/documentos_legais.dart';
 import 'data/profissoes_reguladas.dart';
 
@@ -13,6 +14,7 @@ void main() {
   documentosLegais.carregarTodos().ignore();
   // RN-156: lista de profissões reguladas de docs/.
   profissoesReguladas.carregar().ignore();
+  catalogoServicos.carregar().ignore();
   runApp(const TatuApp());
 }
 

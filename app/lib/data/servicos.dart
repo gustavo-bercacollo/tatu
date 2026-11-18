@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'catalogo_servicos.dart';
 import 'profissoes_reguladas.dart';
 
 /// Serviço do catálogo "Outros serviços".
@@ -25,157 +26,63 @@ class ServicoCatalogo {
 /// Escolha "Não sei qual serviço": a gente descobre pela descrição.
 const naoSeiServico = 'Não sei';
 
-const _chaveiro = ServicoCatalogo(
-  'Chaveiro',
-  TablerIcons.key,
-  detalhe: 'Fechaduras e cópias de chave',
-  palavras: ['chave', 'fechadura', 'tranca'],
-);
-const _vidraceiro = ServicoCatalogo(
-  'Vidraceiro',
-  TablerIcons.photo,
-  detalhe: 'Vidros, janelas e box',
-  palavras: ['vidro', 'janela', 'box', 'espelho'],
+/// Ícone por segmento do catálogo (os principais têm ícone próprio em
+/// [iconeServico]).
+IconData _iconeSegmento(String segmento) {
+  final t = segmento.toLowerCase();
+  if (t.contains('casa')) return TablerIcons.home;
+  if (t.contains('limpeza')) return TablerIcons.sparkles;
+  if (t.contains('mudan')) return TablerIcons.truck;
+  if (t.contains('beleza')) return TablerIcons.scissors;
+  if (t.contains('pessoas') || t.contains('pets')) return TablerIcons.heart;
+  if (t.contains('aulas')) return TablerIcons.school;
+  if (t.contains('tecnologia')) return TablerIcons.device_laptop;
+  if (t.contains('eventos')) return TablerIcons.confetti;
+  return TablerIcons.briefcase;
+}
+
+/// RN-161: uma profissão do catálogo como item da lista.
+ServicoCatalogo _item(ProfissaoCatalogo p, {String? detalhe}) => ServicoCatalogo(
+  p.nome,
+  _iconeDe(p.nome) ?? _iconeSegmento(p.segmento),
+  detalhe: detalhe ?? p.especialidades.take(3).join(', '),
+  palavras: p.sinonimos,
 );
 
-/// Grupos da lista "Outros serviços".
-const gruposServicos = <(String, List<ServicoCatalogo>)>[
-  (
-    'Casa e reparos',
-    [
-      _chaveiro,
-      ServicoCatalogo(
-        'Marceneiro',
-        TablerIcons.tool,
-        detalhe: 'Móveis sob medida e reparos',
-        palavras: ['madeira', 'movel', 'porta'],
+/// RN-161: segmentos do "Outros" (cliente no local e profissional), lidos
+/// de `docs/catalogo-de-servicos.md`.
+List<(String, List<ServicoCatalogo>)> get gruposServicos => [
+  for (final (nome, lista) in catalogoServicos.segmentos)
+    if (lista.any((p) => p.local))
+      (
+        nome,
+        [
+          for (final p in lista)
+            if (p.local) _item(p),
+        ],
       ),
-      _vidraceiro,
-      ServicoCatalogo(
-        'Serralheiro',
-        TablerIcons.tool,
-        detalhe: 'Portões, grades e solda',
-        palavras: ['portao', 'grade', 'solda'],
-      ),
-      ServicoCatalogo(
-        'Gesseiro',
-        TablerIcons.brush,
-        detalhe: 'Forro, sanca e drywall',
-        palavras: ['gesso', 'forro', 'drywall'],
-      ),
-    ],
-  ),
-  (
-    'Aparelhos e clima',
-    [
-      ServicoCatalogo(
-        'Ar-condicionado',
-        TablerIcons.snowflake,
-        detalhe: 'Instalação, limpeza e conserto',
-        palavras: ['ar condicionado', 'split'],
-      ),
-      ServicoCatalogo(
-        'Técnico de TV',
-        TablerIcons.device_tv,
-        detalhe: 'TV, som e antena',
-        palavras: ['televisao', 'antena'],
-      ),
-      ServicoCatalogo(
-        'Eletrodomésticos',
-        TablerIcons.bolt,
-        detalhe: 'Geladeira, máquina e fogão',
-        palavras: ['geladeira', 'maquina de lavar', 'fogao', 'microondas'],
-      ),
-    ],
-  ),
 ];
 
-/// RN-92: outros serviços à distância (lista "Outros" no modo à distância;
-/// profissões à distância do lançamento ainda são decisão em aberto).
-const grupoDistancia = (
+/// Pedido à distância: as profissões que atendem à distância.
+(String, List<ServicoCatalogo>) get grupoDistancia => (
   'À distância',
   [
-    ServicoCatalogo(
-      'Designer',
-      TablerIcons.palette,
-      detalhe: 'Logos, artes e identidade visual',
-      palavras: ['logo', 'arte'],
-    ),
-    ServicoCatalogo(
-      'Programador',
-      TablerIcons.code,
-      detalhe: 'Sites, apps e planilhas',
-      palavras: ['site', 'app', 'sistema'],
-    ),
-    ServicoCatalogo(
-      'Professor',
-      TablerIcons.school,
-      detalhe: 'Aulas e reforço online',
-      palavras: ['aula', 'reforco'],
-    ),
-    ServicoCatalogo(
-      'Contador',
-      TablerIcons.calculator,
-      detalhe: 'Impostos, MEI e declarações',
-      palavras: ['imposto', 'mei'],
-    ),
-    ServicoCatalogo(
-      'Advogado',
-      TablerIcons.scale,
-      detalhe: 'Contratos e orientação',
-      palavras: ['contrato', 'processo'],
-    ),
-    ServicoCatalogo(
-      'Tradutor',
-      TablerIcons.language,
-      detalhe: 'Textos e documentos',
-      palavras: ['traducao', 'traduzir'],
-    ),
-    ServicoCatalogo(
-      'Redator',
-      TablerIcons.pencil,
-      detalhe: 'Textos para site e redes',
-      palavras: ['texto', 'redacao'],
-    ),
-    ServicoCatalogo(
-      'Editor de vídeo',
-      TablerIcons.movie,
-      detalhe: 'Cortes, legendas e vinhetas',
-      palavras: ['video', 'edicao'],
-    ),
-    ServicoCatalogo(
-      'Social media',
-      TablerIcons.speakerphone,
-      detalhe: 'Posts e anúncios',
-      palavras: ['instagram', 'redes sociais', 'post'],
-    ),
+    for (final p in catalogoServicos.todas)
+      if (p.remoto) _item(p),
   ],
 );
+
+/// RN-161: no cadastro, todos os segmentos (no local e à distância).
+List<(String, List<ServicoCatalogo>)> get gruposProfissoes => [
+  for (final (nome, lista) in catalogoServicos.segmentos)
+    (nome, [for (final p in lista) _item(p)]),
+];
 
 /// Atalhos "Mais pedidos perto de você".
 const maisPedidos = ['Chaveiro', 'Limpeza', 'Vidraceiro'];
 
-/// Só aparecem na busca (e nos atalhos).
-const _soNaBusca = [
-  ServicoCatalogo(
-    'Desentupidora',
-    TablerIcons.droplet,
-    detalhe: 'Pia, ralo, vaso e esgoto',
-    palavras: ['desentup', 'entup', 'ralo', 'esgoto', 'vaso'],
-  ),
-  ServicoCatalogo(
-    'Encanador',
-    TablerIcons.droplet,
-    detalhe: 'Também resolve entupimento',
-    palavras: ['desentup', 'entup', 'cano', 'vazamento'],
-  ),
-  ServicoCatalogo(
-    'Limpeza',
-    TablerIcons.sparkles,
-    detalhe: 'Faxina e limpeza pós-obra',
-    palavras: ['faxina', 'diarista'],
-  ),
-];
+/// Atalhos "Mais procuradas" no cadastro do profissional (C11).
+const maisProcuradas = ['Diarista', 'Faz-tudo', 'Vidraceiro'];
 
 String _simples(String s) {
   const de = 'áàâãäéèêëíìîïóòôõöúùûüç';
@@ -199,49 +106,79 @@ List<ServicoCatalogo> get servicosRegulados => [
     ),
 ];
 
-/// Busca por nome ou palavra (sem diferenciar acentos e maiúsculas).
-/// Com [profissional], inclui as profissões reguladas (RN-156) e nunca
-/// mostra as "fora do Tatu" (RN-160).
+/// RN-161: busca por nome e sinônimos, sem acento e sem diferenciar
+/// maiúsculas. Achou pelo sinônimo: "Também chamado de …". Com
+/// [profissional], inclui as profissões reguladas (RN-156) e nunca mostra
+/// as "fora do Tatu" (RN-160).
 List<ServicoCatalogo> buscarServicos(String termo, {bool profissional = false}) {
   final t = _simples(termo.trim());
   if (t.isEmpty) return const [];
-  final todos = [
-    for (final (_, lista) in gruposServicos) ...lista,
-    ..._soNaBusca,
-    if (profissional) ...servicosRegulados,
-  ].where((s) => profissoesReguladas.permitida(s.nome));
-  // Mesmo nome duas vezes (ex.: Advogado): fica a versão com registro.
-  final porNome = <String, ServicoCatalogo>{};
-  for (final s in todos) {
-    porNome[normalizarProfissao(s.nome)] = s;
-  }
-  return [
-    for (final s in porNome.values)
-      if (_simples(s.nome).contains(t) ||
-          s.palavras.any((p) => _simples(p).startsWith(t) || t.startsWith(p)))
-        s,
-  ];
-}
-
-/// Ícone de um serviço (principais da Home ou do catálogo).
-IconData iconeServico(String nome) {
-  const principais = {
-    'Encanador': TablerIcons.droplet,
-    'Eletricista': TablerIcons.bolt,
-    'Pedreiro': TablerIcons.wall,
-    'Pintor': TablerIcons.brush,
-    'Designer': TablerIcons.palette,
-    'Programador': TablerIcons.code,
-    'Professor': TablerIcons.school,
-    'Contador': TablerIcons.calculator,
-    'Advogado': TablerIcons.scale,
-  };
-  final p = principais[nome];
-  if (p != null) return p;
-  for (final (_, lista) in [...gruposServicos, grupoDistancia]) {
-    for (final s in lista) {
-      if (s.nome == nome) return s.icone;
+  final achados = <String, ServicoCatalogo>{};
+  void ver(
+    ServicoCatalogo s, {
+    List<String>? sinonimos,
+    List<String> especialidades = const [],
+  }) {
+    if (!profissoesReguladas.permitida(s.nome)) return;
+    final chave = normalizarProfissao(s.nome);
+    if (_simples(s.nome).contains(t)) {
+      achados[chave] = s;
+      return;
+    }
+    final sin = (sinonimos ?? s.palavras).where(
+      (p) => _simples(p).contains(t) || t.startsWith(_simples(p)),
+    );
+    if (sin.isNotEmpty) {
+      achados[chave] = ServicoCatalogo(
+        s.nome,
+        s.icone,
+        detalhe: 'Também chamado de ${sin.first}',
+        palavras: s.palavras,
+      );
+      return;
+    }
+    // Pela especialidade ("desentup" → Encanador · Desentupimento).
+    final esp = especialidades.where((e) => _simples(e).contains(t));
+    if (esp.isNotEmpty && t.length >= 4) {
+      achados[chave] = ServicoCatalogo(
+        s.nome,
+        s.icone,
+        detalhe: esp.first,
+        palavras: s.palavras,
+      );
     }
   }
-  return TablerIcons.tool;
+
+  for (final p in catalogoServicos.todas) {
+    ver(_item(p), especialidades: p.especialidades);
+  }
+  if (profissional) {
+    for (final s in servicosRegulados) {
+      if (!achados.containsKey(normalizarProfissao(s.nome))) ver(s);
+    }
+  }
+  return achados.values.toList();
+}
+
+IconData? _iconeDe(String nome) => const {
+  'Encanador': TablerIcons.droplet,
+  'Eletricista': TablerIcons.bolt,
+  'Pedreiro': TablerIcons.wall,
+  'Pintor': TablerIcons.brush,
+  'Chaveiro': TablerIcons.key,
+  'Vidraceiro': TablerIcons.photo,
+  'Designer': TablerIcons.palette,
+  'Designer gráfico': TablerIcons.palette,
+  'Programador': TablerIcons.code,
+  'Professor': TablerIcons.school,
+  'Contador': TablerIcons.calculator,
+  'Advogado': TablerIcons.scale,
+}[nome];
+
+/// Ícone de um serviço (principais ou o do segmento no catálogo).
+IconData iconeServico(String nome) {
+  final p = _iconeDe(nome);
+  if (p != null) return p;
+  final c = catalogoServicos.porNome(nome);
+  return c == null ? TablerIcons.tool : _iconeSegmento(c.segmento);
 }

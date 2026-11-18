@@ -368,5 +368,7 @@
  "app/pro-so-visita.png": "docs/fluxo/app/pro-so-visita.png",
  "app/pro-home-pausada.png": "docs/fluxo/app/pro-home-pausada.png",
  "app/chat-pedir-valor.png": "docs/fluxo/app/chat-pedir-valor.png",
- "app/chat-valor-confirmado.png": "docs/fluxo/app/chat-valor-confirmado.png"
+ "app/chat-valor-confirmado.png": "docs/fluxo/app/chat-valor-confirmado.png",
+ "app/pro-outras-busca.png": "docs/fluxo/app/pro-outras-busca.png",
+ "app/pro-sugerir-profissao.png": "docs/fluxo/app/pro-sugerir-profissao.png"
 }

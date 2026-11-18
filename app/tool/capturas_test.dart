@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:tatu/shared/widgets/avatar_iniciais.dart';
 import 'package:tatu/features/entrada/perfil_publico_page.dart';
+import 'package:tatu/data/catalogo_servicos.dart';
 import 'package:tatu/data/encontrados.dart';
 import 'package:tatu/features/profissional/cadastro/registro_page.dart';
 import 'package:tatu/data/profissoes_reguladas.dart';
@@ -218,6 +219,7 @@ void main() {
   setUpAll(() async {
     await documentosLegais.carregarTodos();
     await profissoesReguladas.carregar();
+    await catalogoServicos.carregar();
     demoConferencia = null;
   });
   consultaCpf = ConsultaCpfMock(demora: Duration.zero);
@@ -1918,6 +1920,38 @@ void main() {
       preparar: () async {
         await t.tap(find.text('Outros'));
         await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('pro-outras-busca', (t) async {
+    await _capturar(
+      t,
+      'pro-outras-busca',
+      const ServicosProfissionalPage(),
+      preparar: () async {
+        await t.tap(find.text('Outros'));
+        await t.pumpAndSettle();
+        await t.enterText(find.byType(TextField).last, 'bombeiro hidr');
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('pro-sugerir-profissao', (t) async {
+    await _capturar(
+      t,
+      'pro-sugerir-profissao',
+      const ServicosProfissionalPage(),
+      preparar: () async {
+        await t.tap(find.text('Outros'));
+        await t.pumpAndSettle();
+        await t.ensureVisible(find.text('Não achei a minha'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Não achei a minha'));
+        await t.pumpAndSettle();
+        await t.enterText(find.byType(TextField).last, 'Afinador de piano');
+        await t.pump();
       },
     );
   });

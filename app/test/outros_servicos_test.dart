@@ -20,7 +20,9 @@ void main() {
   ) async {
     await _abrirOutros(t);
     expect(find.text('Outros serviços'), findsOneWidget);
-    expect(find.text('CASA E REPAROS'), findsOneWidget);
+    expect(find.text('CASA E REFORMAS'), findsOneWidget);
+    await t.ensureVisible(find.text('Marceneiro'));
+    await t.pumpAndSettle();
     await t.tap(find.text('Marceneiro'));
     await t.pumpAndSettle();
     expect(find.text('Marceneiro'), findsOneWidget);
@@ -38,8 +40,8 @@ void main() {
     await t.enterText(find.byType(TextField).last, 'desent');
     await t.pump();
     expect(find.text('RESULTADOS'), findsOneWidget);
-    expect(find.text('Desentupidora'), findsOneWidget);
-    expect(find.text('Também resolve entupimento'), findsOneWidget);
+    expect(find.text('Encanador'), findsWidgets);
+    expect(find.text('Desentupimento'), findsOneWidget);
 
     await t.enterText(find.byType(TextField).last, 'afinador de piano');
     await t.pump();

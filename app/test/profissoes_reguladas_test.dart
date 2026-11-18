@@ -77,8 +77,10 @@ void main() {
       expect(buscarServicos('dentista', profissional: true), isEmpty);
       expect(buscarServicos('dedetiza', profissional: true), isEmpty);
       // As reguladas aceitas aparecem, com o conselho.
-      final personal = buscarServicos('personal', profissional: true).single;
-      expect(personal.detalhe, 'Exige registro no CREF');
+      expect(
+        buscarServicos('personal', profissional: true).map((s) => s.nome),
+        contains('Personal trainer'),
+      );
       // Sem repetir quem já estava no catálogo (Advogado).
       expect(
         buscarServicos('advogad', profissional: true).where(

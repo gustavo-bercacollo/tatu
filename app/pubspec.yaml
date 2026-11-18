@@ -83,6 +83,7 @@ flutter:
     - ../docs/termos-de-uso.md
     - ../docs/politica-de-privacidade.md
     - ../docs/profissoes-reguladas.md
+    - ../docs/catalogo-de-servicos.md
 
   # To add assets to your application, add an assets section, like this:
   # assets:
