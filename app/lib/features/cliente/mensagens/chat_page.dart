@@ -34,6 +34,11 @@ import '../atividade/avaliar_page.dart';
 import 'cartao_valor.dart';
 import 'denunciar_page.dart';
 import 'entrega_distancia.dart';
+import '../../../data/conta.dart';
+import '../../../data/denuncias.dart';
+import '../../../data/encontrados.dart';
+import '../../entrada/denunciar_mensagem.dart';
+import '../../entrada/perfil_publico_page.dart';
 
 void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
   ..hideCurrentSnackBar()
@@ -461,6 +466,13 @@ class _ChatPageState extends State<ChatPage> {
               seta: false,
               onTap: () => ir(0),
             ),
+            // Pedido do Gustavo: ver o perfil pelo nome e foto do topo.
+            ItemLista(
+              icone: TablerIcons.user,
+              texto: 'Ver perfil',
+              seta: false,
+              onTap: () => ir(4),
+            ),
             ItemLista(
               icone: TablerIcons.clock,
               texto: 'Ver pedido',
@@ -501,7 +513,66 @@ class _ChatPageState extends State<ChatPage> {
         nav.push(
           MaterialPageRoute(builder: (_) => DenunciarPage(conversa: _c)),
         );
+      case 4:
+        _verPerfil();
     }
+  }
+
+  /// Perfil do profissional (C14–C15) a partir do chat.
+  void _verPerfil() {
+    final p = filaEncontrados.firstWhere(
+      (p) => p.nome == _c.nome,
+      orElse: () => ProfissionalEncontrado(
+        nome: _c.nome,
+        profissao: _c.profissao,
+        feminino: _c.feminino,
+        nota: '4,9',
+        servicos: 120,
+        chegaEm: '',
+      ),
+    );
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => PerfilPublicoPage(
+          perfil: perfilDe(p),
+          avatar: AvatarIniciais(nome: p.nome, tamanho: 96),
+          rodape: FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Voltar para a conversa'),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Chave de cada balão, para o menu abrir no lugar dele (RN-134).
+  final _chaves = <MensagemChat, GlobalKey>{};
+
+  /// RN-134: segurar uma mensagem de texto do outro.
+  Future<void> _segurar(MensagemChat m) async {
+    final texto = m.texto ?? '';
+    final motivo = await segurarMensagem(
+      context,
+      alvo: _chaves.putIfAbsent(m, GlobalKey.new),
+      balao: BalaoChat(texto: texto, outro: '${_c.artigo} ${_c.primeiroNome}'),
+      texto: texto,
+      nome: _c.primeiroNome,
+      feminino: _c.feminino,
+    );
+    if (motivo == null || !mounted) return;
+    final textos = [
+      for (final x in _c.mensagens)
+        if (x.texto != null && !x.denunciada) '${x.minha ? 'Eu' : _c.primeiroNome}: ${x.texto}',
+    ];
+    final i = textos.indexOf('${_c.primeiroNome}: $texto');
+    denuncias.denunciarMensagem(
+      denunciante: conta.nomeCompleto,
+      denunciado: _c.nome,
+      motivo: motivo,
+      mensagem: texto,
+      contexto: RegrasDenuncia.contexto(textos, i < 0 ? 0 : i),
+    );
+    conversas.denunciarMensagem(m);
   }
 
   /// RN-130: "Chamar outro profissional" abre a busca com o mesmo pedido.
@@ -607,6 +678,12 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                 )
+              else if (m.denunciada)
+                // RN-134: só quem denunciou vê isso no lugar da mensagem.
+                const Padding(
+                  padding: EdgeInsets.only(top: 18),
+                  child: MensagemDenunciada(),
+                )
               else
                 Padding(
                   padding: EdgeInsets.only(
@@ -618,10 +695,14 @@ class _ChatPageState extends State<ChatPage> {
                           ),
                   ),
                   child: GestureDetector(
+                    key: _chaves.putIfAbsent(m, GlobalKey.new),
                     // RN-123: foto recebida pode ser denunciada.
-                    onLongPress: !m.minha && m.foto
+                    // RN-134: mensagem de texto do outro também.
+                    onLongPress: m.minha || _c.encerrada
+                        ? null
+                        : m.foto
                         ? () => _denunciar(m)
-                        : null,
+                        : () => _segurar(m),
                     child: BalaoChat(
                       texto: m.texto,
                       minha: m.minha,

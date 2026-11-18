@@ -1055,6 +1055,55 @@ void main() {
     await _capturar(t, 'chat-denuncia-enviada', const DenunciaEnviadaPage());
   });
 
+  /// Conversa com a Luiza e uma mensagem de assédio dela (C135–C137).
+  Conversa conversaAssedio({bool denunciada = false}) {
+    final c = ConversasRepo().conversas.first..valor = null;
+    c.mensagens.add(
+      MensagemChat(texto: 'Manda uma foto sua, linda.')
+        ..denunciada = denunciada,
+    );
+    return c;
+  }
+
+  // RN-134: segurar a mensagem (C135).
+  testWidgets('chat-segurar-mensagem', (t) async {
+    await _capturar(
+      t,
+      'chat-segurar-mensagem',
+      ChatPage(conversa: conversaAssedio()),
+      preparar: () async {
+        await t.longPress(find.text('Manda uma foto sua, linda.'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  // RN-134: motivos da denúncia de mensagem (C136).
+  testWidgets('chat-denunciar-mensagem', (t) async {
+    await _capturar(
+      t,
+      'chat-denunciar-mensagem',
+      ChatPage(conversa: conversaAssedio()),
+      preparar: () async {
+        await t.longPress(find.text('Manda uma foto sua, linda.'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Denunciar mensagem'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Assédio ou ofensa'));
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-134: mensagem denunciada, só para quem denunciou (C137).
+  testWidgets('chat-mensagem-denunciada', (t) async {
+    await _capturar(
+      t,
+      'chat-mensagem-denunciada',
+      ChatPage(conversa: conversaAssedio(denunciada: true)),
+    );
+  });
+
   Future<void> descrever(WidgetTester t) async {
     await t.enterText(
       find.byType(TextField),
@@ -3260,12 +3309,58 @@ void main() {
       const DenunciarPage.pessoa(
         nome: 'Ana',
         feminino: true,
-        motivo: 2,
-        motivos: [
-          'Comportamento inadequado',
-          'Não estava no endereço',
-          'Não quis pagar',
-          'Outro motivo',
+        denunciado: 'Ana Martins',
+        motivo: 1,
+      ),
+    );
+  });
+
+  const conversaAssedioPro = [
+    ('Oi! A pia não para de vazar.', false),
+    ('Posso ir agora. Já te mando o valor.', true),
+    ('Faz por 50 ou te dou nota 1.', false),
+  ];
+
+  // RN-134: segurar a mensagem do cliente (P84).
+  testWidgets('pro-chat-segurar-mensagem', (t) async {
+    await comDemo(
+      t,
+      'pro-chat-segurar-mensagem',
+      const ChatProfissionalPage(mensagens: conversaAssedioPro),
+      depois: () async {
+        await t.longPress(find.text('Faz por 50 ou te dou nota 1.'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  // RN-134: motivos da denúncia de mensagem (P85).
+  testWidgets('pro-chat-denunciar-mensagem', (t) async {
+    await comDemo(
+      t,
+      'pro-chat-denunciar-mensagem',
+      const ChatProfissionalPage(mensagens: conversaAssedioPro),
+      depois: () async {
+        await t.longPress(find.text('Faz por 50 ou te dou nota 1.'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Denunciar mensagem'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Assédio ou ofensa'));
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-134: mensagem denunciada, só para quem denunciou (P86).
+  testWidgets('pro-chat-mensagem-denunciada', (t) async {
+    await comDemo(
+      t,
+      'pro-chat-mensagem-denunciada',
+      const ChatProfissionalPage(
+        mensagens: [
+          ('Oi! A pia não para de vazar.', false),
+          ('Posso ir agora. Já te mando o valor.', true),
+          ('\u0001denunciada', false),
         ],
       ),
     );

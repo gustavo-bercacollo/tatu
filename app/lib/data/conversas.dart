@@ -107,6 +107,10 @@ class MensagemChat {
   final Uint8List? imagem;
   final String? hora;
   EnvioMensagem envio;
+
+  /// RN-134: denunciada por quem está vendo; some só da conversa dele
+  /// e vira "Mensagem denunciada · em análise".
+  bool denunciada = false;
 }
 
 /// RN-100 a RN-105: em que ponto está a entrega à distância de um valor.
@@ -516,6 +520,12 @@ class ConversasRepo extends ChangeNotifier {
     }
     notifyListeners();
     return r;
+  }
+
+  /// RN-134: a mensagem denunciada some só da conversa de quem denunciou.
+  void denunciarMensagem(MensagemChat m) {
+    m.denunciada = true;
+    notifyListeners();
   }
 
   /// RN-123: o arquivo denunciado some do chat de quem denunciou.

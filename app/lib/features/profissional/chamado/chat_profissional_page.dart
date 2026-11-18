@@ -34,6 +34,8 @@ import '../../../shared/widgets/tatu_chip.dart';
 import '../../../shared/widgets/tela_permissao.dart';
 import '../servico/andamento_page.dart';
 import 'enviar_valor_sheet.dart';
+import '../../../data/denuncias.dart';
+import '../../entrada/denunciar_mensagem.dart';
 
 /// Cada lado pode propor até 3 valores.
 const maxRodadas = 3;
@@ -165,17 +167,16 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
       case 'Cancelar atendimento':
         return _cancelar();
       case 'Denunciar cliente':
+        // RN-133: mesmos motivos do cliente.
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => DenunciarPage.pessoa(
               nome: _nome,
               feminino: c.feminino,
-              motivos: const [
-                'Comportamento inadequado',
-                'Não estava no endereço',
-                'Não quis pagar',
-                'Outro motivo',
-              ],
+              denunciado: c.cliente,
+              // RN-56: assédio ou discriminação encerra na hora.
+              aoBloquear: () =>
+                  atendimentoProfissional.clienteSuspensoNo(c.cliente),
             ),
           ),
         );
@@ -504,9 +505,46 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   }
 
   /// Balão especial (prévia, entrega, nota, ajuste, aprovada).
+  /// Chave de cada balão, para o menu abrir no lugar dele (RN-134).
+  final _chaves = <int, GlobalKey>{};
+
+  /// RN-134: segurar uma mensagem de texto do cliente.
+  Future<void> _segurar(int i) async {
+    final c = widget.chamado;
+    final texto = _mensagens[i].$1;
+    final motivo = await segurarMensagem(
+      context,
+      alvo: _chaves.putIfAbsent(i, GlobalKey.new),
+      balao: BalaoChat(texto: texto, outro: '${c.feminino ? 'a' : 'o'} $_nome'),
+      texto: texto,
+      nome: _nome,
+      feminino: c.feminino,
+    );
+    if (motivo == null || !mounted) return;
+    // Contexto: as mensagens de texto em volta (sem as especiais).
+    final textos = <String>[];
+    var pos = 0;
+    for (final (j, m) in _mensagens.indexed) {
+      if (m.$1.startsWith(_esp)) continue;
+      if (j == i) pos = textos.length;
+      textos.add('${m.$2 ? 'Eu' : _nome}: ${m.$1}');
+    }
+    denuncias.denunciarMensagem(
+      denunciante: profissional.nome,
+      denunciado: c.cliente,
+      motivo: motivo,
+      mensagem: texto,
+      contexto: RegrasDenuncia.contexto(textos, pos),
+    );
+    // Some só desta conversa; o cliente não vê nada (RN-133).
+    setState(() => _mensagens[i] = ('${_esp}denunciada', false));
+  }
+
   Widget _especial(String t) {
     final c = widget.chamado;
     final corpo = t.substring(1);
+    // RN-134: só quem denunciou vê isso no lugar da mensagem.
+    if (corpo == 'denunciada') return const MensagemDenunciada();
     final max = RegrasDistancia.maxEntregas;
     if (corpo.startsWith('previa')) {
       return BalaoPrevia(
@@ -664,10 +702,15 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
             ),
             child: m.$1.startsWith(_esp)
                 ? _especial(m.$1)
-                : BalaoChat(
-                    texto: m.$1,
-                    minha: m.$2,
-                    outro: '${c.feminino ? 'a' : 'o'} $_nome',
+                : GestureDetector(
+                    key: _chaves.putIfAbsent(i, GlobalKey.new),
+                    // RN-134: segurar a mensagem do cliente.
+                    onLongPress: m.$2 || fim != null ? null : () => _segurar(i),
+                    child: BalaoChat(
+                      texto: m.$1,
+                      minha: m.$2,
+                      outro: '${c.feminino ? 'a' : 'o'} $_nome',
+                    ),
                   ),
           ),
         ],

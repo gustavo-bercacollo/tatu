@@ -90,7 +90,7 @@ void main() {
     await t.tap(find.text('Denunciar'));
     await t.pumpAndSettle();
     expect(find.text('Denunciar Luiza'), findsOneWidget);
-    await t.tap(find.text('Não compareceu'));
+    await t.tap(find.text('Perfil falso'));
     await t.pump();
     await t.tap(find.text('Enviar denúncia'));
     await t.pumpAndSettle();

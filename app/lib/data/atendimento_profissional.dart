@@ -95,6 +95,21 @@ class AtendimentoProfissionalRepo extends ChangeNotifier {
     return e;
   }
 
+  /// RN-56/RN-129: [cliente] ficou suspenso por uma denúncia de assédio
+  /// ou discriminação. Se é o atendimento atual, vale a RN-131; se não,
+  /// a conversa só fica encerrada (nada a cobrar).
+  Encerramento clienteSuspensoNo(String cliente) {
+    if ((chamado?.cliente ?? servico?.cliente) == cliente) {
+      return clienteSuspenso()!;
+    }
+    final e = RegrasSuspensao.clienteSuspenso(
+      const AtendimentoAberto(ponto: PontoAtendimento.combinando),
+    );
+    encerrados[cliente] = e;
+    notifyListeners();
+    return e;
+  }
+
   /// RN-129/RN-130: a conta deste profissional foi suspensa: o
   /// atendimento acaba na hora (reserva liberada, sinal sem entrega
   /// devolvido ao cliente).

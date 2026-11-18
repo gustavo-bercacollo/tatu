@@ -10,18 +10,47 @@ import '../../shared/widgets/opcao_selecionavel.dart';
 
 /// C161/P58 · "Denunciar arquivo" (RN-123), ao segurar o dedo sobre um
 /// arquivo recebido. Devolve o motivo (nulo se fechar).
-Future<String?> denunciarArquivo(BuildContext context) =>
-    mostrarFolha<String>(context, builder: (_) => const _FolhaDenuncia());
+Future<String?> denunciarArquivo(BuildContext context) => mostrarFolha<String>(
+  context,
+  builder: (_) => const FolhaMotivos(
+    titulo: 'Denunciar arquivo',
+    texto: 'O arquivo some do seu chat e o suporte analisa.',
+    motivos: motivosDenunciaArquivo,
+    nota:
+        'Se for grave, a conta de quem enviou é suspensa\n'
+        'na hora e o caso vai para as autoridades.',
+    botao: 'Enviar denúncia',
+  ),
+);
 
-class _FolhaDenuncia extends StatefulWidget {
-  const _FolhaDenuncia();
+/// Folha de denúncia com motivos de escolha única (arquivo, RN-123;
+/// mensagem, RN-134). Devolve o motivo escolhido.
+class FolhaMotivos extends StatefulWidget {
+  const FolhaMotivos({
+    super.key,
+    required this.titulo,
+    required this.texto,
+    required this.motivos,
+    required this.nota,
+    required this.botao,
+    this.motivo,
+  });
+
+  final String titulo;
+  final String texto;
+  final List<String> motivos;
+  final String nota;
+  final String botao;
+
+  /// Motivo já escolhido (capturas de tela).
+  final String? motivo;
 
   @override
-  State<_FolhaDenuncia> createState() => _FolhaDenunciaState();
+  State<FolhaMotivos> createState() => _FolhaMotivosState();
 }
 
-class _FolhaDenunciaState extends State<_FolhaDenuncia> {
-  String? _motivo;
+class _FolhaMotivosState extends State<FolhaMotivos> {
+  late String? _motivo = widget.motivo;
 
   @override
   Widget build(BuildContext context) {
@@ -40,14 +69,11 @@ class _FolhaDenunciaState extends State<_FolhaDenuncia> {
           children: [
             const AlcaFolha(),
             const SizedBox(height: 22),
-            const Text('Denunciar arquivo', style: TatuTexto.tituloFolha),
+            Text(widget.titulo, style: TatuTexto.tituloFolha),
             const SizedBox(height: 4),
-            const Text(
-              'O arquivo some do seu chat e o suporte analisa.',
-              style: TatuTexto.nota,
-            ),
+            Text(widget.texto, style: TatuTexto.nota),
             const SizedBox(height: TatuMedidas.entreItens + 4),
-            for (final m in motivosDenunciaArquivo) ...[
+            for (final m in widget.motivos) ...[
               OpcaoSelecionavel(
                 selecionado: _motivo == m,
                 rotulo: m,
@@ -69,17 +95,13 @@ class _FolhaDenunciaState extends State<_FolhaDenuncia> {
               const SizedBox(height: 8),
             ],
             const SizedBox(height: 4),
-            const Text(
-              'Se for grave, a conta de quem enviou é suspensa\n'
-              'na hora e o caso vai para as autoridades.',
-              style: TatuTexto.nota,
-            ),
+            Text(widget.nota, style: TatuTexto.nota),
             const SizedBox(height: TatuMedidas.entreItens + 4),
             FilledButton(
               onPressed: _motivo == null
                   ? null
                   : () => Navigator.of(context).pop(_motivo),
-              child: const Text('Enviar denúncia'),
+              child: Text(widget.botao),
             ),
           ],
         ),

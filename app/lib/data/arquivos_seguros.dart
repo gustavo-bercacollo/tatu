@@ -1,6 +1,8 @@
 import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 
+import 'denuncias.dart' as fila;
+
 /// RN-119 a RN-127: o que pode ser enviado no chat, na prévia e na
 /// entrega, e o que acontece quando um arquivo é barrado.
 
@@ -292,8 +294,10 @@ class SegurancaConteudoRepo extends ChangeNotifier {
     }
   }
 
-  /// RN-123: denúncia de um arquivo recebido.
+  /// RN-123: denúncia de um arquivo recebido. RN-135: vai para a fila
+  /// única do suporte, na frente.
   void denunciar(String arquivo, String motivo) {
+    fila.denuncias.denunciarArquivo(arquivo: arquivo, motivo: motivo);
     denuncias.add(
       DenunciaArquivo(arquivo: arquivo, motivo: motivo, em: clock.now()),
     );
