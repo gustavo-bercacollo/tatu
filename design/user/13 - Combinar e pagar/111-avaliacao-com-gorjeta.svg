@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Avaliação com gorjeta</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="40" cy="82" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,73) scale(0.75)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></g>
+  <text x="373" y="88" font-size="17" font-weight="400" fill="#007AFF" text-anchor="end">Pular</text>
+  <circle cx="196.5" cy="140" r="36" fill="#E4E4E7"/>
+  <text x="196.5" y="147.92" font-size="22" font-weight="600" fill="#000000" text-anchor="middle">LS</text>
+  <text x="196.5" y="212" font-size="24" font-weight="700" fill="#000000" text-anchor="middle" letter-spacing="-0.5">Como foi com a Luiza?</text>
+  <g transform="translate(96.5,232) scale(1.4166666666666667)" fill="#FF9F0A" stroke="#FF9F0A" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"/></g>
+  <g transform="translate(136.5,232) scale(1.4166666666666667)" fill="#FF9F0A" stroke="#FF9F0A" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"/></g>
+  <g transform="translate(176.5,232) scale(1.4166666666666667)" fill="#FF9F0A" stroke="#FF9F0A" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"/></g>
+  <g transform="translate(216.5,232) scale(1.4166666666666667)" fill="#FF9F0A" stroke="#FF9F0A" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"/></g>
+  <g transform="translate(256.5,232) scale(1.4166666666666667)" fill="#FF9F0A" stroke="#FF9F0A" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"/></g>
+  <text x="196.5" y="300" font-size="15" font-weight="600" fill="#8E8E93" text-anchor="middle">O que foi bom?</text>
+  <rect x="30" y="314" width="86.890625" height="38" rx="19.0" fill="#1C1C1E"/>
+  <text x="46" y="338.0" font-size="15" font-weight="600" fill="#fff" text-anchor="start">Pontual</text>
+  <rect x="124.890625" y="314" width="95.078125" height="38" rx="19.0" fill="#1C1C1E"/>
+  <text x="140.890625" y="338.0" font-size="15" font-weight="600" fill="#fff" text-anchor="start">Educada</text>
+  <rect x="227.96875" y="314" width="113.46875" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="243.96875" y="338.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Preço justo</text>
+  <rect x="30" y="360" width="92.96875" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="46" y="384.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Limpeza</text>
+  <rect x="130.96875" y="360" width="148.453125" height="38" rx="19.0" fill="#EEEEF0"/>
+  <text x="146.96875" y="384.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Resolveu rápido</text>
+  <rect x="20" y="412" width="353" height="64" rx="16" fill="#EEEEF0"/>
+  <text x="36" y="450" font-size="16" font-weight="400" fill="#8E8E93" text-anchor="start">Comentário (opcional)</text>
+  <rect x="20" y="492" width="353" height="150" rx="18" fill="#fff" stroke="#E4E4E7" stroke-width="1"/>
+  <circle cx="44" cy="522" r="14" fill="#FFF4E0"/>
+  <g transform="translate(35,513) scale(0.75)" fill="none" stroke="#A85F00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14c.83 .642 2.077 1.017 3.5 1c1.423 .017 2.67 -.358 3.5 -1c.83 -.642 2.077 -1.017 3.5 -1c1.423 -.017 2.67 .358 3.5 1"/><path d="M8 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/><path d="M12 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/><path d="M3 10h14v5a6 6 0 0 1 -6 6h-2a6 6 0 0 1 -6 -6v-5z"/><path d="M16.746 16.726a3 3 0 1 0 .252 -5.555"/></g>
+  <text x="68" y="528" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Quer pagar um café para a Luiza?</text>
+  <rect x="36" y="550" width="72" height="40" rx="20" fill="#EEEEF0"/>
+  <text x="72.0" y="575" font-size="15" font-weight="600" fill="#000000" text-anchor="middle">R$ 2</text>
+  <rect x="116" y="550" width="72" height="40" rx="20" fill="#1C1C1E"/>
+  <text x="152.0" y="575" font-size="15" font-weight="600" fill="#fff" text-anchor="middle">R$ 5</text>
+  <rect x="196" y="550" width="72" height="40" rx="20" fill="#EEEEF0"/>
+  <text x="232.0" y="575" font-size="15" font-weight="600" fill="#000000" text-anchor="middle">R$ 10</text>
+  <rect x="276" y="550" width="92" height="40" rx="20" fill="#EEEEF0"/>
+  <text x="322.0" y="575" font-size="15" font-weight="600" fill="#000000" text-anchor="middle">Outro</text>
+  <text x="36" y="616" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="start">Opcional · 100% para ela, só sai a taxa do cartão.</text>
+  <text x="196.5" y="672" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="middle">Cobrado no Visa 4242 junto com a avaliação.</text>
+  <rect x="20" y="709" width="353" height="56" rx="28.0" fill="#1C1C1E"/>
+  <text x="196.5" y="743.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Enviar avaliação e R$ 5</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>

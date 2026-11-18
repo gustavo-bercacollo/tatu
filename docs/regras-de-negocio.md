@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 17/11/2026 (v20)
+Atualizado em 17/11/2026 (v21)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -83,6 +83,9 @@ Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do própri
 | RN-89 | Nenhum valor fica aberto por mais de 7 dias (exemplo). Passou disso, o app pede para concluir ou dividir o trabalho em partes. Não existe chamado aberto por meses. |
 | RN-90 | Um valor em aberto não impede o profissional de ficar online e atender outros clientes. O cliente também pode ter vários profissionais ao mesmo tempo. |
 | RN-91 | Valores altos podem ser parcelados no cartão. Exemplo: a partir de R$ 300, em até 6 vezes. |
+| RN-141 | Gorjeta ("pagar um café") é opcional e só aparece na tela de avaliação, depois do serviço concluído: R$ 2, R$ 5, R$ 10 ou outro valor (até R$ 100, exemplo). Nunca no chat nem antes do serviço. |
+| RN-142 | A gorjeta é cobrada no mesmo cartão, junto com o envio da avaliação. O Tatu não cobra comissão: 100% vai para o profissional, descontada só a taxa do cartão. Vai no Pix com o próximo repasse. |
+| RN-143 | A gorjeta não muda a nota e não aparece para outros clientes. O profissional é avisado por notificação ("Ana deixou R$ 5 de gorjeta"). |
 
 ## 4. Atendimento
 
@@ -239,6 +242,7 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
   - "Ouvir mensagem": ao segurar uma mensagem, o celular lê em voz alta (baixa visão, dificuldade de leitura).
   - Aviso de acessibilidade no perfil (opcional): "Sou surdo(a) · prefiro mensagens", "Tenho baixa visão", "Uso cadeira de rodas · posso demorar para abrir a porta". Aparece para o outro lado no pedido e no chat; quem demora para abrir a porta ganha mais tempo antes de contar ausência (ex.: 20 min em vez de 10).
   - Base técnica: leitor de tela (VoiceOver/TalkBack) com nome em todos os botões, inclusive mapa e contadores; respeitar o tamanho de letra e o alto contraste do celular; botões grandes; avisos importantes também vibram.
+- [ ] **Perfil por seções e certificações (adiado).** Perfil do profissional estilo LinkedIn: cada seção (sobre, especialidades, fotos, certificações) só aparece se estiver preenchida; avaliações e verificação sempre aparecem. Certificações com selo "Informado pelo profissional" ou "Conferido pelo Tatu". Telas de prévia feitas em 17/11/2026, não aprovadas para agora.
 - [ ] **Ligação pelo app.** Escolher como fazer a ligação sem mostrar o número: pela internet (mais barato) ou número intermediário (custo por minuto).
 
 ## 11. Problemas mapeados
@@ -267,11 +271,13 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-18 | Denunciar profissional, cliente e mensagem. | Resolvido | RN-133 a RN-135 |
 | P-19 | Acessibilidade. | Em parte · ditado feito; outras ideias em Decisões em aberto | RN-137, RN-138 |
 | P-20 | Troca de contato por telefone e anexos na descrição do pedido. | Resolvido | RN-139, RN-140 |
+| P-21 | Gorjeta para o profissional. | Resolvido | RN-141 a RN-143 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 17/11/2026 | RN-141 a RN-143 | Gorjeta opcional na avaliação, 100% para o profissional (só a taxa do cartão). |
 | 17/11/2026 | RN-137 a RN-140 | Ditado (fala vira texto) na descrição e no chat, sem mensagem de áudio. Anexos (galeria e arquivo) na descrição. Ligação pelo app só entre a confirmação do valor e a conclusão. |
 | 17/11/2026 | RN-133 a RN-136 | Denúncias: pessoa pelo menu do chat (motivos atualizados), mensagem ao segurar, análise do suporte. Ver perfil do profissional pelo topo do chat. |
 | 17/11/2026 | RN-128 a RN-132 | Conta pausada ou suspensa com atendimentos em andamento: pausa não afeta, suspensão encerra com regras de dinheiro para cada lado. |
