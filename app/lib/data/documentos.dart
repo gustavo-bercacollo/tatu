@@ -11,7 +11,7 @@ class Documento {
 // lançamento, principalmente as seções 4 e 5 (RN-108).
 const termosDeUso = Documento(
   'Termos de uso',
-  'Atualizado em 17 de novembro de 2026',
+  'Atualizado em 18 de novembro de 2026',
   [
     (
       '1. O que é o Tatu',
@@ -40,6 +40,20 @@ const termosDeUso = Documento(
           'Depois disso, a garantia legal do serviço é do profissional '
           '(pelo Código de Defesa do Consumidor, 90 dias para serviços '
           'duráveis). Fale com ele pelo mesmo chat do pedido.',
+    ),
+    // RN-149: aceite do cliente no plano fixo.
+    // TODO(jurídico): revisar esta seção com advogado trabalhista antes do
+    // lançamento (Lei Complementar 150, vínculo de emprego doméstico).
+    (
+      '6. Plano fixo',
+      'Ao confirmar um plano fixo, você declara que contrata um serviço '
+          'autônomo, prestado pelo profissional por conta própria, e que o '
+          'Tatu só intermedia: conecta vocês e processa o pagamento. Pelo '
+          'Tatu, o mesmo profissional vai no máximo 2 vezes por semana ao '
+          'mesmo endereço, somando o plano e os pedidos avulsos; para mais '
+          'que isso, a lei exige contratação com carteira assinada. O plano '
+          'é cobrado no fim de cada período, só pelas visitas feitas, e '
+          'pode ser pausado ou cancelado a partir do próximo período.',
     ),
   ],
 );

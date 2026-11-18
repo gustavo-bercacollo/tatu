@@ -193,7 +193,7 @@ path.entre { opacity: .5; }
 /* ===== DADOS =====
    status: app (já no app, imagem real) · desenho (desenho pronto, ainda não no app) · andamento (tela ainda não desenhada)
    Para atualizar: mudar o status/imagem da tela, ou acrescentar telas e ligações. */
-const ATUALIZADO = '17/11/2026';
+const ATUALIZADO = '18/11/2026';
 
 const ETAPAS = {
   entrada:   { nome: 'Entrada e cadastro', lado: 'ambos' },
@@ -341,7 +341,12 @@ const TELAS_RAW = [
   ['c165','C165','Folha · pedir reembolso','contaC','app','docs/fluxo/app/distancia-pedir-reembolso.png',["RN-104: motivo; o restante fica guardado; o sinal fica com a profissional"]],
   ['c166','C166','Chat · reembolso em análise','contaC','app','docs/fluxo/app/distancia-reembolso-em-analise.png',["RN-104: o suporte responde em até 2 dias úteis"]],
   ['c167','C167','Chat · sem entrega no prazo','contaC','app','docs/fluxo/app/distancia-sem-entrega.png',["RN-105: o prazo do valor (7 dias, RN-89) acabou sem entrega","“Esperar mais” ou “Pedir sinal de volta” (vai para o suporte)"]],
-  ['c97','C142','Folha · opções da conversa','contaC','app','docs/fluxo/app/chat-menu.png',["Abre tocando no nome ou na foto do profissional (seta ao lado do nome)","RN-136: “Ver perfil da Luiza”","RN-140: “Ligar” só entre a confirmação do valor e a conclusão"]],
+  ['c97','C145','Folha · opções da conversa','contaC','app','docs/fluxo/app/chat-menu.png',["Abre tocando no nome ou na foto do profissional (seta ao lado do nome)","RN-136: “Ver perfil da Luiza”","RN-144: “Tornar Luiza fixa” (ou “Ver plano fixo”)","RN-140: “Ligar” só entre a confirmação do valor e a conclusão"]],
+  ['c195','C195','Folha · tornar fixa','contaC','app','docs/fluxo/app/fixo-tornar-fixa.png',["RN-144: Mensal ou Semanal, 1 ou 2 vezes por semana, dia(s) e horário","O pedido vai para o chat do profissional, que responde com o valor por visita"]],
+  ['c196','C196','Chat · valor do plano','contaC','app','docs/fluxo/app/fixo-proposta-valor.png',["RN-144: valor por visita definido uma vez; o cliente confirma no cartão padrão","RN-146: cobrado no fim de cada período, só pelas visitas feitas","RN-149: confirmar = aceite dos Termos do plano fixo","Protótipo: a resposta do profissional é simulada"]],
+  ['c197','C197','Plano fixo','contaC','app','docs/fluxo/app/fixo-plano-ativo.png',["RN-146: visitas feitas e próxima cobrança (até valor × visitas)","RN-148: pausar ou cancelar vale a partir do próximo período"]],
+  ['c198','C198','Folha · até 2 visitas por semana','contaC','app','docs/fluxo/app/fixo-limite-semana.png',["RN-145: no máximo 2 visitas por semana da mesma profissional no mesmo endereço, somando plano e pedidos avulsos (Lei Complementar 150)","Aparece ao tornar fixa ou ao pedir de novo a mesma profissional"]],
+  ['c199','C199','Canal do Tatu · visita não vai','contaC','app','docs/fluxo/app/fixo-visita-nao-vai.png',["RN-147: a profissional avisou “Não vou nesta semana”; a visita não é cobrada"]],
   ['c137d','C137','Chat · ditando','contaC','app','docs/fluxo/app/chat-ditando.png',["RN-138: o microfone fica no lugar do enviar quando o campo está vazio","“Ouvindo · 0:07”, borda vermelha, botão parar; o texto aparece no próprio campo"]],
   ['c138d','C138','Chat · ditado pronto','contaC','app','docs/fluxo/app/chat-ditado-pronto.png',["RN-138: “Ditado · confira antes de enviar”; vai como mensagem de texto","Não existe mensagem de áudio"]],
   ['c98','C98','Denunciar profissional','contaC','app','docs/fluxo/app/chat-denunciar.png',["RN-133: comportamento inadequado, assédio ou discriminação, golpe ou pagamento por fora, perfil falso, outro; “Contar mais” opcional","A denúncia nunca é mostrada para o denunciado","RN-56/RN-135: assédio ou discriminação bloqueia os dois e suspende o acusado enquanto o suporte analisa","RN-135: fila única do suporte; confirmadas e falsas são contadas (pausa/suspensão, RN-128 a RN-132)"]],
@@ -463,6 +468,9 @@ const TELAS_RAW = [
   ['pa-msgs0','P73','Mensagens · primeiro acesso','chamados','app','docs/fluxo/app/pro-mensagens-primeiro-acesso-tatu.png',["RN-115/RN-116: só o Tatu, fixado, com as boas-vindas"]],
   ['p75','P75','Canal do Tatu · boas-vindas','chamados','app','docs/fluxo/app/pro-chat-tatu-boas-vindas.png',["RN-116: chega ao terminar o cadastro (envio da verificação)","RN-117: só o Tatu envia"]],
   ['pa-msgs1','P81','Chat · opções','chamados','app','docs/fluxo/app/pro-chat-opcoes.png',["Abre tocando no nome do cliente","RN-140: “Ligar” só com o valor combinado","No app, Ver chamado ainda mostra “em breve”"]],
+  ['p130','P130','Chat · pedido de plano fixo','chamados','app','docs/fluxo/app/pro-fixo-pedido-do-cliente.png',["RN-144: “Ana quer você fixa”: frequência, dia, horário e endereço"]],
+  ['p131','P131','Folha · valor do plano','chamados','app','docs/fluxo/app/pro-fixo-enviar-valor.png',["RN-144: o valor por visita vai uma vez só","RN-146: comissão normal do Tatu; no Pix por período"]],
+  ['p132','P132','Plano fixo','chamados','app','docs/fluxo/app/pro-fixo-plano-ativo.png',["RN-147: “Não vou nesta semana” sem penalidade; faltar sem avisar é abandono (RN-76 a RN-79)","RN-148: cancelar vale a partir do próximo período (pausar: só nos dados; o desenho não mostra)"]],
   ['pa-msgs2','—','Folha · cancelar atendimento','chamados','app','docs/fluxo/app/pro-chat-cancelar.png',["Cancelar tira a conversa e volta para a lista"]],
   ['pa-msgs3','—','Denunciar cliente','chamados','app','docs/fluxo/app/pro-denunciar.png',["RN-133: mesmos motivos do cliente; “Contar mais” opcional","RN-56: assédio ou discriminação bloqueia os dois e encerra o chamado"]],
   ['pa-msgs4','—','Denúncia enviada','chamados','app','docs/fluxo/app/pro-denuncia-enviada.png'],
@@ -771,6 +779,15 @@ const LIGACOES = [
   ['p23','p88','Ditar','t'],
   ['p88','p89','parar','t'],
   ['c97','c14','Ver perfil','t'],
+  ['c97','c195','Tornar Luiza fixa','t'],
+  ['c195','c198','passaria de 2 visitas na semana','a'],
+  ['c195','p130','pedido vai para o profissional','s'],
+  ['p130','p131','Enviar valor do plano','t'],
+  ['p131','c196','valor chega ao cliente','s'],
+  ['c196','c197','Confirmar plano','t'],
+  ['c97','c197','Ver plano fixo','t'],
+  ['pa-msgs1','p132','Ver plano fixo','t'],
+  ['p132','c199','Não vou nesta semana','s'],
   ['c92','c135','segura uma mensagem','t'],
   ['c135','c136','Denunciar mensagem','t'],
   ['c136','c137','Denunciar mensagem','t'],

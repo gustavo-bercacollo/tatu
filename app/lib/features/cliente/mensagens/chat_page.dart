@@ -40,6 +40,8 @@ import '../../../data/encontrados.dart';
 import '../../entrada/denunciar_mensagem.dart';
 import '../../entrada/perfil_publico_page.dart';
 import '../../entrada/ligacao_page.dart';
+import '../../../data/plano_fixo.dart';
+import '../plano_fixo/plano_fixo.dart';
 
 void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
   ..hideCurrentSnackBar()
@@ -469,6 +471,15 @@ class _ChatPageState extends State<ChatPage> {
               seta: false,
               onTap: () => ir(4),
             ),
+            // RN-144: tornar o profissional fixo (ou ver o plano).
+            ItemLista(
+              icone: TablerIcons.calendar_repeat,
+              texto: _plano == null
+                  ? 'Tornar ${_c.primeiroNome} fix${_c.artigo}'
+                  : 'Ver plano fixo',
+              seta: false,
+              onTap: () => ir(5),
+            ),
             // RN-140: ligar só existe durante o atendimento.
             if (_c.podeLigar)
               ItemLista(
@@ -519,7 +530,92 @@ class _ChatPageState extends State<ChatPage> {
         );
       case 4:
         _verPerfil();
+      case 5:
+        _tornarFixa();
     }
+  }
+
+  /// RN-144: plano fixo com este profissional (nulo = não tem).
+  PlanoFixo? get _plano => planosFixos.planoCom(_c.nome);
+
+  /// RN-144/RN-145: "Tornar [nome] fixa" → folha → o pedido vai para o
+  /// chat do profissional, que responde com o valor por visita.
+  Future<void> _tornarFixa() async {
+    final atual = _plano;
+    if (atual != null && atual.status != StatusPlano.pendente) {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: atual)),
+      );
+      return;
+    }
+    if (atual != null) return;
+    final e = await escolherPlano(
+      context,
+      nome: _c.primeiroNome,
+      feminino: _c.feminino,
+    );
+    if (e == null || !mounted) return;
+    final p = planosFixos.pedir(
+      cliente: conta.nomeCompleto,
+      profissional: _c.nome,
+      endereco: _c.rua,
+      frequencia: e.frequencia,
+      visitasPorSemana: e.vezes,
+      dias: e.dias,
+      horario: e.horario,
+      profissao: _c.profissao,
+      feminino: _c.feminino,
+    );
+    // RN-145: passaria de 2 visitas na semana (com os avulsos).
+    if (p == null) return mostrarLimiteSemana(context);
+    // Protótipo: o profissional responde com o valor por visita.
+    _timer?.cancel();
+    _timer = Timer(widget.resposta, () => planosFixos.enviarValor(p, 150));
+  }
+
+  /// RN-144: o cliente confirma no cartão padrão e o plano fica ativo.
+  void _confirmarPlano(PlanoFixo p) {
+    planosFixos.confirmar(
+      p,
+      cartao: pagamentos.padrao?.titulo ?? 'Visa final 4242',
+    );
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p)),
+    );
+  }
+
+  /// Pedir outro valor: o profissional responde de novo (protótipo).
+  void _outroValorPlano(PlanoFixo p) {
+    planosFixos.pedirOutroValor(p);
+    _timer?.cancel();
+    _timer = Timer(widget.resposta, () => planosFixos.enviarValor(p, 140));
+  }
+
+  List<Widget> _planoNoChat() {
+    final p = _plano;
+    if (p == null || _c.encerrada) return const [];
+    return [
+      const SizedBox(height: 18),
+      if (p.status == StatusPlano.pendente && p.valorPorVisita == null)
+        NotaChat('Pedido de plano fixo enviado ${_c.artigo == 'a' ? 'à' : 'ao'} '
+            '${_c.primeiroNome}.')
+      else if (p.status == StatusPlano.pendente)
+        CartaoPropostaPlano(
+          plano: p,
+          onConfirmar: () => _confirmarPlano(p),
+          onOutroValor: () => _outroValorPlano(p),
+          onTrocarCartao: () => _emBreve(context, 'Trocar cartão'),
+        )
+      else
+        Center(
+          child: GestureDetector(
+            onTap: _tornarFixa,
+            child: MarcadorChat(
+              'Plano fixo · ${p.quando}',
+            ),
+          ),
+        ),
+    ];
   }
 
   /// RN-140: ligação pelo Tatu, sem mostrar o número.
@@ -602,7 +698,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([conversas, pagamentos]),
+      listenable: Listenable.merge([conversas, pagamentos, planosFixos]),
       builder: (context, _) {
         final msgs = _c.mensagens;
         final ultimaFotoMinha = msgs.lastIndexWhere((m) => m.minha && m.foto);
@@ -747,6 +843,7 @@ class _ChatPageState extends State<ChatPage> {
                 NotaChat(fim.nota!),
               ],
             ] else ...[
+              ..._planoNoChat(),
               ..._valor(),
               ..._semEntrega(),
             ],

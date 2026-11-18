@@ -3,6 +3,9 @@
 //   flutter test tool/capturas_test.dart --update-goldens
 import 'dart:io';
 
+import 'package:tatu/features/profissional/plano_fixo/plano_fixo_profissional.dart';
+import 'package:tatu/features/cliente/plano_fixo/plano_fixo.dart';
+import 'package:tatu/data/plano_fixo.dart';
 import 'package:tatu/features/cliente/atividade/gorjeta.dart';
 import 'package:tatu/features/entrada/ligacao_page.dart';
 import 'package:tatu/data/ditado.dart';
@@ -178,6 +181,7 @@ Future<void> _capturar(
   avaliacoesProfissional.restaurar();
   atendimentoProfissional.restaurar();
   canalTatu.restaurar();
+  planosFixos.restaurar();
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -1107,6 +1111,115 @@ void main() {
       t,
       'chat-denunciar',
       DenunciarPage(conversa: ConversasRepo().conversas.first, motivo: 1),
+    );
+  });
+
+  /// Plano fixo de demonstração com a Luiza (C197).
+  PlanoFixo planoDemo() => planosFixos.demo(inicio: DateTime(2026, 11, 3));
+
+  // RN-144: "Tornar Luiza fixa" (C195).
+  testWidgets('fixo-tornar-fixa', (t) async {
+    await _capturar(
+      t,
+      'fixo-tornar-fixa',
+      ChatPage(conversa: ConversasRepo().conversas.first),
+      preparar: () async {
+        await t.tap(find.bySemanticsLabel(RegExp('^Opções da conversa')));
+        await t.pumpAndSettle();
+        await t.tap(find.text('Tornar Luiza fixa'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  // RN-144/RN-146: valor do plano no chat do cliente (C196).
+  testWidgets('fixo-proposta-valor', (t) async {
+    final c = ConversasRepo().conversas.first..valor = null;
+    await _capturar(
+      t,
+      'fixo-proposta-valor',
+      ChatPage(conversa: c),
+      preparar: () async {
+        final p = planosFixos.pedir(
+          cliente: 'Ana Martins',
+          profissional: c.nome,
+          endereco: c.rua,
+          frequencia: FrequenciaPlano.mensal,
+          visitasPorSemana: 1,
+          dias: const [2],
+          horario: '9:00',
+        )!;
+        planosFixos.enviarValor(p, 150);
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-146/RN-148: plano ativo do cliente (C197).
+  testWidgets('fixo-plano-ativo', (t) async {
+    await _capturar(
+      t,
+      'fixo-plano-ativo',
+      const SizedBox(),
+      preparar: () async {
+        final p = planoDemo();
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: PlanoFixoPage(plano: p),
+          ),
+        );
+      },
+    );
+  });
+
+  // RN-145: 3ª visita na semana bloqueada (C198).
+  testWidgets('fixo-limite-semana', (t) async {
+    await _capturar(
+      t,
+      'fixo-limite-semana',
+      const SizedBox(),
+      preparar: () async {
+        final p = planoDemo();
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: Builder(
+              builder: (ctx) => PlanoFixoPage(plano: p),
+            ),
+          ),
+        );
+        mostrarLimiteSemana(t.element(find.byType(PlanoFixoPage)));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  // RN-147: aviso do Tatu de que a visita não acontece (C199).
+  testWidgets('fixo-visita-nao-vai', (t) async {
+    await _capturar(
+      t,
+      'fixo-visita-nao-vai',
+      const SizedBox(),
+      preparar: () async {
+        final p = planoDemo();
+        canalTatu.cliente
+          ..mensagens = []
+          ..naoLidas = 0;
+        planosFixos.naoVou(p, p.proximas.first);
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: CanalTatuPage(
+              canal: canalTatu.cliente,
+              onDestino: abrirDestinoTatuCliente,
+            ),
+          ),
+        );
+      },
     );
   });
 
@@ -3600,6 +3713,73 @@ void main() {
           ('\u0001denunciada', false),
         ],
       ),
+    );
+  });
+
+  // RN-144: o pedido de plano chega no chat do profissional (P130).
+  testWidgets('pro-fixo-pedido-do-cliente', (t) async {
+    await comDemo(
+      t,
+      'pro-fixo-pedido-do-cliente',
+      const ChatProfissionalPage(),
+      depois: () async {
+        planosFixos.pedir(
+          cliente: 'Ana Martins',
+          profissional: 'Luiza Souza',
+          endereco: 'Rua das Flores, 120',
+          frequencia: FrequenciaPlano.mensal,
+          visitasPorSemana: 1,
+          dias: const [2],
+          horario: '9:00',
+        );
+        await t.pump();
+      },
+    );
+  });
+
+  // RN-144/RN-146: valor do plano, uma vez (P131).
+  testWidgets('pro-fixo-enviar-valor', (t) async {
+    await comDemo(
+      t,
+      'pro-fixo-enviar-valor',
+      const ChatProfissionalPage(),
+      depois: () async {
+        planosFixos.pedir(
+          cliente: 'Ana Martins',
+          profissional: 'Luiza Souza',
+          endereco: 'Rua das Flores, 120',
+          frequencia: FrequenciaPlano.mensal,
+          visitasPorSemana: 1,
+          dias: const [2],
+          horario: '9:00',
+        );
+        await t.pump();
+        await t.tap(find.text('Enviar valor do plano'));
+        await t.pumpAndSettle();
+        await t.enterText(find.byType(TextField).last, '150');
+        await t.pump();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  // RN-146 a RN-148: plano ativo do profissional (P132).
+  testWidgets('pro-fixo-plano-ativo', (t) async {
+    await comDemo(
+      t,
+      'pro-fixo-plano-ativo',
+      const SizedBox(),
+      depois: () async {
+        final p = planosFixos.demo(inicio: DateTime(2026, 11, 3));
+        await t.pumpWidget(
+          MaterialApp(
+            theme: tatuTheme(),
+            debugShowCheckedModeBanner: false,
+            home: PlanoFixoProfissionalPage(plano: p),
+          ),
+        );
+      },
     );
   });
 

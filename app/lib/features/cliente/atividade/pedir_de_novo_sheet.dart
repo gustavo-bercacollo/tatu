@@ -12,6 +12,9 @@ import '../../../shared/widgets/opcao_selecionavel.dart';
 import '../chamar/chamar.dart';
 import '../chamar/procurando_page.dart';
 import '../endereco/onde_sheet.dart';
+import '../../../data/plano_fixo.dart';
+import '../plano_fixo/plano_fixo.dart';
+import 'package:clock/clock.dart';
 
 /// Folha "Pedir de novo": chamar o mesmo profissional (se estiver online)
 /// ou qualquer um do serviço, no endereço escolhido.
@@ -22,6 +25,11 @@ Future<void> abrirPedirDeNovo(BuildContext context, PedidoConcluido p) async {
   );
   if (escolha == null || !context.mounted) return;
   final (mesmo, endereco) = escolha;
+  // RN-145: com a mesma profissional, no máximo 2 visitas por semana no
+  // mesmo endereço, somando o plano fixo.
+  if (mesmo && !planosFixos.pedirAvulso(p.profissional, endereco, clock.now())) {
+    return mostrarLimiteSemana(context);
+  }
   if (mesmo) {
     Navigator.of(context).push(
       MaterialPageRoute(

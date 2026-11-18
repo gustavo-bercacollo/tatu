@@ -38,6 +38,8 @@ import '../../../data/denuncias.dart';
 import '../../entrada/denunciar_mensagem.dart';
 import '../../entrada/ligacao_page.dart';
 import '../../../data/ligacao.dart';
+import '../../../data/plano_fixo.dart';
+import '../plano_fixo/plano_fixo_profissional.dart';
 
 /// Cada lado pode propor até 3 valores.
 const maxRodadas = 3;
@@ -157,6 +159,9 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
             // RN-140: ligar só existe durante o atendimento.
             if (_podeLigar) item(TablerIcons.phone, 'Ligar para $_nome'),
             item(TablerIcons.file_text, 'Ver chamado'),
+            // RN-144: plano fixo com este cliente.
+            if (_plano != null && _plano!.status != StatusPlano.pendente)
+              item(TablerIcons.calendar_repeat, 'Ver plano fixo'),
             item(TablerIcons.help_circle, 'Ajuda'),
             if (!_concluida || _estado != EstadoValor.inicio)
               item(TablerIcons.x, 'Cancelar atendimento', perigo: true),
@@ -183,6 +188,8 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
             ),
           ),
         );
+      case 'Ver plano fixo':
+        return _verPlano();
       case 'Ajuda':
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -193,6 +200,47 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
         if (escolha.startsWith('Ligar')) return _ligar();
         _emBreve(escolha);
     }
+  }
+
+  /// RN-144: plano fixo pedido por este cliente.
+  PlanoFixo? get _plano => planosFixos.planoDoCliente(widget.chamado.cliente);
+
+  void _verPlano() {
+    final p = _plano;
+    if (p == null) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => PlanoFixoProfissionalPage(plano: p)),
+    );
+  }
+
+  /// RN-144: o profissional responde com o valor por visita (uma vez).
+  Future<void> _valorDoPlano(PlanoFixo p) async {
+    final v = await pedirValorPlano(context, p);
+    if (v == null || !mounted) return;
+    planosFixos.enviarValor(p, v);
+  }
+
+  List<Widget> _planoNoChat() {
+    final p = _plano;
+    if (p == null) return const [];
+    return [
+      const SizedBox(height: 18),
+      if (p.status == StatusPlano.pendente && p.valorPorVisita == null)
+        CartaoPedidoPlano(plano: p, onEnviarValor: () => _valorDoPlano(p))
+      else if (p.status == StatusPlano.pendente)
+        NotaChat(
+          'Valor do plano enviado · ${reaisInteiros(p.valorPorVisita!)} por '
+          'visita. Aguardando ${p.clienteFeminina ? 'a' : 'o'} '
+          '${p.primeiroCliente}.',
+        )
+      else
+        Center(
+          child: GestureDetector(
+            onTap: _verPlano,
+            child: MarcadorChat('Plano fixo · ${p.quando}'),
+          ),
+        ),
+    ];
   }
 
   /// RN-140: do valor combinado (confirmado pelo cliente) até concluir.
@@ -637,7 +685,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: atendimentoProfissional,
+    listenable: Listenable.merge([atendimentoProfissional, planosFixos]),
     builder: (context, _) => _tela(context),
   );
 
@@ -739,6 +787,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
           ),
         ],
         if (_concluida && _mensagens.length == _antes) ..._marco(),
+        if (fim == null) ..._planoNoChat(),
         const SizedBox(height: TatuMedidas.entreSecoes),
         if (fim != null) ...[
           // RN-131: o Tatu avisa o que o profissional recebe.
