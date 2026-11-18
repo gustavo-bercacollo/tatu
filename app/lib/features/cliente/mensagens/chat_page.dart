@@ -73,9 +73,11 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     // RN-100: entregas sem resposta há 48 h já foram aprovadas.
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => conversas.aprovarSozinhas(),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      conversas.aprovarSozinhas();
+      // RN-155: abriu, leu; o contador da aba diminui na hora.
+      conversas.marcarLida(_c);
+    });
   }
 
   Conversa get _c => widget.conversa;

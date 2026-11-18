@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../data/nao_lidas.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import 'atividade/atividade_profissional_page.dart';
 import 'mensagens/mensagens_profissional_page.dart';
@@ -35,6 +36,8 @@ class AbasDoProfissional extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AbasCliente(
     ativa: ativa,
+    // RN-155: contador de não lidas na aba Mensagens.
+    lado: LadoMensagens.profissional,
     onTrocar: (a) {
       if (a == ativa) return;
       irParaAbaProfissional(context, a);

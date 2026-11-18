@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../data/nao_lidas.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import 'atividade/atividade_page.dart';
 import 'mensagens/mensagens_page.dart';
@@ -41,6 +42,8 @@ class AbasDoCliente extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AbasCliente(
     ativa: ativa,
+    // RN-155: contador de não lidas na aba Mensagens.
+    lado: LadoMensagens.cliente,
     // Início sempre volta para a Home (também do Perfil); as outras abas
     // não reabrem a si mesmas.
     onTrocar: (a) {

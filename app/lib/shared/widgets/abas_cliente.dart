@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
+import '../../core/icone_app/icone_app.dart';
 import '../../core/theme/tatu_colors.dart';
+import '../../data/nao_lidas.dart';
 
 /// Abas do cliente.
 enum AbaCliente { inicio, atividade, mensagens, perfil }
@@ -13,7 +15,11 @@ class AbasCliente extends StatelessWidget {
     this.ativa = AbaCliente.inicio,
     this.onTrocar,
     this.comPerfil = false,
+    this.lado,
   });
+
+  /// RN-155: de quem são as mensagens do contador (nulo = sem contador).
+  final LadoMensagens? lado;
 
   /// Profissional: Perfil como 4ª aba.
   final bool comPerfil;
@@ -25,6 +31,21 @@ class AbasCliente extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = lado;
+    if (l == null) return _barra(0);
+    // RN-155: o total vem de um lugar só (NaoLidas) e muda na hora.
+    return ListenableBuilder(
+      listenable: NaoLidas.fonte(l),
+      builder: (context, _) {
+        final n = NaoLidas.total(l);
+        // O mesmo número no ícone do app, se as notificações deixam.
+        IconeDoApp.definir(NaoLidas.podeNoIcone(l) ? n : 0);
+        return _barra(n);
+      },
+    );
+  }
+
+  Widget _barra(int naoLidas) {
     VoidCallback? ir(AbaCliente a) =>
         onTrocar == null ? null : () => onTrocar!(a);
 
@@ -58,6 +79,8 @@ class AbasCliente extends StatelessWidget {
                 texto: 'Mensagens',
                 ativa: ativa == AbaCliente.mensagens,
                 onTap: ir(AbaCliente.mensagens),
+                contador: NaoLidas.rotulo(naoLidas),
+                leitura: NaoLidas.leitura(naoLidas),
               ),
               if (comPerfil)
                 _Aba(
@@ -80,12 +103,20 @@ class _Aba extends StatelessWidget {
     required this.texto,
     this.ativa = false,
     this.onTap,
+    this.contador,
+    this.leitura,
   });
 
   final IconData icone;
   final String texto;
   final bool ativa;
   final VoidCallback? onTap;
+
+  /// RN-155: "3" ou "9+" no canto do ícone (nulo = nada).
+  final String? contador;
+
+  /// Nome para o leitor de tela ("Mensagens, 3 não lidas").
+  final String? leitura;
 
   @override
   Widget build(BuildContext context) {
@@ -94,12 +125,25 @@ class _Aba extends StatelessWidget {
       child: Semantics(
         button: true,
         selected: ativa,
+        label: leitura,
+        excludeSemantics: leitura != null,
         child: InkWell(
           onTap: onTap,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icone, size: 24, color: cor),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(icone, size: 24, color: cor),
+                  if (contador != null)
+                    Positioned(
+                      left: 15,
+                      top: -6,
+                      child: ContadorVermelho(contador!),
+                    ),
+                ],
+              ),
               const SizedBox(height: 3),
               Text(
                 texto,
@@ -115,4 +159,33 @@ class _Aba extends StatelessWidget {
       ),
     );
   }
+}
+
+/// RN-155: bolinha vermelha com o número de não lidas ("9+" no máximo).
+class ContadorVermelho extends StatelessWidget {
+  const ContadorVermelho(this.texto, {super.key});
+
+  final String texto;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    constraints: const BoxConstraints(minWidth: 18),
+    height: 18,
+    padding: const EdgeInsets.symmetric(horizontal: 4),
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      color: TatuColors.danger,
+      borderRadius: BorderRadius.circular(9),
+      border: Border.all(color: TatuColors.tabBar, width: 2),
+    ),
+    child: Text(
+      texto,
+      style: const TextStyle(
+        fontSize: 10,
+        height: 1,
+        fontWeight: FontWeight.w700,
+        color: TatuColors.onAction,
+      ),
+    ),
+  );
 }

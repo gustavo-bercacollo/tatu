@@ -137,6 +137,14 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     super.initState();
     _antes = _mensagens.length;
     _mensagens.addAll(widget.depois);
+    // RN-155: abriu, leu; o contador da aba diminui na hora.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      for (final c in conversasProfissional.conversas) {
+        if (c.chamado.cliente == widget.chamado.cliente) {
+          conversasProfissional.marcarLida(c);
+        }
+      }
+    });
   }
 
   /// Toque no nome: ligar, ver chamado, ajuda, cancelar e denunciar.
