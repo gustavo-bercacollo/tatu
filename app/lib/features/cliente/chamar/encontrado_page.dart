@@ -31,6 +31,7 @@ class EncontradoPage extends StatefulWidget {
     required this.servico,
     required this.endereco,
     this.indice = 0,
+    this.inicio,
     this.restante,
     this.animar = true,
     this.distancia = false,
@@ -44,6 +45,9 @@ class EncontradoPage extends StatefulWidget {
 
   /// Posição em [filaEncontrados].
   final int indice;
+
+  /// Onde a fila começou (nulo = em [indice]).
+  final int? inicio;
 
   /// Segundos que faltam (capturas de tela); começa em [prazo].
   final int? restante;
@@ -69,6 +73,9 @@ class _EncontradoPageState extends State<EncontradoPage> {
       widget.restante ?? EncontradoPage.prazo.inSeconds;
   Timer? _timer;
   final _som = SomEncontrado();
+
+  /// Onde a fila começou (para "Ver outro" passar por todos uma vez).
+  int get _inicio => widget.inicio ?? widget.indice;
 
   ProfissionalEncontrado get _base =>
       _fila[widget.indice % _fila.length];
@@ -128,11 +135,12 @@ class _EncontradoPageState extends State<EncontradoPage> {
     nav.popUntil((r) => r == rota);
     nav.pushReplacement(
       MaterialPageRoute(
-        builder: (_) => proximo < _fila.length
+        builder: (_) => proximo < _inicio + _fila.length
             ? EncontradoPage(
                 servico: widget.servico,
                 endereco: widget.endereco,
                 indice: proximo,
+                inicio: _inicio,
                 distancia: widget.distancia,
               )
             : ProcurandoPage(

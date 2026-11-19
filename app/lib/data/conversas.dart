@@ -389,7 +389,21 @@ class ConversasRepo extends ChangeNotifier {
     required String rua,
     bool distancia = false,
   }) {
-    conversas.removeWhere((c) => c.nome == nome && c.emAndamento);
+    // RN-87/RN-90: a mesma pessoa de novo continua a conversa (nada some).
+    final atual = conversas
+        .where((c) => c.nome == nome && c.emAndamento)
+        .firstOrNull;
+    if (atual != null) {
+      atual.mensagens.add(
+        MensagemChat(
+          texto: 'Oi! Aceitei também o seu pedido de ${servico.toLowerCase()}.',
+          hora: horaAgora(),
+        ),
+      );
+      conversas = [atual, for (final c in conversas) if (c != atual) c];
+      notifyListeners();
+      return atual;
+    }
     final c = Conversa(
       nome: nome,
       profissao: profissao,

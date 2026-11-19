@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
+import 'package:tatu/data/conversas.dart';
+import 'package:tatu/data/encontrados.dart';
 import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/features/cliente/home_page.dart';
 
@@ -70,6 +72,49 @@ void main() {
     pedidos.abrir(pedidos.andamentos.last);
     expect(pedidos.andamento?.servico, 'Encanador');
     expect(pedidos.andamentos, hasLength(3));
+  });
+
+  test('cada chamada começa a fila em outra pessoa', () {
+    reiniciarFila();
+    final fila = filaPara(soMulheres: false);
+    final nomes = [
+      for (var i = 0; i < 3; i++) fila[inicioDaFila() % fila.length].nome,
+    ];
+    expect(nomes.toSet(), hasLength(3));
+    reiniciarFila();
+  });
+
+  test('cada profissional tem a sua conversa; nenhuma some', () {
+    conversas.restaurar();
+    final antes = conversas.conversas.length;
+    final a = conversas.comecar(
+      nome: 'Carlos Pereira',
+      profissao: 'Eletricista',
+      feminino: false,
+      servico: 'Eletricista',
+      rua: 'Rua A, 1',
+    );
+    conversas.enviar(a, MensagemChat(texto: 'Pode vir agora?', minha: true));
+    conversas.comecar(
+      nome: 'Fernanda Lima',
+      profissao: 'Pintora',
+      feminino: true,
+      servico: 'Pintor',
+      rua: 'Rua A, 1',
+    );
+    expect(conversas.conversas, hasLength(antes + 2));
+    // A mesma pessoa de novo: continua a conversa, com a mensagem.
+    final de = conversas.comecar(
+      nome: 'Carlos Pereira',
+      profissao: 'Eletricista',
+      feminino: false,
+      servico: 'Encanador',
+      rua: 'Rua A, 1',
+    );
+    expect(identical(de, a), isTrue);
+    expect(de.mensagens.map((m) => m.texto), contains('Pode vir agora?'));
+    expect(conversas.conversas, hasLength(antes + 2));
+    conversas.restaurar();
   });
 
   test('cada pedido sem ninguém tem a sua busca', () {

@@ -159,6 +159,16 @@ const filaDistancia = [
   ),
 ];
 
+/// Protótipo: cada chamada começa a fila numa pessoa diferente, para
+/// pedidos seguidos (RN-90) não caírem sempre na mesma profissional.
+int _chamadas = 0;
+
+/// Onde a fila começa nesta chamada (e avança para a próxima).
+int inicioDaFila() => _chamadas++;
+
+/// Volta a fila ao começo (testes e capturas).
+void reiniciarFila() => _chamadas = 0;
+
 /// Fila que vale para o cliente: com "Preferir profissionais mulheres",
 /// só profissionais mulheres. Com [distancia], a fila à distância.
 List<ProfissionalEncontrado> filaPara({

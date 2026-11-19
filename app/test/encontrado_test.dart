@@ -81,8 +81,9 @@ void main() {
     expect(pedidos.andamento?.profissional, 'Luiza Souza');
     expect(pedidos.andamento?.etapasFeitas, 1);
     expect(conversas.conversas.first.nome, 'Luiza Souza');
+    // RN-87/RN-90: a conversa com a Luiza continua (nada some).
     expect(
-      find.textContaining('Aceitei seu pedido'),
+      find.textContaining('Aceitei também o seu pedido de encanador'),
       findsOneWidget,
     );
     // RN-26: o chat já chega com o valor (visita + serviço).
