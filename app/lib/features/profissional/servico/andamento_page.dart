@@ -28,6 +28,7 @@ import '../../../shared/widgets/mapa_falso.dart';
 import '../../../shared/widgets/nota_icone.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import 'codigo_porta.dart';
+import 'conclusao_page.dart';
 import 'rota.dart';
 import '../../entrada/seguranca.dart';
 import '../../entrada/ligacao_page.dart';
@@ -489,16 +490,14 @@ class EmAndamentoPage extends StatelessWidget {
     Navigator.of(context).popUntil((r) => r.isFirst);
   }
 
-  /// Conclui: o cliente é cobrado do valor combinado.
+  /// RN-31/RN-171: conclui, mas não cobra na hora: o cliente recebe a
+  /// notificação e confirma. O profissional espera em "Aguardando a Ana
+  /// confirmar" (e já pode ficar online).
   void _concluir(BuildContext context) {
-    final s = servico;
-    _encerrar(
-      context,
-      semServico: false,
-      titulo: 'Serviço concluído',
-      texto:
-          '${s.cliente.split(' ').first} pagou ${reais(s.valor)}. '
-          'Cai no seu Pix em até 1 dia útil.',
+    profissional.registrarVisita(semServico: false);
+    atendimentoProfissional.encerrar();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => ConclusaoServicoPage(servico: servico)),
     );
   }
 
@@ -768,9 +767,10 @@ class EmAndamentoPage extends StatelessWidget {
                     )
                   else ...[
                   Text(
+                    // RN-31: o cliente confirma antes de ser cobrado.
                     'Ao concluir, ${s.feminino ? 'a' : 'o'} '
-                    '${s.cliente.split(' ').first} é cobrad'
-                    '${s.feminino ? 'a' : 'o'} automaticamente.',
+                    '${s.cliente.split(' ').first} confirma e é cobrad'
+                    '${s.feminino ? 'a' : 'o'}.',
                     textAlign: TextAlign.center,
                     style: TatuTexto.nota,
                   ),

@@ -3,6 +3,7 @@
 //   flutter test tool/capturas_test.dart --update-goldens
 import 'dart:io';
 
+import 'package:tatu/features/profissional/servico/conclusao_page.dart';
 import 'package:tatu/shared/widgets/avatar_iniciais.dart';
 import 'package:tatu/features/entrada/perfil_publico_page.dart';
 import 'package:tatu/data/catalogo_servicos.dart';
@@ -193,7 +194,12 @@ Future<void> _capturar(
   planosFixos.restaurar();
   // RN-165: a Home só mostra a faixa "chega em X min" nas capturas dela.
   if (tela is HomeClientePage &&
-      !const {'home-profissional-a-caminho', 'chamar-ja-tem-pedido'}
+      !const {
+        'home-profissional-a-caminho',
+        'home-profissional-trabalhando',
+        'home-varios-profissionais',
+        'chamar-ja-tem-pedido',
+      }
           .contains(nome)) {
     pedidos.cancelarAndamento();
   }
@@ -231,6 +237,9 @@ void main() {
     // RN-39: código do desenho e sem o profissional digitar sozinho.
     RegrasCodigo.sorteio = null;
     PedidosRepo.demoCodigo = false;
+    // RN-31: sem conclusão nem confirmação automáticas do protótipo.
+    PedidosRepo.demoConclusao = false;
+    ConclusaoServicoPage.clienteConfirmaEm = null;
   });
   consultaCpf = ConsultaCpfMock(demora: Duration.zero);
   ProtecaoTela.ativa = false;
@@ -833,21 +842,6 @@ void main() {
       const AtividadePage(),
       preparar: () async {
         pedidos.cancelarAndamento();
-        await t.pump();
-      },
-    );
-  });
-
-  testWidgets('pedido-andamento', (t) async {
-    // Depois do código (RN-39): etapas, endereço e valor.
-    await _capturar(
-      t,
-      'pedido-andamento',
-      const PedidoAndamentoPage(),
-      preparar: () async {
-        pedidos
-          ..chegou()
-          ..codigoDigitado();
         await t.pump();
       },
     );
@@ -2500,6 +2494,111 @@ void main() {
       pedidos.saiu();
       await t.pump();
     });
+  });
+
+  // RN-169: a Luiza começou às 14:32 (relógio da captura: 14:57).
+  Future<void> trabalhando() async {
+    await withClock(Clock.fixed(DateTime(2026, 11, 14, 14, 32)), () async {
+      pedidos
+        ..chegou()
+        ..codigoDigitado();
+    });
+  }
+
+  Future<void> servico(
+    WidgetTester t,
+    String nome,
+    Widget tela,
+    Future<void> Function() preparar,
+  ) => withClock(Clock.fixed(DateTime(2026, 11, 14, 14, 57)), () async {
+    final antes = Prazos.aceleracao;
+    Prazos.aceleracao = 1;
+    await _capturar(t, nome, tela, preparar: preparar);
+    Prazos.aceleracao = antes;
+    pedidos.restaurar();
+  });
+
+  testWidgets('servico-em-andamento', (t) async {
+    await servico(t, 'servico-em-andamento', const PedidoAndamentoPage(),
+        () async {
+      await trabalhando();
+      await t.pump();
+    });
+  });
+
+  testWidgets('home-profissional-trabalhando', (t) async {
+    await servico(
+      t,
+      'home-profissional-trabalhando',
+      const HomeClientePage(),
+      () async {
+        await trabalhando();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('home-varios-profissionais', (t) async {
+    await servico(t, 'home-varios-profissionais', const HomeClientePage(),
+        () async {
+      await trabalhando();
+      final luiza = pedidos.andamento!;
+      pedidos
+        ..aceitar(
+          const PedidoAndamento(
+            servico: 'Eletricista',
+            profissao: 'Eletricista',
+            profissional: 'Marcos Dias',
+            nota: '4,8',
+            endereco: 'Rua das Flores, 120',
+            valor: r'R$ 120,00',
+            pagamento: 'Visa 4242',
+            etapasFeitas: 1,
+            chegaEm: '8 min',
+          ),
+        )
+        ..saiu()
+        ..abrir(luiza);
+      await t.pump();
+    });
+  });
+
+  testWidgets('servico-confirmar-conclusao', (t) async {
+    await servico(
+      t,
+      'servico-confirmar-conclusao',
+      const PedidoAndamentoPage(),
+      () async {
+        await trabalhando();
+        await t.pump();
+        pedidos.profissionalConcluiu();
+        await t.pump();
+        await t.pump(const Duration(milliseconds: 600));
+      },
+    );
+  });
+
+  // RN-31/RN-171: profissional depois de "Concluir serviço".
+  const servicoAna = ServicoAceito(
+    cliente: 'Ana Martins',
+    descricao: 'Vazamento na pia',
+    valor: 190,
+  );
+
+  testWidgets('pro-aguardando-confirmacao', (t) async {
+    await _capturar(
+      t,
+      'pro-aguardando-confirmacao',
+      const ConclusaoServicoPage(servico: servicoAna),
+    );
+  });
+
+  testWidgets('pro-cliente-confirmou', (t) async {
+    await _capturar(
+      t,
+      'pro-cliente-confirmou',
+      const ConclusaoServicoPage(servico: servicoAna, confirmado: true),
+    );
   });
 
   testWidgets('cliente-ausente', (t) async {

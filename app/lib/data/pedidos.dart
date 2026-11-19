@@ -91,7 +91,58 @@ class PedidoAndamento {
     this.confirmadoEm,
     this.km = 2.3,
     this.id = 0,
+    this.iniciadoEm,
+    this.concluidoEm,
+    this.valorRetido = false,
   });
+
+  /// RN-169: quando o código foi digitado (o serviço começou).
+  final DateTime? iniciadoEm;
+
+  /// RN-31/RN-171: o profissional tocou em "Concluir serviço"; falta o
+  /// cliente confirmar (nulo antes).
+  final DateTime? concluidoEm;
+
+  /// RN-31/RN-45: "Algo errado": o valor fica retido até o suporte
+  /// resolver (nada é cobrado).
+  final bool valorRetido;
+
+  /// RN-31: concluído pelo profissional, esperando o cliente confirmar.
+  bool get aguardandoConfirmacao => concluidoEm != null && !valorRetido;
+
+  /// RN-169: serviço no local em andamento (depois do código).
+  bool get trabalhando => !distancia && etapasFeitas == 4;
+
+  /// RN-170: situação curta para a faixa da Home ("trabalhando",
+  /// "em 8 min"…).
+  String get situacaoCurta {
+    if (distancia) return 'à distância';
+    if (aguardandoConfirmacao) return 'concluiu';
+    if (trabalhando) return 'trabalhando';
+    return switch (acompanhar()) {
+      EtapaAcompanhar.antesDeSair => 'vai sair',
+      EtapaAcompanhar.aCaminho => 'em ${minutosFaltando()} min',
+      EtapaAcompanhar.chegando => 'chegando',
+      EtapaAcompanhar.chegou => 'chegou',
+      null => 'combinando',
+    };
+  }
+
+  /// RN-169: minutos desde o início do serviço (protótipo: relógio
+  /// [Prazos.aceleracao] vezes mais rápido).
+  int minutosTrabalhando([DateTime? agora]) {
+    final i = iniciadoEm;
+    if (i == null) return 0;
+    return _passou(i, agora).inMinutes;
+  }
+
+  /// RN-31: quanto falta das 2 horas para confirmar sozinho.
+  Duration faltaConfirmar([DateTime? agora]) {
+    final c = concluidoEm;
+    if (c == null) return Prazos.confirmarConclusao;
+    final r = Prazos.confirmarConclusao - _passou(c, agora);
+    return r.isNegative ? Duration.zero : r;
+  }
 
   /// RN-90: número do pedido no app (cada chamada é um pedido, mesmo com
   /// a mesma pessoa).
@@ -215,6 +266,9 @@ class PedidoAndamento {
     DateTime? confirmadoEm,
     String? codigo,
     int? id,
+    DateTime? iniciadoEm,
+    DateTime? concluidoEm,
+    bool? valorRetido,
   }) => PedidoAndamento(
     servico: servico,
     profissao: profissao,
@@ -237,6 +291,9 @@ class PedidoAndamento {
     confirmadoEm: confirmadoEm ?? this.confirmadoEm,
     km: km,
     id: id ?? this.id,
+    iniciadoEm: iniciadoEm ?? this.iniciadoEm,
+    concluidoEm: concluidoEm ?? this.concluidoEm,
+    valorRetido: valorRetido ?? this.valorRetido,
   );
 
   /// "A Luiza", "O Carlos".
@@ -332,7 +389,11 @@ class PedidoConcluido {
     this.cancelado = false,
     this.online = false,
     this.chegaEm = '~15 min',
+    this.contestarAte,
   });
+
+  /// RN-45/RN-171: até quando dá para contestar (24 h da confirmação).
+  final DateTime? contestarAte;
 
   final String servico;
   final String profissao;
@@ -394,6 +455,7 @@ class PedidoConcluido {
     cancelado: cancelado,
     online: online,
     chegaEm: chegaEm,
+    contestarAte: contestarAte,
   );
 }
 
@@ -452,6 +514,7 @@ class PedidosRepo extends ChangeNotifier {
     devolvido = null;
     ausente = null;
     avisos.clear();
+    confirmadoSozinho = null;
     _outros.clear();
     buscas.clear();
     andamento = PedidoAndamento(
@@ -567,6 +630,12 @@ class PedidosRepo extends ChangeNotifier {
   Timer? _prazoChegada;
   Timer? _prazoEspera;
   Timer? _prazoCodigo;
+  Timer? _prazoConclusao;
+  Timer? _prazoConfirmar;
+
+  /// Protótipo: a profissional conclui sozinha um tempo depois do código
+  /// (o app do cliente não tem como concluir). Desligado nos testes.
+  static bool demoConclusao = true;
 
   /// Protótipo: depois do "Cheguei", o profissional digita o código
   /// sozinho (o app do cliente não tem o que tocar). Desligado nos
@@ -586,6 +655,8 @@ class PedidosRepo extends ChangeNotifier {
     _prazoChegada?.cancel();
     _prazoEspera?.cancel();
     _prazoCodigo?.cancel();
+    _prazoConclusao?.cancel();
+    _prazoConfirmar?.cancel();
   }
 
   /// O cliente confirmou o valor (RN-76). Protótipo: o profissional não
@@ -763,6 +834,7 @@ class PedidosRepo extends ChangeNotifier {
       ano: '${agora.year}',
       numero: '#TT-${48300 + p.id}',
       online: true,
+      contestarAte: agora.add(Prazos.contestar),
     );
   }
 
@@ -781,7 +853,62 @@ class PedidosRepo extends ChangeNotifier {
     final p = andamento;
     if (p == null) return;
     _pararRelogios();
-    andamento = p.copiar(etapasFeitas: 4);
+    // RN-169: começa o serviço (hora de início e tempo correndo).
+    andamento = p.copiar(etapasFeitas: 4, iniciadoEm: clock.now());
+    if (demoConclusao) {
+      _prazoConclusao = Timer(
+        Prazos.naDemo(const Duration(minutes: 25)),
+        profissionalConcluiu,
+      );
+    }
+    notifyListeners();
+  }
+
+  /// RN-31/RN-171: o profissional tocou em "Concluir serviço". Nada é
+  /// cobrado ainda: o cliente recebe a notificação e confirma. Sem
+  /// resposta em [Prazos.confirmarConclusao], confirma sozinho.
+  void profissionalConcluiu() {
+    final p = andamento;
+    if (p == null || p.distancia || p.etapasFeitas != 4) return;
+    if (p.concluidoEm != null) return;
+    _pararRelogios();
+    andamento = p.copiar(concluidoEm: clock.now());
+    if (notificacoes.ligado('pagamento')) {
+      avisos.add('${p.artigoNome} concluiu o serviço');
+    }
+    _prazoConfirmar = Timer(
+      Prazos.naDemo(Prazos.confirmarConclusao),
+      () => confirmarConclusao(automatico: true),
+    );
+    notifyListeners();
+  }
+
+  /// RN-31: confirmou sozinho (sem resposta em 2 h); a tela aberta usa
+  /// para seguir para a avaliação.
+  PedidoConcluido? confirmadoSozinho;
+
+  /// RN-31: "Sim, confirmar" (ou 2 h sem resposta): cobra (captura a
+  /// reserva) e o pedido vai para "Concluídos". As 24 h para contestar
+  /// contam a partir daqui (RN-171). Devolve o pedido concluído.
+  PedidoConcluido? confirmarConclusao({bool automatico = false}) {
+    final p = andamento;
+    if (p == null || !p.aguardandoConfirmacao) return null;
+    _pararRelogios();
+    final feito = _concluido(p, valor: p.valor, pagamento: p.pagamento);
+    concluidos = [feito, ...concluidos];
+    if (automatico) confirmadoSozinho = feito;
+    _tirarAtual();
+    notifyListeners();
+    return feito;
+  }
+
+  /// RN-31/RN-45: "Algo errado": o valor fica retido e abre a
+  /// contestação. Nada é cobrado até o suporte resolver.
+  void algoErrado() {
+    final p = andamento;
+    if (p == null || !p.aguardandoConfirmacao) return;
+    _pararRelogios();
+    andamento = p.copiar(valorRetido: true);
     notifyListeners();
   }
 

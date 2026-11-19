@@ -44,6 +44,7 @@ void main() {
   setUp(() {
     Prazos.aceleracao = 1;
     PedidosRepo.demoCodigo = false;
+    PedidosRepo.demoConclusao = false;
     navegacao.restaurar();
     pedidos.restaurar();
     atendimentoProfissional.restaurar();
@@ -51,6 +52,7 @@ void main() {
   tearDown(() {
     Prazos.aceleracao = 20;
     PedidosRepo.demoCodigo = true;
+    PedidosRepo.demoConclusao = true;
     pedidos.restaurar();
   });
 
@@ -188,7 +190,8 @@ void main() {
       pedidos.codigoDigitado();
       await t.pump();
       expect(find.text('A Luiza chegou'), findsNothing);
-      expect(find.text('Pedido'), findsOneWidget);
+      // RN-169: vira "está trabalhando".
+      expect(find.text('A Luiza está trabalhando'), findsOneWidget);
     });
 
     testWidgets('RN-78: o atraso aparece no mapa', (t) async {

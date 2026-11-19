@@ -626,13 +626,20 @@ class _Desenho extends CustomPainter {
       old.profissional != profissional;
 }
 
-/// C114 · RN-165: faixa da Home enquanto o profissional está a caminho:
-/// "[nome] chega em X min"; o toque abre o mapa.
+/// C114/C116/C117 · RN-165/RN-169/RN-170: faixa da Home. Um
+/// profissional: "[nome] chega em X min" (a caminho) ou "[nome] está
+/// trabalhando" (depois do código). Dois ou mais: "X profissionais com
+/// você", com a situação de cada um.
 class FaixaACaminho extends StatefulWidget {
-  const FaixaACaminho({super.key, required this.pedido, required this.onTap});
+  const FaixaACaminho({super.key, required this.pedidos, required this.onTap});
 
-  final PedidoAndamento pedido;
+  final List<PedidoAndamento> pedidos;
   final VoidCallback onTap;
+
+  /// Aparece com 2 ou mais pedidos, ou com um a caminho ou trabalhando.
+  static bool mostra(List<PedidoAndamento> ps) =>
+      ps.length > 1 ||
+      (ps.length == 1 && (ps.single.aCaminho || ps.single.trabalhando));
 
   @override
   State<FaixaACaminho> createState() => _FaixaACaminhoState();
@@ -657,9 +664,32 @@ class _FaixaACaminhoState extends State<FaixaACaminho> {
     super.dispose();
   }
 
+  (String, String) get _textos {
+    final ps = widget.pedidos;
+    if (ps.length > 1) {
+      return (
+        '${ps.length} profissionais com você',
+        [for (final p in ps) '${p.primeiroNome} ${p.situacaoCurta}'].join(' · '),
+      );
+    }
+    final p = ps.single;
+    if (p.trabalhando) {
+      return (
+        '${p.primeiroNome} está trabalhando',
+        '${p.profissao} · ${p.minutosTrabalhando()} min · ver serviço',
+      );
+    }
+    return (
+      '${p.primeiroNome} chega em ${p.minutosFaltando()} min',
+      '${p.profissao} · a caminho · ver no mapa',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final p = widget.pedido;
+    final ps = widget.pedidos;
+    final (titulo, detalhe) = _textos;
+    const lado = 40.0;
     return Semantics(
       button: true,
       child: Material(
@@ -672,14 +702,42 @@ class _FaixaACaminhoState extends State<FaixaACaminho> {
             padding: const EdgeInsets.fromLTRB(14, 16, 16, 16),
             child: Row(
               children: [
-                AvatarIniciais(nome: p.profissional, tamanho: 40),
+                if (ps.length > 1)
+                  // RN-170: os dois primeiros, um sobre o outro.
+                  SizedBox(
+                    width: lado + 20,
+                    height: lado,
+                    child: Stack(
+                      children: [
+                        AvatarIniciais(nome: ps[0].profissional, tamanho: lado),
+                        Positioned(
+                          left: 20,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: TatuColors.action,
+                                width: 2,
+                              ),
+                            ),
+                            child: AvatarIniciais(
+                              nome: ps[1].profissional,
+                              tamanho: lado - 4,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  AvatarIniciais(nome: ps.single.profissional, tamanho: lado),
                 const SizedBox(width: TatuMedidas.entreItens),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${p.primeiroNome} chega em ${p.minutosFaltando()} min',
+                        titulo,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 17,
@@ -689,7 +747,7 @@ class _FaixaACaminhoState extends State<FaixaACaminho> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${p.profissao} · a caminho · ver no mapa',
+                        detalhe,
                         overflow: TextOverflow.ellipsis,
                         style: TatuTexto.nota.copyWith(
                           color: TatuColors.avisoEscuroTexto,

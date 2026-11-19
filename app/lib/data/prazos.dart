@@ -26,6 +26,13 @@ abstract final class Prazos {
   static const ausenciasParaPausar = 3;
   static const janelaAusencias = Duration(days: 30);
 
+  /// RN-31/RN-171: depois de "Concluir serviço", tempo para o cliente
+  /// confirmar; sem resposta, confirma sozinho e cobra.
+  static const confirmarConclusao = Duration(hours: 2);
+
+  /// RN-45/RN-171: prazo para contestar, contado da confirmação.
+  static const contestar = Duration(hours: 24);
+
   /// RN-35: retenção antes do repasse ao profissional (Pix em 24 horas).
   static const repasse = Duration(hours: 24);
 

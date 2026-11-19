@@ -109,7 +109,7 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 8.1. **Valor combinado.** O Profissional propõe o valor no chat. No serviço no local, ele pode separar **Visita** (pode ser zero) e **Serviço**. São até 3 rodadas de proposta; sem acordo, o chamado é encerrado sem custo.
 
-8.2. **Reserva e cobrança.** Ao confirmar, o total fica **reservado** no cartão padrão do Cliente. A cobrança acontece **automaticamente** quando o Profissional toca em "Concluir serviço" (no local) ou quando o Cliente aprova a entrega (à distância).
+8.2. **Reserva e cobrança.** Ao confirmar, o total fica **reservado** no cartão padrão do Cliente. A cobrança acontece quando o Cliente **confirma a conclusão** depois que o Profissional toca em "Concluir serviço" (no local); sem resposta do Cliente em 2 horas, a conclusão é confirmada automaticamente ou quando o Cliente aprova a entrega (à distância).
 
 8.3. **Pagamento só pelo app.** Todo pagamento entre Cliente e Profissional por serviços combinados no Tatu deve passar pelo app. **É proibido pagar ou cobrar por fora**, em dinheiro, Pix direto ou qualquer outro meio. Quem paga por fora perde as garantias do Tatu (contestação, reembolso, suporte) e pode ter a conta suspensa.
 

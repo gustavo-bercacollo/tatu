@@ -40,10 +40,12 @@ void main() {
     pedidos.restaurar();
     conta.restaurar();
     PedidosRepo.demoCodigo = false;
+    PedidosRepo.demoConclusao = false;
   });
   tearDown(() {
     Prazos.aceleracao = 20;
     PedidosRepo.demoCodigo = true;
+    PedidosRepo.demoConclusao = true;
     pedidos.restaurar(); // para os relógios
   });
 

@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 18/11/2026 (v27)
+Atualizado em 19/11/2026 (v29)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -80,7 +80,7 @@ Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do própri
 | RN-28 | O endereço exato só vai para o profissional depois que o valor é confirmado. Antes disso, ele vê só o bairro e a distância. |
 | RN-29 | Pagamento só pelo app: cartão ou Pix. Não existe pagamento "por fora" nem em dinheiro. |
 | RN-30 | Ao confirmar o valor, o total fica reservado no cartão padrão. Não é cobrado ainda. |
-| RN-31 | Quando o profissional toca em "Concluir serviço", o cliente é cobrado automaticamente. Não existe tela de cobrança nem botão "Pagar" no fim. |
+| RN-31 | Quando o profissional toca em "Concluir serviço", o cliente confirma ("A [nome] concluiu o serviço. Está tudo certo?"). "Sim, confirmar" cobra na hora; "Algo errado" segura o valor e abre a contestação (RN-45). Sem resposta em 2 horas (exemplo), a conclusão é confirmada sozinha e o cliente é cobrado. Não existe tela de pagamento nem botão "Pagar". |
 | RN-32 | Se o serviço for maior que o descrito, o profissional manda um novo valor pelo chat. Se o cliente aceita, a reserva sobe. Se recusa, o profissional faz só o combinado ou encerra cobrando só a visita. |
 | RN-33 | A visita é sempre cobrada, mesmo que o serviço não aconteça. |
 | RN-34 | O Tatu cobra comissão sobre todo serviço, visita incluída. Valor de exemplo: 10%. |
@@ -217,6 +217,10 @@ As penalidades existem para impedir abuso, nunca para punir quem se protegeu.
 | RN-165 | Depois do valor confirmado, o cliente acompanha o profissional: "vai sair já" (com o tempo para sair, RN-76), mapa ao vivo com rota e previsão de chegada, "chegando" (menos de 2 min, notificação e código na tela) e "chegou" ("Passe o código"). Enquanto o profissional está a caminho, a Home mostra a faixa "[nome] chega em X min", que abre o mapa. |
 | RN-166 | A localização do profissional só é mostrada ao cliente entre "Estou a caminho" e a digitação do código (ou "Cliente não apareceu"). Depois disso para de ser compartilhada. |
 | RN-167 | O código errado 3 vezes bloqueia novas tentativas e o app oferece falar com o suporte. O código nunca deve ser passado por mensagem; o app avisa o cliente. Enquanto o código não é digitado, o tempo de espera do cliente (RN-80) continua contando. |
+| RN-168 | Ao confirmar o primeiro valor de um atendimento no local, o app sai do chat sozinho: o cliente vai para o acompanhamento ("[nome] vai sair já") e o profissional vai para "Saia em até 10 min", com endereço e "Estou a caminho". À distância, o cliente vai para "Pedido em andamento". O chat continua a um toque (Mensagem). Valores novos durante o serviço continuam sendo confirmados no chat. |
+| RN-169 | Depois do código digitado, o cliente vê "A [nome] está trabalhando": hora de início e tempo correndo, Mensagem e Ligar, valor combinado ("cobrado quando você confirmar"), aviso de que novo valor é aprovado no chat e o escudo de segurança. Sem botão de cancelar. A faixa da Home vira "[nome] está trabalhando · X min". |
+| RN-170 | Com mais de um profissional ao mesmo tempo, a faixa da Home mostra "X profissionais com você" e abre a Atividade → Em andamento, com um card por profissional e a situação de cada um ao vivo. Com um só profissional, a faixa abre direto a tela dele. Cada atendimento continua separado (código, cobrança e avaliação). |
+| RN-171 | Depois de "Concluir serviço", o profissional vê "Aguardando [cliente] confirmar" (com o tempo das 2 horas) e já pode ficar online. Confirmado, vê o valor que vai para o Pix. As 24 horas de contestação (RN-45) continuam valendo depois da confirmação. |
 | RN-137 | Acessibilidade · ditado na descrição do pedido: o microfone (à direita na caixa) transforma a fala em texto, que aparece enquanto a pessoa fala; ela confere e edita antes de chamar. Nenhum áudio é enviado. A sugestão de serviço usa o texto. |
 | RN-138 | Acessibilidade · ditado no chat (cliente e profissional): o microfone ao lado do campo transforma a fala em texto no próprio campo; a pessoa confere e envia como mensagem de texto. O chat não tem mensagem de áudio. |
 | RN-139 | Na descrição do pedido, a caixa tem câmera e clipe à esquerda e microfone à direita. O clipe abre "Escolher da galeria" ou "Arquivo (PDF, documento)". Fotos e arquivos aparecem como miniaturas com X para excluir. Até 5 anexos por pedido (exemplo). Valem os tipos e as verificações do chat (RN-119 a RN-122). O profissional vê os anexos no Novo chamado. |
@@ -268,6 +272,7 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 - [ ] **Termos e Política · dados para publicar.** Razão social, CNPJ, endereço, e-mails de suporte e do encarregado (DPO), fornecedores (pagamento, consulta de CPF, verificação, moderação, ditado, ligação, nuvem), prazos de guarda e URL pública. Revisão por advogado antes de publicar.
 - [ ] **Entrar com Google e Apple (adiado).** Proposta: "Continuar com Google" e "Continuar com Apple" (a Apple exige a dela se houver login social), aproveitando nome, e-mail confirmado e foto; falta só CPF e aceite; celular confirmado antes do primeiro pedido; e-mail que já tem conta vincula com código, sem duplicar. Layout das telas ainda não aprovado (opções A: folha na boas-vindas, B: tela com 3 botões, C: celular com ícones).
 - [ ] **Antecedentes criminais (adiado).** Pedir certidão de antecedentes de quem cuida de criança, idoso ou pessoa com deficiência, ou de todos que vão até a casa do cliente. Atualizar a Política de Privacidade se for adotado.
+- [ ] **Uso fora da finalidade (adiado).** Proposta: (1) IA confere se o pedido é um serviço do catálogo e bloqueia termos proibidos ("Esse pedido não é um serviço do Tatu"); (2) profissões sensíveis (ex.: massagem) com regra extra e "acompanhante" fora do catálogo; (3) trava de autopagamento (mesmo CPF, celular, aparelho, cartão ou Pix dos dois lados); (4) revisão de serviços sem chegada/código, valores muito acima do normal e muitos serviços caros entre as mesmas pessoas; (5) teto de valor e sem parcelamento nos primeiros serviços de conta nova; (6) fila de revisão, banimento e comunicação às autoridades; parceiro de pagamentos com antifraude.
 - [ ] **Ligação pelo app.** Escolher como fazer a ligação sem mostrar o número: pela internet (mais barato) ou número intermediário (custo por minuto).
 
 ## 11. Problemas mapeados
@@ -306,6 +311,8 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 19/11/2026 | RN-31, RN-169 a RN-171 | Cliente vê o serviço em andamento; vários profissionais abrem a Atividade; cliente confirma a conclusão (2 horas para confirmar sozinho). |
+| 19/11/2026 | RN-168 | Depois de confirmar o valor, cliente e profissional saem do chat e vão direto para o acompanhamento. |
 | 18/11/2026 | RN-39, RN-165 a RN-167 | Cliente acompanha o profissional no mapa. O cliente passa o código e o profissional digita para começar o serviço. |
 | 18/11/2026 | RN-161, RN-162 | "Outros" no cadastro do profissional igual ao do pedido do cliente (por segmento, com busca) e sugestão de profissão. Especialidades continuam até 3. |
 | 18/11/2026 | RN-156 a RN-160 | Profissões reguladas: registro sem foto, conferido na consulta pública, selo no perfil. |

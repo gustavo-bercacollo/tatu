@@ -4,11 +4,13 @@ import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/atendimento_profissional.dart';
 import 'package:tatu/data/navegacao.dart';
 import 'package:tatu/data/pedidos.dart';
+import 'package:tatu/data/prazos.dart';
 import 'package:tatu/data/profissional.dart';
 import 'package:tatu/features/cliente/atividade/servico_finalizado_page.dart';
 import 'package:tatu/features/profissional/chamado/toque_chamado.dart';
 import 'package:tatu/features/profissional/home/home_profissional_page.dart';
 import 'package:tatu/features/profissional/servico/andamento_page.dart';
+import 'package:tatu/features/profissional/servico/conclusao_page.dart';
 
 Future<void> _abrir(WidgetTester t, Widget tela) async {
   t.view.physicalSize = const Size(430, 1000);
@@ -36,16 +38,50 @@ void main() {
     atendimentoProfissional.restaurar();
   });
 
-  testWidgets('Concluir serviço cobra o cliente e volta à Home', (t) async {
+  testWidgets('RN-31/RN-171: concluir não cobra; espera a Ana confirmar', (
+    t,
+  ) async {
+    ConclusaoServicoPage.clienteConfirmaEm = null;
+    addTearDown(
+      () => ConclusaoServicoPage.clienteConfirmaEm = const Duration(seconds: 6),
+    );
+    Prazos.aceleracao = 1;
+    addTearDown(() => Prazos.aceleracao = 20);
     await _emAndamento(t);
-    expect(find.text('Ao concluir, a Ana é cobrada automaticamente.'),
+    expect(find.text('Ao concluir, a Ana confirma e é cobrada.'),
         findsOneWidget);
     await t.tap(find.text('Concluir serviço'));
     await t.pumpAndSettle();
     expect(find.text('Serviço concluído'), findsOneWidget);
-    expect(find.text('Você está offline'), findsOneWidget);
+    expect(find.text('Aguardando a Ana confirmar'), findsOneWidget);
+    // Contagem das 2 horas (h:mm).
+    expect(
+      find.byWidgetPredicate(
+        (w) => w is Text && RegExp(r'^[12]:\d\d$').hasMatch(w.data ?? ''),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Ficar online'), findsOneWidget);
     expect(profissional.visitas, [false]);
-    await t.pump(const Duration(seconds: 4)); // aviso some
+    // RN-31: 2 horas sem resposta, confirma sozinho.
+    await t.pump(const Duration(hours: 2));
+    await t.pump();
+    expect(find.text('Ana confirmou'), findsOneWidget);
+    expect(find.text(r'R$ 135,00'), findsOneWidget);
+    expect(find.text('Avaliar a Ana'), findsOneWidget);
+  });
+
+  testWidgets('RN-171: aguardando, já pode ficar online', (t) async {
+    ConclusaoServicoPage.clienteConfirmaEm = null;
+    addTearDown(
+      () => ConclusaoServicoPage.clienteConfirmaEm = const Duration(seconds: 6),
+    );
+    await _emAndamento(t);
+    await t.tap(find.text('Concluir serviço'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Ficar online'));
+    await t.pumpAndSettle();
+    expect(profissional.online, isTrue);
   });
 
   testWidgets('Só a visita: folha com aviso e registro no histórico',

@@ -338,20 +338,24 @@ class _HomeClientePageState extends State<HomeClientePage> {
                         ListenableBuilder(
                           listenable: Listenable.merge([pedidos, conta]),
                           builder: (context, _) {
-                            // RN-90: o primeiro que estiver a caminho.
-                            final p = pedidos.andamentos
-                                .where((a) => a.aCaminho)
-                                .firstOrNull;
-                            if (p != null) {
+                            final ps = pedidos.andamentos;
+                            if (FaixaACaminho.mostra(ps)) {
                               return Padding(
                                 padding: const EdgeInsets.only(
                                   top: 16,
                                   bottom: TatuMedidas.entreSecoes + 4,
                                 ),
                                 child: FaixaACaminho(
-                                  pedido: p,
+                                  pedidos: ps,
                                   onTap: () {
-                                    pedidos.abrir(p);
+                                    // RN-170: com 2 ou mais, a Atividade.
+                                    if (ps.length > 1) {
+                                      return irParaAba(
+                                        context,
+                                        AbaCliente.atividade,
+                                      );
+                                    }
+                                    pedidos.abrir(ps.single);
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
                                         builder: (_) =>

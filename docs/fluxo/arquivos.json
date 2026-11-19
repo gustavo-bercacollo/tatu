@@ -120,7 +120,6 @@
  "app/atividade-vazio.png": "docs/fluxo/app/atividade-vazio.png",
  "app/atividade-concluidos-vazio.png": "docs/fluxo/app/atividade-concluidos-vazio.png",
  "app/atividade-ninguem-aceitou.png": "docs/fluxo/app/atividade-ninguem-aceitou.png",
- "app/pedido-andamento.png": "docs/fluxo/app/pedido-andamento.png",
  "app/pedido-cancelar.png": "docs/fluxo/app/pedido-cancelar.png",
  "app/pedido-cancelado.png": "docs/fluxo/app/pedido-cancelado.png",
  "app/pedido-concluido.png": "docs/fluxo/app/pedido-concluido.png",
@@ -361,7 +360,6 @@
  "app/pro-encerrar-perfil.png": "docs/fluxo/app/pro-encerrar-perfil.png",
  "app/pro-perfil-encerrado.png": "docs/fluxo/app/pro-perfil-encerrado.png",
  "app/pro-excluir-saldo.png": "docs/fluxo/app/pro-excluir-saldo.png",
- "app/servico-concluido.png": "docs/fluxo/app/servico-concluido.png",
  "app/servico-nao-realizado.png": "docs/fluxo/app/servico-nao-realizado.png",
  "app/contestar.png": "docs/fluxo/app/contestar.png",
  "app/pro-so-visita.png": "docs/fluxo/app/pro-so-visita.png",
@@ -376,5 +374,11 @@
  "app/acompanhar-chegou.png": "docs/fluxo/app/acompanhar-chegou.png",
  "app/home-profissional-a-caminho.png": "docs/fluxo/app/home-profissional-a-caminho.png",
  "app/pro-chegou-digitar-codigo.png": "docs/fluxo/app/pro-chegou-digitar-codigo.png",
- "app/pro-chegou-codigo-incorreto.png": "docs/fluxo/app/pro-chegou-codigo-incorreto.png"
+ "app/pro-chegou-codigo-incorreto.png": "docs/fluxo/app/pro-chegou-codigo-incorreto.png",
+ "app/servico-em-andamento.png": "docs/fluxo/app/servico-em-andamento.png",
+ "app/servico-confirmar-conclusao.png": "docs/fluxo/app/servico-confirmar-conclusao.png",
+ "app/home-profissional-trabalhando.png": "docs/fluxo/app/home-profissional-trabalhando.png",
+ "app/home-varios-profissionais.png": "docs/fluxo/app/home-varios-profissionais.png",
+ "app/pro-aguardando-confirmacao.png": "docs/fluxo/app/pro-aguardando-confirmacao.png",
+ "app/pro-cliente-confirmou.png": "docs/fluxo/app/pro-cliente-confirmou.png"
 }

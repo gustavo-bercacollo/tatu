@@ -20,6 +20,9 @@ import '../../entrada/seguranca.dart';
 import '../chamar/procurando_page.dart';
 import '../mensagens/chat_page.dart';
 import 'acompanhar.dart';
+import 'avaliar_page.dart';
+import 'contestar_page.dart';
+import 'servico_em_andamento.dart';
 import 'na_porta_page.dart' show mostrarAusencia;
 import 'pedido_cancelado_page.dart';
 import '../../entrada/ligacao_page.dart';
@@ -29,7 +32,9 @@ import '../../../data/ligacao.dart';
 /// RN-165: do valor confirmado até o código, vira o acompanhamento no
 /// mapa ([AcompanharPedido]). Mostra também quando o profissional não
 /// aparece: "Ainda não saiu" (RN-76), a volta à busca (RN-77) e o aviso
-/// de atraso no mapa (RN-78).
+/// de atraso no mapa (RN-78). RN-169: depois do código, "está
+/// trabalhando"; RN-31: quando o profissional conclui, o cliente
+/// confirma (ou "Algo errado") e segue para a avaliação.
 class PedidoAndamentoPage extends StatefulWidget {
   const PedidoAndamentoPage({super.key});
 
@@ -40,10 +45,14 @@ class PedidoAndamentoPage extends StatefulWidget {
 class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
   Timer? _relogio;
 
+  /// RN-31: pedido (id) cuja conclusão já foi perguntada.
+  int? _perguntou;
+
   @override
   void initState() {
     super.initState();
     pedidos.addListener(_mudou);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _conclusao());
     // RN-165/RN-78: o mapa, a previsão e o atraso andam com o relógio.
     _relogio = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
@@ -59,8 +68,63 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
     super.dispose();
   }
 
+  /// RN-31: o profissional concluiu: "Está tudo certo?".
+  Future<void> _conclusao() async {
+    final p = pedidos.andamento;
+    if (!mounted || p == null || !p.aguardandoConfirmacao) return;
+    if (_perguntou == p.id) return;
+    _perguntou = p.id;
+    final r = await perguntarConclusao(context, p);
+    if (!mounted) return;
+    switch (r) {
+      case RespostaConclusao.confirmar:
+        // Cobra (captura a reserva) e vai para a avaliação com gorjeta.
+        final feito = pedidos.confirmarConclusao();
+        if (feito != null) _avaliar(feito);
+      case RespostaConclusao.algoErrado:
+        // RN-45: o valor fica retido; abre a contestação.
+        pedidos.algoErrado();
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const ContestarServicoPage()),
+        );
+      case null:
+        _confirmouSozinho();
+    }
+  }
+
+  /// RN-31: 2 horas sem resposta: confirmou sozinho.
+  void _confirmouSozinho() {
+    final s = pedidos.confirmadoSozinho;
+    if (!mounted || s == null) return;
+    pedidos.confirmadoSozinho = null;
+    _avaliar(s);
+  }
+
+  /// Troca esta tela pela avaliação (a folha pode estar fechando por
+  /// cima, por isso troca a própria rota).
+  void _avaliar(PedidoConcluido feito) {
+    if (_avaliando) return;
+    _avaliando = true;
+    // Depois do quadro: a folha termina de fechar antes da troca.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final rota = ModalRoute.of(context);
+      if (rota == null || !rota.isActive) return;
+      Navigator.of(context).replace(
+        oldRoute: rota,
+        newRoute: MaterialPageRoute<void>(
+          builder: (_) => AvaliarPage(pedido: feito),
+        ),
+      );
+    });
+  }
+
+  bool _avaliando = false;
+
   /// RN-77: o pedido voltou à busca; abre a busca com o aviso.
   void _mudou() {
+    _confirmouSozinho();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _conclusao());
     // RN-81: o cliente não apareceu (se a porta não estiver aberta por cima).
     if (mounted &&
         pedidos.ausente != null &&
@@ -130,6 +194,14 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
         final etapa = p?.acompanhar();
         final tela = p != null && etapa != null
             ? _acompanhar(context, p, etapa)
+            // RN-169: depois do código, "está trabalhando".
+            : p != null && p.trabalhando
+            ? ServicoEmAndamento(
+                pedido: p,
+                direita: BotaoEscudo(servico: Atendimento.doPedido(p)),
+                onMensagem: _mensagem,
+                onLigar: () => ligarPeloTatu(context, p.profissional),
+              )
             : _tela(context, p);
         if (p == null || !p.aindaNaoSaiu) return tela;
         // RN-76: aviso fixo no topo enquanto o profissional não sai.
