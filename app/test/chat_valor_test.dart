@@ -35,6 +35,9 @@ void main() {
         findsOneWidget);
     // RN-76: confirmar começa o prazo da Luiza para sair.
     expect(pedidos.andamento?.etapasFeitas, 2);
+    // RN-165: vai direto para o acompanhamento.
+    await t.pumpAndSettle();
+    expect(find.text('A Luiza vai sair já'), findsOneWidget);
     pedidos.restaurar(); // para os relógios do prazo
   });
 

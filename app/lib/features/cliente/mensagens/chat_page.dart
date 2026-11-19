@@ -298,6 +298,14 @@ class _ChatPageState extends State<ChatPage> {
             if (pedidos.andamento?.profissional == _c.nome) {
               // RN-103: à distância, o sinal é cobrado agora.
               pedidos.valorConfirmado(sinal: v.sinal);
+              // RN-165: no local, vai direto para o acompanhamento.
+              if (!_c.distancia) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const PedidoAndamentoPage(),
+                  ),
+                );
+              }
             }
             // RN-99/RN-100: à distância, protótipo: chega uma prévia e
             // depois a 1ª entrega.

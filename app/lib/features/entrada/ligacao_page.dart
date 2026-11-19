@@ -214,7 +214,7 @@ class BalaoLigarLiberado extends StatefulWidget {
   const BalaoLigarLiberado({super.key, required this.onFechar});
 
   /// Quanto tempo o balão fica na tela.
-  static const duracao = Duration(seconds: 2);
+  static const duracao = Duration(seconds: 3);
 
   final VoidCallback onFechar;
 

@@ -90,8 +90,8 @@ void main() {
       await t.pump();
       expect(find.bySemanticsLabel('Ligar pelo Tatu'), findsOneWidget);
       expect(find.text('Agora dá para ligar pelo Tatu.'), findsOneWidget);
-      // O balão some sozinho depois de 2 s.
-      await t.pump(const Duration(seconds: 2));
+      // O balão some sozinho depois de 3 s.
+      await t.pump(const Duration(seconds: 3));
       await t.pump();
       expect(find.text('Agora dá para ligar pelo Tatu.'), findsNothing);
 
