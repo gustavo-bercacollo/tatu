@@ -150,7 +150,8 @@ void main() {
         find.text('A Luiza não confirmou que vinha.\nNada foi cobrado.'),
         findsOneWidget,
       );
-      expect(pedidos.andamento, isNull);
+      // RN-90: sai só este pedido; o que já existia continua.
+      expect(pedidos.andamentos, hasLength(1));
       await t.tap(find.text('Cancelar pedido'));
       await t.pump(const Duration(milliseconds: 600));
     });

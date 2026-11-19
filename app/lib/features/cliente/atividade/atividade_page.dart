@@ -341,14 +341,18 @@ class _NinguemAceitou extends StatelessWidget {
             children: [
               FilledButton(
                 style: pequeno,
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => ProcurandoPage(
-                      servico: busca.servico,
-                      endereco: busca.endereco,
+                // A busca volta para a tela (e, se sair, para cá de novo).
+                onPressed: () {
+                  pedidos.cancelarBusca(busca);
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ProcurandoPage(
+                        servico: busca.servico,
+                        endereco: busca.endereco,
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
                 child: const Text('Tentar de novo'),
               ),
               FilledButton(

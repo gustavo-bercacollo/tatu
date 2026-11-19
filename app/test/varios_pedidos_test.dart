@@ -57,18 +57,33 @@ void main() {
     expect(pedidos.doProfissional('Luiza Souza'), isNull);
   });
 
+  test('a mesma profissional aceitando de novo é outro pedido', () {
+    pedidos.limpar();
+    pedidos.aceitar(_pedido('Encanador', 'Encanadora', 'Luiza Souza'));
+    pedidos.aceitar(_pedido('Eletricista', 'Encanadora', 'Luiza Souza'));
+    pedidos.aceitar(_pedido('Pintor', 'Encanadora', 'Luiza Souza'));
+    expect(
+      pedidos.andamentos.map((p) => p.servico),
+      ['Pintor', 'Eletricista', 'Encanador'],
+    );
+    // Abrir o mais antigo não perde nenhum.
+    pedidos.abrir(pedidos.andamentos.last);
+    expect(pedidos.andamento?.servico, 'Encanador');
+    expect(pedidos.andamentos, hasLength(3));
+  });
+
   test('cada pedido sem ninguém tem a sua busca', () {
     pedidos.buscarEmSegundoPlano(
       BuscaSegundoPlano(servico: 'Pintor', endereco: 'Rua das Flores, 120'),
     );
     expect(pedidos.buscas.map((b) => b.servico), ['Pintor', 'Eletricista']);
-    // "Tentar de novo" na mesma busca não duplica.
+    // Outro pedido do mesmo serviço é outra busca.
     pedidos.buscarEmSegundoPlano(
       BuscaSegundoPlano(servico: 'Pintor', endereco: 'Rua das Flores, 120'),
     );
-    expect(pedidos.buscas, hasLength(2));
+    expect(pedidos.buscas, hasLength(3));
     pedidos.cancelarBusca(pedidos.buscas.last);
-    expect(pedidos.buscas.single.servico, 'Pintor');
+    expect(pedidos.buscas.map((b) => b.servico), ['Pintor', 'Pintor']);
   });
 
   testWidgets('Atividade mostra todos os pedidos e buscas', (t) async {

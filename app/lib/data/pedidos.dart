@@ -90,7 +90,12 @@ class PedidoAndamento {
     this.sinal = 0,
     this.confirmadoEm,
     this.km = 2.3,
+    this.id = 0,
   });
+
+  /// RN-90: número do pedido no app (cada chamada é um pedido, mesmo com
+  /// a mesma pessoa).
+  final int id;
 
   /// RN-76: quando o cliente confirmou o valor (conta o prazo para sair).
   final DateTime? confirmadoEm;
@@ -209,6 +214,7 @@ class PedidoAndamento {
     DateTime? chegouEm,
     DateTime? confirmadoEm,
     String? codigo,
+    int? id,
   }) => PedidoAndamento(
     servico: servico,
     profissao: profissao,
@@ -230,6 +236,7 @@ class PedidoAndamento {
     sinal: sinal ?? this.sinal,
     confirmadoEm: confirmadoEm ?? this.confirmadoEm,
     km: km,
+    id: id ?? this.id,
   );
 
   /// "A Luiza", "O Carlos".
@@ -402,6 +409,7 @@ class PedidosRepo extends ChangeNotifier {
   /// RN-90: o cliente pode ter vários profissionais ao mesmo tempo; os
   /// outros pedidos em andamento ficam aqui.
   final _outros = <PedidoAndamento>[];
+  int _ultimoId = 0;
 
   /// Buscas em segundo plano (uma por pedido sem ninguém ainda).
   final buscas = <BuscaSegundoPlano>[];
@@ -424,8 +432,8 @@ class PedidosRepo extends ChangeNotifier {
   /// lista.
   void abrir(PedidoAndamento p) {
     final atual = andamento;
-    if (atual == null || atual.profissional == p.profissional) return;
-    final i = _outros.indexWhere((o) => o.profissional == p.profissional);
+    if (atual == null || atual.id == p.id) return;
+    final i = _outros.indexWhere((o) => o.id == p.id);
     if (i < 0) return;
     _pararRelogios();
     final escolhido = _outros.removeAt(i);
@@ -534,12 +542,13 @@ class PedidosRepo extends ChangeNotifier {
     _pararRelogios();
     seguranca.encerrarAlerta(cliente: true);
     final atual = andamento;
-    if (atual != null && atual.profissional != p.profissional) {
-      _outros.insert(0, atual);
-    }
-    _outros.removeWhere((o) => o.profissional == p.profissional);
+    if (atual != null) _outros.insert(0, atual);
+    // RN-90: cada chamada é um pedido novo, mesmo com a mesma pessoa.
     // RN-39: cada atendimento no local tem um código novo.
-    andamento = p.distancia ? p : p.copiar(codigo: RegrasCodigo.gerar());
+    andamento = p.copiar(
+      id: ++_ultimoId,
+      codigo: p.distancia ? null : RegrasCodigo.gerar(),
+    );
     final i = buscas.indexWhere((b) => b.servico == p.servico);
     if (i >= 0) buscas.removeAt(i);
     notifyListeners();
@@ -749,14 +758,7 @@ class PedidosRepo extends ChangeNotifier {
 
   /// Ninguém aceitou ainda: o pedido segue buscando em segundo plano.
   /// RN-90: cada pedido sem ninguém ainda tem a sua busca.
-  /// A mesma busca de novo ("Tentar de novo") não vira duas.
   void buscarEmSegundoPlano(BuscaSegundoPlano b) {
-    buscas.removeWhere(
-      (o) =>
-          o.servico == b.servico &&
-          o.endereco == b.endereco &&
-          (b.descricao.isEmpty || o.descricao == b.descricao),
-    );
     buscas.insert(0, b);
     notifyListeners();
   }
