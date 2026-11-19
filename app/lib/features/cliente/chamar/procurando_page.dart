@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
-import '../../../data/encontrados.dart' show inicioDaFila;
+import '../../../data/encontrados.dart' show filaPara, inicioDaFila;
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
@@ -178,7 +178,17 @@ class _ProcurandoPageState extends State<ProcurandoPage>
           servico: widget.servico,
           endereco: widget.endereco,
           // RN-90: cada chamada começa em outra pessoa.
-          indice: inicioDaFila() + (widget.anterior == null ? 0 : 1),
+          indice:
+              inicioDaFila(
+                fila: filaPara(
+                  soMulheres: seguranca.preferirMulheres,
+                  distancia: widget.distancia,
+                ),
+                ocupados: {
+                  for (final p in pedidos.andamentos) p.profissional,
+                },
+              ) +
+              (widget.anterior == null ? 0 : 1),
           distancia: widget.distancia,
         ),
       ),

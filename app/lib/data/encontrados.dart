@@ -163,8 +163,19 @@ const filaDistancia = [
 /// pedidos seguidos (RN-90) não caírem sempre na mesma profissional.
 int _chamadas = 0;
 
-/// Onde a fila começa nesta chamada (e avança para a próxima).
-int inicioDaFila() => _chamadas++;
+/// Onde a fila começa nesta chamada (e avança para a próxima). Pula quem
+/// já está atendendo este cliente ([ocupados], pelo nome).
+int inicioDaFila({
+  List<ProfissionalEncontrado>? fila,
+  Set<String> ocupados = const {},
+}) {
+  final f = fila ?? filaEncontrados;
+  for (var i = 0; i < f.length; i++) {
+    final n = _chamadas++;
+    if (!ocupados.contains(f[n % f.length].nome)) return n;
+  }
+  return _chamadas++;
+}
 
 /// Volta a fila ao começo (testes e capturas).
 void reiniciarFila() => _chamadas = 0;

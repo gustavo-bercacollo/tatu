@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/encontrados.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/conversas.dart';
 import 'package:tatu/data/pedidos.dart';
@@ -20,11 +21,13 @@ void main() {
   setUp(() {
     pedidos.restaurar();
     conversas.restaurar();
+    reiniciarFila();
     ProcurandoPage.aceitaEm = const Duration(seconds: 8);
   });
   tearDown(() => ProcurandoPage.aceitaEm = null);
 
   testWidgets('A busca encontra a Luiza; Ver outro chama o Carlos', (t) async {
+    pedidos.limpar(); // ninguém atendendo: a fila começa na Luiza
     await _abrir(
       t,
       const ProcurandoPage(servico: 'Encanador', endereco: 'Rua A, 1'),

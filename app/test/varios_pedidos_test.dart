@@ -81,6 +81,10 @@ void main() {
       for (var i = 0; i < 3; i++) fila[inicioDaFila() % fila.length].nome,
     ];
     expect(nomes.toSet(), hasLength(3));
+    // Pula quem já está atendendo.
+    reiniciarFila();
+    final i = inicioDaFila(ocupados: {fila.first.nome});
+    expect(fila[i % fila.length].nome, isNot(fila.first.nome));
     reiniciarFila();
   });
 
