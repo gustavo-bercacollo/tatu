@@ -424,9 +424,8 @@ class PedidosRepo extends ChangeNotifier {
   bool get semNadaEmAndamento => andamentos.isEmpty && buscas.isEmpty;
 
   /// Pedido em andamento com [profissional] (pelo nome).
-  PedidoAndamento? doProfissional(String profissional) => andamentos
-      .where((p) => p.profissional == profissional)
-      .firstOrNull;
+  PedidoAndamento? doProfissional(String profissional) =>
+      andamentos.where((p) => p.profissional == profissional).firstOrNull;
 
   /// Abre [p] (vira o pedido atual); o que estava aberto continua na
   /// lista.
@@ -712,12 +711,59 @@ class PedidosRepo extends ChangeNotifier {
   }
 
   /// RN-100: o cliente aprovou a entrega à distância; o restante é
-  /// cobrado.
-  void entregaAprovada() {
+  /// cobrado e o pedido está pago: sai de "Em andamento" e vai para
+  /// "Concluídos" (com o [valor] total e a forma de [pagamento]).
+  void entregaAprovada({String valor = '', String pagamento = ''}) {
     final p = andamento;
     if (p == null || !p.distancia) return;
-    andamento = p.copiar(etapasFeitas: 5);
+    _pararRelogios();
+    concluidos = [
+      _concluido(p, valor: valor, pagamento: pagamento),
+      ...concluidos,
+    ];
+    _tirarAtual();
     notifyListeners();
+  }
+
+  static const _meses = [
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro',
+  ];
+
+  /// O pedido pago como fica em "Concluídos" (data e hora de agora).
+  PedidoConcluido _concluido(
+    PedidoAndamento p, {
+    required String valor,
+    required String pagamento,
+  }) {
+    final agora = clock.now();
+    String dois(int n) => n.toString().padLeft(2, '0');
+    final mes = _meses[agora.month - 1];
+    return PedidoConcluido(
+      servico: p.servico,
+      profissao: p.profissao,
+      profissional: p.profissional,
+      descricao: p.descricao,
+      endereco: p.distancia ? 'À distância' : p.endereco,
+      pagamento: pagamento.isEmpty ? p.pagamento : pagamento,
+      valor: valor.isEmpty ? p.valor : valor,
+      dia: '${dois(agora.day)} ${mes.substring(0, 3).toLowerCase()}',
+      hora: '${dois(agora.hour)}:${dois(agora.minute)}',
+      mes: mes,
+      ano: '${agora.year}',
+      numero: '#TT-${48300 + p.id}',
+      online: true,
+    );
   }
 
   /// RN-165: menos de 2 min: avisa no celular (uma vez por pedido).

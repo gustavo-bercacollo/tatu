@@ -187,9 +187,14 @@ class _ChatPageState extends State<ChatPage> {
   void _aprovar() {
     conversas.aprovarEntrega(_c);
     if (pedidos.doProfissional(_c.nome) case final p?) {
+      final v = _c.valor;
+      // Pago: o pedido vai para "Concluídos".
       pedidos
         ..abrir(p)
-        ..entregaAprovada();
+        ..entregaAprovada(
+          valor: v == null ? '' : reais(v.total),
+          pagamento: pagamentos.padrao?.curto ?? 'Pix',
+        );
     }
   }
 
@@ -228,10 +233,14 @@ class _ChatPageState extends State<ChatPage> {
 
   void _avaliar() {
     final v = _c.valor;
+    // O pedido já concluído (pago) desta pessoa, se houver.
+    final feito = pedidos.concluidos
+        .where((p) => p.profissional == _c.nome && !p.cancelado)
+        .firstOrNull;
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => AvaliarPage(
-          pedido: PedidoConcluido(
+          pedido: feito ?? PedidoConcluido(
             servico: _c.servico,
             profissao: _c.profissao,
             profissional: _c.nome,

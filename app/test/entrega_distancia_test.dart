@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/core/protecao_tela.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/atendimento_profissional.dart';
@@ -264,6 +265,38 @@ void main() {
     expect(find.text('Você aprovou a entrega'), findsOneWidget);
     expect(find.text(r'R$ 175,00 cobrados · total R$ 250,00'), findsOneWidget);
     expect(find.text('Avaliar Marina'), findsOneWidget);
+  });
+
+  testWidgets('Pago à distância: sai de Em andamento e vai para Concluídos', (
+    t,
+  ) async {
+    pedidos.limpar();
+    pedidos.aceitar(
+      const PedidoAndamento(
+        servico: 'Designer',
+        profissao: 'Designer',
+        profissional: 'Marina Reis',
+        nota: '4,9',
+        endereco: 'À distância',
+        valor: '',
+        pagamento: '',
+        etapasFeitas: 3,
+        distancia: true,
+        sinal: 75,
+      ),
+    );
+    final c = _marina();
+    conversas.receberEntrega(c);
+    await _abrir(t, ChatPage(conversa: c));
+    await _rolar(t, find.text('Aprovar'));
+    await t.tap(find.text('Aprovar'));
+    await t.pumpAndSettle();
+    expect(pedidos.andamentos, isEmpty);
+    final feito = pedidos.concluidos.first;
+    expect(feito.profissional, 'Marina Reis');
+    expect(feito.valor, r'R$ 250,00');
+    expect(feito.endereco, 'À distância');
+    pedidos.restaurar();
   });
 
   testWidgets('RN-105: sem entrega no prazo, pede o sinal de volta', (
