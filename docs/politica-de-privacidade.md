@@ -39,6 +39,7 @@ Fale com o encarregado para qualquer dúvida ou pedido sobre seus dados.
 | Foto de perfil ou avatar | Mostrar quem você é para a outra parte | Execução de contrato |
 | Endereços salvos | Levar o profissional até o local do serviço | Execução de contrato |
 | Localização do aparelho (quando o app está em uso) | Achar profissionais perto, mostrar a chegada, liberar "Cheguei" | Execução de contrato |
+| Localização do Profissional a caminho (do "Estou a caminho" até o código ser digitado) | Mostrar ao Cliente onde o Profissional está e a previsão de chegada | Execução de contrato |
 | Localização ao vivo durante um alerta de segurança ou acompanhamento | Avisar seus contatos de confiança e a central do Tatu | Proteção da vida e da incolumidade física (art. 7º, VII); legítimo interesse |
 | Descrição do pedido, fotos e arquivos anexados | Explicar o serviço ao profissional | Execução de contrato |
 | Texto ditado por voz | Transformar sua fala em texto para você conferir e enviar | Execução de contrato; consentimento ao ativar o microfone |

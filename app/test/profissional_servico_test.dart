@@ -24,7 +24,9 @@ void main() {
     };
   });
 
-  testWidgets('A caminho → Quase lá → Cheguei → Iniciar serviço', (t) async {
+  testWidgets('A caminho → Quase lá → Cheguei → código → Em serviço', (
+    t,
+  ) async {
     await _abrir(t, const ACaminhoPage());
     expect(find.text('A caminho da Ana'), findsOneWidget);
     expect(find.text('Chegada em 6 min · 1,2 km'), findsOneWidget);
@@ -38,9 +40,20 @@ void main() {
     expect(find.text('Você chegou perto da Ana'), findsOneWidget);
     await t.tap(find.text('Cheguei'));
     await t.pump();
+    // RN-39: pede o código; sem botão de começar.
+    expect(find.text('Peça o código para a Ana'), findsOneWidget);
+    expect(find.text('Iniciar serviço'), findsNothing);
+    // RN-80: a espera continua contando.
+    await t.tap(find.text('A Ana não está? Ver tempo de espera'));
+    await t.pump();
     expect(find.text('Aguardando a Ana'), findsOneWidget);
     expect(find.textContaining('ela foi avisada'), findsOneWidget);
-    await t.tap(find.text('Iniciar serviço'));
+    await t.tap(find.text('Digitar o código'));
+    await t.pump();
+    for (final d in ['4', '8', '2', '1']) {
+      await t.tap(find.text(d).last);
+      await t.pump();
+    }
     await t.pumpAndSettle();
     expect(find.text('Em serviço'), findsOneWidget);
   });

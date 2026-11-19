@@ -133,7 +133,7 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 9.1. Depois do valor confirmado, o Profissional tem **10 minutos** para tocar em "Estou a caminho". A rota é aberta no app de navegação que ele escolher.
 
-9.2. Na chegada, o Cliente vê a foto, o nome do Profissional e um **código de 4 dígitos**. Recomendamos conferir o código antes de abrir a porta.
+9.2. Depois do valor confirmado, o Cliente acompanha o Profissional no mapa até a chegada. Na chegada, o Cliente passa ao Profissional, pessoalmente, um **código de 4 dígitos** mostrado no app. O serviço só começa quando o Profissional digita o código. Nunca envie o código por mensagem.
 
 9.3. A ligação entre as partes é feita **pelo app**, sem mostrar o número de ninguém, e só fica disponível entre a confirmação do valor e a conclusão.
 

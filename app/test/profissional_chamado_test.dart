@@ -82,7 +82,10 @@ void main() {
     await t.pump(const Duration(seconds: 6)); // chega perto
     await t.tap(find.text('Cheguei'));
     await t.pump();
-    await t.tap(find.text('Iniciar serviço'));
+    for (final d in ['4', '8', '2', '1']) {
+      await t.tap(find.text(d).last);
+      await t.pump();
+    }
     await t.pumpAndSettle();
     expect(find.text('Em serviço'), findsOneWidget);
   });

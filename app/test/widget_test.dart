@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/data/documentos_legais.dart';
 import 'package:tatu/data/consulta_cpf.dart';
 import 'package:tatu/main.dart';
 
 void main() {
+  // Sem profissional a caminho: a Home mostra a saudação (RN-165).
+  setUp(() => pedidos..restaurar()..cancelarAndamento());
+
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
     // RN-150: os documentos já lidos (o cadastro registra as versões).

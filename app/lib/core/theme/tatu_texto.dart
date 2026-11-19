@@ -64,4 +64,16 @@ class TatuTexto {
     letterSpacing: 0.4,
     color: TatuColors.textSecondary,
   );
+
+  /// RN-39: código da porta no app do cliente ("4 8 2 1").
+  static const codigo = TextStyle(
+    fontSize: 26,
+    fontWeight: FontWeight.w800,
+    letterSpacing: 12,
+    height: 1.1,
+  );
+
+  /// Dígito nas caixas e no teclado numérico do profissional.
+  static const digito = TextStyle(fontSize: 28, fontWeight: FontWeight.w700);
+  static const tecla = TextStyle(fontSize: 26, fontWeight: FontWeight.w400);
 }

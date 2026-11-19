@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Chegou · digitar o código do cliente</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <rect x="0" y="0" width="393" height="300" rx="0" fill="#EAEAEE"/>
+  <path d="M0 0 L-30 300" stroke="#fff" stroke-width="10"/>
+  <path d="M70 0 L40 300" stroke="#fff" stroke-width="10"/>
+  <path d="M140 0 L110 300" stroke="#fff" stroke-width="10"/>
+  <path d="M210 0 L180 300" stroke="#fff" stroke-width="10"/>
+  <path d="M280 0 L250 300" stroke="#fff" stroke-width="10"/>
+  <path d="M350 0 L320 300" stroke="#fff" stroke-width="10"/>
+  <path d="M420 0 L390 300" stroke="#fff" stroke-width="10"/>
+  <path d="M0 40 L393 54" stroke="#fff" stroke-width="8"/>
+  <path d="M0 135 L393 149" stroke="#fff" stroke-width="8"/>
+  <path d="M0 230 L393 244" stroke="#fff" stroke-width="8"/>
+  <rect x="250" y="50" width="90" height="60" rx="10" fill="#DDEBD9"/>
+  <rect x="30" y="180" width="100" height="70" rx="10" fill="#DDEBD9"/>
+  <circle cx="250" cy="232" r="9" fill="#34C759" stroke="#fff" stroke-width="3"/>
+  <circle cx="262" cy="250" r="11" fill="#1C1C1E" stroke="#fff" stroke-width="4"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="40" cy="82" r="18" fill="#fff"/>
+  <g transform="translate(31,73) scale(0.75)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></g>
+  <rect x="0" y="270" width="393" height="582" rx="30" fill="#fff"/>
+  <rect x="178.5" y="278" width="36" height="5" rx="2.5" fill="#C7C7CC"/>
+  <text x="20" y="320" font-size="22" font-weight="700" fill="#000000" text-anchor="start">Peça o código para a Ana</text>
+  <text x="20" y="344" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="start">Digitou, o serviço começa sozinho.</text>
+  <rect x="20" y="366" width="83" height="76" rx="18" fill="#EEEEF0"/>
+  <text x="61" y="416" font-size="30" font-weight="700" fill="#000000" text-anchor="middle">4</text>
+  <rect x="110" y="366" width="83" height="76" rx="18" fill="#EEEEF0"/>
+  <text x="151" y="416" font-size="30" font-weight="700" fill="#000000" text-anchor="middle">8</text>
+  <rect x="200" y="366" width="83" height="76" rx="18" fill="#EEEEF0" stroke="#000" stroke-width="1.5"/>
+  <text x="241" y="416" font-size="30" font-weight="700" fill="#000000" text-anchor="middle"></text>
+  <rect x="290" y="366" width="83" height="76" rx="18" fill="#EEEEF0"/>
+  <text x="331" y="416" font-size="30" font-weight="700" fill="#000000" text-anchor="middle"></text>
+  <text x="20" y="470" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">O código está no app da Ana.</text>
+  <text x="20" y="508" font-size="14" font-weight="600" fill="#007AFF" text-anchor="start">A Ana não está? Ver tempo de espera</text>
+  <rect x="0" y="552" width="393" height="300" rx="0" fill="#D1D3D9"/>
+  <rect x="8" y="562" width="118" height="60" rx="10" fill="#fff"/>
+  <text x="67" y="602" font-size="26" font-weight="400" fill="#000000" text-anchor="middle">1</text>
+  <rect x="134" y="562" width="118" height="60" rx="10" fill="#fff"/>
+  <text x="193" y="602" font-size="26" font-weight="400" fill="#000000" text-anchor="middle">2</text>
+  <rect x="260" y="562" width="118" height="60" rx="10" fill="#fff"/>
+  <text x="319" y="602" font-size="26" font-weight="400" fill="#000000" text-anchor="middle">3</text>
+  <rect x="8" y="630" width="118" height="60" rx="10" fill="#fff"/>
+  <text x="67" y="670" font-size="26" font-weight="400" fill="#000000" text-anchor="middle">4</text>
+  <rect x="134" y="630" width="118" height="60" rx="10" fill="#fff"/>
+  <text x="193" y="670" font-size="26" font-weight="400" fill="#000000" text-anchor="middle">5</text>
+  <rect x="260" y="630" width="118" height="60" rx="10" fill="#fff"/>
+  <text x="319" y="670" font-size="26" font-weight="400" fill="#000000" text-anchor="middle">6</text>
+  <rect x="8" y="698" width="118" height="60" rx="10" fill="#fff"/>
+  <text x="67" y="738" font-size="26" font-weight="400" fill="#000000" text-anchor="middle">7</text>
+  <rect x="134" y="698" width="118" height="60" rx="10" fill="#fff"/>
+  <text x="193" y="738" font-size="26" font-weight="400" fill="#000000" text-anchor="middle">8</text>
+  <rect x="260" y="698" width="118" height="60" rx="10" fill="#fff"/>
+  <text x="319" y="738" font-size="26" font-weight="400" fill="#000000" text-anchor="middle">9</text>
+  <rect x="134" y="766" width="118" height="60" rx="10" fill="#fff"/>
+  <text x="193" y="806" font-size="26" font-weight="400" fill="#000000" text-anchor="middle">0</text>
+  <rect x="260" y="766" width="118" height="60" rx="10" fill="#D1D3D9"/>
+  <text x="319" y="806" font-size="26" font-weight="400" fill="#000000" text-anchor="middle">⌫</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>

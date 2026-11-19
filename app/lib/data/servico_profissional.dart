@@ -22,7 +22,11 @@ class ServicoAceito {
     this.pedido = 'TT-48213',
     this.distancia = false,
     this.sinal = 0,
+    this.codigo = '4821',
   });
+
+  /// RN-39: código que o cliente passa na porta (só ele vê no app).
+  final String codigo;
 
   /// RN-95: serviço à distância (sem visita, rota, "Cheguei" nem porta).
   final bool distancia;

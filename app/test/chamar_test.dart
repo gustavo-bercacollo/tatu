@@ -63,14 +63,15 @@ void main() {
     await _homePronta(t);
     await _chamar(t);
     expect(find.text('Já tem um encanador a caminho'), findsOneWidget);
-    expect(find.textContaining('chega em 12 min'), findsOneWidget);
+    expect(find.textContaining('chega em 12 min'), findsWidgets);
     await t.tap(find.text('Chamar outro'));
     await _abriuBusca(t);
 
     await _chamar(t);
     await t.tap(find.text('Ver pedido atual'));
     await t.pumpAndSettle();
-    expect(find.text('Pedido'), findsOneWidget);
+    // RN-165: a caminho, o pedido é o mapa.
+    expect(find.textContaining('Chega em'), findsOneWidget);
   });
 
   testWidgets('Busca: expande aos 60 s e vira "Ninguém ativo" aos 90 s', (

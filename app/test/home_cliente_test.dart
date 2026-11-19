@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/features/cliente/home_page.dart';
 
@@ -15,6 +16,9 @@ Future<void> _abrir(WidgetTester t) async {
 }
 
 void main() {
+  // Sem profissional a caminho: a Home mostra a saudação (RN-165).
+  setUp(() => pedidos..restaurar()..cancelarAndamento());
+
   testWidgets('Home vazia: saudação, iniciais e botão desabilitado', (t) async {
     await _abrir(t);
     expect(find.text('Oi, Ana'), findsOneWidget);

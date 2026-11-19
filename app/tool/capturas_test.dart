@@ -87,6 +87,7 @@ import 'package:tatu/data/conversas.dart';
 import 'package:tatu/features/cliente/mensagens/chat_page.dart';
 import 'package:tatu/features/cliente/mensagens/denunciar_page.dart';
 import 'package:tatu/features/cliente/mensagens/mensagens_page.dart';
+import 'package:tatu/data/codigo_porta.dart';
 import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/features/cliente/atividade/atividade_page.dart';
 import 'package:tatu/features/cliente/atividade/avaliar_page.dart';
@@ -190,6 +191,12 @@ Future<void> _capturar(
   atendimentoProfissional.restaurar();
   canalTatu.restaurar();
   planosFixos.restaurar();
+  // RN-165: a Home só mostra a faixa "chega em X min" nas capturas dela.
+  if (tela is HomeClientePage &&
+      !const {'home-profissional-a-caminho', 'chamar-ja-tem-pedido'}
+          .contains(nome)) {
+    pedidos.cancelarAndamento();
+  }
   await tester.pumpWidget(
     MaterialApp(
       theme: tatuTheme(),
@@ -221,6 +228,9 @@ void main() {
     await profissoesReguladas.carregar();
     await catalogoServicos.carregar();
     demoConferencia = null;
+    // RN-39: código do desenho e sem o profissional digitar sozinho.
+    RegrasCodigo.sorteio = null;
+    PedidosRepo.demoCodigo = false;
   });
   consultaCpf = ConsultaCpfMock(demora: Duration.zero);
   ProtecaoTela.ativa = false;
@@ -829,7 +839,18 @@ void main() {
   });
 
   testWidgets('pedido-andamento', (t) async {
-    await _capturar(t, 'pedido-andamento', const PedidoAndamentoPage());
+    // Depois do código (RN-39): etapas, endereço e valor.
+    await _capturar(
+      t,
+      'pedido-andamento',
+      const PedidoAndamentoPage(),
+      preparar: () async {
+        pedidos
+          ..chegou()
+          ..codigoDigitado();
+        await t.pump();
+      },
+    );
   });
 
   testWidgets('pedido-cancelar', (t) async {
@@ -2352,6 +2373,11 @@ void main() {
           chegou: true,
           esperou: Duration(minutes: 2, seconds: 18),
         ),
+        // RN-80: "Ver tempo de espera" a partir do código.
+        preparar: () async {
+          await t.tap(find.text('A Ana não está? Ver tempo de espera'));
+          await t.pump();
+        },
       );
     });
   });
@@ -2363,6 +2389,8 @@ void main() {
         'pro-cliente-nao-apareceu',
         const ACaminhoPage(chegou: true, esperou: Duration(minutes: 10)),
         preparar: () async {
+          await t.tap(find.text('A Ana não está? Ver tempo de espera'));
+          await t.pump();
           await t.tap(find.text('Cliente não apareceu'));
           await t.pumpAndSettle();
         },
@@ -2370,18 +2398,108 @@ void main() {
     });
   });
 
-  testWidgets('cliente-na-porta', (t) async {
+  // RN-39/RN-167: o profissional digita o código.
+  Future<void> digitar(WidgetTester t, String codigo) async {
+    for (final d in codigo.split('')) {
+      await t.tap(find.text(d).last);
+      await t.pump();
+    }
+  }
+
+  testWidgets('pro-chegou-digitar-codigo', (t) async {
+    atendimentoProfissional.restaurar();
     await _capturar(
       t,
-      'cliente-na-porta',
-      const PedidoAndamentoPage(),
-      preparar: () async {
-        pedidos.chegou();
-        await t.pump();
-        await t.pump(const Duration(milliseconds: 600));
-      },
+      'pro-chegou-digitar-codigo',
+      const ACaminhoPage(chegou: true),
+      preparar: () => digitar(t, '48'),
     );
-    pedidos.restaurar(); // para o relógio da espera
+  });
+
+  testWidgets('pro-chegou-codigo-incorreto', (t) async {
+    atendimentoProfissional.restaurar();
+    await _capturar(
+      t,
+      'pro-chegou-codigo-incorreto',
+      const ACaminhoPage(chegou: true),
+      preparar: () => digitar(t, '4831'),
+    );
+    atendimentoProfissional.restaurar();
+  });
+
+  // RN-165: acompanhar o profissional (relógio fixo: previsão 14:52).
+  Future<void> acompanhar(
+    WidgetTester t,
+    String nome,
+    Widget tela,
+    Future<void> Function() preparar,
+  ) => withClock(Clock.fixed(DateTime(2026, 11, 14, 14, 40)), () async {
+    final antes = Prazos.aceleracao;
+    Prazos.aceleracao = 1;
+    await _capturar(t, nome, tela, preparar: preparar);
+    Prazos.aceleracao = antes;
+    pedidos.restaurar();
+  });
+
+  const combinado = PedidoAndamento(
+    servico: 'Encanador',
+    profissao: 'Encanadora',
+    profissional: 'Luiza Souza',
+    nota: '4,9',
+    endereco: 'Rua das Flores, 120',
+    valor: r'R$ 190,00',
+    pagamento: 'Visa 4242',
+    etapasFeitas: 1,
+  );
+
+  testWidgets('acompanhar-antes-de-sair', (t) async {
+    await acompanhar(t, 'acompanhar-antes-de-sair', const PedidoAndamentoPage(),
+        () async {
+      pedidos.aceitar(combinado);
+      // Confirmou há 3 min: faltam 7 min para sair.
+      await withClock(Clock.fixed(DateTime(2026, 11, 14, 14, 37)), () async {
+        pedidos.valorConfirmado();
+      });
+      await t.pump();
+    });
+  });
+
+  testWidgets('acompanhar-a-caminho', (t) async {
+    await acompanhar(t, 'acompanhar-a-caminho', const PedidoAndamentoPage(),
+        () async {
+      pedidos.aceitar(combinado);
+      pedidos.saiu();
+      await t.pump();
+    });
+  });
+
+  testWidgets('acompanhar-chegando', (t) async {
+    await acompanhar(t, 'acompanhar-chegando', const PedidoAndamentoPage(),
+        () async {
+      pedidos.aceitar(combinado);
+      await withClock(Clock.fixed(DateTime(2026, 11, 14, 14, 29)), () async {
+        pedidos.saiu();
+      });
+      await t.pump();
+    });
+  });
+
+  testWidgets('acompanhar-chegou', (t) async {
+    await acompanhar(t, 'acompanhar-chegou', const PedidoAndamentoPage(),
+        () async {
+      pedidos.aceitar(combinado);
+      pedidos.saiu();
+      pedidos.chegou();
+      await t.pump();
+    });
+  });
+
+  testWidgets('home-profissional-a-caminho', (t) async {
+    await acompanhar(t, 'home-profissional-a-caminho', const HomeClientePage(),
+        () async {
+      pedidos.saiu();
+      await t.pump();
+    });
   });
 
   testWidgets('cliente-ausente', (t) async {

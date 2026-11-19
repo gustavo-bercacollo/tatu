@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 
+import 'codigo_porta.dart';
 import 'conta.dart';
+import 'notificacoes.dart';
 import 'prazos.dart';
 import 'seguranca.dart';
 
@@ -44,6 +46,26 @@ const etapasCurtas = [
   'Pagamento',
 ];
 
+/// RN-165: o que o cliente acompanha depois do valor confirmado.
+enum EtapaAcompanhar {
+  /// Valor confirmado; o profissional ainda vai sair (RN-76).
+  antesDeSair,
+
+  /// Saiu: mapa ao vivo com rota e previsão.
+  aCaminho,
+
+  /// Menos de [RegrasAcompanhar.chegando]: notificação e código na tela.
+  chegando,
+
+  /// Tocou em "Cheguei": "Passe o código".
+  chegou,
+}
+
+abstract final class RegrasAcompanhar {
+  /// RN-165: abaixo disso, "está chegando".
+  static const chegando = Duration(minutes: 2);
+}
+
 /// Pedido com profissional, ainda não concluído.
 @immutable
 class PedidoAndamento {
@@ -66,7 +88,15 @@ class PedidoAndamento {
     this.codigo = '4821',
     this.distancia = false,
     this.sinal = 0,
+    this.confirmadoEm,
+    this.km = 2.3,
   });
+
+  /// RN-76: quando o cliente confirmou o valor (conta o prazo para sair).
+  final DateTime? confirmadoEm;
+
+  /// Distância do profissional quando saiu (protótipo).
+  final double km;
 
   /// RN-92: pedido à distância (sem visita, rota, porta nem escudo).
   final bool distancia;
@@ -91,7 +121,8 @@ class PedidoAndamento {
   /// Valor da visita (cobrado se o cliente não aparecer, RN-81).
   final num visita;
 
-  /// RN-39: código de 4 dígitos que o cliente pede antes de abrir a porta.
+  /// RN-39: código de 4 dígitos que o cliente passa ao profissional na
+  /// porta (só o cliente vê).
   final String codigo;
 
   /// O profissional chegou e o cliente ainda não abriu a porta.
@@ -110,6 +141,65 @@ class PedidoAndamento {
   /// Minutos previstos de chegada ("12 min" → 12).
   int get minutosChegada => int.tryParse(chegaEm.split(' ').first) ?? 0;
 
+  /// Quanto tempo do protótipo passou desde [desde] (o relógio anda
+  /// [Prazos.aceleracao] vezes mais rápido).
+  static Duration _passou(DateTime desde, DateTime? agora) =>
+      (agora ?? clock.now()).difference(desde) * Prazos.aceleracao;
+
+  /// RN-165: quanto falta para chegar (zero no máximo).
+  Duration faltaChegar([DateTime? agora]) {
+    final s = saiuEm;
+    final previsto = Duration(minutes: minutosChegada);
+    if (s == null) return previsto;
+    final r = previsto - _passou(s, agora);
+    return r.isNegative ? Duration.zero : r;
+  }
+
+  /// "Chega em 12 min" (arredonda para cima; nunca 0).
+  int minutosFaltando([DateTime? agora]) {
+    final r = faltaChegar(agora);
+    final m = (r.inSeconds / 60).ceil();
+    return m < 1 ? 1 : m;
+  }
+
+  /// Distância que falta (protótipo: proporcional ao tempo).
+  double kmFaltando([DateTime? agora]) {
+    final total = minutosChegada;
+    if (total <= 0) return 0;
+    return km * faltaChegar(agora).inSeconds / (total * 60);
+  }
+
+  /// RN-76: minutos que faltam do prazo para sair.
+  int minutosParaSair([DateTime? agora]) {
+    final c = confirmadoEm;
+    final r = c == null
+        ? Prazos.estouACaminho
+        : Prazos.estouACaminho - _passou(c, agora);
+    if (r.isNegative) return 0;
+    return (r.inSeconds / 60).ceil();
+  }
+
+  /// RN-165: etapa do acompanhamento (nula à distância, antes do valor
+  /// confirmado ou depois do código).
+  EtapaAcompanhar? acompanhar([DateTime? agora]) {
+    if (distancia) return null;
+    if (etapasFeitas == 2) return EtapaAcompanhar.antesDeSair;
+    if (etapasFeitas != 3) return null;
+    if (chegouEm != null) return EtapaAcompanhar.chegou;
+    if (saiuEm == null) return EtapaAcompanhar.antesDeSair;
+    return faltaChegar(agora) < RegrasAcompanhar.chegando
+        ? EtapaAcompanhar.chegando
+        : EtapaAcompanhar.aCaminho;
+  }
+
+  /// RN-166: o cliente só vê a posição do profissional entre "Estou a
+  /// caminho" e o código digitado.
+  bool get mostraLocalizacao =>
+      !distancia && etapasFeitas == 3 && saiuEm != null;
+
+  /// RN-165: a Home mostra "[nome] chega em X min" (só a caminho).
+  bool get aCaminho => mostraLocalizacao && chegouEm == null;
+
   PedidoAndamento copiar({
     int? etapasFeitas,
     num? sinal,
@@ -117,6 +207,8 @@ class PedidoAndamento {
     DateTime? saiuEm,
     bool? esperandoAtraso,
     DateTime? chegouEm,
+    DateTime? confirmadoEm,
+    String? codigo,
   }) => PedidoAndamento(
     servico: servico,
     profissao: profissao,
@@ -133,9 +225,11 @@ class PedidoAndamento {
     esperandoAtraso: esperandoAtraso ?? this.esperandoAtraso,
     chegouEm: chegouEm ?? this.chegouEm,
     visita: visita,
-    codigo: codigo,
+    codigo: codigo ?? this.codigo,
     distancia: distancia,
     sinal: sinal ?? this.sinal,
+    confirmadoEm: confirmadoEm ?? this.confirmadoEm,
+    km: km,
   );
 
   /// "A Luiza", "O Carlos".
@@ -312,6 +406,7 @@ class PedidosRepo extends ChangeNotifier {
     _pararRelogios();
     devolvido = null;
     ausente = null;
+    avisos.clear();
     andamento = PedidoAndamento(
       servico: 'Encanador',
       profissao: 'Encanadora',
@@ -395,7 +490,8 @@ class PedidosRepo extends ChangeNotifier {
   void aceitar(PedidoAndamento p) {
     _pararRelogios();
     seguranca.encerrarAlerta(cliente: true);
-    andamento = p;
+    // RN-39: cada atendimento no local tem um código novo.
+    andamento = p.distancia ? p : p.copiar(codigo: RegrasCodigo.gerar());
     busca = null;
     notifyListeners();
   }
@@ -413,6 +509,15 @@ class PedidosRepo extends ChangeNotifier {
   Timer? _prazoResposta;
   Timer? _prazoChegada;
   Timer? _prazoEspera;
+  Timer? _prazoCodigo;
+
+  /// Protótipo: depois do "Cheguei", o profissional digita o código
+  /// sozinho (o app do cliente não tem o que tocar). Desligado nos
+  /// testes de ausência.
+  static bool demoCodigo = true;
+
+  /// RN-165: notificações mandadas ao celular (protótipo: só guarda).
+  final avisos = <String>[];
 
   /// RN-77: pedido que voltou à busca porque o profissional não confirmou
   /// que vinha. A tela do pedido usa para abrir a busca de novo.
@@ -423,6 +528,7 @@ class PedidosRepo extends ChangeNotifier {
     _prazoResposta?.cancel();
     _prazoChegada?.cancel();
     _prazoEspera?.cancel();
+    _prazoCodigo?.cancel();
   }
 
   /// O cliente confirmou o valor (RN-76). Protótipo: o profissional não
@@ -439,7 +545,11 @@ class PedidosRepo extends ChangeNotifier {
       notifyListeners();
       return;
     }
-    andamento = p.copiar(etapasFeitas: 2, aindaNaoSaiu: false);
+    andamento = p.copiar(
+      etapasFeitas: 2,
+      aindaNaoSaiu: false,
+      confirmadoEm: clock.now(),
+    );
     _prazoSaida = Timer(Prazos.naDemo(Prazos.estouACaminho), aindaNaoSaiu);
     notifyListeners();
   }
@@ -531,6 +641,12 @@ class PedidosRepo extends ChangeNotifier {
     _pararRelogios();
     andamento = p.copiar(etapasFeitas: 3, chegouEm: clock.now());
     _prazoEspera = Timer(Prazos.naDemo(Prazos.esperaCliente), clienteAusente);
+    if (demoCodigo) {
+      _prazoCodigo = Timer(
+        Prazos.naDemo(const Duration(minutes: 2)),
+        codigoDigitado,
+      );
+    }
     notifyListeners();
   }
 
@@ -543,8 +659,18 @@ class PedidosRepo extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// RN-39: o código confere; o serviço começa.
-  void abriuPorta() {
+  /// RN-165: menos de 2 min: avisa no celular (uma vez por pedido).
+  void avisarChegando() {
+    final p = andamento;
+    if (p == null || p.acompanhar() != EtapaAcompanhar.chegando) return;
+    final texto = '${p.artigoNome} está chegando';
+    if (avisos.contains(texto)) return;
+    if (notificacoes.ligado('caminho')) avisos.add(texto);
+  }
+
+  /// RN-39: o profissional digitou o código certo: o serviço começa
+  /// sozinho e a localização para de ser mostrada (RN-166).
+  void codigoDigitado() {
     final p = andamento;
     if (p == null) return;
     _pararRelogios();

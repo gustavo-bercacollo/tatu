@@ -30,6 +30,9 @@ class TatuColors {
 
   /// Fundo de erro e do botão de remover.
   static const dangerSoft = Color(0xFFFFE5E5);
+
+  /// Fundo do teclado numérico (código na porta, RN-39).
+  static const teclado = Color(0xFFD1D3D9);
   static const hairline = Color(0x4A3C3C43);
   static const scrim = Color(0x61000000);
 

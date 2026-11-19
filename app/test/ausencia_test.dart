@@ -39,9 +39,11 @@ void main() {
     navegacao.restaurar();
     pedidos.restaurar();
     conta.restaurar();
+    PedidosRepo.demoCodigo = false;
   });
   tearDown(() {
     Prazos.aceleracao = 20;
+    PedidosRepo.demoCodigo = true;
     pedidos.restaurar(); // para os relógios
   });
 
@@ -50,6 +52,9 @@ void main() {
   ) async {
     await _abrir(t, const ACaminhoPage(perto: true));
     await t.tap(find.text('Cheguei'));
+    await t.pump();
+    // RN-80: a espera conta enquanto o código não é digitado.
+    await t.tap(find.text('A Ana não está? Ver tempo de espera'));
     await t.pump();
     // RN-80: contador de 10 min; "Cliente não apareceu" desativado.
     expect(find.text('Aguardando a Ana'), findsOneWidget);
@@ -82,20 +87,23 @@ void main() {
     await t.pumpAndSettle();
   });
 
-  testWidgets('Cliente: a porta mostra o código; "O código confere"', (
+  testWidgets('Cliente: chegou, passa o código; o serviço começa sozinho', (
     t,
   ) async {
     pedidos.chegou();
     await _abrir(t, const PedidoAndamentoPage());
-    await t.pumpAndSettle();
-    expect(find.text('Luiza chegou'), findsOneWidget);
-    for (final d in ['4', '8', '2', '1']) {
-      expect(find.text(d), findsOneWidget);
-    }
-    expect(find.text('A Luiza espera por até 10 minutos.'), findsOneWidget);
-    await t.tap(find.text('O código confere'));
-    await t.pumpAndSettle();
-    expect(find.text('Luiza chegou'), findsNothing);
+    await t.pump();
+    expect(find.text('A Luiza chegou'), findsOneWidget);
+    expect(find.text('Diga este código à Luiza'), findsOneWidget);
+    expect(find.text('4 8 2 1'), findsOneWidget);
+    expect(
+      find.text('Quando ela digitar, o serviço começa sozinho.'),
+      findsOneWidget,
+    );
+    // RN-39: quem digita é a profissional.
+    pedidos.codigoDigitado();
+    await t.pump();
+    expect(find.text('A Luiza chegou'), findsNothing);
     expect(pedidos.andamento?.etapasFeitas, 4);
   });
 
@@ -121,7 +129,7 @@ void main() {
     await _abrir(t, const PedidoAndamentoPage());
     await t.pump(const Duration(minutes: 3));
     await t.pumpAndSettle();
-    expect(find.text('Luiza chegou'), findsOneWidget);
+    expect(find.text('A Luiza chegou'), findsOneWidget);
     pedidos.restaurar(); // para o relógio da espera
   });
 

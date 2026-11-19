@@ -19,14 +19,17 @@ import '../../../shared/widgets/tela_interna.dart';
 import '../../entrada/seguranca.dart';
 import '../chamar/procurando_page.dart';
 import '../mensagens/chat_page.dart';
-import 'na_porta_page.dart';
+import 'acompanhar.dart';
+import 'na_porta_page.dart' show mostrarAusencia;
 import 'pedido_cancelado_page.dart';
 import '../../entrada/ligacao_page.dart';
 import '../../../data/ligacao.dart';
 
 /// Pedido em andamento: profissional, etapas, dados e "Cancelar pedido".
-/// Mostra também quando o profissional não aparece: "Ainda não saiu"
-/// (RN-76), a volta à busca (RN-77) e o aviso de atraso (RN-78).
+/// RN-165: do valor confirmado até o código, vira o acompanhamento no
+/// mapa ([AcompanharPedido]). Mostra também quando o profissional não
+/// aparece: "Ainda não saiu" (RN-76), a volta à busca (RN-77) e o aviso
+/// de atraso no mapa (RN-78).
 class PedidoAndamentoPage extends StatefulWidget {
   const PedidoAndamentoPage({super.key});
 
@@ -36,28 +39,17 @@ class PedidoAndamentoPage extends StatefulWidget {
 
 class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
   Timer? _relogio;
-  bool _perguntouAtraso = false;
-  bool _mostrouPorta = false;
 
   @override
   void initState() {
     super.initState();
     pedidos.addListener(_mudou);
-    // RN-78: confere o atraso enquanto a tela está aberta.
-    _relogio = Timer.periodic(const Duration(seconds: 1), (_) => _atraso());
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _atraso();
-      _porta();
+    // RN-165/RN-78: o mapa, a previsão e o atraso andam com o relógio.
+    _relogio = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      pedidos.avisarChegando();
+      setState(() {});
     });
-  }
-
-  /// RN-80: o profissional chegou: abre a tela da porta (uma vez).
-  void _porta() {
-    final p = pedidos.andamento;
-    if (!mounted || p == null || !p.naPorta || _mostrouPorta) return;
-    _mostrouPorta = true;
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => const NaPortaPage()));
   }
 
   @override
@@ -75,7 +67,6 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
         (ModalRoute.of(context)?.isCurrent ?? true)) {
       return mostrarAusencia(context);
     }
-    _porta();
     final d = pedidos.devolvido;
     if (!mounted || d == null || pedidos.andamento != null) return;
     pedidos.consumirDevolvido();
@@ -95,28 +86,7 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
 
   /// RN-78: passou do dobro do tempo previsto; pode chamar outro sem
   /// pagar nada, nem a visita.
-  Future<void> _atraso() async {
-    final p = pedidos.andamento;
-    final min = pedidos.minutosDeAtraso();
-    if (!mounted || p == null || min == null) return;
-    if (p.esperandoAtraso || _perguntouAtraso) return;
-    _perguntouAtraso = true;
-    final ela = p.profissao.endsWith('a');
-    final outro = await confirmar(
-      context,
-      titulo: '${p.artigoNome} está ${ela ? 'atrasada' : 'atrasado'}',
-      texto:
-          'Era para chegar há $min minutos.\n'
-          'Você pode chamar outro sem pagar nada.',
-      confirmar: 'Chamar outro ${p.servico.toLowerCase()}',
-      cancelar: 'Continuar esperando',
-      iconeAviso: false,
-    );
-    if (!mounted) return;
-    if (!outro) {
-      pedidos.esperarAtrasado();
-      return;
-    }
+  void _chamarOutro(PedidoAndamento p) {
     // RN-78: troca sem custo (nem a visita).
     pedidos.cancelarAndamento();
     Navigator.of(context).pushReplacement(
@@ -157,7 +127,10 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
       listenable: pedidos,
       builder: (context, _) {
         final p = pedidos.andamento;
-        final tela = _tela(context, p);
+        final etapa = p?.acompanhar();
+        final tela = p != null && etapa != null
+            ? _acompanhar(context, p, etapa)
+            : _tela(context, p);
         if (p == null || !p.aindaNaoSaiu) return tela;
         // RN-76: aviso fixo no topo enquanto o profissional não sai.
         return Stack(
@@ -197,6 +170,37 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
           ],
         );
       },
+    );
+  }
+
+  void _mensagem() {
+    final c = conversas.emAndamento.firstOrNull;
+    if (c == null) return;
+    conversas.marcarLida(c);
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => ChatPage(conversa: c)),
+    );
+  }
+
+  /// RN-165: acompanhamento no mapa até o código ser digitado.
+  Widget _acompanhar(
+    BuildContext context,
+    PedidoAndamento p,
+    EtapaAcompanhar etapa,
+  ) {
+    final atraso = pedidos.minutosDeAtraso();
+    return AcompanharPedido(
+      pedido: p,
+      etapa: etapa,
+      direita: BotaoEscudo(servico: Atendimento.doPedido(p)),
+      onMensagem: _mensagem,
+      // RN-140: ligar pelo app do valor confirmado até concluir.
+      onLigar: () => ligarPeloTatu(context, p.profissional),
+      onCancelar: () => _cancelar(context, p),
+      // RN-78: o aviso de atraso fica no próprio mapa.
+      atraso: p.esperandoAtraso ? null : atraso,
+      onChamarOutro: () => _chamarOutro(p),
+      onEsperar: pedidos.esperarAtrasado,
     );
   }
 

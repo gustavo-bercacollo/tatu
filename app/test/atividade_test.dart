@@ -37,7 +37,8 @@ void main() {
     await _abrirAtividade(t);
     await t.tap(find.text('Encanador · Vazamento na pia'));
     await t.pumpAndSettle();
-    expect(find.text('Pedido'), findsOneWidget);
+    // RN-165: a caminho, o pedido abre o mapa.
+    expect(find.textContaining('Chega em'), findsOneWidget);
     await t.tap(find.text('Cancelar pedido'));
     await t.pumpAndSettle();
     expect(find.text('Cancelar pedido?'), findsOneWidget);

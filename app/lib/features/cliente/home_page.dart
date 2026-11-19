@@ -29,7 +29,10 @@ import '../../shared/widgets/espaco_anuncio.dart';
 import '../../shared/widgets/avatar_usuario.dart';
 import '../../shared/widgets/folha.dart';
 import '../../shared/widgets/tatu_chip.dart';
+import '../../data/pedidos.dart';
 import 'abas.dart';
+import 'atividade/acompanhar.dart';
+import 'atividade/pedido_andamento_page.dart';
 import 'chamar/chamar.dart';
 import 'foto/camera_desativada_page.dart';
 import 'outros/outros_servicos_sheet.dart';
@@ -330,29 +333,56 @@ class _HomeClientePageState extends State<HomeClientePage> {
                                 )
                               : const SizedBox.shrink(),
                         ),
-                        SizedBox(
-                          height: conta.pausadaPorAusencias
-                              ? TatuMedidas.entreSecoes + 4
-                              : 40,
-                        ),
+                        // RN-165: profissional a caminho: a faixa
+                        // "[nome] chega em X min" fica no lugar da saudação.
                         ListenableBuilder(
-                          listenable: conta,
-                          builder: (_, _) => Text(
-                            'Oi, ${conta.nome}',
-                            style: TatuTexto.detalhe,
-                          ),
+                          listenable: Listenable.merge([pedidos, conta]),
+                          builder: (context, _) {
+                            final p = pedidos.andamento;
+                            if (p != null && p.aCaminho) {
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                  top: 16,
+                                  bottom: TatuMedidas.entreSecoes + 4,
+                                ),
+                                child: FaixaACaminho(
+                                  pedido: p,
+                                  onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const PedidoAndamentoPage(),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                SizedBox(
+                                  height: conta.pausadaPorAusencias
+                                      ? TatuMedidas.entreSecoes + 4
+                                      : 40,
+                                ),
+                                Text(
+                                  'Oi, ${conta.nome}',
+                                  style: TatuTexto.detalhe,
+                                ),
+                                const SizedBox(height: 10),
+                                const Text(
+                                  'Do que você precisa?',
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                    height: 36 / 30,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.6,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+                            );
+                          },
                         ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Do que você precisa?',
-                          style: TextStyle(
-                            fontSize: 30,
-                            height: 36 / 30,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.6,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
                         _caixaDescricao(),
                         const SizedBox(height: 22),
                         Row(

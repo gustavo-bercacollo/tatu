@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 18/11/2026 (v26)
+Atualizado em 18/11/2026 (v27)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -109,7 +109,7 @@ Do valor confirmado até a avaliação, o atendimento segue sempre a mesma ordem
 | --- | --- |
 | RN-37 | O Tatu não tem GPS próprio. "Abrir rota" abre o app de navegação que o profissional escolher (Google Maps, Waze ou Apple Mapas), e ele pode deixar um como padrão. |
 | RN-38 | O botão "Cheguei" só libera quando o profissional está perto do endereço. Para isso, a localização dele precisa estar ativa. |
-| RN-39 | Na chegada, o cliente vê a foto e o nome do profissional e um código de 4 dígitos. Ele pede o código antes de abrir a porta. |
+| RN-39 | Código na porta: o cliente vê um código de 4 dígitos e passa para o profissional pessoalmente, na chegada. O profissional digita o código no app e o serviço começa sozinho ("Em andamento"). Sem o código certo o serviço não começa. Vale para todo atendimento no local. |
 | RN-40 | O profissional pode tirar fotos ao chegar e ao concluir. Elas servem de prova numa contestação. |
 | RN-41 | Ao concluir, os dois se avaliam. O cliente pode editar a avaliação até 7 dias depois. |
 | RN-42 | Depois de concluído, a conversa continua aberta. Cliente e profissional voltam a se falar por ela quando quiserem, sem fazer um pedido novo. |
@@ -214,6 +214,9 @@ As penalidades existem para impedir abuso, nunca para punir quem se protegeu.
 | RN-117 | A conversa do Tatu é o canal principal de comunicação do Tatu, como o canal oficial de uma empresa no WhatsApp: novidades, mudanças nas regras e avisos importantes chegam por ela. Só o Tatu envia; a pessoa não responde por ali (suporte continua na Ajuda). |
 | RN-118 | Dicas Tatu é um espaço de dicas de boa convivência, boa negociação e segurança. Por enquanto mostra "Em breve" e avisa pelo canal do Tatu quando abrir. |
 | RN-155 | A aba Mensagens mostra um contador vermelho com o total de mensagens não lidas, somando todas as conversas, inclusive a do Tatu (acima de 9 aparece "9+"). Já no primeiro acesso aparece "1" (a boas-vindas do Tatu, RN-116). O número diminui ao abrir cada conversa e some quando tudo foi lido. O mesmo número aparece no ícone do app no celular, quando as notificações estão permitidas. |
+| RN-165 | Depois do valor confirmado, o cliente acompanha o profissional: "vai sair já" (com o tempo para sair, RN-76), mapa ao vivo com rota e previsão de chegada, "chegando" (menos de 2 min, notificação e código na tela) e "chegou" ("Passe o código"). Enquanto o profissional está a caminho, a Home mostra a faixa "[nome] chega em X min", que abre o mapa. |
+| RN-166 | A localização do profissional só é mostrada ao cliente entre "Estou a caminho" e a digitação do código (ou "Cliente não apareceu"). Depois disso para de ser compartilhada. |
+| RN-167 | O código errado 3 vezes bloqueia novas tentativas e o app oferece falar com o suporte. O código nunca deve ser passado por mensagem; o app avisa o cliente. Enquanto o código não é digitado, o tempo de espera do cliente (RN-80) continua contando. |
 | RN-137 | Acessibilidade · ditado na descrição do pedido: o microfone (à direita na caixa) transforma a fala em texto, que aparece enquanto a pessoa fala; ela confere e edita antes de chamar. Nenhum áudio é enviado. A sugestão de serviço usa o texto. |
 | RN-138 | Acessibilidade · ditado no chat (cliente e profissional): o microfone ao lado do campo transforma a fala em texto no próprio campo; a pessoa confere e envia como mensagem de texto. O chat não tem mensagem de áudio. |
 | RN-139 | Na descrição do pedido, a caixa tem câmera e clipe à esquerda e microfone à direita. O clipe abre "Escolher da galeria" ou "Arquivo (PDF, documento)". Fotos e arquivos aparecem como miniaturas com X para excluir. Até 5 anexos por pedido (exemplo). Valem os tipos e as verificações do chat (RN-119 a RN-122). O profissional vê os anexos no Novo chamado. |
@@ -239,7 +242,6 @@ Cada dado é usado só para o motivo pelo qual foi pedido.
 O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa e sai daqui.
 
 - [ ] **Foto da cliente no modo só mulheres.** Recomendação: a profissional vê só o selo "Cliente verificada", nunca a selfie. Opcional: a cliente escolhe mostrar uma foto de perfil conferida com a selfie. As telas atuais ainda mostram a foto.
-- [ ] **Código na porta para todos.** Hoje o cliente sempre vê o código, mas a tela de conferência do profissional existe só no modo só mulheres. Decidir se vale para todo atendimento.
 - [ ] **Parcelamento.** Valor mínimo, número de parcelas e quem paga os juros (o Tatu não paga). Hoje: a partir de R$ 300, até 6 vezes, como exemplo.
 - [ ] **Avaliação em conversas com vários pagamentos.** Avaliar a cada valor concluído ou manter uma avaliação só por profissional, que o cliente atualiza.
 - [ ] **Valor da comissão.** 10% é exemplo.
@@ -304,6 +306,7 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 18/11/2026 | RN-39, RN-165 a RN-167 | Cliente acompanha o profissional no mapa. O cliente passa o código e o profissional digita para começar o serviço. |
 | 18/11/2026 | RN-161, RN-162 | "Outros" no cadastro do profissional igual ao do pedido do cliente (por segmento, com busca) e sugestão de profissão. Especialidades continuam até 3. |
 | 18/11/2026 | RN-156 a RN-160 | Profissões reguladas: registro sem foto, conferido na consulta pública, selo no perfil. |
 | 18/11/2026 | RN-155 | Contador de mensagens não lidas na aba Mensagens e no ícone do app. |

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:clock/clock.dart';
 
+import 'codigo_porta.dart';
 import 'regras_distancia.dart';
 import 'servico_profissional.dart';
 import 'suspensao.dart';
@@ -56,6 +57,40 @@ class AtendimentoProfissionalRepo extends ChangeNotifier {
   bool get sinalLiberado => entregas > 0;
 
   bool get ativo => chamado != null || servico != null;
+
+  /// RN-39/RN-167: conferência do código na porta (nula à distância).
+  ConferenciaCodigo? codigo;
+
+  /// RN-166: a posição só é enviada entre "Estou a caminho" e o código
+  /// digitado (ou "Cliente não apareceu", que encerra o atendimento).
+  bool get enviandoLocalizacao {
+    final s = servico;
+    if (s == null || s.distancia) return false;
+    return etapa == EtapaAtendimento.aCaminho ||
+        etapa == EtapaAtendimento.noLocal;
+  }
+
+  /// Quantas posições foram enviadas ao cliente (protótipo).
+  int posicoesEnviadas = 0;
+
+  /// RN-166: manda a posição ao cliente; fora do trecho permitido, não
+  /// manda nada (devolve false).
+  bool enviarPosicao() {
+    if (!enviandoLocalizacao) return false;
+    posicoesEnviadas++;
+    return true;
+  }
+
+  /// RN-39/RN-167: o profissional digitou o código. Certo: o serviço
+  /// começa sozinho ("Em andamento"). Errado 3 vezes: bloqueia.
+  ResultadoCodigo digitarCodigo(String digitado, {DateTime? agora}) {
+    final c = codigo;
+    if (c == null) return ResultadoCodigo.bloqueado;
+    final r = c.conferir(digitado);
+    if (r == ResultadoCodigo.certo) iniciar(agora ?? clock.now());
+    notifyListeners();
+    return r;
+  }
 
   /// RN-131/RN-132: chats encerrados pelo Tatu porque o cliente foi
   /// suspenso, pelo nome do cliente. Só leitura; o histórico fica.
@@ -137,6 +172,8 @@ class AtendimentoProfissionalRepo extends ChangeNotifier {
     inicio = null;
     entregas = 0;
     previas = 0;
+    codigo = null;
+    posicoesEnviadas = 0;
   }
 
   /// RN-99: mandou uma prévia protegida.
@@ -167,6 +204,8 @@ class AtendimentoProfissionalRepo extends ChangeNotifier {
   void irAteCliente(ServicoAceito s) {
     servico = s;
     etapa = EtapaAtendimento.aCaminho;
+    // RN-95: à distância não tem código.
+    codigo = s.distancia ? null : ConferenciaCodigo(s.codigo);
     notifyListeners();
   }
 

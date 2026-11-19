@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/enderecos.dart';
 import 'package:tatu/features/cliente/home_page.dart';
@@ -22,6 +23,9 @@ Future<void> _abrirFolha(WidgetTester t) async {
 }
 
 void main() {
+  // Sem profissional a caminho: a Home mostra a saudação (RN-165).
+  setUp(() => pedidos..restaurar()..cancelarAndamento());
+
   testWidgets('Folha: escolher um endereço salvo troca o topo da Home', (
     t,
   ) async {

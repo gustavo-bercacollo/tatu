@@ -234,7 +234,6 @@
  "app/cliente-atraso.png": "docs/fluxo/app/cliente-atraso.png",
  "app/cliente-busca-nao-confirmou.png": "docs/fluxo/app/cliente-busca-nao-confirmou.png",
  "app/pro-cliente-nao-apareceu.png": "docs/fluxo/app/pro-cliente-nao-apareceu.png",
- "app/cliente-na-porta.png": "docs/fluxo/app/cliente-na-porta.png",
  "app/cliente-ausente.png": "docs/fluxo/app/cliente-ausente.png",
  "app/cliente-home-pausada.png": "docs/fluxo/app/cliente-home-pausada.png",
  "app/chat-arquivo-bloqueado.png": "docs/fluxo/app/chat-arquivo-bloqueado.png",
@@ -370,5 +369,12 @@
  "app/chat-pedir-valor.png": "docs/fluxo/app/chat-pedir-valor.png",
  "app/chat-valor-confirmado.png": "docs/fluxo/app/chat-valor-confirmado.png",
  "app/pro-outras-busca.png": "docs/fluxo/app/pro-outras-busca.png",
- "app/pro-sugerir-profissao.png": "docs/fluxo/app/pro-sugerir-profissao.png"
+ "app/pro-sugerir-profissao.png": "docs/fluxo/app/pro-sugerir-profissao.png",
+ "app/acompanhar-antes-de-sair.png": "docs/fluxo/app/acompanhar-antes-de-sair.png",
+ "app/acompanhar-a-caminho.png": "docs/fluxo/app/acompanhar-a-caminho.png",
+ "app/acompanhar-chegando.png": "docs/fluxo/app/acompanhar-chegando.png",
+ "app/acompanhar-chegou.png": "docs/fluxo/app/acompanhar-chegou.png",
+ "app/home-profissional-a-caminho.png": "docs/fluxo/app/home-profissional-a-caminho.png",
+ "app/pro-chegou-digitar-codigo.png": "docs/fluxo/app/pro-chegou-digitar-codigo.png",
+ "app/pro-chegou-codigo-incorreto.png": "docs/fluxo/app/pro-chegou-codigo-incorreto.png"
 }

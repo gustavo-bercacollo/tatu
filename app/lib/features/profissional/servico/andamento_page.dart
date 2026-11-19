@@ -27,6 +27,7 @@ import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import '../../../shared/widgets/nota_icone.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
+import 'codigo_porta.dart';
 import 'rota.dart';
 import '../../entrada/seguranca.dart';
 import '../../entrada/ligacao_page.dart';
@@ -38,8 +39,11 @@ void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
 /// P24 · A caminho do cliente: rota no mapa, endereço, "Abrir rota" e
 /// "Cheguei", que só libera perto do local (protótipo: depois de
 /// [chegaEm]) e com a localização ligada. Perto, vira "Quase lá" com o
-/// aviso no topo. Depois do "Cheguei": "Aguardando a Ana" com a espera
-/// de [Prazos.esperaCliente] (RN-80) e "Cliente não apareceu" (RN-81).
+/// aviso no topo. Depois do "Cheguei": "Peça o código" (RN-39/RN-167);
+/// "Ver tempo de espera" mostra "Aguardando a Ana" com a espera de
+/// [Prazos.esperaCliente] (RN-80) e "Cliente não apareceu" (RN-81).
+/// RN-166: enquanto a tela está aberta, a posição vai para o cliente
+/// (só até o código ou o "Cliente não apareceu").
 class ACaminhoPage extends StatefulWidget {
   const ACaminhoPage({
     super.key,
@@ -75,10 +79,20 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
   DateTime? _chegouEm;
   Timer? _relogioEspera;
 
+  /// RN-80: com o código pedido, o profissional pode ver a espera.
+  bool _verEspera = false;
+
+  /// RN-166: manda a posição ao cliente de tempos em tempos.
+  Timer? _posicao;
+
   @override
   void initState() {
     super.initState();
     if (widget.chegou) _comecarEspera(widget.esperou);
+    _posicao = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) => atendimentoProfissional.enviarPosicao(),
+    );
     if (!_perto) {
       _timer = Timer(widget.chegaEm, () {
         if (mounted) setState(() => _perto = true);
@@ -97,6 +111,7 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
   void dispose() {
     _timer?.cancel();
     _relogioEspera?.cancel();
+    _posicao?.cancel();
     super.dispose();
   }
 
@@ -165,6 +180,18 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
   @override
   Widget build(BuildContext context) {
     final s = widget.servico;
+    // RN-39: chegou: pede o código (o serviço começa sozinho).
+    if (_chegou && !_verEspera) {
+      return DigitarCodigoView(
+        servico: s,
+        onVerEspera: () => setState(() => _verEspera = true),
+        onIniciou: (agora) => Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => EmAndamentoPage(servico: s, inicio: agora),
+          ),
+        ),
+      );
+    }
     final localizacao = navegacao.localizacaoAtiva;
     final perto = _perto && localizacao && !_chegou;
     final daCliente = '${s.feminino ? 'da' : 'do'} ${s.primeiroNome}';
@@ -256,18 +283,10 @@ class _ACaminhoPageState extends State<ACaminhoPage> {
                       if (_chegou) ...[
                         ..._aguardando(s),
                         const SizedBox(height: 10),
+                        // RN-39: sem botão de começar; o código inicia.
                         FilledButton(
-                          onPressed: () {
-                            final agora = DateTime.now();
-                            atendimentoProfissional.iniciar(agora);
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    EmAndamentoPage(servico: s, inicio: agora),
-                              ),
-                            );
-                          },
-                          child: const Text('Iniciar serviço'),
+                          onPressed: () => setState(() => _verEspera = false),
+                          child: const Text('Digitar o código'),
                         ),
                         const SizedBox(height: 10),
                         // RN-81: só depois da espera.

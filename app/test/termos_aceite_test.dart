@@ -2,6 +2,7 @@ import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/aceites.dart';
 import 'package:tatu/data/canal_tatu.dart';
@@ -39,6 +40,9 @@ const _cpf = '12345678909';
 String _semMarcas(String s) => s.replaceAll('**', '').toLowerCase();
 
 void main() {
+  // Sem profissional a caminho: a Home mostra a saudação (RN-165).
+  setUp(() => pedidos..restaurar()..cancelarAndamento());
+
   late DocumentoLegal termos, politica;
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();

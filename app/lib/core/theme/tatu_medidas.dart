@@ -46,11 +46,16 @@ class TatuMedidas {
   // Avatares e foto do perfil
   static const avatarPerfil = 76.0; // topo do Perfil
   static const avatarGrande = 124.0; // prévia em "Escolha um avatar"
-  static const avatarChegada = 112.0; // quem está na porta (RN-39)
-  static const codigoPortaLargura = 52.0; // cada dígito do código da porta
-  static const codigoPortaAltura = 64.0;
   static const avatarOpcao = 80.0; // cada avatar para escolher (3 por fileira)
   static const aroAvatar = 3.0; // aro preto do avatar escolhido
   static const circuloRecorte = 300.0; // círculo de "Ajustar foto"
   static const quadradoFoto = 64.0; // quadrado tracejado de foto (contestação)
+
+  // Acompanhar o profissional (RN-165) e código na porta (RN-39)
+  static const avatarAcompanhar = 48.0; // cartão do profissional no mapa
+  static const marcadorMapa = 30.0; // iniciais do profissional no mapa
+  static const botaoCirculo = 44.0; // Mensagem e Ligar no cartão
+  static const codigoDigitarAltura = 76.0; // caixas onde o profissional digita
+  static const teclaAltura = 58.0; // teclado numérico
+  static const raioTecla = 8.0;
 }
