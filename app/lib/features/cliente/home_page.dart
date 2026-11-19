@@ -338,8 +338,11 @@ class _HomeClientePageState extends State<HomeClientePage> {
                         ListenableBuilder(
                           listenable: Listenable.merge([pedidos, conta]),
                           builder: (context, _) {
-                            final p = pedidos.andamento;
-                            if (p != null && p.aCaminho) {
+                            // RN-90: o primeiro que estiver a caminho.
+                            final p = pedidos.andamentos
+                                .where((a) => a.aCaminho)
+                                .firstOrNull;
+                            if (p != null) {
                               return Padding(
                                 padding: const EdgeInsets.only(
                                   top: 16,
@@ -347,12 +350,15 @@ class _HomeClientePageState extends State<HomeClientePage> {
                                 ),
                                 child: FaixaACaminho(
                                   pedido: p,
-                                  onTap: () => Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          const PedidoAndamentoPage(),
-                                    ),
-                                  ),
+                                  onTap: () {
+                                    pedidos.abrir(p);
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const PedidoAndamentoPage(),
+                                      ),
+                                    );
+                                  },
                                 ),
                               );
                             }

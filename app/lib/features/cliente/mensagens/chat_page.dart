@@ -186,8 +186,10 @@ class _ChatPageState extends State<ChatPage> {
   /// RN-100: aprovar cobra o restante.
   void _aprovar() {
     conversas.aprovarEntrega(_c);
-    if (pedidos.andamento?.profissional == _c.nome) {
-      pedidos.entregaAprovada();
+    if (pedidos.doProfissional(_c.nome) case final p?) {
+      pedidos
+        ..abrir(p)
+        ..entregaAprovada();
     }
   }
 
@@ -295,7 +297,8 @@ class _ChatPageState extends State<ChatPage> {
           onConfirmar: () {
             conversas.confirmarValor(_c);
             // RN-76: começa o prazo do profissional para sair.
-            if (pedidos.andamento?.profissional == _c.nome) {
+            if (pedidos.doProfissional(_c.nome) case final p?) {
+              pedidos.abrir(p);
               // RN-103: à distância, o sinal é cobrado agora.
               pedidos.valorConfirmado(sinal: v.sinal);
               // RN-165: no local, vai direto para o acompanhamento.
@@ -453,7 +456,9 @@ class _ChatPageState extends State<ChatPage> {
 
   void _verPedido() {
     final nav = Navigator.of(context);
-    if (_c.emAndamento && pedidos.andamento != null) {
+    final p = pedidos.doProfissional(_c.nome);
+    if (_c.emAndamento && p != null) {
+      pedidos.abrir(p);
       nav.push(MaterialPageRoute(builder: (_) => const PedidoAndamentoPage()));
       return;
     }

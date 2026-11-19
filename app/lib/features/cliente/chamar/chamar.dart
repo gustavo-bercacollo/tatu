@@ -48,8 +48,11 @@ Future<void> chamarProfissional(
   }
 
   // 4. Já existe um pedido do mesmo serviço a caminho.
-  final atual = pedidos.andamento;
-  if (atual != null && atual.servico == servico && context.mounted) {
+  // RN-23/RN-90: pergunta só se já tem um pedido do mesmo serviço.
+  final atual = pedidos.andamentos
+      .where((p) => p.servico == servico)
+      .firstOrNull;
+  if (atual != null && context.mounted) {
     final chamarOutro = await perguntar(
       context,
       titulo: atual.distancia
@@ -64,6 +67,7 @@ Future<void> chamarProfissional(
     );
     if (chamarOutro == null) return;
     if (!chamarOutro) {
+      pedidos.abrir(atual);
       nav.push(MaterialPageRoute(builder: (_) => const PedidoAndamentoPage()));
       return;
     }

@@ -27,14 +27,17 @@ PontoAtendimento pontoDoPedido(PedidoAndamento p) {
 /// verdade, isso chega do backend). Encerra o atendimento dele no chat e
 /// no pedido em andamento.
 Encerramento profissionalSuspenso(Conversa c, {DateTime? agora}) {
-  final p = pedidos.andamento;
-  final doPedido = p != null && p.profissional == c.nome;
+  final p = pedidos.doProfissional(c.nome);
   final e = conversas.profissionalSuspenso(
     c,
-    ponto: doPedido ? pontoDoPedido(p) : null,
+    ponto: p != null ? pontoDoPedido(p) : null,
     agora: agora,
   );
-  if (doPedido) pedidos.cancelarAndamento();
+  if (p != null) {
+    pedidos
+      ..abrir(p)
+      ..cancelarAndamento();
+  }
   return e;
 }
 
@@ -42,11 +45,14 @@ Encerramento profissionalSuspenso(Conversa c, {DateTime? agora}) {
 /// atendimentos em andamento acabam na hora. Ele passa a ver só "Conta
 /// suspensa".
 List<Encerramento> suspenderContaCliente() {
-  final p = pedidos.andamento;
+  final todos = pedidos.andamentos;
   final r = conversas.clienteSuspenso(
-    pontos: {if (p != null) p.profissional: pontoDoPedido(p)},
+    pontos: {for (final p in todos) p.profissional: pontoDoPedido(p)},
   );
-  pedidos.cancelarAndamento();
+  // RN-131: todos os atendimentos acabam.
+  while (pedidos.andamento != null) {
+    pedidos.cancelarAndamento();
+  }
   return r;
 }
 

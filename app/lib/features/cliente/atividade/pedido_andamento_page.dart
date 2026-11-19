@@ -68,7 +68,7 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
       return mostrarAusencia(context);
     }
     final d = pedidos.devolvido;
-    if (!mounted || d == null || pedidos.andamento != null) return;
+    if (!mounted || d == null) return;
     pedidos.consumirDevolvido();
     final busca = pedidos.busca;
     pedidos.cancelarBusca(); // a tela de busca assume daqui

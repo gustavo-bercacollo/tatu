@@ -108,16 +108,25 @@ class _EmAndamento extends StatelessWidget {
         ),
       );
     }
-    final p = pedidos.andamento;
-    final b = pedidos.busca;
+    // RN-90: todos os pedidos em andamento e todas as buscas.
+    final lista = pedidos.andamentos;
+    final buscas = pedidos.buscas;
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: TatuMedidas.entreSecoes),
       children: [
-        if (p != null) _CartaoAndamento(pedido: p),
-        if (p != null && b != null)
-          const SizedBox(height: TatuMedidas.entreSecoes - 4),
-        if (b != null)
-          p == null ? _NinguemAceitou(busca: b) : _BuscaCompacta(busca: b),
+        for (final (i, p) in lista.indexed) ...[
+          if (i > 0) const SizedBox(height: TatuMedidas.entreItens),
+          _CartaoAndamento(pedido: p),
+        ],
+        for (final (i, b) in buscas.indexed) ...[
+          if (lista.isNotEmpty || i > 0)
+            SizedBox(
+              height: i == 0
+                  ? TatuMedidas.entreSecoes - 4
+                  : TatuMedidas.entreItens,
+            ),
+          lista.isEmpty ? _NinguemAceitou(busca: b) : _BuscaCompacta(busca: b),
+        ],
       ],
     );
   }
@@ -152,8 +161,12 @@ class _CartaoAndamento extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _Cartao(
-      onTap: () => Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => const PedidoAndamentoPage())),
+      onTap: () {
+        pedidos.abrir(pedido);
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const PedidoAndamentoPage()),
+        );
+      },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -264,7 +277,7 @@ class _BuscaCompacta extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              onPressed: pedidos.cancelarBusca,
+              onPressed: () => pedidos.cancelarBusca(busca),
               child: const Text('Cancelar pedido'),
             ),
           ),
@@ -346,7 +359,7 @@ class _NinguemAceitou extends StatelessWidget {
                         TatuColors.danger,
                       ),
                     ),
-                onPressed: pedidos.cancelarBusca,
+                onPressed: () => pedidos.cancelarBusca(busca),
                 child: const Text('Cancelar'),
               ),
             ],

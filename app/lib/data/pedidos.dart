@@ -396,17 +396,57 @@ class PedidosRepo extends ChangeNotifier {
     restaurar();
   }
 
+  /// O pedido aberto agora (as telas e os prazos usam este).
   PedidoAndamento? andamento;
-  BuscaSegundoPlano? busca;
+
+  /// RN-90: o cliente pode ter vários profissionais ao mesmo tempo; os
+  /// outros pedidos em andamento ficam aqui.
+  final _outros = <PedidoAndamento>[];
+
+  /// Buscas em segundo plano (uma por pedido sem ninguém ainda).
+  final buscas = <BuscaSegundoPlano>[];
   late List<PedidoConcluido> concluidos;
 
-  bool get semNadaEmAndamento => andamento == null && busca == null;
+  /// Todos os pedidos em andamento (o aberto primeiro).
+  List<PedidoAndamento> get andamentos => [?andamento, ..._outros];
+
+  /// A busca mais recente (compatibilidade com as telas de um pedido).
+  BuscaSegundoPlano? get busca => buscas.firstOrNull;
+
+  bool get semNadaEmAndamento => andamentos.isEmpty && buscas.isEmpty;
+
+  /// Pedido em andamento com [profissional] (pelo nome).
+  PedidoAndamento? doProfissional(String profissional) => andamentos
+      .where((p) => p.profissional == profissional)
+      .firstOrNull;
+
+  /// Abre [p] (vira o pedido atual); o que estava aberto continua na
+  /// lista.
+  void abrir(PedidoAndamento p) {
+    final atual = andamento;
+    if (atual == null || atual.profissional == p.profissional) return;
+    final i = _outros.indexWhere((o) => o.profissional == p.profissional);
+    if (i < 0) return;
+    _pararRelogios();
+    final escolhido = _outros.removeAt(i);
+    _outros.insert(0, atual);
+    andamento = escolhido;
+    notifyListeners();
+  }
+
+  /// O pedido aberto saiu (cancelado, devolvido, encerrado): abre o
+  /// próximo da lista, se houver.
+  void _tirarAtual() {
+    andamento = _outros.isEmpty ? null : _outros.removeAt(0);
+  }
 
   void restaurar() {
     _pararRelogios();
     devolvido = null;
     ausente = null;
     avisos.clear();
+    _outros.clear();
+    buscas.clear();
     andamento = PedidoAndamento(
       servico: 'Encanador',
       profissao: 'Encanadora',
@@ -418,11 +458,13 @@ class PedidosRepo extends ChangeNotifier {
       etapasFeitas: 3,
       saiuEm: clock.now(),
     );
-    busca = BuscaSegundoPlano(
-      servico: 'Eletricista',
-      endereco: 'Rua das Flores, 120',
-      descricao: 'tomada da sala sem energia',
-      desde: DateTime.now().subtract(const Duration(minutes: 12)),
+    buscas.add(
+      BuscaSegundoPlano(
+        servico: 'Eletricista',
+        endereco: 'Rua das Flores, 120',
+        descricao: 'tomada da sala sem energia',
+        desde: DateTime.now().subtract(const Duration(minutes: 12)),
+      ),
     );
     concluidos = const [
       PedidoConcluido(
@@ -485,21 +527,28 @@ class PedidosRepo extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// A pessoa aceitou o profissional: vira o pedido em andamento e a
-  /// busca em segundo plano (se houver) acaba.
+  /// A pessoa aceitou o profissional: vira o pedido aberto. RN-90: os
+  /// outros pedidos em andamento continuam; só acaba a busca em segundo
+  /// plano deste mesmo serviço (se houver).
   void aceitar(PedidoAndamento p) {
     _pararRelogios();
     seguranca.encerrarAlerta(cliente: true);
+    final atual = andamento;
+    if (atual != null && atual.profissional != p.profissional) {
+      _outros.insert(0, atual);
+    }
+    _outros.removeWhere((o) => o.profissional == p.profissional);
     // RN-39: cada atendimento no local tem um código novo.
     andamento = p.distancia ? p : p.copiar(codigo: RegrasCodigo.gerar());
-    busca = null;
+    final i = buscas.indexWhere((b) => b.servico == p.servico);
+    if (i >= 0) buscas.removeAt(i);
     notifyListeners();
   }
 
   void cancelarAndamento() {
     _pararRelogios();
     seguranca.encerrarAlerta(cliente: true);
-    andamento = null;
+    _tirarAtual();
     notifyListeners();
   }
 
@@ -586,11 +635,14 @@ class PedidosRepo extends ChangeNotifier {
     _pararRelogios();
     seguranca.encerrarAlerta(cliente: true);
     devolvido = p;
-    andamento = null;
-    busca = BuscaSegundoPlano(
-      servico: p.servico,
-      endereco: p.endereco,
-      descricao: p.descricao,
+    _tirarAtual();
+    buscas.insert(
+      0,
+      BuscaSegundoPlano(
+        servico: p.servico,
+        endereco: p.endereco,
+        descricao: p.descricao,
+      ),
     );
     notifyListeners();
   }
@@ -687,7 +739,7 @@ class PedidosRepo extends ChangeNotifier {
     _pararRelogios();
     seguranca.encerrarAlerta(cliente: true);
     ausente = p;
-    andamento = null;
+    _tirarAtual();
     conta.registrarAusencia();
     notifyListeners();
   }
@@ -696,13 +748,23 @@ class PedidosRepo extends ChangeNotifier {
   void consumirAusente() => ausente = null;
 
   /// Ninguém aceitou ainda: o pedido segue buscando em segundo plano.
+  /// RN-90: cada pedido sem ninguém ainda tem a sua busca.
+  /// A mesma busca de novo ("Tentar de novo") não vira duas.
   void buscarEmSegundoPlano(BuscaSegundoPlano b) {
-    busca = b;
+    buscas.removeWhere(
+      (o) =>
+          o.servico == b.servico &&
+          o.endereco == b.endereco &&
+          (b.descricao.isEmpty || o.descricao == b.descricao),
+    );
+    buscas.insert(0, b);
     notifyListeners();
   }
 
-  void cancelarBusca() {
-    busca = null;
+  /// Cancela [b] (sem ela, a mais recente).
+  void cancelarBusca([BuscaSegundoPlano? b]) {
+    if (buscas.isEmpty) return;
+    buscas.remove(b ?? buscas.first);
     notifyListeners();
   }
 
@@ -714,7 +776,8 @@ class PedidosRepo extends ChangeNotifier {
   void limpar() {
     _pararRelogios();
     andamento = null;
-    busca = null;
+    _outros.clear();
+    buscas.clear();
     concluidos = const [];
     notifyListeners();
   }
