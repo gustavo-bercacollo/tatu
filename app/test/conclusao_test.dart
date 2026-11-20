@@ -150,6 +150,9 @@ void main() {
     await t.pumpAndSettle();
     expect(pedidos.andamento?.valorRetido, isTrue);
     expect(pedidos.andamento?.aguardandoConfirmacao, isFalse);
+    // RN-45: a tela vira "Analisando o problema" (não "trabalhando").
+    expect(find.text('Analisando o problema'), findsOneWidget);
+    expect(find.text('A Luiza está trabalhando'), findsNothing);
     // Não cobrou, nem depois das 2 horas.
     await t.pump(Prazos.confirmarConclusao);
     expect(pedidos.concluidos, hasLength(antes));
@@ -206,6 +209,24 @@ void main() {
     await t.pumpAndSettle();
     expect(find.text('Aguardando sua confirmação'), findsOneWidget);
     pedidos.restaurar(); // para o relógio das 2 horas
+  });
+
+  testWidgets('RN-45: contestação enviada tira a faixa e mostra a análise', (
+    t,
+  ) async {
+    _trabalhando();
+    pedidos
+      ..profissionalConcluiu()
+      ..algoErrado();
+    await _abrir(t, const HomeClientePage());
+    expect(find.text('Confirme o serviço da Luiza'), findsNothing);
+    expect(find.text('Luiza está trabalhando'), findsNothing);
+    expect(find.text('Do que você precisa?'), findsOneWidget);
+    await t.tap(find.text('Atividade'));
+    await t.pumpAndSettle();
+    expect(find.text('Analisando o problema'), findsOneWidget);
+    expect(find.text('Aguardando sua confirmação'), findsNothing);
+    pedidos.restaurar();
   });
 
   testWidgets('RN-169: faixa "está trabalhando" abre a tela do serviço', (

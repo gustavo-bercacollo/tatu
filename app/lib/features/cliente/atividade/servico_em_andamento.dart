@@ -436,3 +436,125 @@ String tempoConfirmar(PedidoAndamento p) {
   final f = p.faltaConfirmar();
   return '${f.inHours}:${(f.inMinutes % 60).toString().padLeft(2, '0')}';
 }
+
+/// RN-45: depois de enviar "Algo errado", o pedido fica em análise: o
+/// valor fica retido (nada é cobrado) até o suporte resolver.
+class ProblemaEmAnalise extends StatelessWidget {
+  const ProblemaEmAnalise({
+    super.key,
+    required this.pedido,
+    required this.onMensagem,
+  });
+
+  final PedidoAndamento pedido;
+  final VoidCallback onMensagem;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = pedido;
+    return TelaInterna(
+      titulo: 'Serviço concluído',
+      fundoCinza: true,
+      corpo: ListView(
+        padding: const EdgeInsets.only(top: 40),
+        children: [
+          Center(
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: const BoxDecoration(
+                color: TatuColors.warningSoft,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                TablerIcons.clock,
+                size: 38,
+                color: TatuColors.warningTexto,
+              ),
+            ),
+          ),
+          const SizedBox(height: 18),
+          const Text(
+            'Analisando o problema',
+            textAlign: TextAlign.center,
+            style: TatuTexto.tituloFolha,
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Recebemos sua contestação. Avisamos você pelo app.',
+            textAlign: TextAlign.center,
+            style: TatuTexto.detalhe,
+          ),
+          const SizedBox(height: TatuMedidas.entreSecoes),
+          _Cartao(
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    AvatarIniciais(
+                      nome: p.profissional,
+                      tamanho: TatuMedidas.avatarAcompanhar - 4,
+                    ),
+                    const SizedBox(width: TatuMedidas.entreItens),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            p.profissional,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${p.profissao} · ${p.descricao}',
+                            overflow: TextOverflow.ellipsis,
+                            style: TatuTexto.nota,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                const Divider(height: 1, color: TatuColors.hairline),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    const Icon(
+                      TablerIcons.lock,
+                      size: 18,
+                      color: TatuColors.textSecondary,
+                    ),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'Valor retido · não foi cobrado',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ),
+                    Text(
+                      p.valor,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: TatuMedidas.entreItens + 4),
+          _Pilula(
+            icone: TablerIcons.message_circle,
+            texto: 'Mensagem',
+            onTap: onMensagem,
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -181,6 +181,9 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
         final etapa = p?.acompanhar();
         final tela = p != null && etapa != null
             ? _acompanhar(context, p, etapa)
+            // RN-45: contestação enviada: "Analisando o problema".
+            : p != null && p.emAnalise
+            ? ProblemaEmAnalise(pedido: p, onMensagem: _mensagem)
             // RN-172: concluído pelo profissional: a tela de confirmar.
             : p != null && p.aguardandoConfirmacao
             ? ConfirmarConclusao(

@@ -110,13 +110,20 @@ class PedidoAndamento {
   /// RN-31: concluído pelo profissional, esperando o cliente confirmar.
   bool get aguardandoConfirmacao => concluidoEm != null && !valorRetido;
 
-  /// RN-169: serviço no local em andamento (depois do código).
-  bool get trabalhando => !distancia && etapasFeitas == 4;
+  /// RN-169: serviço no local em andamento (depois do código e antes de
+  /// o profissional concluir).
+  bool get trabalhando =>
+      !distancia && etapasFeitas == 4 && concluidoEm == null;
+
+  /// RN-45: o cliente contestou ("Algo errado" enviado): o problema está
+  /// em análise e o valor fica retido.
+  bool get emAnalise => valorRetido;
 
   /// RN-170: situação curta para a faixa da Home ("trabalhando",
   /// "em 8 min"…).
   String get situacaoCurta {
     if (distancia) return 'à distância';
+    if (emAnalise) return 'em análise';
     if (aguardandoConfirmacao) return 'concluiu';
     if (trabalhando) return 'trabalhando';
     return switch (acompanhar()) {

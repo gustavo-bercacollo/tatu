@@ -338,7 +338,11 @@ class _HomeClientePageState extends State<HomeClientePage> {
                         ListenableBuilder(
                           listenable: Listenable.merge([pedidos, conta]),
                           builder: (context, _) {
-                            final ps = pedidos.andamentos;
+                            // RN-45: pedido em análise sai da faixa.
+                            final ps = [
+                              for (final a in pedidos.andamentos)
+                                if (!a.emAnalise) a,
+                            ];
                             final pendente = FaixaACaminho.pendente(ps);
                             if (pendente != null || FaixaACaminho.mostra(ps)) {
                               return Padding(

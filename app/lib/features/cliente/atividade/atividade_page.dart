@@ -202,6 +202,31 @@ class _CartaoAndamento extends StatelessWidget {
             etapas: pedido.etapasCurtasDoPedido,
             feitas: pedido.etapasFeitas,
           ),
+          // RN-45: contestação enviada: o problema está em análise.
+          if (pedido.emAnalise) ...[
+            const SizedBox(height: TatuMedidas.entreItens + 4),
+            const Row(
+              children: [
+                Icon(
+                  TablerIcons.clock,
+                  size: 18,
+                  color: TatuColors.warningTexto,
+                ),
+                SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    'Analisando o problema',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: TatuColors.warningTexto,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
           // RN-172: a conclusão espera o cliente; o toque abre a tela.
           if (pedido.aguardandoConfirmacao) ...[
             const SizedBox(height: TatuMedidas.entreItens + 4),
