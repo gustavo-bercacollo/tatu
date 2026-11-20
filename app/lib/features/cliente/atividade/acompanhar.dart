@@ -61,6 +61,38 @@ class AcompanharPedido extends StatelessWidget {
           Positioned.fill(
             child: _Mapa(pedido: p, etapa: etapa),
           ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              constraints: const BoxConstraints(
+                maxWidth: TatuMedidas.larguraMax,
+              ),
+              decoration: const BoxDecoration(
+                color: TatuColors.bg,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(TatuMedidas.raioFolha),
+                ),
+              ),
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    TatuMedidas.margem,
+                    10,
+                    TatuMedidas.margem,
+                    TatuMedidas.base,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: _folha(context),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Topo (voltar, escudo e aviso de atraso, RN-78) por último: fica
+          // por cima da folha e os botões respondem mesmo em telas baixas.
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(
@@ -98,36 +130,6 @@ class AcompanharPedido extends StatelessWidget {
                     ),
                   ],
                 ],
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              constraints: const BoxConstraints(
-                maxWidth: TatuMedidas.larguraMax,
-              ),
-              decoration: const BoxDecoration(
-                color: TatuColors.bg,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(TatuMedidas.raioFolha),
-                ),
-              ),
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    TatuMedidas.margem,
-                    10,
-                    TatuMedidas.margem,
-                    TatuMedidas.base,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: _folha(context),
-                  ),
-                ),
               ),
             ),
           ),
