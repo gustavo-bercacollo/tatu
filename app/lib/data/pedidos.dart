@@ -477,8 +477,10 @@ class PedidosRepo extends ChangeNotifier {
   final buscas = <BuscaSegundoPlano>[];
   late List<PedidoConcluido> concluidos;
 
-  /// Todos os pedidos em andamento (o aberto primeiro).
-  List<PedidoAndamento> get andamentos => [?andamento, ..._outros];
+  /// Todos os pedidos em andamento, por ordem de chegada (o primeiro
+  /// pedido em cima). Abrir um pedido não muda a ordem.
+  List<PedidoAndamento> get andamentos =>
+      [?andamento, ..._outros]..sort((a, b) => a.id.compareTo(b.id));
 
   /// A busca mais recente (compatibilidade com as telas de um pedido).
   BuscaSegundoPlano? get busca => buscas.firstOrNull;

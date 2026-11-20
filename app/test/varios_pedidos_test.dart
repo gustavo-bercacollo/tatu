@@ -43,20 +43,23 @@ void main() {
     pedidos.aceitar(_pedido('Pintor', 'Pintor', 'Marcos Dias'));
     expect(
       pedidos.andamentos.map((p) => p.profissional),
-      ['Marcos Dias', 'Rafael Lima', 'Luiza Souza'],
+      ['Luiza Souza', 'Rafael Lima', 'Marcos Dias'],
     );
     // A busca do eletricista acabou: alguém aceitou.
     expect(pedidos.buscas, isEmpty);
 
-    // Abrir um não tira os outros.
-    pedidos.abrir(pedidos.doProfissional('Luiza Souza')!);
-    expect(pedidos.andamento?.profissional, 'Luiza Souza');
-    expect(pedidos.andamentos, hasLength(3));
+    // Abrir um não tira os outros nem muda a ordem.
+    pedidos.abrir(pedidos.doProfissional('Rafael Lima')!);
+    expect(pedidos.andamento?.profissional, 'Rafael Lima');
+    expect(
+      pedidos.andamentos.map((p) => p.profissional),
+      ['Luiza Souza', 'Rafael Lima', 'Marcos Dias'],
+    );
 
     // Cancelar o aberto deixa os outros.
     pedidos.cancelarAndamento();
     expect(pedidos.andamentos, hasLength(2));
-    expect(pedidos.doProfissional('Luiza Souza'), isNull);
+    expect(pedidos.doProfissional('Rafael Lima'), isNull);
   });
 
   test('a mesma profissional aceitando de novo é outro pedido', () {
@@ -66,12 +69,15 @@ void main() {
     pedidos.aceitar(_pedido('Pintor', 'Encanadora', 'Luiza Souza'));
     expect(
       pedidos.andamentos.map((p) => p.servico),
-      ['Pintor', 'Eletricista', 'Encanador'],
+      ['Encanador', 'Eletricista', 'Pintor'],
     );
-    // Abrir o mais antigo não perde nenhum.
-    pedidos.abrir(pedidos.andamentos.last);
+    // Abrir um não perde nenhum nem muda a ordem (ordem de chegada).
+    pedidos.abrir(pedidos.andamentos.first);
     expect(pedidos.andamento?.servico, 'Encanador');
-    expect(pedidos.andamentos, hasLength(3));
+    expect(
+      pedidos.andamentos.map((p) => p.servico),
+      ['Encanador', 'Eletricista', 'Pintor'],
+    );
   });
 
   test('cada chamada começa a fila em outra pessoa', () {
