@@ -85,8 +85,9 @@ void main() {
     await t.pumpAndSettle();
     expect(find.text('A Luiza concluiu o serviço'), findsOneWidget);
     expect(find.text('Está tudo certo?'), findsOneWidget);
-    expect(find.text('Sem resposta em 2 horas, confirmamos sozinho.'),
-        findsOneWidget);
+    // RN-172: é uma tela, com a contagem das 2 horas.
+    expect(find.text('Serviço concluído'), findsOneWidget);
+    expect(find.textContaining('Confirmamos sozinho em'), findsOneWidget);
     await t.tap(find.text('Sim, confirmar'));
     await t.pumpAndSettle();
     expect(find.byType(AvaliarPage), findsOneWidget);
@@ -127,6 +128,34 @@ void main() {
     // Não cobrou, nem depois das 2 horas.
     await t.pump(Prazos.confirmarConclusao);
     expect(pedidos.concluidos, hasLength(antes));
+  });
+
+  testWidgets('RN-172: voltar mantém a confirmação na Home e na Atividade', (
+    t,
+  ) async {
+    _trabalhando();
+    pedidos.profissionalConcluiu();
+    await _abrir(t, const HomeClientePage());
+    // Faixa verde na Home.
+    expect(find.text('Confirme o serviço da Luiza'), findsOneWidget);
+    expect(find.textContaining('confirmamos sozinho em'), findsOneWidget);
+    await t.tap(find.text('Confirme o serviço da Luiza'));
+    await t.pumpAndSettle();
+    expect(find.text('A Luiza concluiu o serviço'), findsOneWidget);
+    // Voltar não descarta nada.
+    await t.tap(find.byTooltip('Voltar').evaluate().isNotEmpty
+        ? find.byTooltip('Voltar')
+        : find.bySemanticsLabel('Voltar').first);
+    await t.pumpAndSettle();
+    expect(find.text('Confirme o serviço da Luiza'), findsOneWidget);
+    expect(pedidos.andamento?.aguardandoConfirmacao, isTrue);
+    // Card na Atividade abre a mesma tela.
+    await t.tap(find.text('Atividade'));
+    await t.pumpAndSettle();
+    expect(find.text('Aguardando sua confirmação'), findsOneWidget);
+    await t.tap(find.text('Aguardando sua confirmação'));
+    await t.pumpAndSettle();
+    expect(find.text('A Luiza concluiu o serviço'), findsOneWidget);    pedidos.restaurar(); // para o relógio das 2 horas
   });
 
   testWidgets('RN-169: faixa "está trabalhando" abre a tela do serviço', (

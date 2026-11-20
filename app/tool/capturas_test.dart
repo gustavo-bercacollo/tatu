@@ -198,6 +198,7 @@ Future<void> _capturar(
         'home-profissional-a-caminho',
         'home-profissional-trabalhando',
         'home-varios-profissionais',
+        'home-confirmar-servico',
         'chamar-ja-tem-pedido',
       }
           .contains(nome)) {
@@ -2573,9 +2574,18 @@ void main() {
         await t.pump();
         pedidos.profissionalConcluiu();
         await t.pump();
-        await t.pump(const Duration(milliseconds: 600));
+        await t.pump(const Duration(minutes: 2));
       },
     );
+  });
+
+  testWidgets('home-confirmar-servico', (t) async {
+    await servico(t, 'home-confirmar-servico', const HomeClientePage(),
+        () async {
+      await trabalhando();
+      pedidos.profissionalConcluiu();
+      await t.pump(const Duration(minutes: 2));
+    });
   });
 
   // RN-31/RN-171: profissional depois de "Concluir serviço".

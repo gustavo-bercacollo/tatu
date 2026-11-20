@@ -339,7 +339,8 @@ class _HomeClientePageState extends State<HomeClientePage> {
                           listenable: Listenable.merge([pedidos, conta]),
                           builder: (context, _) {
                             final ps = pedidos.andamentos;
-                            if (FaixaACaminho.mostra(ps)) {
+                            final pendente = FaixaACaminho.pendente(ps);
+                            if (pendente != null || FaixaACaminho.mostra(ps)) {
                               return Padding(
                                 padding: const EdgeInsets.only(
                                   top: 16,
@@ -348,6 +349,18 @@ class _HomeClientePageState extends State<HomeClientePage> {
                                 child: FaixaACaminho(
                                   pedidos: ps,
                                   onTap: () {
+                                    // RN-172: a conclusão pendente abre a
+                                    // tela de confirmar.
+                                    if (pendente != null) {
+                                      pedidos.abrir(pendente);
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              const PedidoAndamentoPage(),
+                                        ),
+                                      );
+                                      return;
+                                    }
                                     // RN-170: com 2 ou mais, a Atividade.
                                     if (ps.length > 1) {
                                       return irParaAba(

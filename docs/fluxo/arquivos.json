@@ -380,5 +380,6 @@
  "app/home-profissional-trabalhando.png": "docs/fluxo/app/home-profissional-trabalhando.png",
  "app/home-varios-profissionais.png": "docs/fluxo/app/home-varios-profissionais.png",
  "app/pro-aguardando-confirmacao.png": "docs/fluxo/app/pro-aguardando-confirmacao.png",
- "app/pro-cliente-confirmou.png": "docs/fluxo/app/pro-cliente-confirmou.png"
+ "app/pro-cliente-confirmou.png": "docs/fluxo/app/pro-cliente-confirmou.png",
+ "app/home-confirmar-servico.png": "docs/fluxo/app/home-confirmar-servico.png"
 }

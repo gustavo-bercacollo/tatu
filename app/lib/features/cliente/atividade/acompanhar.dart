@@ -14,6 +14,7 @@ import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/mapa_falso.dart';
+import 'servico_em_andamento.dart' show tempoConfirmar;
 import '../../entrada/seguranca.dart' show SeloAlertaAtivo;
 import '../../profissional/cadastro/resultado_page.dart' show NomeVerificado;
 
@@ -641,6 +642,11 @@ class FaixaACaminho extends StatefulWidget {
       ps.length > 1 ||
       (ps.length == 1 && (ps.single.aCaminho || ps.single.trabalhando));
 
+  /// RN-172: conclusão esperando o cliente (a faixa fica verde e abre a
+  /// tela de confirmar).
+  static PedidoAndamento? pendente(List<PedidoAndamento> ps) =>
+      ps.where((p) => p.aguardandoConfirmacao).firstOrNull;
+
   @override
   State<FaixaACaminho> createState() => _FaixaACaminhoState();
 }
@@ -666,6 +672,13 @@ class _FaixaACaminhoState extends State<FaixaACaminho> {
 
   (String, String) get _textos {
     final ps = widget.pedidos;
+    if (FaixaACaminho.pendente(ps) case final p?) {
+      return (
+        'Confirme o serviço ${p.profissao.endsWith('a') ? 'da' : 'do'} '
+            '${p.primeiroNome}',
+        'Concluído · confirmamos sozinho em ${tempoConfirmar(p)}',
+      );
+    }
     if (ps.length > 1) {
       return (
         '${ps.length} profissionais com você',
@@ -687,13 +700,15 @@ class _FaixaACaminhoState extends State<FaixaACaminho> {
 
   @override
   Widget build(BuildContext context) {
-    final ps = widget.pedidos;
+    final pendente = FaixaACaminho.pendente(widget.pedidos);
+    // RN-172: com conclusão pendente, só ela (faixa verde).
+    final ps = pendente == null ? widget.pedidos : [pendente];
     final (titulo, detalhe) = _textos;
     const lado = 40.0;
     return Semantics(
       button: true,
       child: Material(
-        color: TatuColors.action,
+        color: pendente == null ? TatuColors.action : TatuColors.onlineTexto,
         borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
         child: InkWell(
           borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
@@ -749,8 +764,10 @@ class _FaixaACaminhoState extends State<FaixaACaminho> {
                       Text(
                         detalhe,
                         overflow: TextOverflow.ellipsis,
-                        style: TatuTexto.nota.copyWith(
-                          color: TatuColors.avisoEscuroTexto,
+                        style: TatuTexto.legenda.copyWith(
+                          color: pendente == null
+                              ? TatuColors.avisoEscuroTexto
+                              : TatuColors.onAction,
                         ),
                       ),
                     ],

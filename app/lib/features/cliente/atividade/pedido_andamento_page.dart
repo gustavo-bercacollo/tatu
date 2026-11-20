@@ -45,14 +45,10 @@ class PedidoAndamentoPage extends StatefulWidget {
 class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
   Timer? _relogio;
 
-  /// RN-31: pedido (id) cuja conclusão já foi perguntada.
-  int? _perguntou;
-
   @override
   void initState() {
     super.initState();
     pedidos.addListener(_mudou);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _conclusao());
     // RN-165/RN-78: o mapa, a previsão e o atraso andam com o relógio.
     _relogio = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
@@ -68,28 +64,19 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
     super.dispose();
   }
 
-  /// RN-31: o profissional concluiu: "Está tudo certo?".
-  Future<void> _conclusao() async {
-    final p = pedidos.andamento;
-    if (!mounted || p == null || !p.aguardandoConfirmacao) return;
-    if (_perguntou == p.id) return;
-    _perguntou = p.id;
-    final r = await perguntarConclusao(context, p);
-    if (!mounted) return;
-    switch (r) {
-      case RespostaConclusao.confirmar:
-        // Cobra (captura a reserva) e vai para a avaliação com gorjeta.
-        final feito = pedidos.confirmarConclusao();
-        if (feito != null) _avaliar(feito);
-      case RespostaConclusao.algoErrado:
-        // RN-45: o valor fica retido; abre a contestação.
-        pedidos.algoErrado();
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const ContestarServicoPage()),
-        );
-      case null:
-        _confirmouSozinho();
-    }
+  /// RN-31: "Sim, confirmar": cobra (captura a reserva) e vai para a
+  /// avaliação com gorjeta.
+  void _confirmar() {
+    final feito = pedidos.confirmarConclusao();
+    if (feito != null) _avaliar(feito);
+  }
+
+  /// RN-31/RN-45: "Algo errado": o valor fica retido; abre a contestação.
+  void _algoErrado() {
+    pedidos.algoErrado();
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const ContestarServicoPage()),
+    );
   }
 
   /// RN-31: 2 horas sem resposta: confirmou sozinho.
@@ -100,12 +87,11 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
     _avaliar(s);
   }
 
-  /// Troca esta tela pela avaliação (a folha pode estar fechando por
-  /// cima, por isso troca a própria rota).
+  /// Troca esta tela pela avaliação (troca a própria rota).
   void _avaliar(PedidoConcluido feito) {
     if (_avaliando) return;
     _avaliando = true;
-    // Depois do quadro: a folha termina de fechar antes da troca.
+    // Depois do quadro (pode ter sido chamado durante uma notificação).
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final rota = ModalRoute.of(context);
@@ -124,7 +110,6 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
   /// RN-77: o pedido voltou à busca; abre a busca com o aviso.
   void _mudou() {
     _confirmouSozinho();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _conclusao());
     // RN-81: o cliente não apareceu (se a porta não estiver aberta por cima).
     if (mounted &&
         pedidos.ausente != null &&
@@ -194,6 +179,13 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
         final etapa = p?.acompanhar();
         final tela = p != null && etapa != null
             ? _acompanhar(context, p, etapa)
+            // RN-172: concluído pelo profissional: a tela de confirmar.
+            : p != null && p.aguardandoConfirmacao
+            ? ConfirmarConclusao(
+                pedido: p,
+                onConfirmar: _confirmar,
+                onAlgoErrado: _algoErrado,
+              )
             // RN-169: depois do código, "está trabalhando".
             : p != null && p.trabalhando
             ? ServicoEmAndamento(

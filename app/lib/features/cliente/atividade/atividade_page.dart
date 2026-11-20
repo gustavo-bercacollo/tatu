@@ -202,6 +202,31 @@ class _CartaoAndamento extends StatelessWidget {
             etapas: pedido.etapasCurtasDoPedido,
             feitas: pedido.etapasFeitas,
           ),
+          // RN-172: a conclusão espera o cliente; o toque abre a tela.
+          if (pedido.aguardandoConfirmacao) ...[
+            const SizedBox(height: TatuMedidas.entreItens + 4),
+            const Row(
+              children: [
+                Icon(
+                  TablerIcons.circle_check,
+                  size: 18,
+                  color: TatuColors.onlineTexto,
+                ),
+                SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    'Aguardando sua confirmação',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: TatuColors.onlineTexto,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

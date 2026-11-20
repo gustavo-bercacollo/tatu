@@ -137,9 +137,18 @@ class IconeResultado extends StatelessWidget {
 /// Linha com ícone num círculo cinza e o texto do que acontece.
 /// Caixa amarela de atenção (ícone de alerta + texto).
 class CaixaAviso extends StatelessWidget {
-  const CaixaAviso(this.texto, {super.key});
+  const CaixaAviso(
+    this.texto, {
+    super.key,
+    this.icone = TablerIcons.alert_triangle,
+    this.negrito = false,
+  });
 
   final String texto;
+  final IconData icone;
+
+  /// Texto em negrito (ex.: contagem "Confirmamos sozinho em 1:58").
+  final bool negrito;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -151,18 +160,14 @@ class CaixaAviso extends StatelessWidget {
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Icon(
-          TablerIcons.alert_triangle,
-          size: 20,
-          color: TatuColors.warningTexto,
-        ),
+        Icon(icone, size: 20, color: TatuColors.warningTexto),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             texto,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
-              fontWeight: FontWeight.w500,
+              fontWeight: negrito ? FontWeight.w700 : FontWeight.w500,
               color: TatuColors.warningTexto,
             ),
           ),
