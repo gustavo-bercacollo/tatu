@@ -189,7 +189,7 @@ void main() {
     await _abrir(t, const HomeClientePage());
     expect(find.text('2 profissionais com você'), findsOneWidget);
     expect(
-      find.text('Luiza trabalhando · Marcos combinando'),
+      find.text('Marcos combinando · Luiza trabalhando'),
       findsOneWidget,
     );
     await t.tap(find.text('2 profissionais com você'));

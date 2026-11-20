@@ -43,7 +43,7 @@ void main() {
     pedidos.aceitar(_pedido('Pintor', 'Pintor', 'Marcos Dias'));
     expect(
       pedidos.andamentos.map((p) => p.profissional),
-      ['Luiza Souza', 'Rafael Lima', 'Marcos Dias'],
+      ['Marcos Dias', 'Rafael Lima', 'Luiza Souza'],
     );
     // A busca do eletricista acabou: alguém aceitou.
     expect(pedidos.buscas, isEmpty);
@@ -53,7 +53,7 @@ void main() {
     expect(pedidos.andamento?.profissional, 'Rafael Lima');
     expect(
       pedidos.andamentos.map((p) => p.profissional),
-      ['Luiza Souza', 'Rafael Lima', 'Marcos Dias'],
+      ['Marcos Dias', 'Rafael Lima', 'Luiza Souza'],
     );
 
     // Cancelar o aberto deixa os outros.
@@ -69,14 +69,15 @@ void main() {
     pedidos.aceitar(_pedido('Pintor', 'Encanadora', 'Luiza Souza'));
     expect(
       pedidos.andamentos.map((p) => p.servico),
-      ['Encanador', 'Eletricista', 'Pintor'],
+      ['Pintor', 'Eletricista', 'Encanador'],
     );
-    // Abrir um não perde nenhum nem muda a ordem (ordem de chegada).
-    pedidos.abrir(pedidos.andamentos.first);
+    // Abrir um não perde nenhum nem muda a ordem (pilha: o mais novo em
+    // cima).
+    pedidos.abrir(pedidos.andamentos.last);
     expect(pedidos.andamento?.servico, 'Encanador');
     expect(
       pedidos.andamentos.map((p) => p.servico),
-      ['Encanador', 'Eletricista', 'Pintor'],
+      ['Pintor', 'Eletricista', 'Encanador'],
     );
   });
 
