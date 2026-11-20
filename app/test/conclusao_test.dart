@@ -136,7 +136,20 @@ void main() {
     await t.tap(find.text('Algo errado'));
     await t.pumpAndSettle();
     expect(find.byType(ContestarServicoPage), findsOneWidget);
+    // RN-172: voltar sem enviar mantém a pendência.
+    expect(pedidos.andamento?.aguardandoConfirmacao, isTrue);
+    await t.tap(find.bySemanticsLabel('Voltar').first);
+    await t.pumpAndSettle();
+    expect(find.text('A Luiza concluiu o serviço'), findsOneWidget);
+    expect(pedidos.andamento?.valorRetido, isFalse);
+    // Enviar a contestação: aí o valor fica retido.
+    await t.tap(find.text('Algo errado'));
+    await t.pumpAndSettle();
+    await t.ensureVisible(find.text('Enviar'));
+    await t.tap(find.text('Enviar'));
+    await t.pumpAndSettle();
     expect(pedidos.andamento?.valorRetido, isTrue);
+    expect(pedidos.andamento?.aguardandoConfirmacao, isFalse);
     // Não cobrou, nem depois das 2 horas.
     await t.pump(Prazos.confirmarConclusao);
     expect(pedidos.concluidos, hasLength(antes));

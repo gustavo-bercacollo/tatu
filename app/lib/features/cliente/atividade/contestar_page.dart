@@ -19,7 +19,11 @@ const motivosContestacao = [
 /// "O que deu errado?": o cliente contesta o serviço em até 24 h.
 /// O valor do serviço fica retido até resolver; a visita não entra.
 class ContestarServicoPage extends StatefulWidget {
-  const ContestarServicoPage({super.key});
+  const ContestarServicoPage({super.key, this.aoEnviar});
+
+  /// RN-31/RN-172: só ao enviar a contestação o valor fica retido e a
+  /// confirmação pendente sai da Home e da Atividade. Voltar não muda nada.
+  final VoidCallback? aoEnviar;
 
   @override
   State<ContestarServicoPage> createState() => _ContestarServicoPageState();
@@ -33,6 +37,7 @@ class _ContestarServicoPageState extends State<ContestarServicoPage> {
     ..showSnackBar(SnackBar(content: Text('$o: em breve')));
 
   void _enviar() {
+    widget.aoEnviar?.call();
     // O aviso fica no Overlay raiz e continua na tela anterior.
     mostrarAvisoTopo(
       context,

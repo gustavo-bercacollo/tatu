@@ -136,11 +136,14 @@ class PedidoAndamento {
     return _passou(i, agora).inMinutes;
   }
 
-  /// RN-31: quanto falta das 2 horas para confirmar sozinho.
+  /// RN-31: quanto falta das 2 horas para confirmar sozinho. Mesmo no
+  /// protótipo são 2 horas de verdade (a confirmação não some no meio da
+  /// demonstração).
   Duration faltaConfirmar([DateTime? agora]) {
     final c = concluidoEm;
     if (c == null) return Prazos.confirmarConclusao;
-    final r = Prazos.confirmarConclusao - _passou(c, agora);
+    final r =
+        Prazos.confirmarConclusao - (agora ?? clock.now()).difference(c);
     return r.isNegative ? Duration.zero : r;
   }
 
@@ -879,7 +882,8 @@ class PedidosRepo extends ChangeNotifier {
       avisos.add('${p.artigoNome} concluiu o serviço');
     }
     _prazoConfirmar = Timer(
-      Prazos.naDemo(Prazos.confirmarConclusao),
+      // 2 horas de verdade, também no protótipo.
+      Prazos.confirmarConclusao,
       () => confirmarConclusao(automatico: true),
     );
     notifyListeners();

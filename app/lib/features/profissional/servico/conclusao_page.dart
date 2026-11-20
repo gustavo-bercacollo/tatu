@@ -65,11 +65,11 @@ class _ConclusaoServicoPageState extends State<ConclusaoServicoPage> {
     super.dispose();
   }
 
-  /// Quanto falta das 2 horas (protótipo: relógio acelerado).
+  /// Quanto falta das 2 horas (de verdade, também no protótipo).
   Duration get _falta {
     final r =
         Prazos.confirmarConclusao -
-        clock.now().difference(_concluidoEm) * Prazos.aceleracao;
+        clock.now().difference(_concluidoEm);
     return r.isNegative ? Duration.zero : r;
   }
 

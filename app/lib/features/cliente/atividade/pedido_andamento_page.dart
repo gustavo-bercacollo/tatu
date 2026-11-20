@@ -71,11 +71,13 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
     if (feito != null) _avaliar(feito);
   }
 
-  /// RN-31/RN-45: "Algo errado": o valor fica retido; abre a contestação.
+  /// RN-31/RN-45: "Algo errado" abre a contestação. RN-172: só ao
+  /// enviar o valor fica retido; voltar sem enviar mantém a pendência.
   void _algoErrado() {
-    pedidos.algoErrado();
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const ContestarServicoPage()),
+      MaterialPageRoute(
+        builder: (_) => ContestarServicoPage(aoEnviar: pedidos.algoErrado),
+      ),
     );
   }
 
