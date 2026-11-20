@@ -6,6 +6,7 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/pedidos.dart';
+import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/nota_icone.dart';
 import '../../../shared/widgets/tela_interna.dart';
@@ -97,7 +98,7 @@ class ServicoEmAndamento extends StatelessWidget {
                           const _Ponto(),
                           const SizedBox(width: 8),
                           Text(
-                            '${p.minutosTrabalhando()} min',
+                            duracaoTrabalho(p.minutosTrabalhando()),
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,

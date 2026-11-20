@@ -10,6 +10,7 @@ import '../../../core/theme/tatu_theme.dart';
 import '../../../data/pedidos.dart';
 import '../../../data/prazos.dart';
 import '../../../data/seguranca.dart';
+import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
@@ -689,7 +690,7 @@ class _FaixaACaminhoState extends State<FaixaACaminho> {
     if (p.trabalhando) {
       return (
         '${p.primeiroNome} está trabalhando',
-        '${p.profissao} · ${p.minutosTrabalhando()} min · ver serviço',
+        '${p.profissao} · ${duracaoTrabalho(p.minutosTrabalhando())} · ver serviço',
       );
     }
     return (

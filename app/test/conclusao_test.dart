@@ -8,6 +8,7 @@ import 'package:tatu/features/cliente/atividade/avaliar_page.dart';
 import 'package:tatu/features/cliente/atividade/contestar_page.dart';
 import 'package:tatu/features/cliente/atividade/pedido_andamento_page.dart';
 import 'package:tatu/features/cliente/home_page.dart';
+import 'package:tatu/shared/formatadores.dart';
 
 /// Serviço em andamento (RN-169), vários profissionais (RN-170) e
 /// conclusão confirmada pelo cliente (RN-31, RN-171).
@@ -64,6 +65,17 @@ void main() {
     expect(find.text('Cancelar pedido'), findsNothing);
     await t.pump(const Duration(minutes: 25));
     expect(find.text('25 min'), findsOneWidget);
+    // Depois de 60 min, horas e minutos.
+    await t.pump(const Duration(minutes: 40));
+    expect(find.text('1 h 05 min'), findsOneWidget);
+  });
+
+  test('RN-169: tempo de serviço em min e depois em h e min', () {
+    expect(duracaoTrabalho(0), '0 min');
+    expect(duracaoTrabalho(59), '59 min');
+    expect(duracaoTrabalho(60), '1 h');
+    expect(duracaoTrabalho(65), '1 h 05 min');
+    expect(duracaoTrabalho(135), '2 h 15 min');
   });
 
   test('RN-31: concluir não cobra antes do cliente confirmar', () {

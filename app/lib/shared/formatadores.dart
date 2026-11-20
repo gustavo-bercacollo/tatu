@@ -87,3 +87,12 @@ class ReaisFormatter extends TextInputFormatter {
 String reaisInteiros(num v) => v == v.roundToDouble()
     ? reais(v).replaceFirst(RegExp(r',00$'), '')
     : reais(v);
+
+/// RN-169: tempo de serviço. Até 59 → "25 min"; depois, "1 h 05 min"
+/// (hora cheia: "2 h").
+String duracaoTrabalho(int minutos) {
+  if (minutos < 60) return '$minutos min';
+  final h = minutos ~/ 60;
+  final m = minutos % 60;
+  return m == 0 ? '$h h' : '$h h ${m.toString().padLeft(2, '0')} min';
+}
