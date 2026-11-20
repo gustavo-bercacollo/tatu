@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 19/11/2026 (v29)
+Atualizado em 20/11/2026 (v30)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -213,6 +213,7 @@ As penalidades existem para impedir abuso, nunca para punir quem se protegeu.
 | RN-116 | A primeira mensagem que a pessoa recebe no app é a do Tatu: boas-vindas e um atalho para as Dicas Tatu. Ela chega logo depois do cadastro, antes de qualquer pedido ou chamado. |
 | RN-117 | A conversa do Tatu é o canal principal de comunicação do Tatu, como o canal oficial de uma empresa no WhatsApp: novidades, mudanças nas regras e avisos importantes chegam por ela. Só o Tatu envia; a pessoa não responde por ali (suporte continua na Ajuda). |
 | RN-118 | Dicas Tatu é um espaço de dicas de boa convivência, boa negociação e segurança. Por enquanto mostra "Em breve" e avisa pelo canal do Tatu quando abrir. |
+| RN-173 | Cliente e profissional podem enviar sugestões ao Tatu em Perfil → Enviar sugestão: tipo (ideia, algo não funciona, outro), texto de até 500 caracteres e print opcional (passa pela verificação de arquivos, RN-120). A sugestão vai para uma fila do time do Tatu, com o tipo de conta (cliente/profissional). Se virar novidade, o Tatu avisa pelo canal oficial. |
 | RN-155 | A aba Mensagens mostra um contador vermelho com o total de mensagens não lidas, somando todas as conversas, inclusive a do Tatu (acima de 9 aparece "9+"). Já no primeiro acesso aparece "1" (a boas-vindas do Tatu, RN-116). O número diminui ao abrir cada conversa e some quando tudo foi lido. O mesmo número aparece no ícone do app no celular, quando as notificações estão permitidas. |
 | RN-165 | Depois do valor confirmado, o cliente acompanha o profissional: "vai sair já" (com o tempo para sair, RN-76), mapa ao vivo com rota e previsão de chegada, "chegando" (menos de 2 min, notificação e código na tela) e "chegou" ("Passe o código"). Enquanto o profissional está a caminho, a Home mostra a faixa "[nome] chega em X min", que abre o mapa. |
 | RN-166 | A localização do profissional só é mostrada ao cliente entre "Estou a caminho" e a digitação do código (ou "Cliente não apareceu"). Depois disso para de ser compartilhada. |
@@ -312,6 +313,7 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 20/11/2026 | RN-173 | Enviar sugestão ao Tatu pelo Perfil. |
 | 19/11/2026 | RN-31, RN-169 a RN-171 | Cliente vê o serviço em andamento; vários profissionais abrem a Atividade; cliente confirma a conclusão (2 horas para confirmar sozinho). |
 | 19/11/2026 | RN-168 | Depois de confirmar o valor, cliente e profissional saem do chat e vão direto para o acompanhamento. |
 | 18/11/2026 | RN-39, RN-165 a RN-167 | Cliente acompanha o profissional no mapa. O cliente passa o código e o profissional digita para começar o serviço. |

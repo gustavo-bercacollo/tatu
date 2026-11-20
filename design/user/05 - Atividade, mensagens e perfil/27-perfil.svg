@@ -27,7 +27,7 @@
   <text x="335" y="337.0" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="end">Visa 4242</text>
   <g transform="translate(343,325.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
   <text x="36" y="388" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="start" letter-spacing="0.3">CONTA</text>
-  <rect x="20" y="398" width="353" height="156" rx="16" fill="#fff"/>
+  <rect x="20" y="398" width="353" height="208" rx="16" fill="#fff"/>
   <g transform="translate(36,413.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"/></g>
   <text x="74" y="430.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Minhas avaliações</text>
   <g transform="translate(343,417.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
@@ -37,19 +37,27 @@
   <text x="335" y="481.0" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="end">Ativadas</text>
   <g transform="translate(343,469.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
   <line x1="74" y1="502" x2="373" y2="502" stroke="#D9D9DC" stroke-width="0.5"/>
-  <g transform="translate(36,517.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></g>
-  <text x="74" y="534.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Dados da conta</text>
+  <g transform="translate(36,517.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/><path d="M9 12l2 2l4 -4"/></g>
+  <text x="74" y="534.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Segurança</text>
   <g transform="translate(343,521.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
-  <rect x="20" y="570" width="353" height="96" rx="16" fill="#fff"/>
-  <g transform="translate(36,583.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 17v.01"/><path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"/></g>
-  <text x="74" y="600.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Ajuda</text>
-  <g transform="translate(343,587.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
-  <line x1="74" y1="618" x2="373" y2="618" stroke="#D9D9DC" stroke-width="0.5"/>
-  <g transform="translate(36,631.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z"/><path d="M8 11v-4a4 4 0 1 1 8 0v4"/></g>
-  <text x="74" y="648.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Privacidade e termos</text>
-  <g transform="translate(343,635.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
-  <rect x="20" y="682" width="353" height="48" rx="16" fill="#fff"/>
-  <text x="196.5" y="713" font-size="17" font-weight="400" fill="#FF3B30" text-anchor="middle">Sair da conta</text>
+  <line x1="74" y1="554" x2="373" y2="554" stroke="#D9D9DC" stroke-width="0.5"/>
+  <g transform="translate(36,569.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></g>
+  <text x="74" y="586.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Dados da conta</text>
+  <g transform="translate(343,573.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <rect x="20" y="622" width="353" height="132" rx="16" fill="#fff"/>
+  <g transform="translate(36,633.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 17v.01"/><path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"/></g>
+  <text x="74" y="650.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Ajuda</text>
+  <g transform="translate(343,637.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <line x1="74" y1="666" x2="373" y2="666" stroke="#D9D9DC" stroke-width="0.5"/>
+  <g transform="translate(36,677.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"/><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"/><path d="M9.7 17l4.6 0"/></g>
+  <text x="74" y="694.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Enviar sugestão</text>
+  <g transform="translate(343,681.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <line x1="74" y1="710" x2="373" y2="710" stroke="#D9D9DC" stroke-width="0.5"/>
+  <g transform="translate(36,721.0) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z"/><path d="M8 11v-4a4 4 0 1 1 8 0v4"/></g>
+  <text x="74" y="738.0" font-size="17" font-weight="400" fill="#000000" text-anchor="start">Privacidade e termos</text>
+  <g transform="translate(343,725.0) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <rect x="20" y="770" width="353" height="48" rx="16" fill="#fff"/>
+  <text x="196.5" y="801" font-size="17" font-weight="400" fill="#FF3B30" text-anchor="middle">Sair da conta</text>
   <rect x="0" y="769" width="393" height="83" rx="0" fill="#F9F9F9"/>
   <line x1="0" y1="769" x2="393" y2="769" stroke="#D9D9DC" stroke-width="0.5"/>
   <g transform="translate(53.5,778) scale(1.0)" fill="none" stroke="#000000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></g>

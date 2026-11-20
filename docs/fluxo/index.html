@@ -193,7 +193,7 @@ path.entre { opacity: .5; }
 /* ===== DADOS =====
    status: app (já no app, imagem real) · desenho (desenho pronto, ainda não no app) · andamento (tela ainda não desenhada)
    Para atualizar: mudar o status/imagem da tela, ou acrescentar telas e ligações. */
-const ATUALIZADO = '19/11/2026';
+const ATUALIZADO = '20/11/2026';
 
 const ETAPAS = {
   entrada:   { nome: 'Entrada e cadastro', lado: 'ambos' },
@@ -364,6 +364,8 @@ const TELAS_RAW = [
   ['c136','C136','Folha · denunciar mensagem','contaC','app','docs/fluxo/app/chat-denunciar-mensagem.png',["RN-134: assédio ou ofensa, conteúdo sexual, ameaça ou chantagem, golpe ou pagamento por fora, outro","O suporte recebe a mensagem e as mensagens em volta"]],
   ['c137','C137','Chat · mensagem denunciada','contaC','app','docs/fluxo/app/chat-mensagem-denunciada.png',["RN-134: some só da conversa de quem denunciou; a outra pessoa não vê nada"]],
   ['c27','C27','Perfil do cliente','contaC','app','docs/fluxo/app/perfil-cliente.png',["Abre pelo avatar da Home; a aba Início volta","Toque na foto abre “Foto do perfil”","No app, Dados da conta, Ajuda, Privacidade ainda mostram “em breve”"]],
+  ['c68s','C68','Enviar sugestão','contaC','app','docs/fluxo/app/enviar-sugestao.png',["RN-173: tipo (Ideia, Algo não funciona, Outro; um obrigatório), texto obrigatório até 500 caracteres com contador","Print opcional (câmera ou galeria), verificado como os arquivos do chat (RN-120)","Grava conta, modo (cliente ou profissional), tipo, texto, print, versão do app e aparelho","O profissional usa as mesmas telas"]],
+  ['c69s','C69','Sugestão enviada','contaC','app','docs/fluxo/app/sugestao-enviada.png',["RN-173: vai para a fila do time do Tatu (protótipo: lista em memória)","Se virar novidade, o aviso sai pelo canal oficial do Tatu (RN-117)"]],
   ['c28','C28','Perfil · sem cartão e avisos desligados','contaC','desenho', U+'05 - Atividade, mensagens e perfil/28-perfil-sem-cartao-notificacoes.svg'],
   ['c27a','C27a','Endereços','contaC','app','docs/fluxo/app/enderecos.png'],
   ['c27b','C27b','Endereços · vazio','contaC','app','docs/fluxo/app/enderecos-vazio.png'],
@@ -575,6 +577,10 @@ const TELAS_RAW = [
 
 // [de, para, toque, tipo]  tipo: t = toque · a = automático · e = outro estado da mesma tela · alt = alternativa · s = entre os dois apps
 const LIGACOES = [
+  ['c27','c68s','Enviar sugestão','t'],
+  ['p31','c68s','Enviar sugestão (profissional)','t'],
+  ['c68s','c69s','Enviar sugestão','t'],
+  ['c69s','c27','Voltar ao perfil','t'],
   ['e01','e02','abre sozinha','a'],
   ['e02','e03','Preciso de um serviço','t'],
   ['e02','p01','Quero trabalhar','t'],

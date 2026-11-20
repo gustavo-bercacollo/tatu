@@ -1,3 +1,5 @@
+import '../../data/sugestoes_tatu.dart' show ModoConta;
+import '../entrada/enviar_sugestao_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/seguranca.dart';
@@ -242,6 +244,19 @@ class PerfilClientePage extends StatelessWidget {
                       texto: 'Ajuda',
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const AjudaPage()),
+                      ),
+                    ),
+                    // RN-173: sugestão ao Tatu.
+                    ItemLista(
+                      icone: TablerIcons.bulb,
+                      texto: 'Enviar sugestão',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => EnviarSugestaoPage(
+                            conta: conta.nome,
+                            modo: ModoConta.cliente,
+                          ),
+                        ),
                       ),
                     ),
                     ItemLista(

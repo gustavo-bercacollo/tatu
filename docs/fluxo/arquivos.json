@@ -381,5 +381,7 @@
  "app/home-varios-profissionais.png": "docs/fluxo/app/home-varios-profissionais.png",
  "app/pro-aguardando-confirmacao.png": "docs/fluxo/app/pro-aguardando-confirmacao.png",
  "app/pro-cliente-confirmou.png": "docs/fluxo/app/pro-cliente-confirmou.png",
- "app/home-confirmar-servico.png": "docs/fluxo/app/home-confirmar-servico.png"
+ "app/home-confirmar-servico.png": "docs/fluxo/app/home-confirmar-servico.png",
+ "app/enviar-sugestao.png": "docs/fluxo/app/enviar-sugestao.png",
+ "app/sugestao-enviada.png": "docs/fluxo/app/sugestao-enviada.png"
 }

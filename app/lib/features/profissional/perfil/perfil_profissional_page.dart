@@ -1,3 +1,5 @@
+import '../../../data/sugestoes_tatu.dart' show ModoConta;
+import '../../entrada/enviar_sugestao_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -297,6 +299,18 @@ class PerfilProfissionalPage extends StatelessWidget {
                           onTap: () => _abrir(
                             context,
                             const AjudaPage(conteudo: conteudoProfissional),
+                          ),
+                        ),
+                        // RN-173: sugestão ao Tatu (mesmas telas).
+                        ItemLista(
+                          icone: TablerIcons.bulb,
+                          texto: 'Enviar sugestão',
+                          onTap: () => _abrir(
+                            context,
+                            EnviarSugestaoPage(
+                              conta: profissional.nome,
+                              modo: ModoConta.profissional,
+                            ),
                           ),
                         ),
                         ItemLista(

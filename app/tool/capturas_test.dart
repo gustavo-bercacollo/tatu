@@ -3,6 +3,8 @@
 //   flutter test tool/capturas_test.dart --update-goldens
 import 'dart:io';
 
+import 'package:tatu/data/sugestoes_tatu.dart' show ModoConta;
+import 'package:tatu/features/entrada/enviar_sugestao_page.dart';
 import 'package:tatu/features/profissional/servico/conclusao_page.dart';
 import 'package:tatu/shared/widgets/avatar_iniciais.dart';
 import 'package:tatu/features/entrada/perfil_publico_page.dart';
@@ -534,6 +536,29 @@ void main() {
 
   testWidgets('perfil-cliente', (t) async {
     await _capturar(t, 'perfil-cliente', const PerfilClientePage());
+  });
+
+  // RN-173: sugestão ao Tatu (cliente e profissional usam as mesmas telas).
+  testWidgets('enviar-sugestao', (t) async {
+    await _capturar(
+      t,
+      'enviar-sugestao',
+      const EnviarSugestaoPage(conta: 'Ana', modo: ModoConta.cliente),
+      preparar: () async {
+        await t.tap(find.text('Ideia'));
+        await t.enterText(
+          find.byType(TextField),
+          'Seria bom poder salvar um profissional favorito para chamar de novo.',
+        );
+        await t.pump();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await t.pump();
+      },
+    );
+  });
+
+  testWidgets('sugestao-enviada', (t) async {
+    await _capturar(t, 'sugestao-enviada', const SugestaoEnviadaPage());
   });
 
   testWidgets('foto-perfil', (t) async {
