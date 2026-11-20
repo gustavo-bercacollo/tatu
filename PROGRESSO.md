@@ -115,6 +115,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Serviço e conclusão (RN-31, RN-169 a RN-171): cliente vê "A Luiza está trabalhando" (`cliente/atividade/servico_em_andamento.dart`); faixa da Home "está trabalhando" e "X profissionais com você" (abre a Atividade); "Concluir serviço" não cobra: o cliente confirma na folha ("Sim, confirmar" cobra e abre a avaliação; "Algo errado" retém e contesta; 2 h sem resposta confirma sozinho, `Prazos.confirmarConclusao`); profissional vê "Aguardando a Ana confirmar" e "Ana confirmou" com o líquido (`profissional/servico/conclusao_page.dart`). Tela da Atividade sem mudança (desenho novo fica para depois).
 - [x] Confirmação como tela (RN-172): "Serviço concluído" com "Confirmamos sozinho em h:mm" (`ConfirmarConclusao`); voltar não descarta; faixa verde na Home ("Confirme o serviço da Luiza") e "Aguardando sua confirmação" no card da Atividade abrem a mesma tela.
 - [x] Enviar sugestão (RN-173): item no Perfil dos dois modos; tela "Sugira algo ao Tatu" (tipo, texto até 500 com contador, print opcional verificado pela RN-120) e "Obrigado!" (`entrada/enviar_sugestao_page.dart`); fila em `data/sugestoes_tatu.dart` (conta, modo, tipo, texto, print, versão, aparelho; `virouNovidade` avisa pelo canal do Tatu).
+- [x] Ganhos em aba própria do profissional (Início · Atividade · Ganhos · Mensagens); a Atividade ficou só com os serviços.
 - Falta do profissional: cobrar o cliente, avaliar o cliente
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado

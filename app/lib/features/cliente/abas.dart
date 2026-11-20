@@ -13,6 +13,8 @@ void irParaAba(BuildContext context, AbaCliente aba) {
   switch (aba) {
     case AbaCliente.inicio:
     case AbaCliente.perfil:
+    // Ganhos só existe no modo profissional.
+    case AbaCliente.ganhos:
       return;
     case AbaCliente.atividade:
       nav.push(

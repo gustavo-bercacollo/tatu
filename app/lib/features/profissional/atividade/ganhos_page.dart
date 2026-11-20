@@ -9,11 +9,17 @@ import '../../../shared/widgets/back_circle_button.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import '../../../shared/widgets/segmento.dart';
+import '../../../shared/widgets/abas_cliente.dart';
+import '../abas.dart';
 import '../cadastro/taxas_sheet.dart';
 
 /// P30 · Ganhos: o dinheiro de hoje, da semana ou do mês.
 class GanhosPage extends StatefulWidget {
-  const GanhosPage({super.key, this.periodo = 1});
+  const GanhosPage({super.key, this.periodo = 1, this.comoAba = false});
+
+  /// Aberta pela aba Ganhos (sem voltar, com a barra de abas). Pela Ajuda
+  /// ou pelos Dados da conta, abre por cima, com voltar.
+  final bool comoAba;
 
   /// 0 = Hoje, 1 = Semana, 2 = Mês.
   final int periodo;
@@ -29,7 +35,11 @@ class _GanhosPageState extends State<GanhosPage> {
   Widget build(BuildContext context) {
     final r = [ganhos.hoje, ganhos.semana, ganhos.mes][_periodo];
     return Scaffold(
+      bottomNavigationBar: widget.comoAba
+          ? const AbasDoProfissional(ativa: AbaCliente.ganhos)
+          : null,
       body: SafeArea(
+        bottom: !widget.comoAba,
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: TatuMedidas.larguraMax),
@@ -41,11 +51,15 @@ class _GanhosPageState extends State<GanhosPage> {
                 TatuMedidas.base,
               ),
               children: [
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: BackCircleButton(),
-                ),
-                const SizedBox(height: 18),
+                if (widget.comoAba)
+                  const SizedBox(height: TatuMedidas.entreItens - 4)
+                else ...[
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: BackCircleButton(),
+                  ),
+                  const SizedBox(height: 18),
+                ],
                 const Text('Ganhos', style: TatuTexto.tituloGrande),
                 const SizedBox(height: TatuMedidas.entreItens),
                 Segmento(

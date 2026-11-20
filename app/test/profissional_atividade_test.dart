@@ -20,9 +20,8 @@ void main() {
     );
     await t.tap(find.text('Atividade'));
     await t.pumpAndSettle();
-    expect(find.text('Esta semana'), findsOneWidget);
-    expect(find.text('R\$ 436,00'), findsOneWidget);
-    expect(find.text('3 serviços · R\$ 150,00 a receber'), findsOneWidget);
+    // Os ganhos ficam na aba Ganhos, não na Atividade.
+    expect(find.text('Esta semana'), findsNothing);
     expect(find.text('Aguardando pagamento'), findsOneWidget);
     expect(find.text('Rafael Gomes'), findsOneWidget);
     expect(find.text('Por fora'), findsNothing);
@@ -31,7 +30,7 @@ void main() {
     await t.pump();
     expect(find.text('Nenhum serviço agora'), findsOneWidget);
 
-    await t.tap(find.text('Esta semana'));
+    await t.tap(find.text('Ganhos'));
     await t.pumpAndSettle();
     expect(find.text('Total da semana'), findsOneWidget);
     expect(find.text('R\$ 436,00'), findsNWidgets(2)); // total e recebido
@@ -44,8 +43,8 @@ void main() {
     expect(find.text('Taxas do Tatu'), findsOneWidget);
     await t.tap(find.text('Entendi'));
     await t.pumpAndSettle();
-    await t.tap(find.byType(BackCircleButton));
-    await t.pumpAndSettle();
+    // Aba: sem voltar.
+    expect(find.byType(BackCircleButton), findsNothing);
 
     await t.tap(find.text('Início'));
     await t.pumpAndSettle();

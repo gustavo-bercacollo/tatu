@@ -6,7 +6,8 @@ import '../../core/theme/tatu_colors.dart';
 import '../../data/nao_lidas.dart';
 
 /// Abas do cliente.
-enum AbaCliente { inicio, atividade, mensagens, perfil }
+/// [ganhos] só existe no modo profissional.
+enum AbaCliente { inicio, atividade, ganhos, mensagens, perfil }
 
 /// Barra de abas do cliente: Início · Atividade · Mensagens.
 class AbasCliente extends StatelessWidget {
@@ -15,8 +16,12 @@ class AbasCliente extends StatelessWidget {
     this.ativa = AbaCliente.inicio,
     this.onTrocar,
     this.comPerfil = false,
+    this.comGanhos = false,
     this.lado,
   });
+
+  /// Profissional: aba Ganhos entre Atividade e Mensagens.
+  final bool comGanhos;
 
   /// RN-155: de quem são as mensagens do contador (nulo = sem contador).
   final LadoMensagens? lado;
@@ -74,6 +79,13 @@ class AbasCliente extends StatelessWidget {
                 ativa: ativa == AbaCliente.atividade,
                 onTap: ir(AbaCliente.atividade),
               ),
+              if (comGanhos)
+                _Aba(
+                  icone: TablerIcons.wallet,
+                  texto: 'Ganhos',
+                  ativa: ativa == AbaCliente.ganhos,
+                  onTap: ir(AbaCliente.ganhos),
+                ),
               _Aba(
                 icone: TablerIcons.message_circle,
                 texto: 'Mensagens',
@@ -147,6 +159,9 @@ class _Aba extends StatelessWidget {
               const SizedBox(height: 3),
               Text(
                 texto,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.fade,
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: ativa ? FontWeight.w600 : FontWeight.w500,

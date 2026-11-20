@@ -3123,11 +3123,15 @@ void main() {
   });
 
   testWidgets('pro-ganhos', (t) async {
-    await _capturar(t, 'pro-ganhos', const GanhosPage());
+    await _capturar(t, 'pro-ganhos', const GanhosPage(comoAba: true));
   });
 
   testWidgets('pro-ganhos-mes', (t) async {
-    await _capturar(t, 'pro-ganhos-mes', const GanhosPage(periodo: 2));
+    await _capturar(
+      t,
+      'pro-ganhos-mes',
+      const GanhosPage(periodo: 2, comoAba: true),
+    );
   });
 
   const rascunho =

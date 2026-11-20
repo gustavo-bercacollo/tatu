@@ -9,17 +9,15 @@ import '../servico/andamento_page.dart';
 import '../chamado/chat_profissional_page.dart';
 import '../../../data/servico_profissional.dart';
 import '../../../data/atendimento_profissional.dart';
-import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/estado_vazio.dart';
 import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/segmento.dart';
 import '../abas.dart';
-import 'ganhos_page.dart';
 
-/// P29 · Atividade do profissional: ganhos da semana no topo e os
-/// serviços (em andamento e concluídos).
+/// P29 · Atividade do profissional: os serviços (em andamento e
+/// concluídos). Os ganhos ficam na aba Ganhos.
 class AtividadeProfissionalPage extends StatefulWidget {
   const AtividadeProfissionalPage({super.key, this.aba = 1});
 
@@ -36,8 +34,6 @@ class _AtividadeProfissionalPageState extends State<AtividadeProfissionalPage> {
 
   @override
   Widget build(BuildContext context) {
-    final semana = ganhos.semana;
-    final n = ganhos.concluidos.length;
     return Scaffold(
       backgroundColor: TatuColors.surfaceGrouped,
       bottomNavigationBar: const AbasDoProfissional(
@@ -59,16 +55,6 @@ class _AtividadeProfissionalPageState extends State<AtividadeProfissionalPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text('Atividade', style: TatuTexto.tituloGrande),
-                  const SizedBox(height: TatuMedidas.entreItens),
-                  _CartaoGanhos(
-                    total: reais(semana.total),
-                    detalhe:
-                        '$n ${n == 1 ? 'serviço' : 'serviços'} · '
-                        '${reais(semana.aReceber)} a receber',
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const GanhosPage()),
-                    ),
-                  ),
                   const SizedBox(height: TatuMedidas.entreItens),
                   Segmento(
                     opcoes: const ['Em andamento', 'Concluídos'],
@@ -182,67 +168,6 @@ class _CartaoAtendimento extends StatelessWidget {
                 feitas: a.etapa.feitas,
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Cartão preto com o ganho da semana; abre "Ganhos".
-class _CartaoGanhos extends StatelessWidget {
-  const _CartaoGanhos({
-    required this.total,
-    required this.detalhe,
-    required this.onTap,
-  });
-
-  final String total;
-  final String detalhe;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final claro = TatuColors.onAction.withValues(alpha: 0.75);
-    return Semantics(
-      button: true,
-      label: 'Ver ganhos',
-      child: Material(
-        color: TatuColors.action,
-        borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 16, 14, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Esta semana',
-                        style: TextStyle(fontSize: 14, color: claro),
-                      ),
-                    ),
-                    Icon(TablerIcons.chevron_right, size: 20, color: claro),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  total,
-                  style: const TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.8,
-                    color: TatuColors.onAction,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(detalhe, style: TextStyle(fontSize: 14, color: claro)),
-              ],
-            ),
           ),
         ),
       ),

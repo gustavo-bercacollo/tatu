@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../data/nao_lidas.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import 'atividade/atividade_profissional_page.dart';
+import 'atividade/ganhos_page.dart';
 import 'mensagens/mensagens_profissional_page.dart';
 
 /// Troca de aba do profissional. Início é a primeira tela da pilha (a
@@ -13,6 +14,7 @@ void irParaAbaProfissional(BuildContext context, AbaCliente aba) {
   final Widget? tela = switch (aba) {
     AbaCliente.inicio => null,
     AbaCliente.atividade => const AtividadeProfissionalPage(),
+    AbaCliente.ganhos => const GanhosPage(comoAba: true),
     AbaCliente.mensagens => const MensagensProfissionalPage(),
     AbaCliente.perfil => null,
   };
@@ -26,7 +28,7 @@ void irParaAbaProfissional(BuildContext context, AbaCliente aba) {
   );
 }
 
-/// Barra de abas do profissional: Início · Atividade · Mensagens.
+/// Barra de abas do profissional: Início · Atividade · Ganhos · Mensagens.
 /// O Perfil abre pela foto no canto da Home.
 class AbasDoProfissional extends StatelessWidget {
   const AbasDoProfissional({super.key, required this.ativa});
@@ -38,6 +40,7 @@ class AbasDoProfissional extends StatelessWidget {
     ativa: ativa,
     // RN-155: contador de não lidas na aba Mensagens.
     lado: LadoMensagens.profissional,
+    comGanhos: true,
     onTrocar: (a) {
       if (a == ativa) return;
       irParaAbaProfissional(context, a);
