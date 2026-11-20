@@ -183,6 +183,31 @@ void main() {
     expect(find.text('A Luiza concluiu o serviço'), findsOneWidget);    pedidos.restaurar(); // para o relógio das 2 horas
   });
 
+  testWidgets('RN-172: "Algo errado" sem enviar não tira a pendência', (
+    t,
+  ) async {
+    _trabalhando();
+    pedidos.profissionalConcluiu();
+    await _abrir(t, const HomeClientePage());
+    await t.tap(find.text('Confirme o serviço da Luiza'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Algo errado'));
+    await t.pumpAndSettle();
+    expect(find.text('O que deu errado?'), findsOneWidget);
+    // Escolhe um motivo, mas volta sem enviar.
+    await t.tap(find.text('Não terminou o serviço'));
+    await t.pump();
+    await t.tap(find.bySemanticsLabel('Voltar').first);
+    await t.pumpAndSettle();
+    await t.tap(find.bySemanticsLabel('Voltar').first);
+    await t.pumpAndSettle();
+    expect(find.text('Confirme o serviço da Luiza'), findsOneWidget);
+    await t.tap(find.text('Atividade'));
+    await t.pumpAndSettle();
+    expect(find.text('Aguardando sua confirmação'), findsOneWidget);
+    pedidos.restaurar(); // para o relógio das 2 horas
+  });
+
   testWidgets('RN-169: faixa "está trabalhando" abre a tela do serviço', (
     t,
   ) async {
