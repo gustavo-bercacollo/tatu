@@ -33,11 +33,33 @@ void main() {
     await t.tap(find.text('Ganhos'));
     await t.pumpAndSettle();
     expect(find.text('Total da semana'), findsOneWidget);
-    expect(find.text('R\$ 436,00'), findsNWidgets(2)); // total e recebido
+    // Serviços R$ 480 − taxa R$ 48 + gorjetas R$ 30 = R$ 462.
+    expect(find.text('R\$ 462,00'), findsNWidgets(2)); // total e recebido
+    expect(find.text('R\$ 52 a mais que na semana passada'), findsOneWidget);
+    expect(find.text('Próximo Pix: R\$ 145,00'), findsOneWidget);
+    // RN-141/RN-143: gorjetas à parte, sem taxa.
+    expect(find.text('R\$ 30'), findsOneWidget);
+    expect(find.text('+ R\$ 30,00'), findsOneWidget);
+    expect(find.text('− R\$ 48,00'), findsOneWidget);
+    expect(find.text('A receber · 1 esperando'), findsOneWidget);
     await t.tap(find.text('Hoje'));
     await t.pump();
     expect(find.text('Total de hoje'), findsOneWidget);
-    expect(find.text('R\$ 135,00'), findsNWidgets(2));
+    expect(find.text('R\$ 145,00'), findsWidgets);
+    expect(find.text('R\$ 73 a menos que ontem'), findsOneWidget);
+    // Últimos recebimentos com a gorjeta de cada um; "Ver todos".
+    await t.scrollUntilVisible(
+      find.text('Ver todos'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.textContaining('+ R\$ 10 de gorjeta'), findsOneWidget);
+    await t.tap(find.text('Ver todos'));
+    await t.pumpAndSettle();
+    expect(find.text('Recebimentos'), findsOneWidget);
+    expect(find.text('Joana Reis'), findsOneWidget);
+    await t.tap(find.byType(BackCircleButton));
+    await t.pumpAndSettle();
     await t.tap(find.text('Ver taxas do Tatu'));
     await t.pumpAndSettle();
     expect(find.text('Taxas do Tatu'), findsOneWidget);

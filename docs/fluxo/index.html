@@ -537,7 +537,8 @@ const TELAS_RAW = [
   ['p29','P29','Atividade · concluídos','contaP','app','docs/fluxo/app/pro-atividade.png',["Só os serviços (em andamento e concluídos); os ganhos ficam na aba Ganhos","Aguardando pagamento separado dos concluídos"]],
   ['p29b','P29b','Atividade · em andamento (vazio)','contaP','app','docs/fluxo/app/pro-atividade-andamento.png'],
   ['p29c','P29c','Atividade · chamado em andamento','contaP','app','docs/fluxo/app/pro-atividade-servico.png',["Aparece ao aceitar um chamado; selo e linha do tempo mudam a cada etapa (Combinando, A caminho, No local, Em serviço)","Toque abre a tela da etapa; some ao cancelar, sair ou não ter acordo"]],
-  ['p30','P30','Ganhos','contaP','app','docs/fluxo/app/pro-ganhos.png',["Aba própria na barra do profissional: Início · Atividade · Ganhos · Mensagens","Hoje · Semana · Mês; barras só na semana","“A receber” não entra no total","Pela Ajuda ou pelos Dados da conta abre por cima, com voltar"]],
+  ['p30','P30','Ganhos','contaP','app','docs/fluxo/app/pro-ganhos.png',["Aba própria na barra do profissional: Início · Atividade · Ganhos · Mensagens","Hoje · Semana · Mês; barras só na semana; comparação com o período anterior","Próximo Pix (RN-35), Serviços · Gorjetas · Média","Serviços, gorjetas (100% suas, RN-143), taxa do Tatu, recebido e a receber (esperando o cliente, RN-171)","Últimos recebimentos com a gorjeta de cada um; “Ver todos” abre a lista completa","Pela Ajuda ou pelos Dados da conta abre por cima, com voltar"]],
+  ['p30r','P30r','Ganhos · recebimentos','contaP','app','docs/fluxo/app/pro-ganhos-recebimentos.png',["Parte de baixo da aba Ganhos: de onde vem o dinheiro e os últimos recebimentos"]],
   ['p30b','P30b','Ganhos · mês','contaP','app','docs/fluxo/app/pro-ganhos-mes.png'],
   ['p31','P31','Perfil do profissional','contaP','app','docs/fluxo/app/pro-perfil.png',["Topo igual ao do cliente: foto ou avatar (mesma foto do modo cliente), nome com selo e nota","Abre pela foto no canto da Home","Inclui “Trocar para modo cliente”","No app, Privacidade ainda mostra “em breve”"]],
   ['p31f','P31f','Perfil · foto do perfil','contaP','app','docs/fluxo/app/pro-perfil-foto.png',["Tirar foto, galeria ou avatar pronto (as mesmas telas do cliente)"]],
@@ -577,6 +578,7 @@ const TELAS_RAW = [
 
 // [de, para, toque, tipo]  tipo: t = toque · a = automático · e = outro estado da mesma tela · alt = alternativa · s = entre os dois apps
 const LIGACOES = [
+  ['p30','p30r','rolar','e'],
   ['c27','c68s','Enviar sugestão','t'],
   ['p31','c68s','Enviar sugestão (profissional)','t'],
   ['c68s','c69s','Enviar sugestão','t'],

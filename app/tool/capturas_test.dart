@@ -3126,6 +3126,18 @@ void main() {
     await _capturar(t, 'pro-ganhos', const GanhosPage(comoAba: true));
   });
 
+  testWidgets('pro-ganhos-recebimentos', (t) async {
+    await _capturar(
+      t,
+      'pro-ganhos-recebimentos',
+      const GanhosPage(comoAba: true),
+      preparar: () async {
+        await t.drag(find.byType(Scrollable).first, const Offset(0, -2000));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
   testWidgets('pro-ganhos-mes', (t) async {
     await _capturar(
       t,
