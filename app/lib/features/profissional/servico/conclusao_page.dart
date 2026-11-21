@@ -13,6 +13,7 @@ import '../../../data/servico_profissional.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/tela_interna.dart';
+import 'avaliar_cliente_page.dart';
 
 /// P52–P53 · RN-31/RN-171: depois de "Concluir serviço", nada é cobrado
 /// na hora. O profissional vê "Aguardando a Ana confirmar" com o tempo
@@ -78,10 +79,6 @@ class _ConclusaoServicoPageState extends State<ConclusaoServicoPage> {
     _cliente?.cancel();
     if (mounted) setState(() => _confirmado = true);
   }
-
-  void _emBreve(String o) => ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text('$o: em breve')));
 
   @override
   Widget build(BuildContext context) {
@@ -230,7 +227,13 @@ class _ConclusaoServicoPageState extends State<ConclusaoServicoPage> {
             padding: const EdgeInsets.only(bottom: TatuMedidas.base),
             child: FilledButton(
               onPressed: _confirmado
-                  ? () => _emBreve('Avaliar cliente')
+                  // RN-41: o profissional também avalia o cliente.
+                  ? () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            AvaliarClientePage(servico: s, liquido: liquido),
+                      ),
+                    )
                   : () {
                       profissional.ficarOnline(true);
                       Navigator.of(context).popUntil((r) => r.isFirst);

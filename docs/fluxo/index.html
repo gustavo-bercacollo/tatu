@@ -512,7 +512,7 @@ const TELAS_RAW = [
 
   ['p25','P25','Serviço em andamento','servico','app','docs/fluxo/app/pro-em-andamento.png',["Escudo no topo: toque abre Segurança; segurar 3 s dispara o alerta silencioso","Concluir serviço: não cobra na hora; o cliente confirma (RN-31)","No app, “Precisa mudar o valor?” ainda mostra “em breve”"]],
   ['p52','P52','Aguardando o cliente confirmar','servico','app','docs/fluxo/app/pro-aguardando-confirmacao.png',["RN-171: “Aguardando a Ana confirmar” com o tempo das 2 horas","Já pode ficar online para outros chamados","Protótipo: a Ana confirma sozinha 6 s depois"]],
-  ['p53','P53','Cliente confirmou','servico','app','docs/fluxo/app/pro-cliente-confirmou.png',["RN-171: valor líquido (menos a taxa) no Pix em 24 horas","“Avaliar a Ana” ainda mostra “em breve” (só existe o desenho P28)"]],
+  ['p53','P53','Cliente confirmou','servico','app','docs/fluxo/app/pro-cliente-confirmou.png',["RN-171: valor líquido (menos a taxa) no Pix em 24 horas"]],
   ['pa-so-visita','—','Folha · encerrar e cobrar só a visita','servico','app','docs/fluxo/app/pro-so-visita.png',["Só aparece se o valor tem visita","Muitas visitas sem serviço pausam a conta"]],
   ['p20a','P20a','Home · pausada por abandonos','chamados','app','docs/fluxo/app/pro-home-pausada-abandonos.png',["RN-79: 3 chamados abandonados em 30 dias","Mesmo aviso da conta pausada por visitas, com outro texto; “Ficar online” desligado"]],
   ['p20p','P20p','Home · conta pausada','chamados','app','docs/fluxo/app/pro-home-pausada.png',["5 das últimas 8 visitas sem serviço (regra provisória)","“Ficar online” desligado até falar com o suporte"]],
@@ -531,7 +531,7 @@ const TELAS_RAW = [
   ['p31c','P31c','Contatos de confiança','contaP','app','docs/fluxo/app/pro-contatos-confianca.png',["Até 5 contatos; “···” remove","No app, “Adicionar contato” ainda mostra “em breve”"]],
   ['p26','P26','Cobrar o cliente','servico','desenho', W+'03 - Serviço e cobrança/26-cobrar-cliente.svg',["Desenho antigo: agora o cliente é cobrado ao “Concluir serviço”","Sem “Recebi por fora”: todo pagamento é pelo app"]],
   ['p27','P27','Cobrança · aguardando','servico','desenho', W+'03 - Serviço e cobrança/27-cobranca-aguardando.svg'],
-  ['p28','P28','Pagamento recebido · avaliar o cliente','servico','desenho', W+'03 - Serviço e cobrança/28-avaliar-cliente.svg'],
+  ['p28','P28','Avaliar a cliente','servico','app','docs/fluxo/app/pro-avaliar-cliente.png',["RN-41: “Pagamento recebido” e “Como foi com a Ana?”: estrelas (obrigatório), elogios (Educada, Pagou rápido, Local organizado) e comentário opcional","Abre por “Avaliar a Ana” depois que a cliente confirma (RN-171)","Enviar volta ao Início com o aviso “Avaliação enviada”"]],
   ['p25b','P25b','Folha · termine o serviço antes de trocar','servico','desenho', W+'03 - Serviço e cobrança/25b-trocar-bloqueado.png',["Com serviço em andamento não dá para trocar de modo"]],
 
   ['p29','P29','Atividade · concluídos','contaP','app','docs/fluxo/app/pro-atividade.png',["Só os serviços (em andamento e concluídos); os ganhos ficam na aba Ganhos","Aguardando pagamento separado dos concluídos"]],
@@ -1032,7 +1032,8 @@ const LIGACOES = [
   ['p25','c118','o cliente é avisado','s'],
   ['p52','p53','a Ana confirma (ou 2 h)','a'],
   ['p52','p20','Ficar online','t'],
-  ['p53','p28','Avaliar a Ana (em breve)','t'],
+  ['p53','p28','Avaliar a Ana','t'],
+  ['p28','p20','Enviar avaliação','t'],
   ['c85','c114','Home enquanto ela vem','t'],
   ['c85n','c79n','5 min sem resposta','a'],
   ['c85','c85t','passou do dobro do tempo','a'],

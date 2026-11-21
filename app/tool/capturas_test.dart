@@ -3,6 +3,7 @@
 //   flutter test tool/capturas_test.dart --update-goldens
 import 'dart:io';
 
+import 'package:tatu/features/profissional/servico/avaliar_cliente_page.dart';
 import 'package:tatu/data/sugestoes_tatu.dart' show ModoConta;
 import 'package:tatu/features/entrada/enviar_sugestao_page.dart';
 import 'package:tatu/features/profissional/servico/conclusao_page.dart';
@@ -2625,6 +2626,19 @@ void main() {
       t,
       'pro-aguardando-confirmacao',
       const ConclusaoServicoPage(servico: servicoAna),
+    );
+  });
+
+  testWidgets('pro-avaliar-cliente', (t) async {
+    await _capturar(
+      t,
+      'pro-avaliar-cliente',
+      const AvaliarClientePage(servico: servicoAna, liquido: 171),
+      preparar: () async {
+        await t.tap(find.bySemanticsLabel('5 estrelas'));
+        await t.tap(find.text('Educada'));
+        await t.pump();
+      },
     );
   });
 

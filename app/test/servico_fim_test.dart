@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/atendimento_profissional.dart';
+import 'package:tatu/data/avaliacoes_de_clientes.dart';
 import 'package:tatu/data/navegacao.dart';
 import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/data/prazos.dart';
@@ -69,6 +70,25 @@ void main() {
     expect(find.text('Ana confirmou'), findsOneWidget);
     expect(find.text(r'R$ 135,00'), findsOneWidget);
     expect(find.text('Avaliar a Ana'), findsOneWidget);
+    // RN-41: o profissional avalia a cliente.
+    await t.tap(find.text('Avaliar a Ana'));
+    await t.pumpAndSettle();
+    expect(find.text('Pagamento recebido'), findsOneWidget);
+    expect(find.text('Como foi com a Ana?'), findsOneWidget);
+    final enviar = find.widgetWithText(FilledButton, 'Enviar avaliação');
+    expect(t.widget<FilledButton>(enviar).onPressed, isNull); // sem nota
+    await t.tap(find.bySemanticsLabel(RegExp('5 estrela')).first);
+    await t.tap(find.text('Pagou rápido'));
+    await t.pump();
+    await t.tap(enviar);
+    await t.pumpAndSettle();
+    final a = avaliacoesDeClientes.enviadas.single;
+    expect(a.cliente, 'Ana Julia');
+    expect(a.nota, 5);
+    expect(a.elogios, ['Pagou rápido']);
+    expect(find.text('Avaliação enviada'), findsOneWidget);
+    await t.pump(const Duration(seconds: 5));
+    await t.pumpAndSettle();
   });
 
   testWidgets('RN-171: aguardando, já pode ficar online', (t) async {

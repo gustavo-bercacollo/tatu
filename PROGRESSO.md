@@ -117,6 +117,7 @@ Próxima tela: Gustavo envia a referência. Construir **uma tela por vez, junto 
 - [x] Enviar sugestão (RN-173): item no Perfil dos dois modos; tela "Sugira algo ao Tatu" (tipo, texto até 500 com contador, print opcional verificado pela RN-120) e "Obrigado!" (`entrada/enviar_sugestao_page.dart`); fila em `data/sugestoes_tatu.dart` (conta, modo, tipo, texto, print, versão, aparelho; `virouNovidade` avisa pelo canal do Tatu).
 - [x] Ganhos em aba própria do profissional (Início · Atividade · Ganhos · Mensagens); a Atividade ficou só com os serviços.
 - [x] Ganhos redesenhado: comparação com o período anterior, próximo Pix, Serviços · Gorjetas · Média, serviços/gorjetas (sem taxa, RN-143)/taxa/recebido/a receber, últimos recebimentos com gorjeta e "Ver todos" (`RecebimentosPage`).
+- [x] Profissional avalia a cliente (RN-41, desenho P28): "Avaliar a Ana" depois da confirmação abre "Pagamento recebido · Como foi com a Ana?" (estrelas, elogios, comentário); `data/avaliacoes_de_clientes.dart`, `profissional/servico/avaliar_cliente_page.dart`.
 - Falta do profissional: cobrar o cliente, avaliar o cliente
 - [ ] P6–P7 Home (primeira vez, offline, online)
 - [ ] P8 Novo chamado
