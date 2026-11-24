@@ -162,29 +162,42 @@ class _EspecialidadesPageState extends State<EspecialidadesPage> {
 
 /// Etiqueta cinza em pílula com ícone (ex.: "Encanador · 1 de 2").
 class EtiquetaCinza extends StatelessWidget {
-  const EtiquetaCinza({super.key, required this.icone, required this.texto});
+  const EtiquetaCinza({
+    super.key,
+    required this.icone,
+    required this.texto,
+    this.verde = false,
+  });
 
   final IconData icone;
   final String texto;
 
+  /// Verde claro com texto verde (ex.: "Pediu você de novo", RN-178).
+  final bool verde;
+
   @override
   Widget build(BuildContext context) {
+    final cor = verde ? TatuColors.onlineTexto : TatuColors.textPrimary;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: const ShapeDecoration(
-        color: TatuColors.fill,
-        shape: StadiumBorder(),
+      decoration: ShapeDecoration(
+        color: verde ? TatuColors.onlineSoft : TatuColors.fill,
+        shape: const StadiumBorder(),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icone, size: 14),
+          Icon(icone, size: 14, color: cor),
           const SizedBox(width: 6),
           Flexible(
             child: Text(
               texto,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: cor,
+              ),
             ),
           ),
         ],

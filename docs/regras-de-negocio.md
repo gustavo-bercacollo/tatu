@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 20/11/2026 (v30)
+Atualizado em 24/11/2026 (v32)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -76,7 +76,9 @@ Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do própri
 | RN | Regra |
 | --- | --- |
 | RN-26 | O valor é combinado no chat. O profissional define dois valores: Visita (pode ser zero) e Serviço. O cliente confirma o total uma vez. |
-| RN-27 | São até 3 rodadas de proposta. Sem acordo, o chamado é encerrado e nada é cobrado. |
+| RN-27 | São até 3 rodadas de proposta. Sem acordo, o chamado é encerrado e nada é cobrado. No 3º valor, o cliente confirma ou recusa (RN-183). |
+| RN-183 | No 3º valor, "Pedir outro valor" vira "Recusar valor" (vermelho) e o cartão avisa antes: "Último valor. Se recusar, a conversa com a [nome] termina sem custo." Recusar abre a folha "Recusar o valor?" com três saídas: "Recusar e chamar outro" (o pedido volta à busca, RN-18 a RN-20), "Recusar e cancelar pedido" (volta para a Home com "Pedido cancelado. Nada foi cobrado.") e "Voltar". Nada é cobrado, nem a visita, e o endereço exato nunca chega ao profissional (RN-28). |
+| RN-184 | Depois da recusa, o profissional vê "Sem acordo de valor" ("A [cliente] recusou o último valor. O chamado foi encerrado sem custo e não conta contra você.") e continua online. Ele não recebe de novo o mesmo pedido. Sem acordo não conta como cancelamento (RN-64) nem como abandono (RN-79) para nenhum dos dois. A conversa fica nas Mensagens dos dois só para leitura, com "Sem acordo de valor". |
 | RN-28 | O endereço exato só vai para o profissional depois que o valor é confirmado. Antes disso, ele vê só o bairro e a distância. |
 | RN-29 | Pagamento só pelo app: cartão ou Pix. Não existe pagamento "por fora" nem em dinheiro. |
 | RN-30 | Ao confirmar o valor, o total fica reservado no cartão padrão. Não é cobrado ainda. |
@@ -112,7 +114,7 @@ Do valor confirmado até a avaliação, o atendimento segue sempre a mesma ordem
 | RN-39 | Código na porta: o cliente vê um código de 4 dígitos e passa para o profissional pessoalmente, na chegada. O profissional digita o código no app e o serviço começa sozinho ("Em andamento"). Sem o código certo o serviço não começa. Vale para todo atendimento no local. |
 | RN-40 | O profissional pode tirar fotos ao chegar e ao concluir. Elas servem de prova numa contestação. |
 | RN-41 | Ao concluir, os dois se avaliam. O cliente pode editar a avaliação até 7 dias depois. |
-| RN-42 | Depois de concluído, a conversa continua aberta. Cliente e profissional voltam a se falar por ela quando quiserem, sem fazer um pedido novo. |
+| RN-42 | Depois de concluído, a conversa continua aberta. Cliente e profissional voltam a se falar por ela quando quiserem. Mensagem é só conversa: serviço novo só por "Pedir de novo" ou por novo valor confirmado no chat (RN-175 a RN-182). |
 | RN-95 | Serviço à distância não tem Visita, rota, "Cheguei" nem código na porta. O valor tem só o Serviço. Confirmado o valor, o pedido vai direto para Em andamento. |
 | RN-96 | A entrega à distância é feita pelo chat, com arquivos. O profissional toca em "Enviar entrega", mas quem conclui é o cliente (RN-100). |
 | RN-98 | Serviço à distância não mostra o botão de segurança (ninguém vai até ninguém). Denúncia continua pelo menu do chat. |
@@ -123,6 +125,29 @@ Do valor confirmado até a avaliação, o atendimento segue sempre a mesma ordem
 | RN-103 | O sinal é cobrado quando o cliente confirma o valor e fica guardado. Vai para o profissional quando ele manda a 1ª entrega, mesmo que o cliente não aprove. |
 | RN-104 | No pedido de reembolso, o suporte decide pelo chat (pedido, prévias, ajustes, entregas) em até 2 dias úteis (exemplo): devolve tudo, parte ou nada do restante. O restante fica guardado até a decisão. O sinal fica com o profissional. |
 | RN-105 | Se o prazo do valor (RN-89) acabar sem nenhuma entrega, o cliente pode tocar em "Pedir sinal de volta". O pedido vai para o suporte e, sem entrega, o sinal volta para o cliente. O Tatu não paga nada: o sinal ainda estava guardado. |
+
+### Pedir de novo × mensagem no chat (depois do serviço)
+
+| RN | Regra |
+| --- | --- |
+| RN-175 | Depois de um serviço concluído existem dois caminhos, e só dois: **"Pedir de novo"** (um chamado novo) e a **mensagem no chat** (só conversa). Mandar mensagem nunca cria chamado, valor nem cobrança. |
+| RN-176 | "Pedir de novo" fica na Atividade (card e detalhe do concluído) e no chat. Abre o pedido já preenchido com profissão, descrição e endereço do anterior (o cliente pode trocar o endereço). O cliente escolhe "Chamar a [nome]" (se ela estiver online) ou "Chamar qualquer [profissão]". Profissional offline: a primeira opção aparece desativada. |
+| RN-177 | Chamando a mesma pessoa, o chamado fica **só para ela por 2 minutos**. O cliente vê "Chamando a [nome]". Se ela recusar ou não responder, o chamado vai para outros profissionais perto, como um pedido normal. |
+| RN-178 | O profissional recebe o chamado na tela normal de novo chamado, com a etiqueta verde **"Pediu você de novo · atendeu a [cliente] em [data]"** e o aviso **"Só para você por 2 min. Depois vai para outros."** |
+| RN-179 | Aceito, o pedido segue o fluxo normal: valor, confirmação, código, conclusão, cobrança, comissão e avaliação. A conversa é a mesma, mas o atendimento é novo: no chat aparece o divisor **"Novo pedido · [data] · [descrição]"** e a Atividade ganha um card novo. |
+| RN-180 | Mensagem no chat de um serviço concluído chega ao profissional como **notificação de mensagem**, nunca como chamado. Para o cliente, acima do campo de mensagem aparece a dica **"Precisa de um novo serviço? Pedir de novo"**. |
+| RN-181 | Serviço novo combinado pelo chat: no chat de um serviço concluído, o profissional pode enviar um **Novo valor** (com a descrição do serviço novo). Ele vê "Aguardando [cliente] confirmar · Só vira serviço quando a [cliente] confirmar." Confirmado pelo cliente, aparece no chat o card preto **"Novo serviço iniciado pelo chat · R$ X"** com "Ele aparece na sua Atividade." Vira um atendimento novo nos dois lados, com código, cobrança, comissão e avaliação normais. Sem confirmação, nada é cobrado e nada aparece na Atividade. |
+| RN-182 | Não existe serviço no Tatu sem valor confirmado pelo cliente no app. Todo serviço, venha do "Pedir de novo" ou do chat, passa pela confirmação do valor; serviço combinado só na mensagem, sem valor confirmado, não tem garantia, contestação nem cobrança pelo Tatu (ver RN-83 a RN-86 sobre fechar por fora). |
+
+**Textos**
+
+| Situação | Cliente vê | Profissional vê |
+| --- | --- | --- |
+| Pedir de novo (mesma pessoa) | "Chamando a Luiza" · "Se ela não aceitar em 2 min, chamamos outro encanador perto de você." | Novo chamado com "Pediu você de novo · atendeu a Ana em 12 nov" e "Só para você por 2 min. Depois vai para outros." |
+| Pedido aceito | Divisor no chat: "Novo pedido · 24 nov · Vazamento no banheiro" | O mesmo divisor no chat |
+| Mensagem depois do serviço | Dica: "Precisa de um novo serviço? Pedir de novo" | Notificação: "Ana: Pode vir sexta trocar o registro?" |
+| Novo valor enviado no chat | "Luiza enviou um novo valor" · card "Novo serviço · troca de registro · R$ 150,00" · botão "Confirmar valor" | "Novo valor · R$ 150,00 · Aguardando a Ana confirmar" · "Só vira serviço quando a Ana confirmar." |
+| Novo valor confirmado | Card preto "Novo serviço iniciado pelo chat · R$ 150,00" · "Ele aparece na sua Atividade." | O mesmo card preto · serviço novo na Atividade |
 
 ## 5. Cancelamentos e contestação
 
@@ -214,6 +239,7 @@ As penalidades existem para impedir abuso, nunca para punir quem se protegeu.
 | RN-117 | A conversa do Tatu é o canal principal de comunicação do Tatu, como o canal oficial de uma empresa no WhatsApp: novidades, mudanças nas regras e avisos importantes chegam por ela. Só o Tatu envia; a pessoa não responde por ali (suporte continua na Ajuda). |
 | RN-118 | Dicas Tatu é um espaço de dicas de boa convivência, boa negociação e segurança. Por enquanto mostra "Em breve" e avisa pelo canal do Tatu quando abrir. |
 | RN-173 | Cliente e profissional podem enviar sugestões ao Tatu em Perfil → Enviar sugestão: tipo (ideia, algo não funciona, outro), texto de até 500 caracteres e print opcional (passa pela verificação de arquivos, RN-120). A sugestão vai para uma fila do time do Tatu, com o tipo de conta (cliente/profissional). Se virar novidade, o Tatu avisa pelo canal oficial. |
+| RN-174 | No modo profissional, a barra de baixo tem 5 abas: Início, Atividade, Ganhos, Mensagens e Perfil. Atividade mostra só serviços (em andamento e concluídos), sem valores. Ganhos concentra o financeiro: total por semana, mês ou ano (já descontada a taxa), próximo Pix, já no Pix, a receber, gorjetas, taxa do Tatu, onde receber e extrato de repasses. |
 | RN-155 | A aba Mensagens mostra um contador vermelho com o total de mensagens não lidas, somando todas as conversas, inclusive a do Tatu (acima de 9 aparece "9+"). Já no primeiro acesso aparece "1" (a boas-vindas do Tatu, RN-116). O número diminui ao abrir cada conversa e some quando tudo foi lido. O mesmo número aparece no ícone do app no celular, quando as notificações estão permitidas. |
 | RN-165 | Depois do valor confirmado, o cliente acompanha o profissional: "vai sair já" (com o tempo para sair, RN-76), mapa ao vivo com rota e previsão de chegada, "chegando" (menos de 2 min, notificação e código na tela) e "chegou" ("Passe o código"). Enquanto o profissional está a caminho, a Home mostra a faixa "[nome] chega em X min", que abre o mapa. |
 | RN-166 | A localização do profissional só é mostrada ao cliente entre "Estou a caminho" e a digitação do código (ou "Cliente não apareceu"). Depois disso para de ser compartilhada. |
@@ -275,6 +301,7 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 - [ ] **Entrar com Google e Apple (adiado).** Proposta: "Continuar com Google" e "Continuar com Apple" (a Apple exige a dela se houver login social), aproveitando nome, e-mail confirmado e foto; falta só CPF e aceite; celular confirmado antes do primeiro pedido; e-mail que já tem conta vincula com código, sem duplicar. Layout das telas ainda não aprovado (opções A: folha na boas-vindas, B: tela com 3 botões, C: celular com ícones).
 - [ ] **Antecedentes criminais (adiado).** Pedir certidão de antecedentes de quem cuida de criança, idoso ou pessoa com deficiência, ou de todos que vão até a casa do cliente. Atualizar a Política de Privacidade se for adotado.
 - [ ] **Uso fora da finalidade (adiado).** Proposta: (1) IA confere se o pedido é um serviço do catálogo e bloqueia termos proibidos ("Esse pedido não é um serviço do Tatu"); (2) profissões sensíveis (ex.: massagem) com regra extra e "acompanhante" fora do catálogo; (3) trava de autopagamento (mesmo CPF, celular, aparelho, cartão ou Pix dos dois lados); (4) revisão de serviços sem chegada/código, valores muito acima do normal e muitos serviços caros entre as mesmas pessoas; (5) teto de valor e sem parcelamento nos primeiros serviços de conta nova; (6) fila de revisão, banimento e comunicação às autoridades; parceiro de pagamentos com antifraude.
+- [ ] **Último valor sem resposta.** O que acontece quando o cliente não confirma nem recusa o 3º valor. Sugestão: depois de um prazo (ex.: 10 minutos) vale como recusa e o pedido volta à busca (RN-183).
 - [ ] **Ligação pelo app.** Escolher como fazer a ligação sem mostrar o número: pela internet (mais barato) ou número intermediário (custo por minuto).
 
 ## 11. Problemas mapeados
@@ -308,11 +335,16 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-23 | Termos de Uso e Política de Privacidade completos e sempre atualizados. | Rascunho v1.0 feito · revisão jurídica pendente | RN-150, RN-151 |
 | P-24 | Profissões que exigem registro ou documentação. | Resolvido | RN-156 a RN-160 |
 | P-25 | Poucas opções de profissões no cadastro do profissional. | Resolvido | RN-161, RN-162 |
+| P-26 | Depois do serviço: diferença entre "Pedir de novo" e mandar mensagem no chat; evitar serviços infinitos só pela mensagem. | Resolvido | RN-42, RN-175 a RN-182 |
+| P-27 | Depois das 3 rodadas, o cliente não tem como recusar o valor. | Decidido · falta implementar | RN-27, RN-183, RN-184 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 24/11/2026 | RN-27, RN-183, RN-184 | Cliente recusa o 3º valor ("Recusar valor") e escolhe chamar outro ou cancelar. Sem custo e sem penalidade; o profissional não recebe de novo o mesmo pedido. |
+| 24/11/2026 | RN-42, RN-175 a RN-182 | Pedir de novo (chamado novo, 2 min só para a mesma pessoa) × mensagem no chat (só conversa); serviço novo pelo chat só com novo valor confirmado ("Novo serviço iniciado pelo chat"). |
+| 20/11/2026 | RN-174 | Aba Ganhos separada da Atividade no modo profissional. |
 | 20/11/2026 | RN-173 | Enviar sugestão ao Tatu pelo Perfil. |
 | 19/11/2026 | RN-31, RN-169 a RN-171 | Cliente vê o serviço em andamento; vários profissionais abrem a Atividade; cliente confirma a conclusão (2 horas para confirmar sozinho). |
 | 19/11/2026 | RN-168 | Depois de confirmar o valor, cliente e profissional saem do chat e vão direto para o acompanhamento. |

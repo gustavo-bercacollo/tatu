@@ -22,20 +22,21 @@ class NovoChamadoPage extends StatefulWidget {
   const NovoChamadoPage({
     super.key,
     this.chamado = chamadoExemplo,
-    this.restante = segundosParaAceitar,
+    this.restante,
   });
 
   final ChamadoNovo chamado;
 
-  /// Segundos que faltam ao abrir (para o fluxograma e testes).
-  final int restante;
+  /// Segundos que faltam ao abrir (para o fluxograma e testes); nulo =
+  /// o prazo inteiro do chamado ([ChamadoNovo.segundos]).
+  final int? restante;
 
   @override
   State<NovoChamadoPage> createState() => _NovoChamadoPageState();
 }
 
 class _NovoChamadoPageState extends State<NovoChamadoPage> {
-  late int _restante = widget.restante;
+  late int _restante = widget.restante ?? widget.chamado.segundos;
   Timer? _timer;
   final _toque = ToqueChamado();
 
@@ -112,7 +113,7 @@ class _NovoChamadoPageState extends State<NovoChamadoPage> {
                           const Expanded(
                             child: Text('NOVO CHAMADO', style: TatuTexto.secao),
                           ),
-                          _Contagem(restante: _restante),
+                          _Contagem(restante: _restante, total: c.segundos),
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -136,6 +137,20 @@ class _NovoChamadoPageState extends State<NovoChamadoPage> {
                           ),
                         ],
                       ),
+                      // RN-178: o cliente pediu este profissional de novo.
+                      if (c.pediuDeNovoEm case final dia?) ...[
+                        const SizedBox(height: TatuMedidas.entreItens),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: EtiquetaCinza(
+                            icone: TablerIcons.refresh,
+                            texto: 'Pediu você de novo · atendeu '
+                                '${c.feminino ? 'a' : 'o'} ${c.primeiroNome} '
+                                'em $dia',
+                            verde: true,
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: TatuMedidas.entreItens),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,6 +231,16 @@ class _NovoChamadoPageState extends State<NovoChamadoPage> {
                         textAlign: TextAlign.center,
                         style: TatuTexto.nota,
                       ),
+                      // RN-177/RN-178: só dele por 2 min; depois, para
+                      // os outros por perto, como um pedido normal.
+                      if (c.pediuDeNovo) ...[
+                        const SizedBox(height: 6),
+                        const Text(
+                          'Só para você por 2 min. Depois vai para outros.',
+                          textAlign: TextAlign.center,
+                          style: TatuTexto.nota,
+                        ),
+                      ],
                       const SizedBox(height: TatuMedidas.entreItens),
                       FilledButton(
                         onPressed: _aceitar,
@@ -247,9 +272,15 @@ class _NovoChamadoPageState extends State<NovoChamadoPage> {
 
 /// Anel com os segundos que faltam para aceitar.
 class _Contagem extends StatelessWidget {
-  const _Contagem({required this.restante});
+  const _Contagem({required this.restante, required this.total});
 
   final int restante;
+  final int total;
+
+  /// "25s" ou, com 1 minuto ou mais, "1:21".
+  String get _texto => restante < 60
+      ? '${restante}s'
+      : '${restante ~/ 60}:${(restante % 60).toString().padLeft(2, '0')}';
 
   @override
   Widget build(BuildContext context) {
@@ -263,7 +294,7 @@ class _Contagem extends StatelessWidget {
           children: [
             Positioned.fill(
               child: CircularProgressIndicator(
-                value: restante / segundosParaAceitar,
+                value: restante / total,
                 strokeWidth: 3.5,
                 strokeCap: StrokeCap.round,
                 color: TatuColors.action,
@@ -272,7 +303,7 @@ class _Contagem extends StatelessWidget {
             ),
             ExcludeSemantics(
               child: Text(
-                '${restante}s',
+                _texto,
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,

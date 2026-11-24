@@ -16,8 +16,10 @@ import '../../../data/plano_fixo.dart';
 import '../plano_fixo/plano_fixo.dart';
 import 'package:clock/clock.dart';
 
-/// Folha "Pedir de novo": chamar o mesmo profissional (se estiver online)
-/// ou qualquer um do serviço, no endereço escolhido.
+/// RN-176: folha "Pedir de novo": chamar o mesmo profissional (se estiver
+/// online) ou qualquer um do serviço. Serviço, descrição e endereço vêm do
+/// pedido anterior; o endereço pode ser trocado. RN-177: com a mesma
+/// pessoa, o chamado é só dela por 2 min ("Chamando a [nome]").
 Future<void> abrirPedirDeNovo(BuildContext context, PedidoConcluido p) async {
   final escolha = await mostrarFolha<(bool, String)>(
     context,
@@ -38,11 +40,19 @@ Future<void> abrirPedirDeNovo(BuildContext context, PedidoConcluido p) async {
           endereco: endereco,
           direto: p.primeiroNome,
           diretoFeminino: p.feminino,
+          descricao: p.descricao,
+          deNovo: p,
         ),
       ),
     );
   } else {
-    await chamarProfissional(context, p.servico);
+    // RN-176: "Chamar qualquer": pedido normal, já preenchido.
+    await chamarProfissional(
+      context,
+      p.servico,
+      endereco: endereco,
+      descricao: p.descricao,
+    );
   }
 }
 

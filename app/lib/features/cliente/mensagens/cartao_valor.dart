@@ -18,6 +18,8 @@ const maxRodadasValor = 3;
 /// (RN-95); valor novo só de serviço, "Serviço · troca da tubulação".
 String detalheValor(ValorProposta v) {
   if (v.distancia) return 'Serviço · sem visita';
+  // RN-181: novo valor no chat de um serviço concluído.
+  if (v.novo && v.descricao != null) return 'Novo serviço · ${v.descricao}';
   if (v.visita == 0 && v.descricao != null) return 'Serviço · ${v.descricao}';
   return [
     if (v.visita > 0) 'Visita ${reaisInteiros(v.visita)}',

@@ -35,7 +35,11 @@ class EncontradoPage extends StatefulWidget {
     this.restante,
     this.animar = true,
     this.distancia = false,
+    this.descricao = '',
   });
+
+  /// O que a pessoa escreveu (vazio = o nome do serviço).
+  final String descricao;
 
   /// RN-93/RN-94: profissional online, sem distância nem chegada.
   final bool distancia;
@@ -142,12 +146,14 @@ class _EncontradoPageState extends State<EncontradoPage> {
                 indice: proximo,
                 inicio: _inicio,
                 distancia: widget.distancia,
+                descricao: widget.descricao,
               )
             : ProcurandoPage(
                 servico: widget.servico,
                 endereco: widget.endereco,
                 simularAceite: false,
                 distancia: widget.distancia,
+                descricao: widget.descricao,
               ),
       ),
     );
@@ -185,7 +191,9 @@ class _EncontradoPageState extends State<EncontradoPage> {
         pagamento: '',
         etapasFeitas: 1,
         chegaEm: p.chegaEm,
-        descricao: widget.servico,
+        descricao: widget.descricao.isEmpty
+            ? widget.servico
+            : widget.descricao,
         distancia: widget.distancia,
       ),
     );
@@ -196,6 +204,7 @@ class _EncontradoPageState extends State<EncontradoPage> {
       servico: widget.servico,
       rua: widget.distancia ? 'À distância' : widget.endereco,
       distancia: widget.distancia,
+      descricao: widget.descricao.isEmpty ? null : widget.descricao,
     );
     final nav = Navigator.of(context);
     irParaAba(context, AbaCliente.mensagens);

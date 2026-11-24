@@ -38,6 +38,8 @@ import '../../../data/denuncias.dart';
 import '../../entrada/denunciar_mensagem.dart';
 import '../../entrada/ligacao_page.dart';
 import '../../../data/ligacao.dart';
+import 'package:clock/clock.dart';
+
 import '../../../data/plano_fixo.dart';
 import '../plano_fixo/plano_fixo_profissional.dart';
 
@@ -96,7 +98,10 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   late final _mensagens = <(String, bool)>[
     if (widget.mensagens != null)
       ...widget.mensagens!
-    else if (widget.chamado.distancia) ...[
+    // RN-179: "Pedir de novo" aceito: a conversa é a mesma, o pedido é novo.
+    else if (widget.chamado.pediuDeNovo) ...[
+      ('Oi, ${widget.chamado.primeiroNome}! Aceitei, já te mando o valor.', true),
+    ] else if (widget.chamado.distancia) ...[
       ('Oi, ${widget.chamado.primeiroNome}! Que estilo você imagina?', true),
       ('Algo simples e colorido.', false),
     ] else ...[
@@ -305,6 +310,8 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
       cliente: _nome,
       rodada: _rodada + 1,
       distancia: widget.chamado.distancia,
+      // RN-181: no chat de um serviço concluído, é um novo serviço.
+      novo: _concluida,
     );
     if (v == null || !mounted) return;
     setState(() {
@@ -322,12 +329,16 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   /// Resposta simulada do cliente.
   void _clienteResponde() {
     if (!mounted) return;
-    final aceita = _rodada > 1 && _meuValor <= _proposta * 1.15;
+    // RN-181: protótipo: o novo valor pelo chat é confirmado pelo cliente.
+    final aceita =
+        _concluida || (_rodada > 1 && _meuValor <= _proposta * 1.15);
     if (aceita) {
       setState(() {
         _combinado = _meuValor;
         _estado = EstadoValor.combinado;
       });
+      // RN-181: confirmado, vira um atendimento novo (aparece na Atividade).
+      if (_concluida) atendimentoProfissional.aceitar(widget.chamado);
       _contarPrazoSaida();
     } else if (_rodada >= maxRodadas) {
       atendimentoProfissional.encerrar();
@@ -768,6 +779,19 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
         if (fim == null)
           const NotaChat('Você aceitou o chamado. Combinem o valor por aqui.'),
         const SizedBox(height: TatuMedidas.entreItens + 4),
+        // RN-179: o mesmo divisor que o cliente vê, depois do serviço
+        // anterior.
+        if (c.pediuDeNovoEm case final dia?) ...[
+          if (c.valorAnterior case final valor?) ...[
+            MarcoConcluido(
+              'Serviço concluído · ${reais(valor)} · $dia',
+              nota: false,
+            ),
+            const SizedBox(height: 18),
+          ],
+          DivisorChat('Novo pedido · ${diaMes(clock.now())} · ${c.resumo}'),
+          const SizedBox(height: 18),
+        ],
         for (final (i, m) in _mensagens.indexed) ...[
           if (_concluida && i == _antes) ..._marco(),
           Padding(
@@ -807,6 +831,24 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
         ] else
         ...switch (_estado) {
             EstadoValor.inicio => const <Widget>[],
+            // P104 · RN-181: novo valor no chat de um serviço concluído.
+            EstadoValor.aguardando when _concluida => [
+              _MeuValor(
+                rodada: _rodada,
+                valor: _meuValor,
+                detalhe: '',
+                icone: TablerIcons.clock,
+                titulo: 'Novo valor',
+                situacao:
+                    'Aguardando ${c.feminino ? 'a' : 'o'} $_nome confirmar',
+                aviso: true,
+              ),
+              const SizedBox(height: TatuMedidas.entreSecoes),
+              NotaChat(
+                'Só vira serviço quando ${c.feminino ? 'a' : 'o'} $_nome '
+                'confirmar.',
+              ),
+            ],
             EstadoValor.aguardando => [
               _MeuValor(
                 rodada: _rodada,
@@ -836,6 +878,14 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
             // À distância, o valor combinado vira marcador na conversa.
             EstadoValor.combinado when c.distancia => const <Widget>[],
             EstadoValor.combinado => [
+              // RN-181: o mesmo card preto que o cliente vê.
+              if (_concluida) ...[
+                DivisorChat(
+                  'Novo serviço iniciado pelo chat · ${reais(_combinado)}',
+                  nota: 'Ele aparece na sua Atividade.',
+                ),
+                const SizedBox(height: TatuMedidas.entreSecoes),
+              ],
               _ValorCombinado(valor: _combinado),
               const SizedBox(height: TatuMedidas.entreItens),
               // RN-28: no local, o endereço aparece.
@@ -917,6 +967,8 @@ class _MeuValor extends StatelessWidget {
     required this.detalhe,
     required this.icone,
     required this.situacao,
+    this.titulo,
+    this.aviso = false,
   });
 
   final int rodada;
@@ -924,6 +976,12 @@ class _MeuValor extends StatelessWidget {
   final String detalhe;
   final IconData icone;
   final String situacao;
+
+  /// Título no lugar de "Seu valor · 1 de 3" (ex.: "Novo valor").
+  final String? titulo;
+
+  /// Situação em laranja (esperando o cliente confirmar).
+  final bool aviso;
 
   @override
   Widget build(BuildContext context) {
@@ -940,20 +998,30 @@ class _MeuValor extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Seu valor · $rodada de $maxRodadas', style: TatuTexto.nota),
+              Text(
+                titulo ?? 'Seu valor · $rodada de $maxRodadas',
+                style: TatuTexto.nota,
+              ),
               const SizedBox(height: 2),
               _Valor(valor),
               if (detalhe.isNotEmpty) Text(detalhe, style: TatuTexto.nota),
               const SizedBox(height: 6),
               Row(
                 children: [
-                  Icon(icone, size: 15, color: TatuColors.textSecondary),
+                  Icon(
+                    icone,
+                    size: 15,
+                    color: aviso
+                        ? TatuColors.warningTexto
+                        : TatuColors.textSecondary,
+                  ),
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text(
                       situacao,
                       style: TatuTexto.nota.copyWith(
                         fontWeight: FontWeight.w600,
+                        color: aviso ? TatuColors.warningTexto : null,
                       ),
                     ),
                   ),

@@ -86,7 +86,7 @@ void main() {
           .first,
     );
     expect(find.text('Rafael enviou um novo valor'), findsOneWidget);
-    expect(find.text('Serviço · troca do quadro de luz'), findsOneWidget);
+    expect(find.text('Novo serviço · troca do quadro de luz'), findsOneWidget);
     expect(find.text('R\$ 1.200,00'), findsOneWidget);
     expect(find.text('À vista'), findsOneWidget);
 

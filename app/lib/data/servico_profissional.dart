@@ -105,7 +105,22 @@ class ChamadoNovo {
     this.anexos = const [AnexoPedido('foto.jpg')],
     this.feminino = true,
     this.distancia = false,
+    this.pediuDeNovoEm,
+    this.valorAnterior,
   });
+
+  /// RN-178: veio de "Pedir de novo": dia em que o profissional atendeu
+  /// este cliente ("12 nov"). Nulo = chamado normal.
+  final String? pediuDeNovoEm;
+
+  /// Valor do serviço anterior (para o marco "Serviço concluído").
+  final double? valorAnterior;
+
+  /// RN-177: só para este profissional por [segundosExclusivo].
+  bool get pediuDeNovo => pediuDeNovoEm != null;
+
+  /// Segundos para aceitar: 2 min quando é "Pedir de novo" (RN-177).
+  int get segundos => pediuDeNovo ? segundosExclusivo : segundosParaAceitar;
 
   final bool feminino;
 
@@ -165,3 +180,16 @@ const chamadoDistanciaExemplo = ChamadoNovo(
 
 /// Segundos para aceitar um chamado (provisório: prazo em aberto).
 const segundosParaAceitar = 30;
+
+/// RN-177: "Pedir de novo" fica só para a mesma pessoa por 2 minutos.
+const segundosExclusivo = 120;
+
+/// RN-178: chamado de quem pediu o mesmo profissional de novo.
+const chamadoPediuDeNovo = ChamadoNovo(
+  titulo: 'Chuveiro pingando',
+  descricao: 'o chuveiro está pingando sem parar',
+  resumo: 'Chuveiro pingando sem parar',
+  anexos: [AnexoPedido('foto.jpg')],
+  pediuDeNovoEm: '12 nov',
+  valorAnterior: 190,
+);

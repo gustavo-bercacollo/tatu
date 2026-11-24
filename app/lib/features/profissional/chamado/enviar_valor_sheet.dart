@@ -8,6 +8,7 @@ import '../../../data/profissional.dart';
 import '../../../data/regras_distancia.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/folha.dart';
+import '../../../shared/widgets/tatu_field.dart';
 
 /// Valor que o profissional envia: visita + serviço.
 @immutable
@@ -16,7 +17,12 @@ class ValorProposto {
     required this.visita,
     required this.servico,
     this.sinal = 0,
+    this.descricao,
   });
+
+  /// RN-181: o que é o serviço novo, quando o valor vai num chat de
+  /// serviço concluído ("troca de registro").
+  final String? descricao;
 
   /// RN-102: sinal pedido à distância (0 = sem sinal).
   final double sinal;
@@ -35,17 +41,23 @@ class ValorProposto {
 }
 
 /// P24 · Folha "Quanto vai custar?". [rodada] é qual dos 3 valores
-/// possíveis este é. Com [distancia] (P110, RN-95), só o Serviço.
-/// Devolve null se fechar sem enviar.
+/// possíveis este é. Com [distancia] (P110, RN-95), só o Serviço. Com
+/// [novo] (RN-181), é um serviço novo num chat de serviço concluído: pede
+/// a descrição. Devolve null se fechar sem enviar.
 Future<ValorProposto?> pedirValor(
   BuildContext context, {
   required String cliente,
   required int rodada,
   bool distancia = false,
+  bool novo = false,
 }) => mostrarFolha<ValorProposto>(
   context,
-  builder: (_) =>
-      _FolhaValor(cliente: cliente, rodada: rodada, distancia: distancia),
+  builder: (_) => _FolhaValor(
+    cliente: cliente,
+    rodada: rodada,
+    distancia: distancia,
+    novo: novo,
+  ),
 );
 
 
@@ -54,11 +66,13 @@ class _FolhaValor extends StatefulWidget {
     required this.cliente,
     required this.rodada,
     this.distancia = false,
+    this.novo = false,
   });
 
   final String cliente;
   final int rodada;
   final bool distancia;
+  final bool novo;
 
   @override
   State<_FolhaValor> createState() => _FolhaValorState();
@@ -69,6 +83,7 @@ class _FolhaValorState extends State<_FolhaValor> {
   bool _sinal = false;
   final _visita = TextEditingController();
   final _servico = TextEditingController();
+  final _descricao = TextEditingController();
   final _focoVisita = FocusNode();
   final _focoServico = FocusNode();
 
@@ -83,6 +98,7 @@ class _FolhaValorState extends State<_FolhaValor> {
   void dispose() {
     _visita.dispose();
     _servico.dispose();
+    _descricao.dispose();
     _focoVisita.dispose();
     _focoServico.dispose();
     super.dispose();
@@ -99,7 +115,10 @@ class _FolhaValorState extends State<_FolhaValor> {
       visita: d ? 0 : _ler(_visita),
       servico: _ler(_servico),
       sinal: d && _sinal ? RegrasDistancia.sinalDe(_ler(_servico)) : 0,
+      descricao: widget.novo ? _descricao.text.trim() : null,
     );
+    // RN-181: o serviço novo precisa dizer o que é.
+    final semDescricao = widget.novo && _descricao.text.trim().isEmpty;
     final total = valor.total;
     final taxa = total * taxaTatu;
     final pct = (taxaTatu * 100).round();
@@ -124,12 +143,24 @@ class _FolhaValorState extends State<_FolhaValor> {
                 const Text('Quanto vai custar?', style: TatuTexto.tituloFolha),
                 const SizedBox(height: 6),
                 Text(
-                  d
+                  widget.novo
+                      ? 'Só vira serviço quando a ${widget.cliente} confirmar.'
+                      : d
                       ? 'À distância não tem visita.'
                       : 'A ${widget.cliente} pode aceitar ou propor outro valor.',
                   style: TatuTexto.corpo,
                 ),
                 const SizedBox(height: TatuMedidas.entreItens + 4),
+                if (widget.novo) ...[
+                  TatuField(
+                    label: 'O que vai ser feito',
+                    hintText: 'Ex.: troca de registro',
+                    controller: _descricao,
+                    textCapitalization: TextCapitalization.sentences,
+                    onChanged: (_) => setState(() {}),
+                  ),
+                  const SizedBox(height: TatuMedidas.entreItens),
+                ],
                 if (d) ...[
                   _CampoValor(
                     rotulo: 'Serviço',
@@ -245,12 +276,12 @@ class _FolhaValorState extends State<_FolhaValor> {
                   ),
                 ),
                 const SizedBox(height: TatuMedidas.entreItens + 4),
-                if (!d) ...[
+                if (!d && !widget.novo) ...[
                   Text('Valor ${widget.rodada} de 3', style: TatuTexto.detalhe),
                   const SizedBox(height: TatuMedidas.entreItens),
                 ],
                 FilledButton(
-                  onPressed: total > 0
+                  onPressed: total > 0 && !semDescricao
                       ? () => Navigator.of(context).pop(valor)
                       : null,
                   child: Text('Enviar para ${widget.cliente}'),

@@ -31,6 +31,7 @@ import '../../entrada/conta_suspensa_page.dart';
 import '../chamar/procurando_page.dart';
 import '../../entrada/denunciar_arquivo.dart';
 import '../atividade/avaliar_page.dart';
+import '../atividade/pedir_de_novo_sheet.dart';
 import 'cartao_valor.dart';
 import 'denunciar_page.dart';
 import 'entrega_distancia.dart';
@@ -304,7 +305,10 @@ class _ChatPageState extends State<ChatPage> {
           valor: v,
           nome: '${_c.artigo} ${_c.primeiroNome}',
           onConfirmar: () {
+            // RN-181: novo valor no chat de um serviço concluído.
+            final peloChat = v.novo && !_c.emAndamento;
             conversas.confirmarValor(_c);
+            if (peloChat) return _novoServicoPeloChat(v);
             // RN-76: começa o prazo do profissional para sair.
             if (pedidos.doProfissional(_c.nome) case final p?) {
               pedidos.abrir(p);
@@ -342,8 +346,70 @@ class _ChatPageState extends State<ChatPage> {
         ),
         SituacaoValor.confirmado => CartaoValorConfirmado(valor: v),
       },
+      // RN-181: o novo valor confirmado no chat virou um serviço.
+      if (v.novo && v.situacao == SituacaoValor.confirmado) ...[
+        const SizedBox(height: TatuMedidas.entreSecoes),
+        DivisorChat(
+          'Novo serviço iniciado pelo chat · ${reais(v.total)}',
+          nota: 'Ele aparece na sua Atividade.',
+        ),
+      ],
     ];
   }
+
+  /// RN-181: confirmado o novo valor enviado no chat, vira um atendimento
+  /// novo, com card na Atividade. O cliente continua no chat (o chat mostra
+  /// "Novo serviço iniciado pelo chat").
+  void _novoServicoPeloChat(ValorProposta v) {
+    pedidos.aceitar(
+      PedidoAndamento(
+        servico: _c.servico,
+        profissao: _c.profissao,
+        profissional: _c.nome,
+        nota: '4,9',
+        endereco: _c.rua,
+        valor: reais(v.total),
+        pagamento: pagamentos.padrao?.curto ?? '',
+        etapasFeitas: 2,
+        descricao: v.descricao ?? _c.descricao,
+        visita: v.visita,
+        confirmadoEm: clock.now(),
+      ),
+    );
+  }
+
+  /// RN-176/RN-180: "Pedir de novo" a partir do chat de um serviço
+  /// concluído (serviço, descrição e endereço do último pedido).
+  void _pedirDeNovo() {
+    final feito = pedidos.concluidos
+        .where((p) => p.profissional == _c.nome && !p.cancelado)
+        .firstOrNull;
+    abrirPedirDeNovo(
+      context,
+      feito ??
+          PedidoConcluido(
+            servico: _c.servico,
+            profissao: _c.profissao,
+            profissional: _c.nome,
+            descricao: _c.descricao,
+            endereco: _c.rua,
+            pagamento: '',
+            valor: '',
+            dia: _c.concluidoEm ?? '',
+            hora: '',
+            mes: '',
+            online: _c.online,
+          ),
+    );
+  }
+
+  /// RN-180: a dica aparece no chat de um serviço concluído, quando não
+  /// há atendimento nem valor em aberto (mensagem é só conversa).
+  bool get _mostraDicaPedirDeNovo =>
+      _c.concluida &&
+      !_c.emAndamento &&
+      !_c.encerrada &&
+      (_c.valor == null || _c.valor!.situacao == SituacaoValor.confirmado);
 
   void _enviar() {
     final texto = _campo.text.trim();
@@ -760,6 +826,12 @@ class _ChatPageState extends State<ChatPage> {
                   padding: const EdgeInsets.only(top: 18),
                   child: MarcoConcluido(m.concluido!),
                 )
+              else if (m.divisor != null)
+                // RN-179/RN-181: começa um atendimento novo na conversa.
+                Padding(
+                  padding: const EdgeInsets.only(top: 18),
+                  child: DivisorChat(m.divisor!, nota: m.divisorNota),
+                )
               else if (m.dia != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 18),
@@ -882,6 +954,10 @@ class _ChatPageState extends State<ChatPage> {
             children: [
               if (conversas.semInternet || algumaFalhou) ...[
                 const _SemInternet(),
+                const SizedBox(height: TatuMedidas.entreItens),
+              ],
+              if (_mostraDicaPedirDeNovo) ...[
+                DicaPedirDeNovo(onPedir: _pedirDeNovo),
                 const SizedBox(height: TatuMedidas.entreItens),
               ],
               // RN-85: contato não passa pelo chat.
@@ -1013,5 +1089,8 @@ class _SemInternet extends StatelessWidget {
 bool _primeiroDoBloco(List<MensagemChat> msgs, int i) {
   if (i == 0) return true;
   final a = msgs[i - 1];
-  return a.concluido != null || a.dia != null || a.arquivo != null;
+  return a.concluido != null ||
+      a.dia != null ||
+      a.arquivo != null ||
+      a.divisor != null;
 }

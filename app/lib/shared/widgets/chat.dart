@@ -788,6 +788,95 @@ class MarcoConcluido extends StatelessWidget {
   }
 }
 
+/// Pílula preta sobre uma linha fina, no meio da conversa: começa um
+/// atendimento novo. RN-179: "Novo pedido · 24 nov · Vazamento no
+/// banheiro". RN-181: "Novo serviço iniciado pelo chat · R$ 150,00", com
+/// [nota] embaixo ("Ele aparece na sua Atividade.").
+class DivisorChat extends StatelessWidget {
+  const DivisorChat(this.texto, {super.key, this.nota});
+
+  final String texto;
+  final String? nota;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            const Divider(height: 1, color: TatuColors.trilho),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              decoration: const ShapeDecoration(
+                color: TatuColors.action,
+                shape: StadiumBorder(),
+              ),
+              child: Text(
+                texto,
+                textAlign: TextAlign.center,
+                style: TatuTexto.nota.copyWith(
+                  color: TatuColors.onAction,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (nota != null) ...[
+          const SizedBox(height: 8),
+          NotaChat(nota!),
+        ],
+      ],
+    );
+  }
+}
+
+/// RN-180: dica acima do campo de mensagem, no chat de um serviço
+/// concluído: mensagem é só conversa; serviço novo é "Pedir de novo".
+class DicaPedirDeNovo extends StatelessWidget {
+  const DicaPedirDeNovo({super.key, required this.onPedir});
+
+  final VoidCallback onPedir;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
+      decoration: BoxDecoration(
+        color: TatuColors.surfaceGrouped,
+        borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            TablerIcons.refresh,
+            size: 18,
+            color: TatuColors.textSecondary,
+          ),
+          const SizedBox(width: 8),
+          const Expanded(
+            child: Text('Precisa de um novo serviço?', style: TatuTexto.detalhe),
+          ),
+          TextButton(
+            onPressed: onPedir,
+            style: TextButton.styleFrom(
+              foregroundColor: TatuColors.verified,
+              textStyle: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            child: const Text('Pedir de novo'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Separador de dia no meio da conversa ("12 nov").
 class SeparadorDia extends StatelessWidget {
   const SeparadorDia(this.dia, {super.key});

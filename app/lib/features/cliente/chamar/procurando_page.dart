@@ -8,6 +8,7 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
+import '../../../data/conversas.dart';
 import '../../../data/pedidos.dart';
 import '../../../data/seguranca.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
@@ -17,6 +18,7 @@ import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import '../../entrada/seguranca.dart';
 import '../abas.dart';
+import '../mensagens/chat_page.dart';
 import 'encontrado_page.dart';
 import 'ninguem_ativo_page.dart';
 
@@ -55,7 +57,17 @@ class ProcurandoPage extends StatefulWidget {
     this.simularAceite = true,
     this.troca = TrocaProfissional.cancelou,
     this.distancia = false,
+    this.descricao = '',
+    this.deNovo,
   });
+
+  /// O que a pessoa escreveu (RN-176: no "Pedir de novo", a descrição do
+  /// pedido anterior).
+  final String descricao;
+
+  /// RN-176/RN-177: "Pedir de novo" com a mesma pessoa: aceito, abre a
+  /// mesma conversa com um atendimento novo (RN-179).
+  final PedidoConcluido? deNovo;
 
   /// RN-94: busca à distância, sem mapa nem raio, em ondas: primeiro os
   /// mais bem avaliados online, depois todos os online.
@@ -144,6 +156,7 @@ class _ProcurandoPageState extends State<ProcurandoPage>
       final busca = BuscaSegundoPlano(
         servico: widget.servico,
         endereco: widget.endereco,
+        descricao: widget.descricao,
       );
       // Depois do quadro atual (a árvore está sendo desmontada).
       Future.microtask(() => pedidos.buscarEmSegundoPlano(busca));
@@ -152,7 +165,11 @@ class _ProcurandoPageState extends State<ProcurandoPage>
   }
 
   void _emSegundoPlano() => pedidos.buscarEmSegundoPlano(
-    BuscaSegundoPlano(servico: widget.servico, endereco: widget.endereco),
+    BuscaSegundoPlano(
+      servico: widget.servico,
+      endereco: widget.endereco,
+      descricao: widget.descricao,
+    ),
   );
 
   void _ninguemAtivo() {
@@ -172,6 +189,7 @@ class _ProcurandoPageState extends State<ProcurandoPage>
     if (!mounted) return;
     _saiu = true;
     _fim?.cancel();
+    if (widget.deNovo case final p?) return _aceitouDeNovo(p);
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => EncontradoPage(
@@ -190,9 +208,42 @@ class _ProcurandoPageState extends State<ProcurandoPage>
               ) +
               (widget.anterior == null ? 0 : 1),
           distancia: widget.distancia,
+          descricao: widget.descricao,
         ),
       ),
     );
+  }
+
+  /// RN-177/RN-179: a mesma pessoa aceitou dentro dos 2 min. O cliente já
+  /// escolheu quem chamar: vai direto para a mesma conversa, com o
+  /// divisor "Novo pedido" e o valor (fluxo normal a partir daqui).
+  void _aceitouDeNovo(PedidoConcluido p) {
+    final descricao = widget.descricao.isEmpty ? p.descricao : widget.descricao;
+    pedidos.aceitar(
+      PedidoAndamento(
+        servico: widget.servico,
+        profissao: p.profissao,
+        profissional: p.profissional,
+        nota: '4,9',
+        endereco: widget.endereco,
+        valor: '',
+        pagamento: '',
+        etapasFeitas: 1,
+        chegaEm: p.chegaEm,
+        descricao: descricao,
+      ),
+    );
+    final c = conversas.comecar(
+      nome: p.profissional,
+      profissao: p.profissao,
+      feminino: p.feminino,
+      servico: widget.servico,
+      rua: widget.endereco,
+      descricao: descricao,
+    );
+    final nav = Navigator.of(context);
+    irParaAba(context, AbaCliente.mensagens);
+    nav.push(MaterialPageRoute(builder: (_) => ChatPage(conversa: c)));
   }
 
   /// O profissional chamado direto não aceitou: busca normal.
@@ -205,6 +256,7 @@ class _ProcurandoPageState extends State<ProcurandoPage>
           servico: widget.servico,
           endereco: widget.endereco,
           distancia: widget.distancia,
+          descricao: widget.descricao,
         ),
       ),
     );

@@ -46,6 +46,9 @@ class HomeProfissionalPage extends StatefulWidget {
 }
 
 class _HomeProfissionalPageState extends State<HomeProfissionalPage> {
+  /// Chamados de demonstração que já chegaram nesta tela.
+  int _chamadosNaDemo = 0;
+
   Timer? _chamado;
   bool _online = false;
 
@@ -81,10 +84,17 @@ class _HomeProfissionalPageState extends State<HomeProfissionalPage> {
       // e não está recebendo chamados no local.
       final distancia =
           profissional.recebeDistancia && !profissional.recebeNoLocal;
+      // Protótipo: o 1º chamado é normal; ficando online de novo, o
+      // próximo vem de "Pedir de novo" (RN-178), e assim por diante.
+      final deNovo = !distancia && (_chamadosNaDemo++).isOdd;
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => NovoChamadoPage(
-            chamado: distancia ? chamadoDistanciaExemplo : chamadoExemplo,
+            chamado: distancia
+                ? chamadoDistanciaExemplo
+                : deNovo
+                ? chamadoPediuDeNovo
+                : chamadoExemplo,
           ),
         ),
       );

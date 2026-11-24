@@ -4,6 +4,7 @@ import 'package:tatu/features/profissional/chamado/toque_chamado.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/navegacao.dart';
 import 'package:tatu/data/profissional.dart';
+import 'package:tatu/data/servico_profissional.dart';
 import 'package:tatu/features/profissional/chamado/chat_profissional_page.dart';
 import 'package:tatu/features/profissional/home/home_profissional_page.dart';
 
@@ -134,6 +135,7 @@ void main() {
     expect(find.text('Você está online'), findsOneWidget);
 
     // Fica offline e online de novo: outro chamado, que expira sozinho.
+    // Na demonstração, o 2º vem de "Pedir de novo" (RN-177: 2 min).
     await t.tap(find.text('Ficar offline'));
     await t.pump();
     await t.tap(find.text('Ficar online'));
@@ -141,7 +143,8 @@ void main() {
     await t.pump(const Duration(seconds: 6));
     await t.pump(const Duration(milliseconds: 500));
     expect(find.text('NOVO CHAMADO'), findsOneWidget);
-    for (var i = 0; i < 31; i++) {
+    expect(find.textContaining('Pediu você de novo'), findsOneWidget);
+    for (var i = 0; i < segundosExclusivo + 1; i++) {
       await t.pump(const Duration(seconds: 1));
     }
     await t.pumpAndSettle();

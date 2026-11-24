@@ -19,6 +19,8 @@ Future<void> chamarProfissional(
   BuildContext context,
   String servico, {
   bool distancia = false,
+  String? endereco,
+  String descricao = '',
 }) async {
   final nav = Navigator.of(context);
 
@@ -78,8 +80,10 @@ Future<void> chamarProfissional(
     MaterialPageRoute(
       builder: (_) => ProcurandoPage(
         servico: servico,
-        endereco: distancia ? 'À distância' : enderecos.atual.rua,
+        // RN-176: "Pedir de novo" já vem com o endereço escolhido.
+        endereco: distancia ? 'À distância' : endereco ?? enderecos.atual.rua,
         distancia: distancia,
+        descricao: descricao,
       ),
     ),
   );

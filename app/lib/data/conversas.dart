@@ -2,6 +2,8 @@ import 'package:clock/clock.dart';
 import '../shared/formatadores.dart';
 import 'package:flutter/foundation.dart';
 
+import 'conta.dart';
+import 'plano_fixo.dart' show diaMes;
 import 'regras_distancia.dart';
 import 'regras_valor.dart';
 import 'suspensao.dart';
@@ -29,7 +31,20 @@ class MensagemChat {
     this.marcador,
     this.bloqueada = false,
     this.link,
+    this.divisor,
+    this.divisorNota,
   });
+
+  /// RN-179/RN-181: começa um atendimento novo na mesma conversa (pílula
+  /// preta: "Novo pedido · 24 nov · Vazamento no banheiro").
+  MensagemChat.divisor(String divisor, {String? nota})
+    : this(divisor: divisor, divisorNota: nota);
+
+  /// Texto da pílula preta (nulo = não é divisor).
+  final String? divisor;
+
+  /// Nota embaixo do divisor ("Ele aparece na sua Atividade.").
+  final String? divisorNota;
 
   /// RN-120: arquivo barrado; só quem enviou vê o aviso.
   final bool bloqueada;
@@ -98,6 +113,7 @@ class MensagemChat {
       previaEm != null ||
       entrega != null ||
       marcador != null ||
+      divisor != null ||
       bloqueada;
 
   final String? texto;
@@ -274,7 +290,10 @@ class Conversa {
   final String rua;
   final String quando;
   final List<MensagemChat> mensagens;
-  final bool _emAndamento;
+
+  /// RN-179/RN-181: volta a "Em andamento" quando começa um atendimento
+  /// novo na mesma conversa.
+  bool _emAndamento;
 
   /// RN-129: encerrada pelo Tatu, sai de "Em andamento".
   bool get emAndamento => _emAndamento && !encerrada;
@@ -291,7 +310,7 @@ class Conversa {
 
   String get ultima {
     final m = mensagens.lastWhere(
-      (m) => m.concluido == null && m.dia == null,
+      (m) => m.concluido == null && m.dia == null && m.divisor == null,
       orElse: () => mensagens.last,
     );
     return m.foto ? 'Foto' : (m.texto ?? m.concluido ?? '');
@@ -388,7 +407,36 @@ class ConversasRepo extends ChangeNotifier {
     required String servico,
     required String rua,
     bool distancia = false,
+    String? descricao,
   }) {
+    // RN-179: "Pedir de novo" aceito pela mesma pessoa de um serviço já
+    // concluído: a conversa é a mesma, mas o atendimento é novo.
+    final anterior = conversas
+        .where((c) => c.nome == nome && !c.emAndamento && !c.encerrada)
+        .firstOrNull;
+    if (anterior != null) {
+      anterior
+        .._emAndamento = true
+        ..servicoConcluido = false
+        ..dicaLigarVista = false
+        ..entrega = null
+        ..mensagens.addAll([
+          MensagemChat.divisor(
+            'Novo pedido · ${diaMes(clock.now())} · '
+            '${descricao ?? servico}',
+          ),
+          MensagemChat(
+            texto: 'Oi ${conta.nome}! Aceitei, já te mando o valor.',
+            hora: horaAgora(),
+          ),
+        ])
+        // RN-179: segue o fluxo normal (valor, confirmação, código…).
+        // Protótipo: o valor já chega enviado.
+        ..valor = ValorProposta(visita: 40, servico: 110);
+      conversas = [anterior, for (final c in conversas) if (c != anterior) c];
+      notifyListeners();
+      return anterior;
+    }
     // RN-87/RN-90: a mesma pessoa de novo continua a conversa (nada some).
     final atual = conversas
         .where((c) => c.nome == nome && c.emAndamento)
@@ -409,7 +457,7 @@ class ConversasRepo extends ChangeNotifier {
       profissao: profissao,
       feminino: feminino,
       servico: servico,
-      descricao: servico,
+      descricao: descricao ?? servico,
       rua: rua,
       quando: 'agora',
       emAndamento: true,
@@ -442,6 +490,9 @@ class ConversasRepo extends ChangeNotifier {
     v?.situacao = SituacaoValor.confirmado;
     // RN-140: valor novo confirmado, a ligação volta a existir.
     c.servicoConcluido = false;
+    // RN-181: novo valor confirmado no chat de um serviço concluído vira
+    // um atendimento novo (aparece na Atividade). Sem confirmação, nada.
+    if (v != null && v.novo) c._emAndamento = true;
     if (c.distancia && v != null) {
       c.entrega = EntregaDistancia(confirmadoEm: clock.now());
       c.mensagens.add(
