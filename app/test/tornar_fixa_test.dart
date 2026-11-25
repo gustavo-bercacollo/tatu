@@ -119,4 +119,31 @@ void main() {
     expect(find.text('Ver plano fixo'), findsOneWidget);
     expect(find.text('Tornar Marcos fixo'), findsNothing);
   });
+
+  testWidgets('RN-144: "Pedir de novo" oferece tornar fixa', (t) async {
+    await _abrir(t, const AtividadePage(aba: 1));
+    await t.tap(find.text('Pedir de novo').first);
+    await t.pumpAndSettle();
+    expect(find.text('Precisa toda semana? Tornar a Luiza fixa'), findsOneWidget);
+    await t.tap(find.text('Precisa toda semana? Tornar a Luiza fixa'));
+    await t.pumpAndSettle();
+    // Abre a mesma tela de escolha do plano.
+    expect(find.text('Tornar Luiza fixa'), findsOneWidget);
+  });
+
+  testWidgets('RN-144: com plano, o "Pedir de novo" não oferece', (t) async {
+    planosFixos.pedir(
+      cliente: conta.nomeCompleto,
+      profissional: 'Luiza Souza',
+      endereco: 'Rua das Flores, 120',
+      frequencia: FrequenciaPlano.semanal,
+      visitasPorSemana: 1,
+      dias: const [2],
+      horario: '9:00',
+    );
+    await _abrir(t, const AtividadePage(aba: 1));
+    await t.tap(find.text('Pedir de novo').first);
+    await t.pumpAndSettle();
+    expect(find.textContaining('Precisa toda semana?'), findsNothing);
+  });
 }

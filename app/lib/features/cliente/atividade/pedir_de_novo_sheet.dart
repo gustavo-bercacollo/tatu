@@ -21,12 +21,22 @@ import 'package:clock/clock.dart';
 /// pedido anterior; o endereço pode ser trocado. RN-177: com a mesma
 /// pessoa, o chamado é só dela por 2 min ("Chamando a [nome]").
 Future<void> abrirPedirDeNovo(BuildContext context, PedidoConcluido p) async {
-  final escolha = await mostrarFolha<(bool, String)>(
+  final escolha = await mostrarFolha<(bool, String, bool)>(
     context,
     builder: (_) => _FolhaPedirDeNovo(pedido: p),
   );
   if (escolha == null || !context.mounted) return;
-  final (mesmo, endereco) = escolha;
+  final (mesmo, endereco, fixo) = escolha;
+  // RN-144: "Precisa toda semana? Tornar [nome] fixa".
+  if (fixo) {
+    return tornarFixo(
+      context,
+      profissional: p.profissional,
+      profissao: p.profissao,
+      feminino: p.feminino,
+      endereco: p.endereco,
+    );
+  }
   // RN-145: com a mesma profissional, no máximo 2 visitas por semana no
   // mesmo endereço, somando o plano fixo.
   if (mesmo && !planosFixos.pedirAvulso(p.profissional, endereco, clock.now())) {
@@ -163,13 +173,27 @@ class _FolhaPedirDeNovoState extends State<_FolhaPedirDeNovo> {
             ),
             const SizedBox(height: TatuMedidas.entreItens + 4),
             FilledButton(
-              onPressed: () => Navigator.of(context).pop((_mesmo, _endereco)),
+              onPressed: () =>
+                  Navigator.of(context).pop((_mesmo, _endereco, false)),
               child: Text(
                 _mesmo
                     ? 'Chamar $artigo ${p.primeiroNome}'
                     : 'Chamar qualquer $servico',
               ),
             ),
+            // RN-144: quem chama sempre a mesma pessoa pode tornar o
+            // serviço fixo daqui (só sem plano com ela).
+            if (planosFixos.planoCom(p.profissional) == null) ...[
+              const SizedBox(height: 4),
+              Center(
+                child: LinkAzul(
+                  'Precisa toda semana? '
+                  '${textoTornarFixo(p.profissional, p.feminino).replaceFirst('Tornar ', 'Tornar $artigo ')}',
+                  onTap: () =>
+                      Navigator.of(context).pop((false, _endereco, true)),
+                ),
+              ),
+            ],
           ],
         ),
       ),
