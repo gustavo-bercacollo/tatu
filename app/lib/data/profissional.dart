@@ -1,3 +1,4 @@
+import 'catalogo_servicos.dart';
 import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
@@ -140,11 +141,35 @@ bool ehTecnologia(String profissao) =>
     profissoesTecnologia.contains(profissao) ||
     profissoesTecnologia.contains(profissao.replaceFirst(RegExp(r'a$'), ''));
 
-/// Modo sugerido para uma profissão nova.
+/// RN-97: modos que o catálogo permite para a profissão (coluna "Atende"
+/// de docs/catalogo-de-servicos.md). L → só no local; D → só à
+/// distância; L/D (ou profissão fora do catálogo) → os três.
+List<ModoAtendimento> modosPermitidos(String profissao) =>
+    switch (catalogoServicos.porNome(profissao)?.atende) {
+      AtendeCatalogo.local => const [ModoAtendimento.local],
+      AtendeCatalogo.distancia => const [ModoAtendimento.distancia],
+      _ => ModoAtendimento.values,
+    };
+
+/// O único modo possível (nulo = há escolha, "Como você atende?").
+ModoAtendimento? modoUnico(String profissao) {
+  final m = modosPermitidos(profissao);
+  return m.length == 1 ? m.single : null;
+}
+
+/// Modo sugerido para uma profissão nova: o do catálogo quando só há
+/// um; com escolha, a sugestão inicial.
 ModoAtendimento modoSugerido(String profissao) =>
-    profissoesDistancia.contains(profissao)
-    ? ModoAtendimento.distancia
-    : ModoAtendimento.local;
+    modoUnico(profissao) ??
+    (profissoesDistancia.contains(profissao)
+        ? ModoAtendimento.distancia
+        : ModoAtendimento.local);
+
+/// RN-97: a profissão com um modo que o catálogo permite.
+ProfissaoEscolhida comModoValido(ProfissaoEscolhida p) =>
+    modosPermitidos(p.nome).contains(p.modo)
+    ? p
+    : p.comModo(modoSugerido(p.nome));
 
 @immutable
 class ProfissaoEscolhida {
@@ -567,7 +592,8 @@ class ProfissionalRepo extends ChangeNotifier {
   }
 
   void definirProfissoes(List<ProfissaoEscolhida> lista) {
-    profissoes = List.of(lista);
+    // RN-97: modo único do catálogo já vem marcado.
+    profissoes = [for (final p in lista) comModoValido(p)];
     // Profissão que saiu leva o registro junto.
     registros.removeWhere((k, _) => !profissoes.any((p) => p.nome == k));
     notifyListeners();
@@ -699,6 +725,8 @@ class ProfissionalRepo extends ChangeNotifier {
 
   /// RN-97: muda como atende numa profissão.
   void definirModo(String profissao, ModoAtendimento modo) {
+    // RN-97: nunca um modo que o catálogo não permite.
+    if (!modosPermitidos(profissao).contains(modo)) return;
     profissoes = [
       for (final p in profissoes) p.nome == profissao ? p.comModo(modo) : p,
     ];
@@ -744,7 +772,7 @@ class ProfissionalRepo extends ChangeNotifier {
   }
 
   void adicionarProfissao(ProfissaoEscolhida p) {
-    profissoes = [...profissoes, p];
+    profissoes = [...profissoes, comModoValido(p)];
     notifyListeners();
   }
 

@@ -54,9 +54,17 @@ void main() {
     atendimentoProfissional.restaurar();
   });
 
+  testWidgets('RN-180: a dica está desligada por enquanto', (t) async {
+    await _abrir(t, ChatPage(conversa: _de('Marcos Dias')));
+    expect(find.text('Precisa de um novo serviço?'), findsNothing);
+    expect(find.byType(TextField), findsOneWidget);
+  });
+
   testWidgets('RN-180: chat de serviço concluído mostra "Pedir de novo"', (
     t,
   ) async {
+    ChatPage.dicaPedirDeNovo = true;
+    addTearDown(() => ChatPage.dicaPedirDeNovo = false);
     await _abrir(t, ChatPage(conversa: _de('Marcos Dias')));
     expect(find.text('Precisa de um novo serviço?'), findsOneWidget);
     await t.tap(find.text('Pedir de novo'));

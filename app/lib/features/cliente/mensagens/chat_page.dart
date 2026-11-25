@@ -70,6 +70,11 @@ class ChatPage extends StatefulWidget {
   /// de outro valor.
   final Duration resposta;
 
+  /// RN-180: dica "Precisa de um novo serviço? Pedir de novo" acima do
+  /// campo. Desligada por enquanto (pedido do Gustavo, 25/11/2026); o
+  /// "Pedir de novo" continua na Atividade e no detalhe do concluído.
+  static bool dicaPedirDeNovo = false;
+
   @override
   State<ChatPage> createState() => _ChatPageState();
 }
@@ -469,6 +474,7 @@ class _ChatPageState extends State<ChatPage> {
   /// RN-180: a dica aparece no chat de um serviço concluído, quando não
   /// há atendimento nem valor em aberto (mensagem é só conversa).
   bool get _mostraDicaPedirDeNovo =>
+      ChatPage.dicaPedirDeNovo &&
       _c.concluida &&
       !_c.emAndamento &&
       !_c.encerrada &&
@@ -785,12 +791,18 @@ class _ChatPageState extends State<ChatPage> {
   List<Widget> _visitasDoPlano() {
     final p = _planoVisivel;
     if (p == null || _c.encerrada) return const [];
-    return [
+    final feitas = [
       for (final v in p.visitas)
-        if (v.situacao == SituacaoVisita.feita) ...[
-          const SizedBox(height: 18),
-          DivisorChat('Visita do plano · ${diaMes(v.dia)} · feita'),
-        ],
+        if (v.situacao == SituacaoVisita.feita) v,
+    ];
+    if (feitas.isEmpty) return const [];
+    return [
+      for (final v in feitas) ...[
+        const SizedBox(height: 18),
+        DivisorChat('Visita do plano · ${diaMes(v.dia)} · feita'),
+      ],
+      // Espaço antes do 1º balão (ele não tem margem de cima).
+      const SizedBox(height: 18),
     ];
   }
 

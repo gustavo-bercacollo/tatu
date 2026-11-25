@@ -78,7 +78,7 @@ void sementeDemoPlanoFixo() {
         concluidoEm: '18 nov',
         mensagens: [
           MensagemChat(texto: 'Tudo limpinho! Deixei a chave.'),
-          MensagemChat(texto: 'Obrigada, Júlia! Até terça.', minha: true),
+          MensagemChat(texto: 'Obrigada, Júlia! Até a próxima.', minha: true),
         ],
       ),
     );

@@ -212,17 +212,25 @@ class _CartaoProfissao extends StatelessWidget {
                   ),
                 ],
                 const SizedBox(height: 4),
-                GestureDetector(
-                  onTap: onModo,
-                  behavior: HitTestBehavior.opaque,
-                  child: Text(
-                    'Atende: ${profissao.modo.nome.toLowerCase()} · Mudar',
-                    style: TatuTexto.nota.copyWith(
-                      color: TatuColors.verified,
-                      fontWeight: FontWeight.w600,
+                // RN-97: só dá para mudar quando o catálogo permite mais
+                // de um modo.
+                if (modoUnico(profissao.nome) != null)
+                  Text(
+                    'Atende: ${profissao.modo.nome.toLowerCase()}',
+                    style: TatuTexto.nota,
+                  )
+                else
+                  GestureDetector(
+                    onTap: onModo,
+                    behavior: HitTestBehavior.opaque,
+                    child: Text(
+                      'Atende: ${profissao.modo.nome.toLowerCase()} · Mudar',
+                      style: TatuTexto.nota.copyWith(
+                        color: TatuColors.verified,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),

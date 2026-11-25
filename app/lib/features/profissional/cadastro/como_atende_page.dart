@@ -7,7 +7,9 @@ import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 
 /// P107 · "Como você atende?" numa profissão: no local, à distância ou os
-/// dois (RN-97). [onContinuar] segue o cadastro; com [edicao], volta.
+/// dois (RN-97). Só aparece quando o catálogo permite mais de um modo, e
+/// só com os modos permitidos. [onContinuar] segue o cadastro; com
+/// [edicao], volta.
 class ComoAtendePage extends StatefulWidget {
   const ComoAtendePage({
     super.key,
@@ -28,8 +30,11 @@ class ComoAtendePage extends StatefulWidget {
 class _ComoAtendePageState extends State<ComoAtendePage> {
   late final ProfissaoEscolhida _prof = profissional.profissoes[widget.indice];
 
+  /// RN-97: os modos que o catálogo permite.
+  late final _permitidos = modosPermitidos(_prof.nome);
+
   /// Profissão nova vem com o modo mais comum dela.
-  late ModoAtendimento _modo = widget.edicao
+  late ModoAtendimento _modo = widget.edicao && _permitidos.contains(_prof.modo)
       ? _prof.modo
       : modoSugerido(_prof.nome);
 
@@ -58,7 +63,8 @@ class _ComoAtendePageState extends State<ComoAtendePage> {
             'Atende online, clientes de qualquer cidade',
           ),
           (ModoAtendimento.ambos, null),
-        ]) ...[
+        ])
+          if (_permitidos.contains(m)) ...[
           OpcaoSelecionavel(
             selecionado: _modo == m,
             rotulo: m.nome,

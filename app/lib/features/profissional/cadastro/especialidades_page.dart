@@ -88,21 +88,29 @@ class _EspecialidadesPageState extends State<EspecialidadesPage> {
       nav.pop();
       return;
     }
+    void continuar() => _registro(
+      nav,
+      () => nav.push(
+        MaterialPageRoute(
+          builder: (_) => widget.indice < total - 1
+              ? EspecialidadesPage(indice: widget.indice + 1)
+              : const ProfissoesPage(),
+        ),
+      ),
+    );
+    // RN-97: com um modo só no catálogo, ele já fica salvo e a pergunta
+    // não aparece.
+    if (modoUnico(_prof.nome) case final m?) {
+      profissional.definirModo(_prof.nome, m);
+      continuar();
+      return;
+    }
     // RN-97: depois das especialidades, como atende nesta profissão.
     nav.push(
       MaterialPageRoute(
         builder: (_) => ComoAtendePage(
           indice: widget.indice,
-          onContinuar: () => _registro(
-            nav,
-            () => nav.push(
-              MaterialPageRoute(
-                builder: (_) => widget.indice < total - 1
-                    ? EspecialidadesPage(indice: widget.indice + 1)
-                    : const ProfissoesPage(),
-              ),
-            ),
-          ),
+          onContinuar: continuar,
         ),
       ),
     );

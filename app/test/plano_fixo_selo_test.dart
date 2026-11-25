@@ -163,6 +163,15 @@ void main() {
         find.text('Visita do plano · 17 nov · feita'),
         findsOneWidget,
       );
+      // O marcador não cobre a primeira mensagem.
+      final marcador = t.getRect(
+        find.ancestor(
+          of: find.text('Visita do plano · 17 nov · feita'),
+          matching: find.byType(Container),
+        ).first,
+      );
+      final balao = t.getRect(find.text('Tudo limpinho! Deixei a chave.'));
+      expect(balao.top - marcador.bottom, greaterThanOrEqualTo(12));
     });
   });
 
