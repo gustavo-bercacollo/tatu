@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 25/11/2026 (v40)
+Atualizado em 25/11/2026 (v41)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -76,9 +76,9 @@ Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do própri
 | RN | Regra |
 | --- | --- |
 | RN-26 | O valor é combinado no chat. O profissional define dois valores: Visita (pode ser zero) e Serviço. O cliente confirma o total uma vez. |
-| RN-27 | São até 3 rodadas de proposta. Sem acordo, o chamado é encerrado e nada é cobrado. No 3º valor, o cliente confirma ou recusa (RN-210). |
-| RN-210 | No 3º valor, "Pedir outro valor" vira "Recusar valor" (vermelho) e o cartão avisa antes: "Último valor. Se recusar, a conversa com a [nome] termina sem custo." Recusar abre a folha "Recusar o valor?" com três saídas: "Recusar e chamar outro" (o pedido volta à busca, RN-18 a RN-20), "Recusar e cancelar pedido" (volta para a Home com "Pedido cancelado. Nada foi cobrado.") e "Voltar". Nada é cobrado, nem a visita, e o endereço exato nunca chega ao profissional (RN-28). |
-| RN-211 | Depois da recusa, o profissional vê "Sem acordo de valor" ("A [cliente] recusou o último valor. O chamado foi encerrado sem custo e não conta contra você.") e continua online. Ele não recebe de novo o mesmo pedido. Sem acordo não conta como cancelamento (RN-64) nem como abandono (RN-79) para nenhum dos dois. A conversa fica nas Mensagens dos dois só para leitura, com "Sem acordo de valor". |
+| RN-27 | São até 3 rodadas de proposta. Sem acordo, o chamado é encerrado e nada é cobrado. No 3º valor, o cliente confirma ou recusa (RN-212). |
+| RN-212 | No 3º valor, "Pedir outro valor" vira "Recusar valor" (vermelho) e o cartão avisa antes: "Último valor. Se recusar, a conversa com a [nome] termina sem custo." Recusar abre a folha "Recusar o valor?" com três saídas: "Recusar e chamar outro" (o pedido volta à busca, RN-18 a RN-20), "Recusar e cancelar pedido" (volta para a Home com "Pedido cancelado. Nada foi cobrado.") e "Voltar". Nada é cobrado, nem a visita, e o endereço exato nunca chega ao profissional (RN-28). |
+| RN-213 | Depois da recusa, o profissional vê "Sem acordo de valor" ("A [cliente] recusou o último valor. O chamado foi encerrado sem custo e não conta contra você.") e continua online. Ele não recebe de novo o mesmo pedido. Sem acordo não conta como cancelamento (RN-64) nem como abandono (RN-79) para nenhum dos dois. A conversa fica nas Mensagens dos dois só para leitura, com "Sem acordo de valor". |
 | RN-28 | O endereço exato só vai para o profissional depois que o valor é confirmado. Antes disso, ele vê só o bairro e a distância. |
 | RN-29 | Pagamento só pelo app: cartão ou Pix. Não existe pagamento "por fora" nem em dinheiro. |
 | RN-30 | Ao confirmar o valor, o total fica reservado no cartão padrão. Não é cobrado ainda. |
@@ -96,11 +96,11 @@ Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do própri
 | RN-141 | Gorjeta ("pagar um café") é opcional e só aparece na tela de avaliação, depois do serviço concluído: R$ 2, R$ 5, R$ 10 ou outro valor (até R$ 100, exemplo). Nunca no chat nem antes do serviço. |
 | RN-142 | A gorjeta é cobrada no mesmo cartão, junto com o envio da avaliação. O Tatu não cobra comissão: 100% vai para o profissional, descontada só a taxa do cartão. Vai no Pix com o próximo repasse. |
 | RN-143 | A gorjeta não muda a nota e não aparece para outros clientes. O profissional é avisado por notificação ("Ana deixou R$ 5 de gorjeta"). |
-| RN-144 | Plano fixo: o cliente toca em "Tornar [nome] fixa" (no perfil aberto pelo chat, no menu do chat, segurando a conversa, no card de Concluídos ou no link "Precisa toda semana? Tornar a [nome] fixa" da folha "Pedir de novo", que aparece em qualquer profissão quando ainda não há plano com a pessoa; RN-208 e RN-209) e escolhe Mensal ou Semanal, 1 ou 2 vezes por semana, dia e horário. O profissional responde com o valor por visita uma única vez; o cliente confirma e o plano fica ativo. Ninguém renegocia a cada visita. |
+| RN-144 | Plano fixo: o cliente toca em "Tornar [nome] fixa" (no perfil aberto pelo chat, no menu do chat, segurando a conversa, no card de Concluídos ou na opção "Precisa toda semana? Tornar a [nome] fixa" da folha "Pedir de novo", que aparece em qualquer profissão quando ainda não há plano com a pessoa; RN-208 e RN-209) e escolhe Mensal ou Semanal, 1 ou 2 vezes por semana, dia e horário. O profissional responde com o valor por visita e o valor pode ser negociado (RN-210); com o valor confirmado pelo cliente, o plano fica ativo. Ninguém renegocia a cada visita. |
 | RN-145 | Limite legal: a mesma profissional vai no máximo 2 vezes por semana ao mesmo endereço pelo Tatu, somando plano fixo e pedidos avulsos, para qualquer serviço na casa. A 3ª visita na semana é bloqueada com o aviso: "Pelo Tatu, a mesma profissional pode vir até 2 vezes por semana. Para mais que isso, a lei exige contratação com carteira assinada." (Lei Complementar 150.) |
 | RN-146 | O valor do plano é de pacote de visitas (valor por visita × visitas do período), combinado entre cliente e profissional; o Tatu não define. A cobrança é automática no fim de cada período (semana ou mês), só pelas visitas feitas. Comissão normal do Tatu em cada cobrança. |
 | RN-147 | O profissional pode avisar "Não vou nesta semana" sem penalidade: a visita não é cobrada e o Tatu avisa o cliente pelo canal oficial. Faltar sem avisar segue as regras de abandono (RN-76 a RN-79). |
-| RN-148 | Cliente e profissional podem pausar ou cancelar o plano quando quiserem, valendo a partir do próximo período. Mudar o valor exige nova proposta do profissional e aceite do cliente. |
+| RN-148 | Cliente e profissional podem pausar ou cancelar o plano quando quiserem, valendo a partir do próximo período. Mudar o valor exige nova proposta (mesma negociação da RN-210) e aceite dos dois. |
 | RN-149 | Nos termos de uso, o cliente declara que contrata um serviço autônomo, que o Tatu só intermedia e que está ciente do limite de 2 visitas por semana. Revisar com advogado trabalhista. |
 
 ### Identificação do plano fixo
@@ -116,6 +116,7 @@ Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do própri
 | RN-206 | **Card da visita do plano em Atividade → Em andamento (cliente).** Mesma estrutura dos outros cards: foto com as iniciais do nome (ex.: "JC"), nome em cima, profissão embaixo e status à direita. O plano aparece como um **selo de repetição no canto da foto** e no texto "[profissão] · Plano fixo". **Visita agendada:** pílula clara "Hoje, [hora]" e, embaixo, a barra do mês (um segmento por visita: feitas em preto, a de hoje em cinza, as próximas em cinza claro) com "Visita X de Y de [mês]" e "toda [dia]". **A caminho em diante:** pílula escura com o tempo ("8 min"), subtítulo "[profissão] · visita X de Y" e a linha de etapas Agendada → A caminho → Serviço → Feita (sem Pagamento, porque a cobrança é no fim do mês). O card tem a mesma altura nos dois estados. |
 | RN-208 | **Segurar a conversa** (Mensagens, cliente): segurar uma conversa abre um menu com "Ver perfil da [nome]", "Tornar [nome] fixa" (ou "fixo") e "Pedir de novo". Vale para qualquer profissão. Se já existe plano com a pessoa, o item vira "Ver plano fixo". |
 | RN-209 | **Botão "Tornar fixa" em Atividade → Concluídos** (cliente): no card do serviço, ao lado de "Pedir de novo" e "Recibo", com contorno escuro. Só aparece em profissões marcadas como **Fixo: Sim** no catálogo (diarista, passadeira, jardineiro, babá, professor etc.). Se já existe plano com a pessoa, o botão não aparece. O acesso pelo perfil e pelo menu do chat continua para todas as profissões. |
+| RN-210 | **Negociação do valor do plano**, igual ao avulso (RN-27): até **3 propostas**, sempre pelo **valor por visita** (o total do mês aparece calculado). (1) A profissional envia o valor. (2) O cliente toca em "Confirmar plano" ou "Pedir outro valor" (botão cinza dentro do card, abaixo de "Confirmar plano") e digita quanto quer pagar por visita. (3) A profissional toca em "Aceitar R$ X por visita" ou "Enviar outro valor" (a última proposta). Na última, o cliente vê "Proposta 3 de 3 · última" em laranja, com "Confirmar plano" ou "Recusar". Sem acordo, o plano não começa e serviços avulsos continuam valendo. O card mostra "Proposta X de 3" e a referência "Último serviço avulso com a [nome]: R$ X" (quando existir). A barra do chat mostra "Plano fixo · confirme o valor" (cliente) ou "Plano fixo · responda" (profissional) em laranja, com o valor por visita. |
 
 ## 4. Atendimento
 
@@ -359,8 +360,8 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 - [ ] **Antecedentes criminais (adiado).** Pedir certidão de antecedentes de quem cuida de criança, idoso ou pessoa com deficiência, ou de todos que vão até a casa do cliente. Atualizar a Política de Privacidade se for adotado.
 - [ ] **Uso fora da finalidade (adiado).** Proposta: (1) IA confere se o pedido é um serviço do catálogo e bloqueia termos proibidos ("Esse pedido não é um serviço do Tatu"); (2) profissões sensíveis (ex.: massagem) com regra extra e "acompanhante" fora do catálogo; (3) trava de autopagamento (mesmo CPF, celular, aparelho, cartão ou Pix dos dois lados); (4) revisão de serviços sem chegada/código, valores muito acima do normal e muitos serviços caros entre as mesmas pessoas; (5) teto de valor e sem parcelamento nos primeiros serviços de conta nova; (6) fila de revisão, banimento e comunicação às autoridades; parceiro de pagamentos com antifraude.
 - [ ] **Números do retorno.** Exemplos a confirmar: 48 horas para o profissional responder, 7 dias para marcar, 48 horas para o cliente responder "Resolveu?", 3 dias úteis de mediação, 3 faltas em 90 dias, 3 "não procede" em 6 meses, reserva de 1% da comissão. Classificação 30/90 dias do catálogo a validar com o advogado. Prazo de guarda das fotos (5 anos é exemplo, J-06).
-- [ ] **Último valor sem resposta.** O que acontece quando o cliente não confirma nem recusa o 3º valor. Sugestão: depois de um prazo (ex.: 10 minutos) vale como recusa e o pedido volta à busca (RN-210).
 - [ ] **Seus profissionais (adiado).** Lista em Atividade com quem já atendeu o cliente e botão Chamar (RN-83). Saiu do app em 24/11/2026; decidir depois se volta e como.
+- [ ] **Último valor sem resposta.** O que acontece quando o cliente não confirma nem recusa o 3º valor. Sugestão: depois de um prazo (ex.: 10 minutos) vale como recusa e o pedido volta à busca (RN-212).
 - [ ] **Mais lugares para "Tornar fixa" (adiado).** Ideias avaliadas e guardadas: sugestão "Quer a [nome] sempre?" depois de avaliar com 4 ou 5 estrelas; dica "Chama a [nome] sempre?" no chat a partir do 2º serviço. Testar a de depois de avaliar primeiro se poucos clientes criarem plano.
 - [ ] **Ligação pelo app.** Escolher como fazer a ligação sem mostrar o número: pela internet (mais barato) ou número intermediário (custo por minuto).
 
@@ -400,14 +401,16 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-28 | Card do plano fixo em Atividade → Em andamento desorganizado e fora do padrão. | Resolvido | RN-206 |
 | P-29 | Card do retorno em Atividade → Em andamento com pouca informação e data cortada. | Resolvido | RN-207 |
 | P-30 | "Tornar fixa" difícil de encontrar (só no perfil e no menu do chat). | Resolvido | RN-144, RN-208, RN-209 |
-| P-31 | Depois das 3 rodadas, o cliente não tem como recusar o valor. | Resolvido | RN-27, RN-210, RN-211 |
+| P-31 | Valor do plano fixo sem negociação, e "Pedir outro valor" fora do card. | Resolvido | RN-144, RN-148, RN-210 |
+| P-32 | Depois das 3 rodadas, o cliente não tem como recusar o valor. | Resolvido | RN-27, RN-212, RN-213 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
 | 25/11/2026 | RN-144 | "Precisa toda semana? Tornar a [nome] fixa" na folha "Pedir de novo" (pedido do Gustavo). |
-| 25/11/2026 | RN-27, RN-210, RN-211 | Cliente recusa o 3º valor ("Recusar valor") e escolhe chamar outro ou cancelar. Sem custo e sem penalidade; o profissional não recebe de novo o mesmo pedido. |
+| 25/11/2026 | RN-27, RN-212, RN-213 | Cliente recusa o 3º valor ("Recusar valor") e escolhe chamar outro ou cancelar. Sem custo e sem penalidade; o profissional não recebe de novo o mesmo pedido. (Eram RN-210/RN-211 na v40; renumeradas porque a v41 usa o RN-210 para o plano fixo.) |
+| 25/11/2026 | RN-144, RN-148, RN-210 | Valor do plano fixo negociável, até 3 propostas pelo valor por visita; "Pedir outro valor" dentro do card. |
 | 25/11/2026 | RN-161 | Botão "Outros" do cadastro com seta para baixo e contorno, sem estado de selecionado. |
 | 25/11/2026 | RN-144, RN-208, RN-209 | "Tornar fixa" também segurando a conversa e no card de Concluídos (só profissões com Fixo: Sim no catálogo). Outras ideias adiadas. |
 | 25/11/2026 | RN-207 | Novo card do retorno em Atividade → Em andamento: data e hora completas, selo "Retorno · sem custo", dica do código e etapas quando o profissional sai. |

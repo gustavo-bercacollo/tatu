@@ -40,11 +40,27 @@ enum SituacaoVisita {
 
 const _diasSemana = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 const _diasLongos = [
-  'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado', 'domingo',
+  'segunda',
+  'terça',
+  'quarta',
+  'quinta',
+  'sexta',
+  'sábado',
+  'domingo',
 ];
 const _meses = [
-  'jan', 'fev', 'mar', 'abr', 'mai', 'jun',
-  'jul', 'ago', 'set', 'out', 'nov', 'dez',
+  'jan',
+  'fev',
+  'mar',
+  'abr',
+  'mai',
+  'jun',
+  'jul',
+  'ago',
+  'set',
+  'out',
+  'nov',
+  'dez',
 ];
 
 /// "Seg" a "Sáb" para escolher o dia (1 = segunda).
@@ -72,6 +88,9 @@ abstract final class RegrasPlanoFixo {
   /// semana).
   static const semanasPorMes = 4;
 
+  /// RN-210: até 3 propostas de valor por visita (como no avulso, RN-27).
+  static const maxPropostas = 3;
+
   /// RN-145: aviso da 3ª visita na semana.
   static const avisoLimite =
       'Pelo Tatu, a mesma profissional pode vir até 2 vezes por semana. '
@@ -92,6 +111,9 @@ abstract final class RegrasPlanoFixo {
 enum EstadoPlano {
   aguardandoValor,
   valorEnviado,
+
+  /// RN-210: o cliente pediu outro valor; a vez é do profissional.
+  outroValorPedido,
   ativo,
   semVisitaNaSemana,
   pausado,
@@ -132,8 +154,18 @@ class VisitaPlano {
 const etapasVisitaPlano = ['Agendada', 'A caminho', 'Serviço', 'Feita'];
 
 const _mesesLongos = [
-  'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
-  'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
+  'janeiro',
+  'fevereiro',
+  'março',
+  'abril',
+  'maio',
+  'junho',
+  'julho',
+  'agosto',
+  'setembro',
+  'outubro',
+  'novembro',
+  'dezembro',
 ];
 
 /// "novembro".
@@ -154,6 +186,62 @@ class CobrancaPlano {
 
   /// O que vai para o Pix do profissional.
   double get repasse => total - comissao;
+}
+
+/// RN-210: uma proposta de valor por visita.
+@immutable
+class PropostaPlano {
+  const PropostaPlano(
+    this.porVisita, {
+    required this.doCliente,
+    this.aceite = false,
+  });
+
+  final double porVisita;
+  final bool doCliente;
+
+  /// O profissional aceitou o valor que o cliente pediu (não é proposta
+  /// nova: não conta no "Proposta X de 3").
+  final bool aceite;
+}
+
+/// RN-210: negociação do valor por visita, igual ao avulso (RN-27): (1) o
+/// profissional envia, (2) o cliente pode pedir outro, (3) o profissional
+/// aceita ou envia o último. Também vale para mudar o valor de um plano
+/// ativo (RN-148).
+class NegociacaoPlano {
+  final propostas = <PropostaPlano>[];
+
+  /// O cliente recusou a última proposta: sem acordo.
+  bool recusada = false;
+
+  PropostaPlano? get ultima => propostas.lastOrNull;
+
+  /// Valor na mesa agora (por visita).
+  double? get valor => ultima?.porVisita;
+
+  /// "Proposta X de 3".
+  int get numero => propostas.where((p) => !p.aceite).length;
+
+  /// Último valor que o profissional pediu (antes da proposta do cliente).
+  double? get doProfissional =>
+      propostas.where((p) => !p.doCliente).lastOrNull?.porVisita;
+
+  bool get vezDoCliente => !recusada && ultima != null && !ultima!.doCliente;
+  bool get vezDoProfissional =>
+      !recusada && (ultima == null || ultima!.doCliente);
+
+  /// O profissional aceitou o valor do cliente: falta só confirmar.
+  bool get aceita => ultima?.aceite ?? false;
+
+  /// Já foi a 3ª proposta.
+  bool get ultimaProposta => numero >= RegrasPlanoFixo.maxPropostas;
+
+  /// O cliente só pede outro valor na 1ª proposta (a 2ª é dele).
+  bool get clientePodePedirOutro => vezDoCliente && !aceita && !ultimaProposta;
+
+  /// Na última proposta, o cliente confirma ou recusa.
+  bool get clientePodeRecusar => vezDoCliente && !aceita && ultimaProposta;
 }
 
 /// RN-144: plano fixo entre um cliente e um profissional, num endereço.
@@ -190,8 +278,19 @@ class PlanoFixo {
   /// "9:00".
   String horario;
 
-  /// RN-144: valor por visita que o profissional enviou (nulo = ainda não).
+  /// RN-144: valor por visita (nulo = ainda não). Pendente: o valor na
+  /// mesa da negociação (RN-210); ativo: o valor combinado.
   double? valorPorVisita;
+
+  /// RN-210: negociação do valor antes de o plano começar.
+  final negociacao = NegociacaoPlano();
+
+  /// RN-148/RN-210: negociação de um novo valor com o plano ativo (nula
+  /// quando não há).
+  NegociacaoPlano? novoValor;
+
+  /// RN-210: o cliente recusou a última proposta; o plano não começou.
+  bool get semAcordo => negociacao.recusada;
   StatusPlano status = StatusPlano.pendente;
 
   /// Cartão onde é cobrado (o padrão, ao confirmar).
@@ -206,7 +305,15 @@ class PlanoFixo {
   StatusPlano? noProximoPeriodo;
 
   /// RN-148: novo valor proposto pelo profissional, esperando o aceite.
-  double? valorProposto;
+  double? get valorProposto =>
+      novoValor?.vezDoCliente ?? false ? novoValor!.valor : null;
+
+  /// Negociação em andamento (do plano pendente ou do novo valor).
+  NegociacaoPlano? get negociacaoAberta => switch (status) {
+    StatusPlano.pendente => negociacao,
+    StatusPlano.ativo => novoValor,
+    _ => null,
+  };
 
   /// Visitas do período atual.
   final visitas = <VisitaPlano>[];
@@ -234,9 +341,10 @@ class PlanoFixo {
     final hoje = agora ?? clock.now();
     switch (status) {
       case StatusPlano.pendente:
-        return valorPorVisita == null
-            ? EstadoPlano.aguardandoValor
-            : EstadoPlano.valorEnviado;
+        if (negociacao.propostas.isEmpty) return EstadoPlano.aguardandoValor;
+        return negociacao.vezDoCliente
+            ? EstadoPlano.valorEnviado
+            : EstadoPlano.outroValorPedido;
       case StatusPlano.pausado:
         return EstadoPlano.pausado;
       case StatusPlano.cancelado:
@@ -254,8 +362,11 @@ class PlanoFixo {
   }
 
   static bool _mesmaSemanaDe(DateTime a, DateTime b) {
-    DateTime inicio(DateTime d) =>
-        DateTime(d.year, d.month, d.day).subtract(Duration(days: d.weekday - 1));
+    DateTime inicio(DateTime d) => DateTime(
+      d.year,
+      d.month,
+      d.day,
+    ).subtract(Duration(days: d.weekday - 1));
     return inicio(a) == inicio(b);
   }
 
@@ -304,16 +415,29 @@ class PlanoFixo {
                   '$primeiroNome'
             : 'Plano fixo · envie o valor por visita',
       ),
-      EstadoPlano.valorEnviado => cliente
-          ? BarraPlano(
-              'Plano fixo · confirme o valor',
-              direita: 'R\$ ${valorPorVisita!.round()}/visita',
-              laranja: true,
-            )
-          : BarraPlano(
-              'Plano fixo · aguardando ${clienteFeminina ? 'a' : 'o'} '
-              '$primeiroCliente confirmar',
-            ),
+      EstadoPlano.valorEnviado =>
+        cliente
+            ? BarraPlano(
+                'Plano fixo · confirme o valor',
+                direita: 'R\$ ${valorPorVisita!.round()}/visita',
+                laranja: true,
+              )
+            : BarraPlano(
+                'Plano fixo · aguardando ${clienteFeminina ? 'a' : 'o'} '
+                '$primeiroCliente confirmar',
+              ),
+      // RN-210: o cliente pediu outro valor; o profissional responde.
+      EstadoPlano.outroValorPedido =>
+        cliente
+            ? BarraPlano(
+                'Plano fixo · aguardando ${feminino ? 'a' : 'o'} $primeiroNome',
+                direita: 'R\$ ${valorPorVisita!.round()}/visita',
+              )
+            : BarraPlano(
+                'Plano fixo · responda',
+                direita: 'R\$ ${valorPorVisita!.round()}/visita',
+                laranja: true,
+              ),
       EstadoPlano.ativo => BarraPlano('Plano fixo · $quando', direita: prox),
       EstadoPlano.semVisitaNaSemana => BarraPlano(
         'Sem visita nesta semana',
@@ -389,7 +513,9 @@ class PlanosFixosRepo extends ChangeNotifier {
           .length;
     }
     n += _avulsos
-        .where((a) => a.$1 == pessoa && a.$2 == endereco && _mesmaSemana(a.$3, dia))
+        .where(
+          (a) => a.$1 == pessoa && a.$2 == endereco && _mesmaSemana(a.$3, dia),
+        )
         .length;
     return n;
   }
@@ -423,7 +549,9 @@ class PlanosFixosRepo extends ChangeNotifier {
       .firstOrNull;
 
   PlanoFixo? planoCom(String pessoa) => planos
-      .where((p) => p.profissional == pessoa && p.status != StatusPlano.cancelado)
+      .where(
+        (p) => p.profissional == pessoa && p.status != StatusPlano.cancelado,
+      )
       .firstOrNull;
 
   /// RN-144/RN-145: "Tornar [nome] fixa". Nulo se passaria do limite de
@@ -450,7 +578,9 @@ class PlanosFixosRepo extends ChangeNotifier {
     final avulsos = _avulsos
         .where(
           (a) =>
-              a.$1 == profissional && a.$2 == endereco && _mesmaSemana(a.$3, hoje),
+              a.$1 == profissional &&
+              a.$2 == endereco &&
+              _mesmaSemana(a.$3, hoje),
         )
         .length;
     if (avulsos + visitasPorSemana > RegrasPlanoFixo.maxVisitasSemana) {
@@ -473,28 +603,91 @@ class PlanosFixosRepo extends ChangeNotifier {
     return p;
   }
 
-  /// RN-144: o profissional responde com o valor por visita (uma vez).
+  /// Pendente: o valor na mesa acompanha a negociação.
+  void _mesa(PlanoFixo p, NegociacaoPlano n) {
+    if (p.status == StatusPlano.pendente) p.valorPorVisita = n.valor;
+  }
+
+  /// RN-210: o profissional envia o valor por visita (1ª proposta) ou o
+  /// último (3ª, depois do pedido do cliente).
   bool enviarValor(PlanoFixo p, double porVisita) {
-    if (p.status != StatusPlano.pendente || p.valorPorVisita != null) {
-      return false;
-    }
+    final n = p.negociacaoAberta;
+    if (n == null || !n.vezDoProfissional || n.ultimaProposta) return false;
     if (porVisita <= 0) return false;
-    p.valorPorVisita = porVisita;
+    n.propostas.add(PropostaPlano(porVisita, doCliente: false));
+    _mesa(p, n);
     notifyListeners();
     return true;
   }
 
-  /// Cliente: "Pedir outro valor" (o profissional responde de novo).
-  void pedirOutroValor(PlanoFixo p) {
-    if (p.status != StatusPlano.pendente) return;
-    p.valorPorVisita = null;
+  /// RN-210: o cliente pede outro valor por visita (2ª proposta).
+  bool pedirOutroValor(PlanoFixo p, double porVisita) {
+    final n = p.negociacaoAberta;
+    if (n == null || !n.clientePodePedirOutro || porVisita <= 0) return false;
+    n.propostas.add(PropostaPlano(porVisita, doCliente: true));
+    _mesa(p, n);
+    notifyListeners();
+    return true;
+  }
+
+  /// RN-210: o profissional aceita o valor que o cliente pediu; falta o
+  /// cliente confirmar.
+  bool aceitarValorDoCliente(PlanoFixo p) {
+    final n = p.negociacaoAberta;
+    final v = n?.valor;
+    if (n == null || !n.vezDoProfissional || v == null) return false;
+    n.propostas.add(PropostaPlano(v, doCliente: false, aceite: true));
+    _mesa(p, n);
+    notifyListeners();
+    return true;
+  }
+
+  /// RN-210: o cliente recusa a última proposta. Sem acordo, o plano não
+  /// começa (os avulsos continuam valendo); num plano ativo, fica o valor
+  /// de antes (RN-148).
+  void recusarValor(PlanoFixo p) {
+    final n = p.negociacaoAberta;
+    if (n == null || !n.vezDoCliente) return;
+    n.recusada = true;
+    if (p.status == StatusPlano.pendente) {
+      p
+        ..status = StatusPlano.cancelado
+        ..encerradoEm = clock.now();
+    } else {
+      p.novoValor = null;
+    }
     notifyListeners();
   }
 
-  /// RN-144: o cliente confirma no cartão padrão; o plano fica ativo e
-  /// as visitas do período são marcadas a partir de [inicio].
+  /// Protótipo: a profissional aceita até 5% abaixo do que pediu; senão
+  /// manda a última proposta, no meio do caminho (de 10 em 10).
+  void simularRespostaDoProfissional(PlanoFixo p) {
+    final n = p.negociacaoAberta;
+    final cliente = n?.valor;
+    final pediu = n?.doProfissional;
+    if (n == null || !n.vezDoProfissional || cliente == null || pediu == null) {
+      return;
+    }
+    if (cliente >= pediu * 0.95) {
+      aceitarValorDoCliente(p);
+    } else {
+      enviarValor(p, ((pediu + cliente) / 2 / 10).round() * 10.0);
+    }
+  }
+
+  /// Protótipo: o cliente pede uns 13% a menos (de 10 em 10).
+  void simularPedidoDoCliente(PlanoFixo p) {
+    final v = p.negociacaoAberta?.valor;
+    if (v == null) return;
+    pedirOutroValor(p, (v * 0.87 / 10).round() * 10.0);
+  }
+
+  /// RN-144/RN-210: o cliente confirma no cartão padrão; o plano fica
+  /// ativo e as visitas do período são marcadas a partir de [inicio].
   void confirmar(PlanoFixo p, {required String cartao, DateTime? inicio}) {
-    if (p.status != StatusPlano.pendente || p.valorPorVisita == null) return;
+    if (p.status != StatusPlano.pendente || !p.negociacao.vezDoCliente) {
+      return;
+    }
     p
       ..cartao = cartao
       ..aceitouTermosEm = clock.now()
@@ -516,9 +709,13 @@ class PlanosFixosRepo extends ChangeNotifier {
     var s = 0;
     while (p.visitas.length < p.visitasNoPeriodo) {
       for (final d in p.dias) {
-        final dia = base.add(Duration(days: 7 * s + d - 1, hours: h, minutes: m));
+        final dia = base.add(
+          Duration(days: 7 * s + d - 1, hours: h, minutes: m),
+        );
         if (dia.isBefore(inicio) && s == 0) continue;
-        if (p.visitas.length < p.visitasNoPeriodo) p.visitas.add(VisitaPlano(dia));
+        if (p.visitas.length < p.visitasNoPeriodo) {
+          p.visitas.add(VisitaPlano(dia));
+        }
       }
       s++;
       if (s > semanas + 1) break;
@@ -644,20 +841,23 @@ class PlanosFixosRepo extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// RN-148: mudar o valor é uma nova proposta do profissional…
+  /// RN-148/RN-210: mudar o valor abre a mesma negociação (até 3
+  /// propostas), começando pelo profissional…
   void proporNovoValor(PlanoFixo p, double porVisita) {
     if (p.status != StatusPlano.ativo || porVisita <= 0) return;
-    p.valorProposto = porVisita;
-    notifyListeners();
+    if (p.novoValor != null) return;
+    p.novoValor = NegociacaoPlano();
+    enviarValor(p, porVisita);
   }
 
-  /// …que só vale com o aceite do cliente.
+  /// …e só vale quando o cliente confirma o valor na mesa.
   void aceitarNovoValor(PlanoFixo p) {
-    final v = p.valorProposto;
-    if (v == null) return;
+    final n = p.novoValor;
+    final v = n?.valor;
+    if (n == null || !n.vezDoCliente || v == null) return;
     p
       ..valorPorVisita = v
-      ..valorProposto = null;
+      ..novoValor = null;
     notifyListeners();
   }
 

@@ -1,4 +1,5 @@
 import '../../../shared/widgets/selo_plano_fixo.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -14,7 +15,9 @@ import '../../../data/regras_distancia.dart';
 import '../../../data/atendimento_profissional.dart';
 import 'ainda_vai.dart';
 import '../../../data/profissional.dart';
-import '../../../data/prazos.dart';import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import '../../../data/prazos.dart';
+
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
@@ -39,6 +42,7 @@ import '../../../data/denuncias.dart';
 import '../../entrada/denunciar_mensagem.dart';
 import '../../entrada/ligacao_page.dart';
 import '../../../data/ligacao.dart';
+
 import 'package:clock/clock.dart';
 
 import '../../../data/retorno.dart';
@@ -46,6 +50,7 @@ import '../retorno/retorno_profissional.dart';
 
 import '../../../data/plano_fixo.dart';
 import '../plano_fixo/plano_fixo_profissional.dart';
+import '../../cliente/plano_fixo/plano_fixo.dart' show respostaValorPlano;
 
 /// Cada lado pode propor até 3 valores.
 const maxRodadas = 3;
@@ -104,7 +109,10 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
       ...widget.mensagens!
     // RN-179: "Pedir de novo" aceito: a conversa é a mesma, o pedido é novo.
     else if (widget.chamado.pediuDeNovo) ...[
-      ('Oi, ${widget.chamado.primeiroNome}! Aceitei, já te mando o valor.', true),
+      (
+        'Oi, ${widget.chamado.primeiroNome}! Aceitei, já te mando o valor.',
+        true,
+      ),
     ] else if (widget.chamado.distancia) ...[
       ('Oi, ${widget.chamado.primeiroNome}! Que estilo você imagina?', true),
       ('Algo simples e colorido.', false),
@@ -130,6 +138,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    _timerPlano?.cancel();
     _prazoSaida?.cancel();
     _campo.dispose();
     super.dispose();
@@ -232,12 +241,25 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     );
   }
 
-  /// RN-144: o profissional responde com o valor por visita (uma vez).
+  /// RN-144/RN-210: o profissional envia o valor por visita (1ª
+  /// proposta) ou o último (3ª).
   Future<void> _valorDoPlano(PlanoFixo p) async {
-    final v = await pedirValorPlano(context, p);
+    final n = p.negociacaoAberta;
+    final ultimo = n != null && n.propostas.isNotEmpty;
+    final v = await pedirValorPlano(context, p, ultimo: ultimo);
     if (v == null || !mounted) return;
-    planosFixos.enviarValor(p, v);
+    if (!planosFixos.enviarValor(p, v) || ultimo) return;
+    // Protótipo: o cliente pede outro valor (P147).
+    final espera = respostaValorPlano;
+    if (espera == null) return;
+    _timerPlano?.cancel();
+    _timerPlano = Timer(espera, () => planosFixos.simularPedidoDoCliente(p));
   }
+
+  Timer? _timerPlano;
+
+  /// P147 · RN-210: aceita o valor que o cliente pediu.
+  void _aceitarValorPlano(PlanoFixo p) => planosFixos.aceitarValorDoCliente(p);
 
   /// RN-202/RN-205: o plano com este cliente, mesmo encerrado.
   PlanoFixo? get _planoVisivel =>
@@ -276,26 +298,54 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     final p = _planoVisivel;
     if (p == null) return const [];
     final estado = p.estado();
+    // RN-148/RN-210: plano ativo com um novo valor em negociação.
+    final novo = p.status == StatusPlano.ativo ? p.novoValor : null;
     // RN-202: com o plano em andamento, a barra no topo já mostra.
-    if (estado != EstadoPlano.aguardandoValor &&
+    if (novo == null &&
+        estado != EstadoPlano.aguardandoValor &&
         estado != EstadoPlano.valorEnviado &&
+        estado != EstadoPlano.outroValorPedido &&
         estado != EstadoPlano.encerrado) {
       return const [];
     }
+    final n = novo ?? p.negociacao;
+    final cliente = '${p.clienteFeminina ? 'a' : 'o'} ${p.primeiroCliente}';
+    final valor = n.valor;
     return [
       const SizedBox(height: 18),
-      // RN-205: encerrado: só o divisor.
+      // RN-205: encerrado: só o divisor. RN-210: sem acordo.
       if (estado == EstadoPlano.encerrado)
         MarcadorChat(
-          'Plano fixo encerrado · ${diaMes(p.encerradoEm ?? clock.now())}',
+          p.semAcordo
+              ? 'Plano fixo sem acordo · '
+                    '${diaMes(p.encerradoEm ?? clock.now())}'
+              : 'Plano fixo encerrado · '
+                    '${diaMes(p.encerradoEm ?? clock.now())}',
         )
-      else if (p.status == StatusPlano.pendente && p.valorPorVisita == null)
+      else if (n.propostas.isEmpty)
         CartaoPedidoPlano(plano: p, onEnviarValor: () => _valorDoPlano(p))
+      // P147 · RN-210: o cliente pediu outro valor.
+      else if (n.vezDoProfissional)
+        CartaoOutroValorPlano(
+          plano: p,
+          novoValor: novo != null,
+          onAceitar: () => _aceitarValorPlano(p),
+          onEnviarOutro: () => _valorDoPlano(p),
+        )
+      else if (n.aceita)
+        NotaChat(
+          'Você aceitou ${reaisInteiros(valor!)} por visita. '
+          'Aguardando $cliente confirmar.',
+        )
+      else if (n.ultimaProposta)
+        NotaChat(
+          'Último valor enviado · ${reaisInteiros(valor!)} por visita. '
+          'Aguardando $cliente.',
+        )
       else
         NotaChat(
-          'Valor do plano enviado · ${reaisInteiros(p.valorPorVisita!)} por '
-          'visita. Aguardando ${p.clienteFeminina ? 'a' : 'o'} '
-          '${p.primeiroCliente}.',
+          'Valor do plano enviado · ${reaisInteiros(valor!)} por '
+          'visita. Aguardando $cliente.',
         ),
     ];
   }
@@ -304,8 +354,9 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   bool get _podeLigar => RegrasLigacao.disponivel(
     valorConfirmado: _estado == EstadoValor.combinado,
     concluido: false,
-    encerrado:
-        atendimentoProfissional.encerrados.containsKey(widget.chamado.cliente),
+    encerrado: atendimentoProfissional.encerrados.containsKey(
+      widget.chamado.cliente,
+    ),
   );
 
   /// RN-140: o balão aparece uma vez, quando o ligar é liberado.
@@ -374,8 +425,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   void _clienteResponde() {
     if (!mounted) return;
     // RN-181: protótipo: o novo valor pelo chat é confirmado pelo cliente.
-    final aceita =
-        _concluida || (_rodada > 1 && _meuValor <= _proposta * 1.15);
+    final aceita = _concluida || (_rodada > 1 && _meuValor <= _proposta * 1.15);
     if (aceita) {
       setState(() {
         _combinado = _meuValor;
@@ -710,10 +760,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
       final p = corpo.substring(8).split('|');
       return GestureDetector(
         onLongPress: () => _denunciarArquivo(t, p.first),
-        child: BalaoArquivo(
-          nome: p.first,
-          detalhe: p.length > 1 ? p[1] : '',
-        ),
+        child: BalaoArquivo(nome: p.first, detalhe: p.length > 1 ? p[1] : ''),
       );
     }
     if (corpo.startsWith('nota:')) return MarcadorChat(corpo.substring(5));
@@ -775,57 +822,59 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
           : null,
       topo: fim != null
           ? const TopoContaIndisponivel(detalhe: 'Cliente')
-          : _comBarraDoPlano(Row(
-        children: [
-          const BackCircleButton(),
-          Expanded(
-            child: Semantics(
-              container: true,
-              button: true,
-              label: 'Opções da conversa',
-              child: GestureDetector(
-                onTap: _menu,
-                behavior: HitTestBehavior.opaque,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AvatarIniciais(nome: c.cliente),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            c.cliente,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
+          : _comBarraDoPlano(
+              Row(
+                children: [
+                  const BackCircleButton(),
+                  Expanded(
+                    child: Semantics(
+                      container: true,
+                      button: true,
+                      label: 'Opções da conversa',
+                      child: GestureDetector(
+                        onTap: _menu,
+                        behavior: HitTestBehavior.opaque,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            AvatarIniciais(nome: c.cliente),
+                            const SizedBox(width: 10),
+                            Flexible(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    c.cliente,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  // RN-202: "Cliente · Plano fixo".
+                                  Text(
+                                    _barraPlano == null
+                                        ? 'Cliente'
+                                        : 'Cliente · Plano fixo',
+                                    style: TatuTexto.nota,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          // RN-202: "Cliente · Plano fixo".
-                          Text(
-                            _barraPlano == null
-                                ? 'Cliente'
-                                : 'Cliente · Plano fixo',
-                            style: TatuTexto.nota,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  // RN-140: o telefone só aparece com o valor confirmado.
+                  if (_podeLigar)
+                    BotaoLigar(onTap: _ligar)
+                  else
+                    const SizedBox(width: 48),
+                ],
               ),
             ),
-          ),
-          // RN-140: o telefone só aparece com o valor confirmado.
-          if (_podeLigar)
-            BotaoLigar(onTap: _ligar)
-          else
-            const SizedBox(width: 48),
-        ],
-      )),
       mensagens: [
         CartaoPedidoChat(
           rotulo: 'Chamado',
@@ -861,7 +910,8 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
           if (_concluida && i == _antes) ..._marco(),
           Padding(
             padding: EdgeInsets.only(
-              top: m.$1.startsWith(_esp) ||
+              top:
+                  m.$1.startsWith(_esp) ||
                       (i > 0 && _mensagens[i - 1].$1.startsWith(_esp))
                   ? 18
                   : espacoAntesDoBalao(
@@ -886,13 +936,8 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
         if (_concluida && _mensagens.length == _antes) ..._marco(),
         if (fim == null) ..._planoNoChat(),
         // P152 a P155 · RN-186: pedido de retorno deste cliente.
-        if (fim == null ? retornos.doCliente(c.cliente) : null
-            case final r?)
-          ...secaoRetornoProfissional(
-            context,
-            r,
-            onOutroValor: _enviarValor,
-          ),
+        if (fim == null ? retornos.doCliente(c.cliente) : null case final r?)
+          ...secaoRetornoProfissional(context, r, onOutroValor: _enviarValor),
         const SizedBox(height: TatuMedidas.entreSecoes),
         if (fim != null) ...[
           // RN-131: o Tatu avisa o que o profissional recebe.
@@ -902,7 +947,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
             NotaChat(fim.nota!),
           ],
         ] else
-        ...switch (_estado) {
+          ...switch (_estado) {
             EstadoValor.inicio => const <Widget>[],
             // P104 · RN-181: novo valor no chat de um serviço concluído.
             EstadoValor.aguardando when _concluida => [
@@ -989,10 +1034,10 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
                       spacing: 8,
                       children: [
                         if (!c.distancia)
-                        TatuChip(
-                          label: 'Estou a caminho',
-                          onTap: () => _enviar('Estou a caminho'),
-                        ),
+                          TatuChip(
+                            label: 'Estou a caminho',
+                            onTap: () => _enviar('Estou a caminho'),
+                          ),
                         TatuChip(
                           label: c.distancia ? 'Mandar arquivo' : 'Mandar foto',
                           onTap: () => _emBreve('Mandar foto'),
@@ -1010,7 +1055,9 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
                 if (_estado == EstadoValor.combinado) ...[
                   FilledButton(
                     onPressed: c.distancia ? _comecarDistancia : _irAteOCliente,
-                    child: Text(c.distancia ? 'Ver em andamento' : 'Estou a caminho'),
+                    child: Text(
+                      c.distancia ? 'Ver em andamento' : 'Estou a caminho',
+                    ),
                   ),
                   const SizedBox(height: TatuMedidas.entreItens),
                 ],
@@ -1283,7 +1330,7 @@ class _EnderecoLiberado extends StatelessWidget {
   }
 }
 
-/// P28 · RN-211: o cliente recusou o último valor: o chamado é encerrado
+/// P28 · RN-213: o cliente recusou o último valor: o chamado é encerrado
 /// sem custo e não conta contra o profissional (nem como cancelamento,
 /// RN-64, nem como abandono, RN-79).
 class SemAcordoPage extends StatelessWidget {
@@ -1384,10 +1431,7 @@ class _FolhaAnexo extends StatelessWidget {
           children: [
             const AlcaFolha(),
             const SizedBox(height: 22),
-            const Text(
-              'O que você vai mandar?',
-              style: TatuTexto.tituloFolha,
-            ),
+            const Text('O que você vai mandar?', style: TatuTexto.tituloFolha),
             const SizedBox(height: TatuMedidas.entreItens + 4),
             opcao(
               icone: TablerIcons.lock,

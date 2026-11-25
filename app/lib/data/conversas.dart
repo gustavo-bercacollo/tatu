@@ -255,7 +255,7 @@ class Conversa {
 
   bool get encerrada => encerramento != null;
 
-  /// RN-210/RN-211: o cliente recusou o último valor. A conversa fica só
+  /// RN-212/RN-213: o cliente recusou o último valor. A conversa fica só
   /// para leitura, com "Sem acordo de valor", e sai de "Em andamento".
   bool semAcordo = false;
 
@@ -487,7 +487,7 @@ class ConversasRepo extends ChangeNotifier {
     return c;
   }
 
-  /// RN-210: o cliente recusou o 3º valor: nada é cobrado e a conversa
+  /// RN-212: o cliente recusou o 3º valor: nada é cobrado e a conversa
   /// fica só para leitura.
   void recusarValor(Conversa c) {
     c.semAcordo = true;

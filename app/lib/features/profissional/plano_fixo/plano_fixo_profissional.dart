@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
+import '../../../core/theme/tatu_theme.dart';
 import '../../../data/plano_fixo.dart';
 import '../../../data/profissional.dart' show taxaTatu;
 import '../../../shared/formatadores.dart';
@@ -13,7 +14,8 @@ import '../../../shared/widgets/tatu_field.dart';
 import '../../../shared/widgets/tela_interna.dart';
 import '../../cliente/plano_fixo/plano_fixo.dart';
 
-String _maiuscula(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+String _maiuscula(String s) =>
+    s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 
 /// P130 · RN-144: o pedido de plano do cliente chega no chat.
 class CartaoPedidoPlano extends StatelessWidget {
@@ -94,15 +96,159 @@ class CartaoPedidoPlano extends StatelessWidget {
   }
 }
 
-/// P131 · RN-144/RN-146: o profissional define o valor por visita uma
-/// vez. Devolve o valor.
-Future<double?> pedirValorPlano(BuildContext context, PlanoFixo plano) =>
-    mostrarFolha<double>(context, builder: (_) => _FolhaValorPlano(plano));
-
-class _FolhaValorPlano extends StatefulWidget {
-  const _FolhaValorPlano(this.plano);
+/// P147 · RN-210: o cliente pediu outro valor por visita. A profissional
+/// aceita ou envia o último valor (3 de 3).
+class CartaoOutroValorPlano extends StatelessWidget {
+  const CartaoOutroValorPlano({
+    super.key,
+    required this.plano,
+    required this.onAceitar,
+    required this.onEnviarOutro,
+    this.novoValor = false,
+  });
 
   final PlanoFixo plano;
+  final VoidCallback onAceitar;
+  final VoidCallback onEnviarOutro;
+
+  /// RN-148: negociação de um novo valor num plano ativo.
+  final bool novoValor;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = plano;
+    final n = (novoValor ? p.novoValor : null) ?? p.negociacao;
+    final pediu = n.valor ?? 0;
+    final voce = n.doProfissional;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          '${p.primeiroCliente} pediu outro valor',
+          textAlign: TextAlign.center,
+          style: TatuTexto.legenda,
+        ),
+        const SizedBox(height: 10),
+        FractionallySizedBox(
+          alignment: Alignment.centerLeft,
+          widthFactor: 0.91,
+          child: Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+              border: Border.all(color: TatuColors.action, width: 1.5),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Plano fixo · ${p.mensal ? 'Mensal' : 'Semanal'}',
+                        style: TatuTexto.nota,
+                      ),
+                    ),
+                    Text(
+                      'Proposta ${n.numero} de ${RegrasPlanoFixo.maxPropostas}',
+                      style: TatuTexto.legenda.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  // RN-210: o total é sempre calculado.
+                  '${reaisInteiros(pediu * p.visitasNoPeriodo)} por '
+                  '${p.periodo}',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.4,
+                  ),
+                ),
+                const SizedBox(height: TatuMedidas.entreItens),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: TatuColors.surfaceGrouped,
+                    borderRadius: BorderRadius.circular(TatuMedidas.raioCaixa),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${_maiuscula(p.quando)} · ${p.visitasNoPeriodo} '
+                        'visita${p.visitasNoPeriodo == 1 ? '' : 's'}',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${reaisInteiros(pediu)} por visita'
+                        '${voce == null ? '' : ' · você pediu ${reaisInteiros(voce)}'}',
+                        style: TatuTexto.nota,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Cobrado no fim do ${p.periodo}, só pelas visitas feitas.',
+                  style: TatuTexto.legenda,
+                ),
+                const SizedBox(height: TatuMedidas.entreItens),
+                FilledButton(
+                  onPressed: onAceitar,
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(
+                      TatuMedidas.alturaBotaoCartao,
+                    ),
+                  ),
+                  child: Text('Aceitar ${reaisInteiros(pediu)} por visita'),
+                ),
+                const SizedBox(height: 8),
+                FilledButton(
+                  onPressed: onEnviarOutro,
+                  style: tatuBotaoSecundario().copyWith(
+                    minimumSize: const WidgetStatePropertyAll(
+                      Size.fromHeight(TatuMedidas.alturaBotaoCartao),
+                    ),
+                  ),
+                  child: const Text('Enviar outro valor'),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: TatuMedidas.entreItens),
+        Text(
+          'Seu próximo valor será o último '
+          '(${RegrasPlanoFixo.maxPropostas} de ${RegrasPlanoFixo.maxPropostas}).',
+          textAlign: TextAlign.center,
+          style: TatuTexto.legenda,
+        ),
+      ],
+    );
+  }
+}
+
+/// P131 · RN-144/RN-146/RN-210: o profissional define o valor por visita
+/// (1ª proposta) ou envia o último ([ultimo], 3ª). Devolve o valor.
+Future<double?> pedirValorPlano(
+  BuildContext context,
+  PlanoFixo plano, {
+  bool ultimo = false,
+}) => mostrarFolha<double>(
+  context,
+  builder: (_) => _FolhaValorPlano(plano, ultimo: ultimo),
+);
+
+class _FolhaValorPlano extends StatefulWidget {
+  const _FolhaValorPlano(this.plano, {this.ultimo = false});
+
+  final PlanoFixo plano;
+  final bool ultimo;
 
   @override
   State<_FolhaValorPlano> createState() => _FolhaValorPlanoState();
@@ -164,7 +310,11 @@ class _FolhaValorPlanoState extends State<_FolhaValorPlano> {
               const Text('Valor do plano', style: TatuTexto.tituloFolha),
               const SizedBox(height: 4),
               Text(
-                'Você define uma vez. Vale todo ${p.periodo}.',
+                widget.ultimo
+                    ? 'É o seu último valor '
+                          '(${RegrasPlanoFixo.maxPropostas} de '
+                          '${RegrasPlanoFixo.maxPropostas}).'
+                    : 'Vale todo ${p.periodo}.',
                 style: TatuTexto.nota,
               ),
               const SizedBox(height: TatuMedidas.entreItens + 4),

@@ -248,11 +248,23 @@ void main() {
       await t.pump();
       expect(find.text('Luiza enviou o valor do plano'), findsOneWidget);
       expect(find.text('R\$ 600 por mês'), findsOneWidget);
+      // RN-210: "Proposta 1 de 3" e "Pedir outro valor" dentro do card.
+      expect(find.text('Proposta 1 de 3'), findsOneWidget);
       await t.scrollUntilVisible(
-        find.text('Confirmar plano'),
+        find.text('Pedir outro valor'),
         200,
         scrollable: find.byType(Scrollable).first,
       );
+      expect(
+        find.ancestor(
+          of: find.text('Pedir outro valor'),
+          matching: find.byType(CartaoPropostaPlano),
+        ),
+        findsOneWidget,
+      );
+      // Tira o botão de baixo da barra de mensagem.
+      await t.drag(find.byType(Scrollable).first, const Offset(0, -200));
+      await t.pumpAndSettle();
       await t.tap(find.text('Confirmar plano'));
       await t.pumpAndSettle();
       expect(find.byType(PlanoFixoPage), findsOneWidget);

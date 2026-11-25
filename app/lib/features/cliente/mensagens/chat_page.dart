@@ -1,4 +1,5 @@
 import '../../../shared/widgets/selo_plano_fixo.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ import '../atividade/pedido_andamento_page.dart';
 import '../foto/camera_desativada_page.dart';
 import '../atividade/pedido_concluido_page.dart';
 import '../pagamento/pagamento_page.dart';
+
 import 'package:clock/clock.dart';
 
 import '../../../data/retorno.dart';
@@ -320,18 +322,20 @@ class _ChatPageState extends State<ChatPage> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => AvaliarPage(
-          pedido: feito ?? PedidoConcluido(
-            servico: _c.servico,
-            profissao: _c.profissao,
-            profissional: _c.nome,
-            descricao: _c.descricao,
-            endereco: _c.rua,
-            pagamento: pagamentos.padrao?.curto ?? 'Pix',
-            valor: v == null ? '' : reais(v.total),
-            dia: 'hoje',
-            hora: '',
-            mes: 'Novembro',
-          ),
+          pedido:
+              feito ??
+              PedidoConcluido(
+                servico: _c.servico,
+                profissao: _c.profissao,
+                profissional: _c.nome,
+                descricao: _c.descricao,
+                endereco: _c.rua,
+                pagamento: pagamentos.padrao?.curto ?? 'Pix',
+                valor: v == null ? '' : reais(v.total),
+                dia: 'hoje',
+                hora: '',
+                mes: 'Novembro',
+              ),
         ),
       ),
     );
@@ -462,7 +466,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  /// RN-210: "Recusar valor" no 3º valor: chamar outro ou cancelar.
+  /// RN-212: "Recusar valor" no 3º valor: chamar outro ou cancelar.
   Future<void> _recusar() async {
     final ela = '${_c.artigo} ${_c.primeiroNome}';
     final chamarOutro = await perguntar(
@@ -477,7 +481,7 @@ class _ChatPageState extends State<ChatPage> {
       iconeAviso: false,
     );
     if (chamarOutro == null || !mounted) return;
-    // RN-211: sem custo; o pedido com ela sai e ela não volta.
+    // RN-213: sem custo; o pedido com ela sai e ela não volta.
     conversas.recusarValor(_c);
     final p = pedidos.semAcordo(_c.nome);
     if (chamarOutro) {
@@ -692,7 +696,8 @@ class _ChatPageState extends State<ChatPage> {
             // RN-136: ver o perfil pelo nome e pela foto do topo.
             ItemLista(
               icone: TablerIcons.user,
-              texto: 'Ver perfil ${_c.artigo == 'a' ? 'da' : 'do'} '
+              texto:
+                  'Ver perfil ${_c.artigo == 'a' ? 'da' : 'do'} '
                   '${_c.primeiroNome}',
               seta: false,
               onTap: () => ir(4),
@@ -802,7 +807,12 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   /// RN-144: o cliente confirma no cartão padrão e o plano fica ativo.
+  /// RN-148: num plano ativo, confirma o novo valor.
   void _confirmarPlano(PlanoFixo p) {
+    if (p.status == StatusPlano.ativo) {
+      planosFixos.aceitarNovoValor(p);
+      return;
+    }
     planosFixos.confirmar(
       p,
       cartao: pagamentos.padrao?.titulo ?? 'Visa final 4242',
@@ -812,11 +822,33 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  /// Pedir outro valor: o profissional responde de novo (protótipo).
-  void _outroValorPlano(PlanoFixo p) {
-    planosFixos.pedirOutroValor(p);
+  /// C218 · RN-210: o cliente diz quanto quer pagar por visita; a
+  /// profissional aceita ou manda o último valor (protótipo).
+  Future<void> _outroValorPlano(PlanoFixo p) async {
+    final v = await pedirValorPorVisita(
+      context,
+      p,
+      novoValor: p.status == StatusPlano.ativo,
+    );
+    if (v == null || !mounted) return;
+    if (!planosFixos.pedirOutroValor(p, v)) return;
     _timer?.cancel();
-    _timer = Timer(widget.resposta, () => planosFixos.enviarValor(p, 140));
+    _timer = Timer(
+      widget.resposta,
+      () => planosFixos.simularRespostaDoProfissional(p),
+    );
+  }
+
+  /// C219 · RN-210: recusa a última proposta. Sem acordo, o plano não
+  /// começa (num plano ativo, fica o valor de hoje).
+  void _recusarPlano(PlanoFixo p) => planosFixos.recusarValor(p);
+
+  /// RN-210: "Último serviço avulso com a [nome]: R$ X".
+  double? get _ultimoAvulso {
+    final c = pedidos.concluidos
+        .where((x) => x.profissional == _c.nome)
+        .firstOrNull;
+    return c == null ? null : lerReais(c.valor);
   }
 
   /// RN-202/RN-205: o plano com esta pessoa, mesmo encerrado.
@@ -845,27 +877,49 @@ class _ChatPageState extends State<ChatPage> {
     final p = _planoVisivel;
     if (p == null || _c.encerrada) return const [];
     final estado = p.estado();
+    // RN-148/RN-210: plano ativo com um novo valor em negociação.
+    final novo = p.status == StatusPlano.ativo ? p.novoValor : null;
     // RN-202: ativo, pausado ou cancelado: a barra no topo já mostra.
-    if (estado != EstadoPlano.aguardandoValor &&
+    if (novo == null &&
+        estado != EstadoPlano.aguardandoValor &&
         estado != EstadoPlano.valorEnviado &&
+        estado != EstadoPlano.outroValorPedido &&
         estado != EstadoPlano.encerrado) {
       return const [];
     }
+    final n = novo ?? p.negociacao;
+    final para = '${_c.artigo == 'a' ? 'a' : 'o'} ${_c.primeiroNome}';
     return [
       const SizedBox(height: 18),
       // RN-205: encerrado: sem selo e sem barra, só o divisor.
+      // RN-210: sem acordo, o plano não começou.
       if (estado == EstadoPlano.encerrado)
         MarcadorChat(
-          'Plano fixo encerrado · ${diaMes(p.encerradoEm ?? clock.now())}',
+          p.semAcordo
+              ? 'Plano fixo sem acordo · '
+                    '${diaMes(p.encerradoEm ?? clock.now())}'
+              : 'Plano fixo encerrado · '
+                    '${diaMes(p.encerradoEm ?? clock.now())}',
         )
-      else if (p.status == StatusPlano.pendente && p.valorPorVisita == null)
-        NotaChat('Pedido de plano fixo enviado ${_c.artigo == 'a' ? 'à' : 'ao'} '
-            '${_c.primeiroNome}.')
-      else if (p.status == StatusPlano.pendente)
+      else if (n.propostas.isEmpty)
+        NotaChat(
+          'Pedido de plano fixo enviado ${_c.artigo == 'a' ? 'à' : 'ao'} '
+          '${_c.primeiroNome}.',
+        )
+      // RN-210: o cliente pediu outro valor; aguarda a resposta.
+      else if (n.vezDoProfissional)
+        NotaChat(
+          'Você pediu ${reaisInteiros(n.valor!)} por visita. '
+          'Aguardando $para.',
+        )
+      else
         CartaoPropostaPlano(
           plano: p,
+          novoValor: novo != null,
+          ultimoAvulso: _ultimoAvulso,
           onConfirmar: () => _confirmarPlano(p),
           onOutroValor: () => _outroValorPlano(p),
+          onRecusar: () => _recusarPlano(p),
           onTrocarCartao: () => _emBreve(context, 'Trocar cartão'),
         ),
     ];
@@ -898,7 +952,8 @@ class _ChatPageState extends State<ChatPage> {
     if (motivo == null || !mounted) return;
     final textos = [
       for (final x in _c.mensagens)
-        if (x.texto != null && !x.denunciada) '${x.minha ? 'Eu' : _c.primeiroNome}: ${x.texto}',
+        if (x.texto != null && !x.denunciada)
+          '${x.minha ? 'Eu' : _c.primeiroNome}: ${x.texto}',
     ];
     final i = textos.indexOf('${_c.primeiroNome}: $texto');
     denuncias.denunciarMensagem(
@@ -955,9 +1010,7 @@ class _ChatPageState extends State<ChatPage> {
                 ),
           // C104 · RN-140: o ligar acabou de ser liberado.
           sobre: _c.podeLigar && !_c.dicaLigarVista
-              ? BalaoLigarLiberado(
-                  onFechar: () => conversas.verDicaLigar(_c),
-                )
+              ? BalaoLigarLiberado(onFechar: () => conversas.verDicaLigar(_c))
               : null,
           rodapeColado: fim != null || _c.semAcordo,
           mensagens: [
@@ -1094,7 +1147,7 @@ class _ChatPageState extends State<ChatPage> {
                 NotaChat(fim.nota!),
               ],
             ] else if (_c.semAcordo) ...[
-              // RN-211: só leitura depois da recusa do último valor.
+              // RN-213: só leitura depois da recusa do último valor.
               const SizedBox(height: TatuMedidas.entreSecoes),
               const MarcadorChat('Sem acordo de valor'),
             ] else ...[
@@ -1111,29 +1164,29 @@ class _ChatPageState extends State<ChatPage> {
           rodape: fim != null || _c.semAcordo
               ? const RodapeConversaEncerrada()
               : Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (conversas.semInternet || algumaFalhou) ...[
-                const _SemInternet(),
-                const SizedBox(height: TatuMedidas.entreItens),
-              ],
-              if (_mostraDicaPedirDeNovo) ...[
-                DicaPedirDeNovo(onPedir: _pedirDeNovo),
-                const SizedBox(height: TatuMedidas.entreItens),
-              ],
-              // RN-85: contato não passa pelo chat.
-              BarraMensagem(
-                controller: _campo,
-                onEnviar: _enviar,
-                onCamera: _anexar,
-                porQue:
-                    // RN-107: garantia de 24 horas por serviço.
-                    'Pelo Tatu o serviço tem garantia de 24h. Chame '
-                    '${_c.artigo} ${_c.primeiroNome} de novo pelo app.',
-              ),
-            ],
-          ),
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (conversas.semInternet || algumaFalhou) ...[
+                      const _SemInternet(),
+                      const SizedBox(height: TatuMedidas.entreItens),
+                    ],
+                    if (_mostraDicaPedirDeNovo) ...[
+                      DicaPedirDeNovo(onPedir: _pedirDeNovo),
+                      const SizedBox(height: TatuMedidas.entreItens),
+                    ],
+                    // RN-85: contato não passa pelo chat.
+                    BarraMensagem(
+                      controller: _campo,
+                      onEnviar: _enviar,
+                      onCamera: _anexar,
+                      porQue:
+                          // RN-107: garantia de 24 horas por serviço.
+                          'Pelo Tatu o serviço tem garantia de 24h. Chame '
+                          '${_c.artigo} ${_c.primeiroNome} de novo pelo app.',
+                    ),
+                  ],
+                ),
         );
       },
     );
