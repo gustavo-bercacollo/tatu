@@ -73,6 +73,7 @@ Publicado em https://claude.ai/artifact/UbvPYpEqyP5sWj9cbtvT7B. Fonte: `docs/flu
 ## Como trabalhar
 - Uma tela ou componente por vez. Cada tela a partir do SVG correspondente, com os estados do guia (vazio, carregando, erro).
 - Commit a cada tela/componente pronto; atualizar `PROGRESSO.md`.
+- Economia de uso (pedido do Gustavo, 25/11/2026): tarefas simples que só leem e resumem (procurar onde algo está, listar arquivos, ler um zip ou documento grande e trazer só o que importa, conferir se uma RN aparece no app) vão para o subagente `tarefa-simples` (`.claude/agents/tarefa-simples.md`, modelo Haiku, só leitura). Edição, decisão, testes, build, commit e publicação continuam na sessão principal. Não usar subagente para algo que se resolve em 1–2 buscas diretas: abrir um subagente também gasta.
 - Ordem: 1) tema + Inter + componentes base → 2) fluxo do cliente (Home → Endereço → Procurando → Encontrado → Perfil → Chat/valor → Pagamento → Avaliação → Atividade/Mensagens/Perfil) → 3) fluxo do profissional (Cadastro → Home on/offline → Novo chamado → Chat → Andamento → Cobrança → Ganhos → Perfil) → 4) mocks simulando a busca para demo.
 
 ## Comandos
