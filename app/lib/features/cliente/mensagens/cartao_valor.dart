@@ -144,7 +144,7 @@ class CartaoValorRecebido extends StatelessWidget {
     this.nome = '',
   });
 
-  /// RN-200: no 3º valor (sem [onPedirOutro]), "Recusar valor".
+  /// RN-206: no 3º valor (sem [onPedirOutro]), "Recusar valor".
   final VoidCallback? onRecusar;
 
   /// "a Marina" (para "O sinal paga o tempo da Marina.").
@@ -227,7 +227,7 @@ class CartaoValorRecebido extends StatelessWidget {
               : 'Reservamos agora. Só cobramos no fim.',
           style: TatuTexto.nota,
         ),
-        // RN-200: avisa antes que este é o último valor.
+        // RN-206: avisa antes que este é o último valor.
         if (onPedirOutro == null && onRecusar != null) ...[
           const SizedBox(height: 6),
           Text(
@@ -257,23 +257,30 @@ class CartaoValorRecebido extends StatelessWidget {
 
 /// Valor confirmado: reservado na forma de pagamento.
 class CartaoValorConfirmado extends StatelessWidget {
-  const CartaoValorConfirmado({super.key, required this.valor});
+  const CartaoValorConfirmado({
+    super.key,
+    required this.valor,
+    this.avulso = false,
+  });
 
   final ValorProposta valor;
+
+  /// RN-203: com plano fixo, "Valor combinado · avulso".
+  final bool avulso;
 
   @override
   Widget build(BuildContext context) {
     final cartao = pagamentos.padrao;
     return _Cartao(
       children: [
-        const Row(
+        Row(
           children: [
-            Icon(TablerIcons.circle_check_filled,
+            const Icon(TablerIcons.circle_check_filled,
                 size: 20, color: TatuColors.online),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Text(
-              'Valor confirmado',
-              style: TextStyle(
+              avulso ? 'Valor combinado · avulso' : 'Valor confirmado',
+              style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: TatuColors.onlineTexto,

@@ -82,6 +82,28 @@ abstract final class RegrasPlanoFixo {
   static double comissao(double total) => total * pro.taxaTatu;
 }
 
+/// RN-205: estado do plano, do jeito que o selo e a barra mostram.
+enum EstadoPlano {
+  aguardandoValor,
+  valorEnviado,
+  ativo,
+  semVisitaNaSemana,
+  pausado,
+  cancelado,
+  encerrado,
+}
+
+/// RN-202/RN-205: barra fixa no chat ("Plano fixo · toda terça, 9h ·
+/// Próxima: 25 nov ›"). [laranja] só quando o cliente precisa agir.
+@immutable
+class BarraPlano {
+  const BarraPlano(this.texto, {this.direita, this.laranja = false});
+
+  final String texto;
+  final String? direita;
+  final bool laranja;
+}
+
 /// Uma visita do plano.
 class VisitaPlano {
   VisitaPlano(this.dia);
@@ -177,6 +199,111 @@ class PlanoFixo {
   /// Cobranças já feitas (RN-146).
   final cobrancas = <CobrancaPlano>[];
 
+  /// RN-205: quando o plano acabou de vez (cancelado e fora do período).
+  DateTime? encerradoEm;
+
+  /// RN-205: estado para o selo e a barra.
+  EstadoPlano estado([DateTime? agora]) {
+    final hoje = agora ?? clock.now();
+    switch (status) {
+      case StatusPlano.pendente:
+        return valorPorVisita == null
+            ? EstadoPlano.aguardandoValor
+            : EstadoPlano.valorEnviado;
+      case StatusPlano.pausado:
+        return EstadoPlano.pausado;
+      case StatusPlano.cancelado:
+        return EstadoPlano.encerrado;
+      case StatusPlano.ativo:
+        if (noProximoPeriodo == StatusPlano.cancelado) {
+          return EstadoPlano.cancelado;
+        }
+        final semana = visitas.where((v) => _mesmaSemanaDe(v.dia, hoje));
+        final temNaSemana = semana.any(
+          (v) =>
+              v.situacao == SituacaoVisita.agendada ||
+              v.situacao == SituacaoVisita.feita,
+        );
+        return temNaSemana ? EstadoPlano.ativo : EstadoPlano.semVisitaNaSemana;
+    }
+  }
+
+  static bool _mesmaSemanaDe(DateTime a, DateTime b) {
+    DateTime inicio(DateTime d) =>
+        DateTime(d.year, d.month, d.day).subtract(Duration(days: d.weekday - 1));
+    return inicio(a) == inicio(b);
+  }
+
+  /// RN-200/RN-205: texto do selo (nulo = sem selo).
+  String? selo([DateTime? agora]) => switch (estado(agora)) {
+    EstadoPlano.ativo || EstadoPlano.semVisitaNaSemana => 'Plano fixo',
+    EstadoPlano.pausado => 'Plano pausado',
+    EstadoPlano.cancelado =>
+      'Plano até ${diaMes(proximaCobranca ?? clock.now())}',
+    _ => null,
+  };
+
+  /// RN-205: "Plano pausado" fica cinza apagado.
+  bool get seloApagado => status == StatusPlano.pausado;
+
+  /// Próxima visita marcada (nula se não houver).
+  VisitaPlano? get proximaVisita => proximas.firstOrNull;
+
+  /// RN-203: "visita 3 de 4" (posição no período).
+  int numeroDa(VisitaPlano v) => visitas.indexOf(v) + 1;
+
+  /// RN-204: visita marcada para hoje (nula se não houver).
+  VisitaPlano? visitaDeHoje([DateTime? agora]) {
+    final hoje = agora ?? clock.now();
+    if (status != StatusPlano.ativo) return null;
+    return visitas
+        .where(
+          (v) =>
+              v.situacao == SituacaoVisita.agendada &&
+              v.dia.year == hoje.year &&
+              v.dia.month == hoje.month &&
+              v.dia.day == hoje.day,
+        )
+        .firstOrNull;
+  }
+
+  /// RN-202/RN-205: barra do chat para quem está vendo ([cliente] ou
+  /// profissional). Nula quando o plano está encerrado.
+  BarraPlano? barra({required bool cliente, DateTime? agora}) {
+    final proxima = proximaVisita;
+    final prox = proxima == null ? null : 'Próxima: ${diaMes(proxima.dia)}';
+    return switch (estado(agora)) {
+      EstadoPlano.aguardandoValor => BarraPlano(
+        cliente
+            ? 'Plano fixo · aguardando o valor ${feminino ? 'da' : 'do'} '
+                  '$primeiroNome'
+            : 'Plano fixo · envie o valor por visita',
+      ),
+      EstadoPlano.valorEnviado => cliente
+          ? BarraPlano(
+              'Plano fixo · confirme o valor',
+              direita: 'R\$ ${valorPorVisita!.round()}/visita',
+              laranja: true,
+            )
+          : BarraPlano(
+              'Plano fixo · aguardando ${clienteFeminina ? 'a' : 'o'} '
+              '$primeiroCliente confirmar',
+            ),
+      EstadoPlano.ativo => BarraPlano('Plano fixo · $quando', direita: prox),
+      EstadoPlano.semVisitaNaSemana => BarraPlano(
+        'Sem visita nesta semana',
+        direita: prox,
+      ),
+      EstadoPlano.pausado => const BarraPlano(
+        'Plano pausado · volta quando quiser',
+      ),
+      EstadoPlano.cancelado => BarraPlano(
+        'Plano termina em ${diaMes(proximaCobranca ?? clock.now())}',
+      ),
+      EstadoPlano.encerrado => null,
+    };
+  }
+
   String get primeiroNome => profissional.split(' ').first;
   String get primeiroCliente => cliente.split(' ').first;
   bool get mensal => frequencia == FrequenciaPlano.mensal;
@@ -254,6 +381,16 @@ class PlanosFixosRepo extends ChangeNotifier {
     notifyListeners();
     return true;
   }
+
+  /// RN-205: o plano mais recente com [profissional] (cliente) ou com
+  /// [cliente] (profissional), mesmo encerrado (para o divisor no chat).
+  PlanoFixo? ultimoCom({String? profissional, String? cliente}) => planos
+      .where(
+        (p) =>
+            (profissional == null || p.profissional == profissional) &&
+            (cliente == null || p.cliente == cliente),
+      )
+      .lastOrNull;
 
   /// Plano (não cancelado) de [cliente], do lado do profissional.
   PlanoFixo? planoDoCliente(String cliente) => planos
@@ -417,6 +554,10 @@ class PlanosFixosRepo extends ChangeNotifier {
       p
         ..status = muda
         ..noProximoPeriodo = null;
+      // RN-205: cancelado no fim do período vira "encerrado".
+      if (muda == StatusPlano.cancelado) {
+        p.encerradoEm = p.proximaCobranca ?? clock.now();
+      }
     }
     if (p.status == StatusPlano.ativo) {
       _agendar(
@@ -443,10 +584,11 @@ class PlanosFixosRepo extends ChangeNotifier {
   /// RN-148: cancelar vale a partir do próximo período (os dois lados).
   /// Pendente ainda não tem período: cancela na hora.
   void cancelar(PlanoFixo p) {
-    if (p.status == StatusPlano.pendente) {
-      p.status = StatusPlano.cancelado;
-    } else if (p.status == StatusPlano.pausado) {
-      p.status = StatusPlano.cancelado;
+    if (p.status == StatusPlano.pendente || p.status == StatusPlano.pausado) {
+      // RN-205: sem período em andamento, encerra na hora.
+      p
+        ..status = StatusPlano.cancelado
+        ..encerradoEm = clock.now();
     } else {
       p.noProximoPeriodo = StatusPlano.cancelado;
     }

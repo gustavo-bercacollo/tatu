@@ -1,3 +1,6 @@
+import 'plano_fixo/plano_fixo.dart' show PlanoFixoPage;
+import '../../shared/widgets/selo_plano_fixo.dart';
+import '../../data/plano_fixo.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -336,7 +339,11 @@ class _HomeClientePageState extends State<HomeClientePage> {
                         // RN-165: profissional a caminho: a faixa
                         // "[nome] chega em X min" fica no lugar da saudação.
                         ListenableBuilder(
-                          listenable: Listenable.merge([pedidos, conta]),
+                          listenable: Listenable.merge([
+                            pedidos,
+                            conta,
+                            planosFixos,
+                          ]),
                           builder: (context, _) {
                             // RN-45: pedido em análise sai da faixa.
                             final ps = [
@@ -380,6 +387,29 @@ class _HomeClientePageState extends State<HomeClientePage> {
                                       ),
                                     );
                                   },
+                                ),
+                              );
+                            }
+                            // RN-204: dia da visita do plano fixo.
+                            final hoje = [
+                              for (final p in planosFixos.planos)
+                                if (p.cliente == conta.nomeCompleto &&
+                                    p.visitaDeHoje() != null)
+                                  p,
+                            ].firstOrNull;
+                            if (hoje != null) {
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                  top: 16,
+                                  bottom: TatuMedidas.entreSecoes + 4,
+                                ),
+                                child: FaixaVisitaPlano(
+                                  plano: hoje,
+                                  onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => PlanoFixoPage(plano: hoje),
+                                    ),
+                                  ),
                                 ),
                               );
                             }

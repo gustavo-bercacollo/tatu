@@ -1,3 +1,5 @@
+import '../../../shared/widgets/selo_plano_fixo.dart';
+import '../../../data/plano_fixo.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tatu_colors.dart';
@@ -58,7 +60,7 @@ class _MensagensPageState extends State<MensagensPage> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: TatuMedidas.larguraMax),
             child: ListenableBuilder(
-              listenable: conversas,
+              listenable: Listenable.merge([conversas, planosFixos]),
               builder: (context, _) => _conteudo(),
             ),
           ),
@@ -189,6 +191,12 @@ class _LinhaConversa extends StatelessWidget {
     quando: conversa.quando,
     naoLidas: conversa.naoLidas,
     online: conversa.online && !conversa.encerrada,
+    // RN-200/RN-201: selo "Plano fixo" embaixo da última mensagem.
+    selo: conversa.encerrada
+        ? null
+        : SeloPlanoFixo.de(
+            planosFixos.ultimoCom(profissional: conversa.nome),
+          ),
     onTap: onTap,
   );
 }

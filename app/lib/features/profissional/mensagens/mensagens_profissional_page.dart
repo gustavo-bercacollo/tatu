@@ -1,3 +1,5 @@
+import '../../../shared/widgets/selo_plano_fixo.dart';
+import '../../../data/plano_fixo.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tatu_medidas.dart';
@@ -82,7 +84,7 @@ class _MensagensProfissionalPageState extends State<MensagensProfissionalPage> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: TatuMedidas.larguraMax),
             child: ListenableBuilder(
-              listenable: conversasProfissional,
+              listenable: Listenable.merge([conversasProfissional, planosFixos]),
               builder: (context, _) => _conteudo(),
             ),
           ),
@@ -145,7 +147,10 @@ class _MensagensProfissionalPageState extends State<MensagensProfissionalPage> {
       quando: c.quando,
       naoLidas: c.naoLidas,
       selo: encerrada(c) ? null : switch (c.selo) {
-        SeloConversa.nenhum => null,
+        // RN-200/RN-201: sem outro status, o selo do plano fixo.
+        SeloConversa.nenhum => SeloPlanoFixo.de(
+          planosFixos.ultimoCom(cliente: c.nome),
+        ),
         SeloConversa.combinado => SeloVerde(c.textoSelo, pequeno: true),
         SeloConversa.proposta => SeloVerde(
           c.textoSelo,

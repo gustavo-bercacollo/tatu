@@ -1,3 +1,6 @@
+import '../plano_fixo/plano_fixo_profissional.dart' show PlanoFixoProfissionalPage;
+import '../../../shared/widgets/selo_plano_fixo.dart';
+import '../../../data/plano_fixo.dart';
 import '../../../data/profissional.dart';
 import '../../../data/retorno.dart';
 import '../../../shared/widgets/retorno.dart' show CartaoRetornoAtividade;
@@ -71,9 +74,11 @@ class _AtividadeProfissionalPageState extends State<AtividadeProfissionalPage> {
                             listenable: Listenable.merge([
                               atendimentoProfissional,
                               retornos,
+                              planosFixos,
                             ]),
                             builder: (_, _) => atendimentoProfissional.ativo ||
-                                    _retornosMarcados.isNotEmpty
+                                    _retornosMarcados.isNotEmpty ||
+                                    _planos.isNotEmpty
                                 ? ListView(
                                     padding: const EdgeInsets.only(top: 16),
                                     children: [
@@ -81,6 +86,26 @@ class _AtividadeProfissionalPageState extends State<AtividadeProfissionalPage> {
                                         // Sem const: refaz a cada etapa.
                                         // ignore: prefer_const_constructors
                                         _CartaoAtendimento(),
+                                      // RN-201/RN-203: visita do plano de
+                                      // hoje, sem valor.
+                                      for (final p in _planos)
+                                        if (p.visitaDeHoje() case final v?) ...[
+                                          const SizedBox(
+                                            height: TatuMedidas.entreItens,
+                                          ),
+                                          CartaoPlanoFixo(
+                                            nome: '${p.cliente} · ${p.profissao}',
+                                            detalhe:
+                                                'Hoje às ${horaCurta(p.horario)}',
+                                            selo: SeloPlanoFixo.de(
+                                              p,
+                                              complemento:
+                                                  'visita ${p.numeroDa(v)} de '
+                                                  '${p.visitas.length}',
+                                            ),
+                                            onTap: () => _verPlano(context, p),
+                                          ),
+                                        ],
                                       // RN-187: retorno aceito, sem custo.
                                       for (final r in _retornosMarcados) ...[
                                         const SizedBox(
@@ -95,6 +120,27 @@ class _AtividadeProfissionalPageState extends State<AtividadeProfissionalPage> {
                                                 r,
                                               ),
                                         ),
+                                      ],
+                                      // RN-204: "Próximas visitas do plano".
+                                      if (_planos.isNotEmpty) ...[
+                                        const SizedBox(
+                                          height: TatuMedidas.entreSecoes,
+                                        ),
+                                        const Text(
+                                          'PRÓXIMAS VISITAS DO PLANO',
+                                          style: TatuTexto.secao,
+                                        ),
+                                        for (final p in _planos) ...[
+                                          const SizedBox(
+                                            height: TatuMedidas.entreItens,
+                                          ),
+                                          CartaoPlanoFixo(
+                                            nome: p.cliente,
+                                            detalhe: _detalheProxima(p),
+                                            selo: SeloPlanoFixo.de(p),
+                                            onTap: () => _verPlano(context, p),
+                                          ),
+                                        ],
                                       ],
                                     ],
                                   )
@@ -117,6 +163,27 @@ class _AtividadeProfissionalPageState extends State<AtividadeProfissionalPage> {
     );
   }
 }
+
+/// RN-201: planos deste profissional que ainda aparecem (com selo).
+List<PlanoFixo> get _planos => [
+  for (final p in planosFixos.planos)
+    if (p.profissional == profissional.nome && p.selo() != null) p,
+];
+
+/// "Terça, 2 dez · 9h", "Pausado" ou "Termina em 30 nov".
+String _detalheProxima(PlanoFixo p) {
+  final v = p.proximaVisita;
+  return switch (p.estado()) {
+    EstadoPlano.pausado => 'Pausado',
+    EstadoPlano.cancelado =>
+      'Termina em ${diaMes(p.proximaCobranca ?? DateTime.now())}',
+    _ => v == null ? 'Sem visita marcada' : quandoVisita(p, v),
+  };
+}
+
+void _verPlano(BuildContext context, PlanoFixo p) => Navigator.of(context).push(
+  MaterialPageRoute(builder: (_) => PlanoFixoProfissionalPage(plano: p)),
+);
 
 /// RN-187: retornos aceitos deste profissional.
 List<PedidoRetorno> get _retornosMarcados => [

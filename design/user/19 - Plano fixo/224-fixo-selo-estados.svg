@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Plano fixo · estados do selo e da barra (referência)</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#fff"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="40" cy="82" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,73) scale(0.75)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></g>
+  <text x="196.5" y="88" font-size="17" font-weight="600" fill="#000000" text-anchor="middle">Estados do plano fixo</text>
+  <text x="20" y="132" font-size="11" font-weight="600" fill="#8E8E93" text-anchor="start" letter-spacing="0.3">AGUARDANDO O VALOR</text>
+  <text x="373" y="132" font-size="11" font-weight="500" fill="#C7C7CC" text-anchor="end">sem selo</text>
+  <rect x="20" y="142" width="353" height="44" rx="12" fill="#F2F2F7"/>
+  <g transform="translate(34,155) scale(0.75)" fill="none" stroke="#8E8E93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="60" y="169" font-size="13" font-weight="600" fill="#8E8E93" text-anchor="start">Plano fixo · aguardando o valor da Júlia</text>
+  <g transform="translate(355,158) scale(0.5)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <text x="20" y="218" font-size="11" font-weight="600" fill="#8E8E93" text-anchor="start" letter-spacing="0.3">VALOR ENVIADO (CLIENTE)</text>
+  <text x="373" y="218" font-size="11" font-weight="500" fill="#C7C7CC" text-anchor="end">sem selo</text>
+  <rect x="20" y="228" width="353" height="44" rx="12" fill="#FFF4E0"/>
+  <g transform="translate(34,241) scale(0.75)" fill="none" stroke="#A85F00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="60" y="255" font-size="13" font-weight="600" fill="#A85F00" text-anchor="start">Plano fixo · confirme o valor</text>
+  <text x="349" y="255" font-size="13" font-weight="400" fill="#A85F00" text-anchor="end">R$ 150/visita</text>
+  <g transform="translate(355,244) scale(0.5)" fill="none" stroke="#A85F00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <text x="20" y="304" font-size="11" font-weight="600" fill="#8E8E93" text-anchor="start" letter-spacing="0.3">ATIVO</text>
+  <rect x="286.578125" y="290" width="86.421875" height="20" rx="10.0" fill="#EEEEF0"/>
+  <g transform="translate(294.578125,294.0) scale(0.5)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="310.578125" y="304.0" font-size="11" font-weight="600" fill="#000000" text-anchor="start">Plano fixo</text>
+  <rect x="20" y="314" width="353" height="44" rx="12" fill="#F2F2F7"/>
+  <g transform="translate(34,327) scale(0.75)" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="60" y="341" font-size="13" font-weight="600" fill="#000000" text-anchor="start">Plano fixo · toda terça, 9h</text>
+  <text x="349" y="341" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="end">Próxima: 25 nov</text>
+  <g transform="translate(355,330) scale(0.5)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <text x="20" y="390" font-size="11" font-weight="600" fill="#8E8E93" text-anchor="start" letter-spacing="0.3">SEM VISITA NESTA SEMANA</text>
+  <rect x="286.578125" y="376" width="86.421875" height="20" rx="10.0" fill="#EEEEF0"/>
+  <g transform="translate(294.578125,380.0) scale(0.5)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="310.578125" y="390.0" font-size="11" font-weight="600" fill="#000000" text-anchor="start">Plano fixo</text>
+  <rect x="20" y="400" width="353" height="44" rx="12" fill="#F2F2F7"/>
+  <g transform="translate(34,413) scale(0.75)" fill="none" stroke="#8E8E93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="60" y="427" font-size="13" font-weight="600" fill="#8E8E93" text-anchor="start">Sem visita nesta semana</text>
+  <text x="349" y="427" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="end">Próxima: 2 dez</text>
+  <g transform="translate(355,416) scale(0.5)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <text x="20" y="476" font-size="11" font-weight="600" fill="#8E8E93" text-anchor="start" letter-spacing="0.3">PAUSADO</text>
+  <rect x="260.578125" y="462" width="112.421875" height="20" rx="10.0" fill="#EEEEF0"/>
+  <g transform="translate(268.578125,466.0) scale(0.5)" fill="none" stroke="#8E8E93" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="284.578125" y="476.0" font-size="11" font-weight="600" fill="#8E8E93" text-anchor="start">Plano pausado</text>
+  <rect x="20" y="486" width="353" height="44" rx="12" fill="#F2F2F7"/>
+  <g transform="translate(34,499) scale(0.75)" fill="none" stroke="#8E8E93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="60" y="513" font-size="13" font-weight="600" fill="#8E8E93" text-anchor="start">Plano pausado · volta quando quiser</text>
+  <g transform="translate(355,502) scale(0.5)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <text x="20" y="562" font-size="11" font-weight="600" fill="#8E8E93" text-anchor="start" letter-spacing="0.3">CANCELADO</text>
+  <rect x="250.453125" y="548" width="122.546875" height="20" rx="10.0" fill="#EEEEF0"/>
+  <g transform="translate(258.453125,552.0) scale(0.5)" fill="none" stroke="#8E8E93" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="274.453125" y="562.0" font-size="11" font-weight="600" fill="#8E8E93" text-anchor="start">Plano até 30 nov</text>
+  <rect x="20" y="572" width="353" height="44" rx="12" fill="#F2F2F7"/>
+  <g transform="translate(34,585) scale(0.75)" fill="none" stroke="#8E8E93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="60" y="599" font-size="13" font-weight="600" fill="#8E8E93" text-anchor="start">Plano termina em 30 nov</text>
+  <g transform="translate(355,588) scale(0.5)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <text x="20" y="648" font-size="11" font-weight="600" fill="#8E8E93" text-anchor="start" letter-spacing="0.3">ENCERRADO</text>
+  <text x="373" y="648" font-size="11" font-weight="500" fill="#C7C7CC" text-anchor="end">sem selo</text>
+  <rect x="98.2578125" y="664" width="196.484375" height="26" rx="13" fill="#F2F2F7"/>
+  <text x="196.5" y="681" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="middle">Plano fixo encerrado · 30 nov</text>
+  <text x="196.5" y="726" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="middle">Laranja só quando o cliente precisa agir.</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>

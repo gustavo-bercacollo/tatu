@@ -1,3 +1,6 @@
+import '../plano_fixo/plano_fixo.dart' show PlanoFixoPage;
+import '../../../shared/widgets/selo_plano_fixo.dart';
+import '../../../data/plano_fixo.dart';
 import '../../../data/retorno.dart';
 import '../../../shared/widgets/retorno.dart' show CartaoRetornoAtividade;
 import '../../../data/conta.dart';
@@ -93,9 +96,16 @@ class _EmAndamento extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: Listenable.merge([pedidos, retornos]),
+    listenable: Listenable.merge([pedidos, retornos, planosFixos]),
     builder: (context, _) => _lista(context),
   );
+
+  /// RN-201/RN-203: visitas do plano marcadas para hoje.
+  List<(PlanoFixo, VisitaPlano)> get _visitasHoje => [
+    for (final p in planosFixos.planos)
+      if (p.cliente == conta.nomeCompleto)
+        if (p.visitaDeHoje() case final v?) (p, v),
+  ];
 
   /// RN-187: retornos aceitos do cliente (card "Retorno · sem custo").
   List<PedidoRetorno> get _retornos => [
@@ -107,7 +117,10 @@ class _EmAndamento extends StatelessWidget {
 
   Widget _lista(BuildContext context) {
     final retornosMarcados = _retornos;
-    if (pedidos.semNadaEmAndamento && retornosMarcados.isEmpty) {
+    final visitas = _visitasHoje;
+    if (pedidos.semNadaEmAndamento &&
+        retornosMarcados.isEmpty &&
+        visitas.isEmpty) {
       return EstadoVazio(
         icone: TablerIcons.clock,
         titulo: 'Nenhum pedido agora',
@@ -128,6 +141,21 @@ class _EmAndamento extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: TatuMedidas.entreSecoes),
       children: [
+        // RN-203: visita do plano: "Plano fixo · visita X de Y", sem valor.
+        for (final (p, v) in visitas) ...[
+          CartaoPlanoFixo(
+            nome: '${p.profissao} · ${p.primeiroNome}',
+            detalhe: 'Hoje às ${horaCurta(p.horario)}',
+            selo: SeloPlanoFixo.de(
+              p,
+              complemento: 'visita ${p.numeroDa(v)} de ${p.visitas.length}',
+            ),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p)),
+            ),
+          ),
+          const SizedBox(height: TatuMedidas.entreItens),
+        ],
         for (final (i, p) in lista.indexed) ...[
           if (i > 0) const SizedBox(height: TatuMedidas.entreItens),
           _CartaoAndamento(pedido: p),
@@ -216,7 +244,12 @@ class _CartaoAndamento extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${pedido.servico} · ${pedido.descricao}',
+                      // RN-203: com plano fixo, o serviço do chat é avulso.
+                      planosFixos.ultimoCom(profissional: pedido.profissional)
+                                  ?.selo() ==
+                              null
+                          ? '${pedido.servico} · ${pedido.descricao}'
+                          : '${pedido.servico} · avulso · ${pedido.descricao}',
                       style: TatuTexto.nota,
                     ),
                   ],
@@ -475,13 +508,19 @@ class _Concluidos extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: pedidos,
+    listenable: Listenable.merge([pedidos, planosFixos]),
     builder: (context, _) => _lista(context),
   );
 
   Widget _lista(BuildContext context) {
     final lista = pedidos.concluidos;
-    if (lista.isEmpty) {
+    // RN-201/RN-203: cobranças do plano fixo ("Plano fixo · N visitas").
+    final cobrancas = [
+      for (final p in planosFixos.planos)
+        if (p.cliente == conta.nomeCompleto)
+          for (final c in p.cobrancas.reversed) (p, c),
+    ];
+    if (lista.isEmpty && cobrancas.isEmpty) {
       return const EstadoVazio(
         icone: TablerIcons.clock,
         titulo: 'Nada por aqui ainda',
@@ -490,6 +529,38 @@ class _Concluidos extends StatelessWidget {
     }
     final itens = <Widget>[];
     String? mes;
+    if (cobrancas.isNotEmpty) {
+      mes = lista.firstOrNull?.mes ?? 'Este mês';
+      itens.add(
+        Padding(
+          padding: const EdgeInsets.only(
+            top: TatuMedidas.entreSecoes,
+            bottom: TatuMedidas.entreItens,
+          ),
+          child: Text(mes, style: TatuTexto.grupo),
+        ),
+      );
+      for (final (i, (p, c)) in cobrancas.indexed) {
+        if (i > 0) itens.add(const SizedBox(height: TatuMedidas.entreItens + 4));
+        itens.add(
+          CartaoPlanoFixo(
+            nome: p.profissional,
+            detalhe: p.profissao,
+            selo: SeloPlanoFixo(
+              'Plano fixo · ${c.visitasFeitas} '
+              '${c.visitasFeitas == 1 ? 'visita' : 'visitas'}',
+            ),
+            valor: c.total,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p)),
+            ),
+          ),
+        );
+      }
+      if (lista.isNotEmpty) {
+        itens.add(const SizedBox(height: TatuMedidas.entreItens + 4));
+      }
+    }
     for (final p in lista) {
       if (p.mes != mes) {
         mes = p.mes;
@@ -547,7 +618,14 @@ class _CartaoConcluido extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text('${p.profissao} · ${p.dia}', style: TatuTexto.nota),
+                    Text(
+                      // RN-203: com plano fixo, o serviço do chat é avulso.
+                      planosFixos.ultimoCom(profissional: p.profissional) ==
+                              null
+                          ? '${p.profissao} · ${p.dia}'
+                          : '${p.profissao} · avulso · ${p.dia}',
+                      style: TatuTexto.nota,
+                    ),
                   ],
                 ),
               ),

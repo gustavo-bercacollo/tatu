@@ -1,3 +1,4 @@
+import '../../../shared/widgets/selo_plano_fixo.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -238,25 +239,63 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     planosFixos.enviarValor(p, v);
   }
 
+  /// RN-202/RN-205: o plano com este cliente, mesmo encerrado.
+  PlanoFixo? get _planoVisivel =>
+      planosFixos.ultimoCom(cliente: widget.chamado.cliente);
+
+  /// RN-202/RN-205: barra do plano para o profissional.
+  BarraPlano? get _barraPlano => _planoVisivel?.barra(cliente: false);
+
+  /// Topo do chat com a barra fixa do plano logo abaixo (RN-202).
+  Widget _comBarraDoPlano(Widget topo) {
+    final b = _barraPlano;
+    if (b == null) return topo;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        topo,
+        const SizedBox(height: TatuMedidas.entreItens),
+        BarraPlanoFixo(
+          barra: b,
+          onTap: () {
+            final p = _planoVisivel;
+            if (p == null || p.status == StatusPlano.pendente) return;
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => PlanoFixoProfissionalPage(plano: p),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   List<Widget> _planoNoChat() {
-    final p = _plano;
+    final p = _planoVisivel;
     if (p == null) return const [];
+    final estado = p.estado();
+    // RN-202: com o plano em andamento, a barra no topo já mostra.
+    if (estado != EstadoPlano.aguardandoValor &&
+        estado != EstadoPlano.valorEnviado &&
+        estado != EstadoPlano.encerrado) {
+      return const [];
+    }
     return [
       const SizedBox(height: 18),
-      if (p.status == StatusPlano.pendente && p.valorPorVisita == null)
+      // RN-205: encerrado: só o divisor.
+      if (estado == EstadoPlano.encerrado)
+        MarcadorChat(
+          'Plano fixo encerrado · ${diaMes(p.encerradoEm ?? clock.now())}',
+        )
+      else if (p.status == StatusPlano.pendente && p.valorPorVisita == null)
         CartaoPedidoPlano(plano: p, onEnviarValor: () => _valorDoPlano(p))
-      else if (p.status == StatusPlano.pendente)
+      else
         NotaChat(
           'Valor do plano enviado · ${reaisInteiros(p.valorPorVisita!)} por '
           'visita. Aguardando ${p.clienteFeminina ? 'a' : 'o'} '
           '${p.primeiroCliente}.',
-        )
-      else
-        Center(
-          child: GestureDetector(
-            onTap: _verPlano,
-            child: MarcadorChat('Plano fixo · ${p.quando}'),
-          ),
         ),
     ];
   }
@@ -736,7 +775,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
           : null,
       topo: fim != null
           ? const TopoContaIndisponivel(detalhe: 'Cliente')
-          : Row(
+          : _comBarraDoPlano(Row(
         children: [
           const BackCircleButton(),
           Expanded(
@@ -765,7 +804,13 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          const Text('Cliente', style: TatuTexto.nota),
+                          // RN-202: "Cliente · Plano fixo".
+                          Text(
+                            _barraPlano == null
+                                ? 'Cliente'
+                                : 'Cliente · Plano fixo',
+                            style: TatuTexto.nota,
+                          ),
                         ],
                       ),
                     ),
@@ -780,7 +825,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
           else
             const SizedBox(width: 48),
         ],
-      ),
+      )),
       mensagens: [
         CartaoPedidoChat(
           rotulo: 'Chamado',
@@ -792,6 +837,13 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
         if (fim == null)
           const NotaChat('Você aceitou o chamado. Combinem o valor por aqui.'),
         const SizedBox(height: TatuMedidas.entreItens + 4),
+        // RN-203: visitas do plano já feitas.
+        if (fim == null && _planoVisivel != null)
+          for (final v in _planoVisivel!.visitas)
+            if (v.situacao == SituacaoVisita.feita) ...[
+              DivisorChat('Visita do plano · ${diaMes(v.dia)} · feita'),
+              const SizedBox(height: 18),
+            ],
         // RN-179: o mesmo divisor que o cliente vê, depois do serviço
         // anterior.
         if (c.pediuDeNovoEm case final dia?) ...[
@@ -1231,7 +1283,7 @@ class _EnderecoLiberado extends StatelessWidget {
   }
 }
 
-/// P28 · RN-201: o cliente recusou o último valor: o chamado é encerrado
+/// P28 · RN-207: o cliente recusou o último valor: o chamado é encerrado
 /// sem custo e não conta contra o profissional (nem como cancelamento,
 /// RN-64, nem como abandono, RN-79).
 class SemAcordoPage extends StatelessWidget {

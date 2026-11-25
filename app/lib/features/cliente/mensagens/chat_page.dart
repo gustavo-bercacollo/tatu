@@ -1,3 +1,4 @@
+import '../../../shared/widgets/selo_plano_fixo.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -362,7 +363,11 @@ class _ChatPageState extends State<ChatPage> {
           valor: v,
           nome: '${_c.artigo} ${_c.primeiroNome}',
         ),
-        SituacaoValor.confirmado => CartaoValorConfirmado(valor: v),
+        // RN-203: com plano fixo, o valor do chat é um serviço avulso.
+        SituacaoValor.confirmado => CartaoValorConfirmado(
+          valor: v,
+          avulso: _barraPlano != null,
+        ),
       },
       // RN-181: o novo valor confirmado no chat virou um serviço.
       if (v.novo && v.situacao == SituacaoValor.confirmado) ...[
@@ -396,7 +401,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  /// RN-200: "Recusar valor" no 3º valor: chamar outro ou cancelar.
+  /// RN-206: "Recusar valor" no 3º valor: chamar outro ou cancelar.
   Future<void> _recusar() async {
     final ela = '${_c.artigo} ${_c.primeiroNome}';
     final chamarOutro = await perguntar(
@@ -411,7 +416,7 @@ class _ChatPageState extends State<ChatPage> {
       iconeAviso: false,
     );
     if (chamarOutro == null || !mounted) return;
-    // RN-201: sem custo; o pedido com ela sai e ela não volta.
+    // RN-207: sem custo; o pedido com ela sai e ela não volta.
     conversas.recusarValor(_c);
     final p = pedidos.semAcordo(_c.nome);
     if (chamarOutro) {
@@ -468,6 +473,38 @@ class _ChatPageState extends State<ChatPage> {
       !_c.emAndamento &&
       !_c.encerrada &&
       (_c.valor == null || _c.valor!.situacao == SituacaoValor.confirmado);
+
+  /// RN-202/RN-205: barra do plano para o cliente (nula = sem plano ou
+  /// encerrado).
+  BarraPlano? get _barraPlano => _planoVisivel?.barra(cliente: true);
+
+  /// Topo do chat com a barra fixa do plano logo abaixo (RN-202).
+  Widget _comBarraDoPlano(Widget topo) {
+    final b = _barraPlano;
+    if (b == null) return topo;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        topo,
+        const SizedBox(height: TatuMedidas.entreItens),
+        BarraPlanoFixo(barra: b, onTap: _abrirPlano),
+      ],
+    );
+  }
+
+  /// A barra abre a tela do plano (ou o pedido, enquanto pendente).
+  void _abrirPlano() {
+    final p = _planoVisivel;
+    if (p == null) return;
+    if (p.status == StatusPlano.pendente) {
+      _tornarFixa();
+      return;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p)),
+    );
+  }
 
   void _enviar() {
     final texto = _campo.text.trim();
@@ -739,12 +776,40 @@ class _ChatPageState extends State<ChatPage> {
     _timer = Timer(widget.resposta, () => planosFixos.enviarValor(p, 140));
   }
 
-  List<Widget> _planoNoChat() {
-    final p = _plano;
+  /// RN-202/RN-205: o plano com esta pessoa, mesmo encerrado.
+  PlanoFixo? get _planoVisivel => planosFixos.ultimoCom(profissional: _c.nome);
+
+  /// RN-203: visitas do plano já feitas viram divisores no chat.
+  List<Widget> _visitasDoPlano() {
+    final p = _planoVisivel;
     if (p == null || _c.encerrada) return const [];
     return [
+      for (final v in p.visitas)
+        if (v.situacao == SituacaoVisita.feita) ...[
+          const SizedBox(height: 18),
+          DivisorChat('Visita do plano · ${diaMes(v.dia)} · feita'),
+        ],
+    ];
+  }
+
+  List<Widget> _planoNoChat() {
+    final p = _planoVisivel;
+    if (p == null || _c.encerrada) return const [];
+    final estado = p.estado();
+    // RN-202: ativo, pausado ou cancelado: a barra no topo já mostra.
+    if (estado != EstadoPlano.aguardandoValor &&
+        estado != EstadoPlano.valorEnviado &&
+        estado != EstadoPlano.encerrado) {
+      return const [];
+    }
+    return [
       const SizedBox(height: 18),
-      if (p.status == StatusPlano.pendente && p.valorPorVisita == null)
+      // RN-205: encerrado: sem selo e sem barra, só o divisor.
+      if (estado == EstadoPlano.encerrado)
+        MarcadorChat(
+          'Plano fixo encerrado · ${diaMes(p.encerradoEm ?? clock.now())}',
+        )
+      else if (p.status == StatusPlano.pendente && p.valorPorVisita == null)
         NotaChat('Pedido de plano fixo enviado ${_c.artigo == 'a' ? 'à' : 'ao'} '
             '${_c.primeiroNome}.')
       else if (p.status == StatusPlano.pendente)
@@ -753,15 +818,6 @@ class _ChatPageState extends State<ChatPage> {
           onConfirmar: () => _confirmarPlano(p),
           onOutroValor: () => _outroValorPlano(p),
           onTrocarCartao: () => _emBreve(context, 'Trocar cartão'),
-        )
-      else
-        Center(
-          child: GestureDetector(
-            onTap: _tornarFixa,
-            child: MarcadorChat(
-              'Plano fixo · ${p.quando}',
-            ),
-          ),
         ),
     ];
   }
@@ -861,7 +917,17 @@ class _ChatPageState extends State<ChatPage> {
           // RN-132: encerrada pelo Tatu, o nome vira "Conta indisponível".
           topo: fim != null
               ? TopoContaIndisponivel(detalhe: _c.servico)
-              : _Topo(conversa: _c, onMenu: _menu, onLigar: _ligar),
+              : _comBarraDoPlano(
+                  _Topo(
+                    conversa: _c,
+                    onMenu: _menu,
+                    onLigar: _ligar,
+                    // RN-202: "[profissão] · Plano fixo".
+                    subtitulo: _barraPlano == null
+                        ? null
+                        : '${_c.profissao} · Plano fixo',
+                  ),
+                ),
           // C104 · RN-140: o ligar acabou de ser liberado.
           sobre: _c.podeLigar && !_c.dicaLigarVista
               ? BalaoLigarLiberado(
@@ -882,6 +948,7 @@ class _ChatPageState extends State<ChatPage> {
                 'Combinem os detalhes e o valor por aqui.',
               ),
             const SizedBox(height: TatuMedidas.entreItens + 4),
+            ..._visitasDoPlano(),
             for (final (i, m) in msgs.indexed)
               if (m.concluido != null)
                 // RN-42: o serviço acabou, a conversa continua.
@@ -1002,7 +1069,7 @@ class _ChatPageState extends State<ChatPage> {
                 NotaChat(fim.nota!),
               ],
             ] else if (_c.semAcordo) ...[
-              // RN-201: só leitura depois da recusa do último valor.
+              // RN-207: só leitura depois da recusa do último valor.
               const SizedBox(height: TatuMedidas.entreSecoes),
               const MarcadorChat('Sem acordo de valor'),
             ] else ...[
@@ -1053,7 +1120,11 @@ class _Topo extends StatelessWidget {
     required this.conversa,
     required this.onMenu,
     required this.onLigar,
+    this.subtitulo,
   });
+
+  /// RN-202: "Diarista · Plano fixo" (nulo = só a profissão).
+  final String? subtitulo;
 
   final Conversa conversa;
   final VoidCallback onMenu;
@@ -1108,7 +1179,10 @@ class _Topo extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Text(conversa.profissao, style: TatuTexto.nota),
+                        Text(
+                          subtitulo ?? conversa.profissao,
+                          style: TatuTexto.nota,
+                        ),
                       ],
                     ),
                   ),
