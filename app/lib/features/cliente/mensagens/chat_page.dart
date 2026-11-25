@@ -502,7 +502,7 @@ class _ChatPageState extends State<ChatPage> {
       return;
     }
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p)),
+      MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p, doChat: true)),
     );
   }
 
@@ -729,7 +729,9 @@ class _ChatPageState extends State<ChatPage> {
     final atual = _plano;
     if (atual != null && atual.status != StatusPlano.pendente) {
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: atual)),
+        MaterialPageRoute(
+          builder: (_) => PlanoFixoPage(plano: atual, doChat: true),
+        ),
       );
       return;
     }
@@ -765,7 +767,7 @@ class _ChatPageState extends State<ChatPage> {
       cartao: pagamentos.padrao?.titulo ?? 'Visa final 4242',
     );
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p)),
+      MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p, doChat: true)),
     );
   }
 

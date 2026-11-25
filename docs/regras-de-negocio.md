@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 24/11/2026 (v35)
+Atualizado em 24/11/2026 (v36)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -109,7 +109,7 @@ Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do própri
 | --- | --- |
 | RN-200 | **Um selo só: "Plano fixo"**, cinza, com ícone de repetição, igual para cliente e profissional. Fica embaixo do nome ou da última mensagem, no mesmo lugar das pílulas de status ("Valor combinado", "Proposta 2 de 3"), nunca ao lado do nome (onde fica o selo de verificado). Não existe seção própria de fixos. |
 | RN-201 | Onde o selo aparece. **Cliente:** Mensagens (lista), Atividade → Em andamento (card da visita) e Atividade → Concluídos (cobrança do plano). **Profissional:** Mensagens (lista) e Atividade (card da visita e a lista "Próximas visitas do plano"). |
-| RN-202 | **Chat com plano:** o topo mostra "[profissão] · Plano fixo" (para o cliente) ou "Cliente · Plano fixo" (para o profissional). Logo abaixo, uma barra fixa: **"Plano fixo · [dia], [hora] · Próxima: [data] ›"**, que abre a tela do plano. |
+| RN-202 | **Chat com plano:** o topo mostra "[profissão] · Plano fixo" (para o cliente) ou "Cliente · Plano fixo" (para o profissional). Logo abaixo, uma barra fixa: **"Plano fixo · [dia], [hora] · Próxima: [data] ›"**, que abre a tela do plano. A tela do plano tem o botão **"Mensagem"**, que volta para o chat com a pessoa. |
 | RN-203 | **Fixo × avulso com a mesma pessoa.** Visita do plano: card "Plano fixo · visita X de Y" sem valor; divisor no chat "Visita do plano · [data] · feita"; nos concluídos, a cobrança aparece como "Plano fixo · N visitas". Serviço avulso: segue como hoje, com "avulso" na linha da Atividade e "Valor combinado · avulso" no card de valor. |
 | RN-204 | **Dia da visita:** a Home do cliente mostra a faixa "A [nome] vem hoje às [hora]" · "[profissão] · Plano fixo · ver plano". O profissional vê as visitas na Atividade → "Próximas visitas do plano". |
 | RN-205 | **Estados do plano** (selo · barra no chat). Aguardando o valor: sem selo · "Plano fixo · aguardando o valor da [nome]". Valor enviado: sem selo · cliente vê "Plano fixo · confirme o valor ›" em laranja, profissional vê "aguardando a [cliente] confirmar". Ativo: "Plano fixo" · "toda [dia], [hora] · Próxima: [data]". Sem visita na semana: "Plano fixo" · "Sem visita nesta semana · Próxima: [data]". Pausado: "Plano pausado" (cinza apagado) · "Plano pausado · volta quando quiser ›". Cancelado: "Plano até [data]" · "Plano termina em [data]". Encerrado: sem selo e sem barra; fica só o divisor "Plano fixo encerrado · [data]" no chat. **Laranja só quando o cliente precisa agir.** |
@@ -398,6 +398,7 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 24/11/2026 | RN-202 | Botão "Mensagem" na tela do plano fixo. |
 | 24/11/2026 | RN-27, RN-206, RN-207 | Cliente recusa o 3º valor ("Recusar valor") e escolhe chamar outro ou cancelar. Sem custo e sem penalidade; o profissional não recebe de novo o mesmo pedido. |
 | 24/11/2026 | RN-83, RN-86, RN-200 a RN-205 | Identificação do plano fixo: selo único "Plano fixo", barra no chat, fixo × avulso, faixa no dia da visita e estados. "Seus profissionais" adiado. |
 | 24/11/2026 | RN-191, RN-192, RN-197 a RN-199 | Ajustes legais do retorno: termo de garantia no recibo, revisão de decisão automática (LGPD art. 20), guarda das fotos, dívida só dentro do Tatu. |

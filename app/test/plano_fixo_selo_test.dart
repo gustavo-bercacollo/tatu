@@ -15,6 +15,7 @@ import 'package:tatu/data/retorno.dart';
 import 'package:tatu/features/cliente/atividade/atividade_page.dart';
 import 'package:tatu/features/cliente/mensagens/chat_page.dart';
 import 'package:tatu/features/cliente/mensagens/mensagens_page.dart';
+import 'package:tatu/features/cliente/plano_fixo/plano_fixo.dart';
 import 'package:tatu/features/profissional/atividade/atividade_profissional_page.dart';
 import 'package:tatu/features/profissional/mensagens/mensagens_profissional_page.dart';
 
@@ -191,6 +192,36 @@ void main() {
       expect(find.text('PRÓXIMAS VISITAS DO PLANO'), findsOneWidget);
       expect(find.text('Roberto Alves · Diarista'), findsOneWidget);
       expect(find.text('Pausado'), findsOneWidget);
+    });
+  });
+
+  testWidgets('C216 · RN-202: "Mensagem" na tela do plano abre o chat', (
+    t,
+  ) async {
+    await withClock(Clock.fixed(_terca), () async {
+      sementeDemoPlanoFixo();
+      final p = planosFixos.ultimoCom(profissional: 'Júlia Costa')!;
+      await _abrir(t, PlanoFixoPage(plano: p));
+      expect(find.text('Mensagem'), findsOneWidget);
+      await t.tap(find.text('Mensagem'));
+      await t.pumpAndSettle();
+      expect(find.byType(ChatPage), findsOneWidget);
+      expect(find.text('Diarista · Plano fixo'), findsOneWidget);
+    });
+  });
+
+  testWidgets('RN-202: aberta pelo chat, "Mensagem" só volta', (t) async {
+    await withClock(Clock.fixed(_terca), () async {
+      sementeDemoPlanoFixo();
+      final c = conversas.conversas.firstWhere((c) => c.nome == 'Júlia Costa');
+      await _abrir(t, ChatPage(conversa: c));
+      await t.tap(find.text('Plano fixo · toda terça, 9h'));
+      await t.pumpAndSettle();
+      expect(find.byType(PlanoFixoPage), findsOneWidget);
+      await t.tap(find.text('Mensagem'));
+      await t.pumpAndSettle();
+      expect(find.byType(PlanoFixoPage), findsNothing);
+      expect(find.byType(ChatPage), findsOneWidget);
     });
   });
 }

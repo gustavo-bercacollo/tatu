@@ -1,3 +1,5 @@
+import '../mensagens/chat_page.dart';
+import '../../../data/conversas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -489,7 +491,7 @@ class CartaoPlano extends StatelessWidget {
   );
 }
 
-/// Cabeçalho com avatar, nome, detalhe e selo (C197/P132).
+/// Cabeçalho com avatar, nome, detalhe e selo (C216/P132).
 class TopoPlano extends StatelessWidget {
   const TopoPlano({
     super.key,
@@ -497,12 +499,16 @@ class TopoPlano extends StatelessWidget {
     required this.nome,
     required this.detalhe,
     required this.rodape,
+    this.acao,
   });
 
   final PlanoFixo plano;
   final String nome;
   final String detalhe;
   final String rodape;
+
+  /// Botão embaixo do rodapé, na largura do cartão (C216: "Mensagem").
+  final Widget? acao;
 
   @override
   Widget build(BuildContext context) => CartaoPlano(
@@ -536,16 +542,37 @@ class TopoPlano extends StatelessWidget {
         const Divider(height: 1),
         const SizedBox(height: 12),
         Text(rodape, style: TatuTexto.nota),
+        if (acao != null) ...[
+          const SizedBox(height: TatuMedidas.entreItens + 2),
+          acao!,
+        ],
       ],
     ),
   );
 }
 
-/// C197 · RN-146/RN-148: plano fixo do lado do cliente.
+/// C216 · RN-146/RN-148: plano fixo do lado do cliente.
 class PlanoFixoPage extends StatelessWidget {
-  const PlanoFixoPage({super.key, required this.plano});
+  const PlanoFixoPage({super.key, required this.plano, this.doChat = false});
 
   final PlanoFixo plano;
+
+  /// Aberta pelo chat com a profissional: "Mensagem" só volta para ele.
+  final bool doChat;
+
+  /// RN-202: "Mensagem" leva ao chat com a profissional do plano.
+  void _mensagem(BuildContext context) {
+    final nav = Navigator.of(context);
+    if (doChat) {
+      nav.pop();
+      return;
+    }
+    final c = conversas.conversas
+        .where((c) => c.nome == plano.profissional)
+        .firstOrNull;
+    if (c == null) return;
+    nav.push(MaterialPageRoute(builder: (_) => ChatPage(conversa: c)));
+  }
 
   Future<void> _mudar(BuildContext context, {required bool cancelar}) async {
     final p = plano;
@@ -588,6 +615,17 @@ class PlanoFixoPage extends StatelessWidget {
               nome: p.profissional,
               detalhe: '${p.profissao} · ${p.quando}',
               rodape: '$porVisita por visita · cobrado no fim do ${p.periodo}',
+              // C216 · RN-202: volta para o chat com a profissional.
+              acao: FilledButton.icon(
+                style: tatuBotaoSecundario().copyWith(
+                  minimumSize: const WidgetStatePropertyAll(
+                    Size.fromHeight(TatuMedidas.alturaBotaoCartao),
+                  ),
+                ),
+                onPressed: () => _mensagem(context),
+                icon: const Icon(TablerIcons.message_circle, size: 20),
+                label: const Text('Mensagem'),
+              ),
             ),
             const SizedBox(height: TatuMedidas.entreSecoes),
             Text(
