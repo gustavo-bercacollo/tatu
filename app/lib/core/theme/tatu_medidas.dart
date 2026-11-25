@@ -63,6 +63,10 @@ class TatuMedidas {
   /// etapas): a mesma altura nos dois estados.
   static const progressoCartao = 46.0;
 
+  /// RN-207: parte de baixo do card do retorno (data e dica, ou etapas):
+  /// a mesma altura nos dois estados.
+  static const progressoRetorno = 62.0;
+
   /// RN-206: selo de repetição no canto da foto.
   static const seloFoto = 18.0;
 }

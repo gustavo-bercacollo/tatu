@@ -2,7 +2,6 @@ import '../plano_fixo/plano_fixo.dart' show PlanoFixoPage;
 import '../../../shared/widgets/selo_plano_fixo.dart';
 import '../../../data/plano_fixo.dart';
 import '../../../data/retorno.dart';
-import '../../../shared/widgets/retorno.dart' show CartaoRetornoAtividade;
 import '../../../data/conta.dart';
 import '../../../data/conversas.dart';
 import '../mensagens/chat_page.dart';
@@ -162,7 +161,8 @@ class _EmAndamento extends StatelessWidget {
         ],
         for (final r in retornosMarcados) ...[
           const SizedBox(height: TatuMedidas.entreItens),
-          CartaoRetornoAtividade(
+          // C234/C235 · RN-207: mesmo formato dos outros cards.
+          _CartaoRetornoCliente(
             retorno: r,
             onTap: () {
               final c = conversas.conversas
@@ -274,6 +274,129 @@ class _CartaoVisitaPlano extends StatelessWidget {
                 : LinhaDoTempoHorizontal(
                     etapas: etapasVisitaPlano,
                     feitas: feitas,
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// C234/C235 · RN-207: card do retorno (cliente). Agendado: selo verde
+/// "Retorno · sem custo", data e hora completas e a dica do código. A
+/// caminho em diante: pílula escura com o tempo e as etapas Agendado → A
+/// caminho → Retorno → Feito. A parte de baixo tem a mesma altura.
+class _CartaoRetornoCliente extends StatelessWidget {
+  const _CartaoRetornoCliente({required this.retorno, required this.onTap});
+
+  final PedidoRetorno retorno;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final r = retorno;
+    final caminho = r.aCaminho;
+    final m = r.marcadoPara;
+    const verde = TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w600,
+      color: TatuColors.onlineTexto,
+    );
+    return _Cartao(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              AvatarIniciais(nome: r.profissional, tamanho: 44),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      r.profissional,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    if (caminho)
+                      // Uma linha só (o card tem a mesma altura sempre).
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text.rich(
+                          TextSpan(
+                            style: TatuTexto.nota,
+                            children: [
+                              TextSpan(text: '${r.servicoNome} · '),
+                              const TextSpan(
+                                text: 'Retorno · sem custo',
+                                style: verde,
+                              ),
+                            ],
+                          ),
+                          maxLines: 1,
+                        ),
+                      )
+                    else
+                      Text(
+                        '${r.servicoNome} · ${r.descricaoServico}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TatuTexto.nota,
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              if (caminho)
+                SeloPreto('${r.minutosParaChegar} min')
+              else
+                const SeloVerde('Retorno · sem custo', pequeno: true),
+            ],
+          ),
+          const SizedBox(height: TatuMedidas.entreItens + 4),
+          SizedBox(
+            height: TatuMedidas.progressoRetorno,
+            child: caminho
+                ? Center(
+                    child: LinhaDoTempoHorizontal(
+                      etapas: etapasRetorno,
+                      feitas: 2,
+                    ),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Divider(height: 1),
+                      const SizedBox(height: TatuMedidas.entreItens),
+                      Row(
+                        children: [
+                          const Icon(TablerIcons.calendar, size: 18),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              m == null ? 'Dia a combinar' : quandoRetorno(m),
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Na hora, passe o código para '
+                        '${r.profissionalFeminino ? 'a' : 'o'} '
+                        '${r.primeiroProfissional}.',
+                        style: TatuTexto.nota,
+                      ),
+                    ],
                   ),
           ),
         ],

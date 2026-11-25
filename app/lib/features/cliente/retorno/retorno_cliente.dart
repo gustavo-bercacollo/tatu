@@ -30,6 +30,10 @@ import '../mensagens/chat_page.dart';
 /// nos testes, que controlam cada resposta).
 Duration? simularAceiteRetorno = const Duration(seconds: 4);
 
+/// Protótipo: depois do aceite, o profissional sai para o retorno (RN-207:
+/// o card da Atividade muda para "a caminho").
+Duration simularSaidaRetorno = const Duration(seconds: 20);
+
 /// RN-45/RN-184: o cliente pede o retorno de [p]. Nas primeiras 24 horas
 /// o valor continua retido (RN-46). Devolve nulo se já houver um pedido.
 PedidoRetorno? pedirRetornoCliente(
@@ -64,7 +68,10 @@ PedidoRetorno? pedirRetornoCliente(
   // Protótipo: a profissional responde e marca a próxima sexta às 14h.
   final espera = simularAceiteRetorno;
   if (r != null && espera != null) {
-    Timer(espera, () => retornos.aceitar(r, _proximaSexta(clock.now())));
+    Timer(espera, () {
+      retornos.aceitar(r, _proximaSexta(clock.now()));
+      Timer(simularSaidaRetorno, () => retornos.saiuParaRetorno(r));
+    });
   }
   return r;
 }

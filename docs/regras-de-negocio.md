@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 25/11/2026 (v37)
+Atualizado em 25/11/2026 (v38)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -76,9 +76,9 @@ Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do própri
 | RN | Regra |
 | --- | --- |
 | RN-26 | O valor é combinado no chat. O profissional define dois valores: Visita (pode ser zero) e Serviço. O cliente confirma o total uma vez. |
-| RN-27 | São até 3 rodadas de proposta. Sem acordo, o chamado é encerrado e nada é cobrado. No 3º valor, o cliente confirma ou recusa (RN-207). |
-| RN-207 | No 3º valor, "Pedir outro valor" vira "Recusar valor" (vermelho) e o cartão avisa antes: "Último valor. Se recusar, a conversa com a [nome] termina sem custo." Recusar abre a folha "Recusar o valor?" com três saídas: "Recusar e chamar outro" (o pedido volta à busca, RN-18 a RN-20), "Recusar e cancelar pedido" (volta para a Home com "Pedido cancelado. Nada foi cobrado.") e "Voltar". Nada é cobrado, nem a visita, e o endereço exato nunca chega ao profissional (RN-28). |
-| RN-208 | Depois da recusa, o profissional vê "Sem acordo de valor" ("A [cliente] recusou o último valor. O chamado foi encerrado sem custo e não conta contra você.") e continua online. Ele não recebe de novo o mesmo pedido. Sem acordo não conta como cancelamento (RN-64) nem como abandono (RN-79) para nenhum dos dois. A conversa fica nas Mensagens dos dois só para leitura, com "Sem acordo de valor". |
+| RN-27 | São até 3 rodadas de proposta. Sem acordo, o chamado é encerrado e nada é cobrado. No 3º valor, o cliente confirma ou recusa (RN-208). |
+| RN-208 | No 3º valor, "Pedir outro valor" vira "Recusar valor" (vermelho) e o cartão avisa antes: "Último valor. Se recusar, a conversa com a [nome] termina sem custo." Recusar abre a folha "Recusar o valor?" com três saídas: "Recusar e chamar outro" (o pedido volta à busca, RN-18 a RN-20), "Recusar e cancelar pedido" (volta para a Home com "Pedido cancelado. Nada foi cobrado.") e "Voltar". Nada é cobrado, nem a visita, e o endereço exato nunca chega ao profissional (RN-28). |
+| RN-209 | Depois da recusa, o profissional vê "Sem acordo de valor" ("A [cliente] recusou o último valor. O chamado foi encerrado sem custo e não conta contra você.") e continua online. Ele não recebe de novo o mesmo pedido. Sem acordo não conta como cancelamento (RN-64) nem como abandono (RN-79) para nenhum dos dois. A conversa fica nas Mensagens dos dois só para leitura, com "Sem acordo de valor". |
 | RN-28 | O endereço exato só vai para o profissional depois que o valor é confirmado. Antes disso, ele vê só o bairro e a distância. |
 | RN-29 | Pagamento só pelo app: cartão ou Pix. Não existe pagamento "por fora" nem em dinheiro. |
 | RN-30 | Ao confirmar o valor, o total fica reservado no cartão padrão. Não é cobrado ainda. |
@@ -204,6 +204,7 @@ Quem cancela ou falha não transfere o custo para o outro lado nem para o Tatu.
 | RN-197 | **Termo de garantia no recibo** (CDC, art. 50, parágrafo único): o recibo de cada serviço mostra o bloco "Garantia": "Retorno sem custo até [data] ([30 ou 90] dias)", "Como pedir: Atividade → serviço → Algo errado?", "Seus direitos pelo Código do Consumidor continuam." e o link "Ver termo de garantia" (texto da seção 11 dos Termos). Vai também no PDF e no e-mail do recibo. |
 | RN-198 | **Revisão de decisão automática** (LGPD, art. 20): toda decisão tomada só pelo sistema no retorno (devolução automática, falta, retorno dado como cumprido, "resolvido" por falta de resposta, pausa por faltas) mostra **"Pedir revisão"**. O pedido vale por 7 dias e uma pessoa do Tatu revisa em até 3 dias úteis. A decisão da mediação (RN-191) já é de uma pessoa e não tem nova revisão. |
 | RN-199 | **Fotos e provas:** as fotos do serviço e do retorno são usadas só como prova (retorno, mediação, chargeback). Ficam guardadas por [5 anos] (exemplo, prazo do CDC para ações por danos, art. 27), com acesso restrito ao suporte, e depois são apagadas. A IA da mediação só resume e sugere; quem decide é uma pessoa. |
+| RN-207 | **Card do retorno em Atividade → Em andamento (cliente).** Mesma estrutura dos outros cards: foto com as iniciais, nome, "[profissão] · [descrição do serviço]". **Retorno agendado:** selo verde "Retorno · sem custo" à direita; abaixo de uma linha divisória, a data e a hora completas com ícone de calendário ("Sexta, 27 nov · 14h"), sem cortar; embaixo, "Na hora, passe o código para o [nome]." **A caminho em diante:** pílula escura com o tempo ("8 min"), subtítulo "[profissão] · Retorno · sem custo" (com "Retorno · sem custo" em verde) e a linha de etapas Agendado → A caminho → Retorno → Feito. O card tem a mesma altura nos dois estados. |
 
 **Textos**
 
@@ -356,7 +357,7 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 - [ ] **Antecedentes criminais (adiado).** Pedir certidão de antecedentes de quem cuida de criança, idoso ou pessoa com deficiência, ou de todos que vão até a casa do cliente. Atualizar a Política de Privacidade se for adotado.
 - [ ] **Uso fora da finalidade (adiado).** Proposta: (1) IA confere se o pedido é um serviço do catálogo e bloqueia termos proibidos ("Esse pedido não é um serviço do Tatu"); (2) profissões sensíveis (ex.: massagem) com regra extra e "acompanhante" fora do catálogo; (3) trava de autopagamento (mesmo CPF, celular, aparelho, cartão ou Pix dos dois lados); (4) revisão de serviços sem chegada/código, valores muito acima do normal e muitos serviços caros entre as mesmas pessoas; (5) teto de valor e sem parcelamento nos primeiros serviços de conta nova; (6) fila de revisão, banimento e comunicação às autoridades; parceiro de pagamentos com antifraude.
 - [ ] **Números do retorno.** Exemplos a confirmar: 48 horas para o profissional responder, 7 dias para marcar, 48 horas para o cliente responder "Resolveu?", 3 dias úteis de mediação, 3 faltas em 90 dias, 3 "não procede" em 6 meses, reserva de 1% da comissão. Classificação 30/90 dias do catálogo a validar com o advogado. Prazo de guarda das fotos (5 anos é exemplo, J-06).
-- [ ] **Último valor sem resposta.** O que acontece quando o cliente não confirma nem recusa o 3º valor. Sugestão: depois de um prazo (ex.: 10 minutos) vale como recusa e o pedido volta à busca (RN-207).
+- [ ] **Último valor sem resposta.** O que acontece quando o cliente não confirma nem recusa o 3º valor. Sugestão: depois de um prazo (ex.: 10 minutos) vale como recusa e o pedido volta à busca (RN-208).
 - [ ] **Seus profissionais (adiado).** Lista em Atividade com quem já atendeu o cliente e botão Chamar (RN-83). Saiu do app em 24/11/2026; decidir depois se volta e como.
 - [ ] **Ligação pelo app.** Escolher como fazer a ligação sem mostrar o número: pela internet (mais barato) ou número intermediário (custo por minuto).
 
@@ -394,13 +395,15 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-26 | Depois do serviço: diferença entre "Pedir de novo" e mandar mensagem no chat; evitar serviços infinitos só pela mensagem. | Resolvido | RN-42, RN-175 a RN-182 |
 | P-27 | Plano fixo sem identificação clara nas listas e conversas. | Resolvido | RN-200 a RN-205 |
 | P-28 | Card do plano fixo em Atividade → Em andamento desorganizado e fora do padrão. | Resolvido | RN-206 |
-| P-29 | Depois das 3 rodadas, o cliente não tem como recusar o valor. | Resolvido | RN-27, RN-207, RN-208 |
+| P-29 | Card do retorno em Atividade → Em andamento com pouca informação e data cortada. | Resolvido | RN-207 |
+| P-30 | Depois das 3 rodadas, o cliente não tem como recusar o valor. | Resolvido | RN-27, RN-208, RN-209 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
-| 25/11/2026 | RN-27, RN-207, RN-208 | Cliente recusa o 3º valor ("Recusar valor") e escolhe chamar outro ou cancelar. Sem custo e sem penalidade; o profissional não recebe de novo o mesmo pedido. |
+| 25/11/2026 | RN-27, RN-208, RN-209 | Cliente recusa o 3º valor ("Recusar valor") e escolhe chamar outro ou cancelar. Sem custo e sem penalidade; o profissional não recebe de novo o mesmo pedido. |
+| 25/11/2026 | RN-207 | Novo card do retorno em Atividade → Em andamento: data e hora completas, selo "Retorno · sem custo", dica do código e etapas quando o profissional sai. |
 | 25/11/2026 | RN-201, RN-206 | Novo card da visita do plano em Atividade → Em andamento: selo na foto, barra do mês e etapas quando a profissional sai. |
 | 24/11/2026 | RN-202 | Botão "Mensagem" na tela do plano fixo. |
 | 24/11/2026 | RN-83, RN-86, RN-200 a RN-205 | Identificação do plano fixo: selo único "Plano fixo", barra no chat, fixo × avulso, faixa no dia da visita e estados. "Seus profissionais" adiado. |

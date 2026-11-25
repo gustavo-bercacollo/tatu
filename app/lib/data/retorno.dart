@@ -150,6 +150,9 @@ const _mesesCurtos = [
 String dataCurta(DateTime d) =>
     '${d.day.toString().padLeft(2, '0')} ${_mesesCurtos[d.month - 1]}';
 
+/// RN-207: etapas do retorno no card da Atividade (cliente).
+const etapasRetorno = ['Agendado', 'A caminho', 'Retorno', 'Feito'];
+
 /// "26 nov, 21:00".
 String diaHora(DateTime d) =>
     '${diaMes(d)}, ${d.hour.toString().padLeft(2, '0')}:'
@@ -392,6 +395,10 @@ class PedidoRetorno {
 
   /// RN-187: o retorno começa com o código na porta (RN-39).
   String codigo = RegrasCodigo.gerar();
+
+  /// RN-207: o profissional saiu para o retorno (pílula "8 min").
+  bool aCaminho = false;
+  int minutosParaChegar = 8;
 
   /// RN-186: motivo da recusa.
   String? motivoRecusa;
@@ -653,6 +660,15 @@ class RetornosRepo extends ChangeNotifier {
       ..outroProblema = descricao;
     notifyListeners();
     return true;
+  }
+
+  /// RN-207: o profissional saiu para o retorno marcado.
+  void saiuParaRetorno(PedidoRetorno r, {int minutos = 8}) {
+    if (r.situacao != SituacaoRetorno.aceito || r.marcadoPara == null) return;
+    r
+      ..aCaminho = true
+      ..minutosParaChegar = minutos;
+    notifyListeners();
   }
 
   /// RN-187: o código na porta foi digitado e o retorno terminou.
