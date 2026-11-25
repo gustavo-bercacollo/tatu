@@ -20,15 +20,16 @@ void main() {
     );
     await t.tap(find.text('Atividade'));
     await t.pumpAndSettle();
+    // Abre em "Em andamento": os serviços ativos primeiro.
+    expect(find.text('Nenhum serviço agora'), findsOneWidget);
     // Os ganhos ficam na aba Ganhos, não na Atividade.
     expect(find.text('Esta semana'), findsNothing);
+
+    await t.tap(find.text('Concluídos'));
+    await t.pump();
     expect(find.text('Aguardando pagamento'), findsOneWidget);
     expect(find.text('Rafael Gomes'), findsOneWidget);
     expect(find.text('Por fora'), findsNothing);
-
-    await t.tap(find.text('Em andamento'));
-    await t.pump();
-    expect(find.text('Nenhum serviço agora'), findsOneWidget);
 
     await t.tap(find.text('Ganhos'));
     await t.pumpAndSettle();
@@ -89,7 +90,8 @@ void main() {
     await t.pumpWidget(
       MaterialApp(
         theme: tatuTheme(),
-        home: const AtividadeProfissionalPage(aba: 0),
+        // Abre em "Em andamento" por padrão.
+        home: const AtividadeProfissionalPage(),
       ),
     );
     expect(find.text('Nenhum serviço agora'), findsOneWidget);

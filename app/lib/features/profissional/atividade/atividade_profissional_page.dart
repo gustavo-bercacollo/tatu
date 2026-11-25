@@ -26,9 +26,9 @@ import '../abas.dart';
 /// P29 · Atividade do profissional: os serviços (em andamento e
 /// concluídos). Os ganhos ficam na aba Ganhos.
 class AtividadeProfissionalPage extends StatefulWidget {
-  const AtividadeProfissionalPage({super.key, this.aba = 1});
+  const AtividadeProfissionalPage({super.key, this.aba = 0});
 
-  /// 0 = Em andamento, 1 = Concluídos.
+  /// 0 = Em andamento (padrão: os serviços ativos primeiro), 1 = Concluídos.
   final int aba;
 
   @override

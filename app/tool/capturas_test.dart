@@ -3112,7 +3112,11 @@ void main() {
   });
 
   testWidgets('pro-atividade', (t) async {
-    await _capturar(t, 'pro-atividade', const AtividadeProfissionalPage());
+    await _capturar(
+      t,
+      'pro-atividade',
+      const AtividadeProfissionalPage(aba: 1),
+    );
   });
 
   testWidgets('pro-atividade-servico', (t) async {
