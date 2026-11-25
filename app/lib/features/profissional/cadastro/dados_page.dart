@@ -105,8 +105,8 @@ class _DadosProfissionalPageState extends State<DadosProfissionalPage> {
             MascaraFormatter('###.###.###-##'),
           ],
           errorText: cpfCompleto && _cpfComDivida
-              ? 'Este CPF tem uma dívida com o Tatu. Quite antes de abrir '
-                    'outra conta.'
+              ? 'Há uma dívida ligada à sua conta no Tatu. Quite antes de '
+                    'abrir outra conta.'
               : (cpfCompleto || _cpfTocado) && !_cpfOk && cpfCompleto
               ? 'CPF inválido. Confira os números.'
               : null,

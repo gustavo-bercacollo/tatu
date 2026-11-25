@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -380,6 +381,71 @@ class CartaoTatuRetorno extends StatelessWidget {
   }
 }
 
+/// RN-198: "Pedir revisão" de uma decisão tomada só pelo sistema. Vale
+/// por 7 dias; depois de pedir, mostra até quando uma pessoa responde.
+/// A decisão da mediação (RN-191) é de uma pessoa e não usa isto.
+class PedirRevisao extends StatelessWidget {
+  const PedirRevisao({
+    super.key,
+    required this.decisao,
+    required this.quem,
+    required this.decididoEm,
+    this.servico,
+    this.texto = 'Não foi isso? Pedir revisão',
+  });
+
+  final DecisaoAutomatica decisao;
+
+  /// Quem pede (nome da conta).
+  final String quem;
+  final DateTime decididoEm;
+  final String? servico;
+  final String texto;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: retornos,
+      builder: (context, _) {
+        final pedido = retornos.revisaoDe(quem, decisao, servico);
+        if (pedido != null) {
+          return Text(
+            'Revisão pedida · uma pessoa do Tatu responde até '
+            '${dataCurta(pedido.respostaAte)}',
+            style: TatuTexto.nota,
+          );
+        }
+        if (!RegrasRetorno.podePedirRevisao(decididoEm, clock.now())) {
+          return const SizedBox.shrink();
+        }
+        return Semantics(
+          button: true,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => retornos.pedirRevisao(
+              decisao: decisao,
+              quem: quem,
+              decididoEm: decididoEm,
+              servico: servico,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Text(
+                texto,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: TatuColors.verified,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 /// RN-187: card "Retorno · sem custo" na Atividade dos dois.
 class CartaoRetornoAtividade extends StatelessWidget {
   const CartaoRetornoAtividade({
@@ -453,7 +519,15 @@ class CartaoDecisaoTatu extends StatelessWidget {
     required this.texto,
     required this.rodape,
     this.rodapeAviso = false,
+    this.cabecalho = 'Decisão do Tatu',
+    this.revisao,
   });
+
+  /// "Decisão do Tatu" (pessoa) ou "Resolvido automaticamente" (sistema).
+  final String cabecalho;
+
+  /// RN-198: "Pedir revisão" (só nas decisões automáticas).
+  final Widget? revisao;
 
   /// "Devolvemos R$ 150,00".
   final String titulo;
@@ -479,7 +553,7 @@ class CartaoDecisaoTatu extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Decisão do Tatu', style: TatuTexto.nota),
+            Text(cabecalho, style: TatuTexto.nota),
             const SizedBox(height: 6),
             Text(
               titulo,
@@ -514,6 +588,7 @@ class CartaoDecisaoTatu extends StatelessWidget {
                 ),
               ],
             ),
+            if (revisao != null) ...[const SizedBox(height: 4), revisao!],
           ],
         ),
       ),

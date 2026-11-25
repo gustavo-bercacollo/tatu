@@ -45,18 +45,71 @@ void conferirPrazosRetorno({DateTime? agora}) {
     if (antes[r] != r.situacao &&
         r.situacao == SituacaoRetorno.resolvidoAutomatico) {
       _cobrar(r, RegrasRetorno.devolucao(r.valorServico));
+      _avisarResolvidoAutomatico(r);
     }
   }
+  // RN-199: fotos guardadas além do prazo são apagadas.
+  retornos.apagarFotosAntigas(agora: agora);
+}
+
+/// P157 · RN-198: o profissional recebe a decisão automática pelo canal
+/// do Tatu, com "Pedir revisão".
+void _avisarResolvidoAutomatico(PedidoRetorno r) {
+  if (!_ehOProfissional(r.profissional)) return;
+  canalTatu.profissional.receber(mensagemResolvidoAutomatico(r));
+}
+
+/// P157 · "Resolvido automaticamente · Devolução de R$ X · 1 falta".
+MensagemTatu mensagemResolvidoAutomatico(PedidoRetorno r) {
+  final em = r.decididoEm ?? clock.now();
+  final motivo = switch (r.falha) {
+    FalhaProfissional.naoMarcou =>
+      'você não marcou o retorno em ${RegrasRetorno.marcarEm.inDays} dias',
+    FalhaProfissional.naoVeio => 'você não veio no retorno marcado',
+    _ =>
+      'você não respondeu em '
+          '${RegrasRetorno.respostaProfissional.inHours} horas',
+  };
+  final devolucao = r.resolucao == ResolucaoAutomatica.devolucao;
+  return MensagemTatu(
+    id: 'automatico-${r.servico}',
+    em: em,
+    resumo: 'Retorno resolvido automaticamente',
+    texto:
+        'Oi, ${profissional.primeiroNome}! ${r.clienteFeminina ? 'A' : 'O'} '
+        '${r.primeiroCliente} pediu um retorno do serviço de '
+        '${r.diaServico} e $motivo.',
+    decisao: DecisaoTatu(
+      titulo: devolucao
+          ? 'Devolução de ${reais(r.valorServico)}'
+          : 'Outro profissional vai refazer',
+      texto: devolucao
+          ? 'Descontada dos seus próximos repasses.'
+          : 'Até ${reais(r.valorServico)}, descontado dos seus próximos '
+                'repasses.',
+      rodape: '1 falta registrada',
+      rodapeAviso: true,
+      automatica: true,
+      revisaoServico: r.servico,
+      revisaoEm: em,
+      revisaoQuem: r.profissional,
+    ),
+    textoDepois:
+        'Algo impediu sua resposta? Peça revisão em até '
+        '${RegrasRetorno.prazoRevisao.inDays} dias. Uma pessoa do Tatu '
+        'analisa.',
+  );
 }
 
 /// RN-188: o profissional não apareceu no retorno marcado.
 void naoVeioNoRetorno(PedidoRetorno r) {
   retornos.naoVeio(r, presos: saldoPresoDe, falta: faltaNoRetorno);
   _cobrar(r, RegrasRetorno.devolucao(r.valorServico));
+  _avisarResolvidoAutomatico(r);
 }
 
 /// RN-192: o que o profissional recebeu sai dos presos; sem saldo, vira
-/// dívida no CPF. A comissão o Tatu devolve.
+/// dívida ligada à conta dele no Tatu. A comissão o Tatu devolve.
 void _cobrar(PedidoRetorno r, Devolucao d) {
   if (!_ehOProfissional(r.profissional) || d.total <= 0) return;
   final saldo = saldoPresoDe(r.profissional);

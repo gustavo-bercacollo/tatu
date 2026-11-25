@@ -199,8 +199,8 @@ class EncerrarPerfilPage extends StatelessWidget {
     // RN-185/RN-192: com retorno aberto ou dívida, não encerra.
     final abertos = retornos.abertosDe(profissional.nome).length;
     final bloqueio = profissional.comDivida
-        ? 'Você tem ${reais(profissional.divida)} de retorno para acertar '
-              'com o Tatu. Quite antes de encerrar.'
+        ? 'Você tem uma dívida ligada à sua conta no Tatu '
+              '(${reais(profissional.divida)}). Quite antes de encerrar.'
         : abertos > 0
         ? 'Você tem ${abertos == 1 ? 'um retorno aberto' : '$abertos retornos abertos'}. '
               'Resolva antes de encerrar.'

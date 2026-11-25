@@ -34,11 +34,12 @@
   <line x1="91" y1="396" x2="355" y2="396" stroke="#D9D9DC" stroke-width="0.5"/>
   <g transform="translate(91,402) scale(0.6666666666666666)" fill="none" stroke="#8E8E93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/></g>
   <text x="115" y="416" font-size="13" font-weight="600" fill="#8E8E93" text-anchor="start">Retorno marcado · sexta, 28 nov · 14h</text>
-  <rect x="20" y="440" width="353" height="96" rx="18" fill="#FFF4E0"/>
+  <rect x="20" y="440" width="353" height="126" rx="18" fill="#FFF4E0"/>
   <g transform="translate(36,458) scale(0.75)" fill="none" stroke="#A85F00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/><path d="M12 16h.01"/></g>
   <text x="62" y="472" font-size="15" font-weight="700" fill="#A85F00" text-anchor="start">Você não estava no retorno</text>
   <text x="36" y="498" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">A Luiza veio às 14h e esperou 15 min.</text>
   <text x="36" y="517" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">O retorno foi dado como cumprido.</text>
+  <text x="36" y="550" font-size="13" font-weight="600" fill="#007AFF" text-anchor="start">Não foi isso? Pedir revisão</text>
   <circle cx="36" cy="799" r="18" fill="#EEEEF0"/>
   <g transform="translate(27,790) scale(0.75)" fill="none" stroke="#000000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"/><path d="M12 13m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/></g>
   <rect x="62" y="781" width="267" height="38" rx="19" fill="#EEEEF0"/>

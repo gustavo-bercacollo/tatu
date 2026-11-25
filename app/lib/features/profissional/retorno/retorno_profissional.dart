@@ -129,15 +129,24 @@ List<Widget> secaoRetornoProfissional(
         },
         TatuColors.danger,
       );
-      depois.add(
+      depois.addAll([
         CartaoSituacaoRetorno(
           aviso: true,
-          titulo: 'Contou 1 falta',
+          titulo: 'Resolvido automaticamente · 1 falta',
           nota:
               '${reais(RegrasRetorno.devolucao(r.valorServico).doProfissional)}'
               ' descontados dos seus repasses.',
         ),
-      );
+        // RN-198: a falta e a devolução foram decididas pelo sistema.
+        if (r.decididoEm != null)
+          PedirRevisao(
+            decisao: DecisaoAutomatica.falta,
+            quem: r.profissional,
+            decididoEm: r.decididoEm!,
+            servico: r.servico,
+            texto: 'Pedir revisão',
+          ),
+      ]);
     case SituacaoRetorno.emMediacao:
       linha = SituacaoCartaoRetorno(
         TablerIcons.shield_check,
@@ -529,7 +538,7 @@ Future<void> clienteNaoEstava(BuildContext context, PedidoRetorno r) async {
   if (sim) retornos.clienteAusente(r);
 }
 
-/// P157 · RN-185: "R$ 150,00 presos · Retorno da Ana aberto · solta ao
+/// P158 · RN-185: "R$ 150,00 presos · Retorno da Ana aberto · solta ao
 /// resolver" (Ganhos).
 class CartaoRepassePreso extends StatelessWidget {
   const CartaoRepassePreso({super.key, required this.profissional});

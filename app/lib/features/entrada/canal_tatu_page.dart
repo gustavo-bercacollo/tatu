@@ -1,4 +1,5 @@
-import '../../shared/widgets/retorno.dart' show CartaoDecisaoTatu;
+import '../../data/retorno.dart' show DecisaoAutomatica;
+import '../../shared/widgets/retorno.dart' show CartaoDecisaoTatu, PedirRevisao;
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -294,6 +295,19 @@ class _CanalTatuPageState extends State<CanalTatuPage> {
             texto: d.texto,
             rodape: d.rodape,
             rodapeAviso: d.rodapeAviso,
+            cabecalho: d.automatica
+                ? 'Resolvido automaticamente'
+                : 'Decisão do Tatu',
+            // P157 · RN-198: só a decisão automática pode ser revista.
+            revisao: d.automatica && d.revisaoEm != null
+                ? PedirRevisao(
+                    decisao: DecisaoAutomatica.falta,
+                    quem: d.revisaoQuem ?? '',
+                    decididoEm: d.revisaoEm!,
+                    servico: d.revisaoServico,
+                    texto: 'Pedir revisão',
+                  )
+                : null,
           ),
         );
       }

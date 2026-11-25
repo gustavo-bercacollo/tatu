@@ -121,7 +121,7 @@ class _GanhosPageState extends State<GanhosPage> {
                   _Barras(resumo: r),
                 ],
                 const SizedBox(height: TatuMedidas.entreSecoes),
-                // P157 · RN-185: repasses presos por retorno aberto.
+                // P158 · RN-185: repasses presos por retorno aberto.
                 CartaoRepassePreso(profissional: profissional.nome),
                 // RN-35: quando o dinheiro cai.
                 _Caixa(

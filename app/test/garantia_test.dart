@@ -45,7 +45,11 @@ void main() {
         for (final m in aspas.allMatches(linha)) {
           final t = m.group(1)!;
           final temPrazo =
-              t.contains('24') || t.toLowerCase().contains('garantia legal');
+              t.contains('24') ||
+              t.toLowerCase().contains('garantia legal') ||
+              // RN-197: o termo de garantia do recibo (com a data).
+              t.toLowerCase().contains('termo de garantia') ||
+              t == 'Garantia';
           // Títulos de seção ("5. Garantia") não prometem nada.
           final titulo = RegExp(r'^\d+\. ').hasMatch(t);
           if (!temPrazo && !titulo) semPrazo.add('${f.path}: $t');

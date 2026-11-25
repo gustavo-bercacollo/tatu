@@ -290,7 +290,7 @@ void main() {
   testWidgets('C224 · RN-183: depois de 24 h, "O problema voltou?"', (t) async {
     await _abrir(t, PedidoConcluidoPage(pedido: pedidos.concluidos.first));
     expect(find.text('O problema voltou?'), findsOneWidget);
-    expect(find.text('Peça um retorno sem custo até 2 fev.'), findsOneWidget);
+    expect(find.text('Peça um retorno sem custo até 02 fev.'), findsOneWidget);
     await t.tap(find.text('O problema voltou?'));
     await t.pumpAndSettle();
     expect(find.text('O que voltou a dar problema?'), findsOneWidget);
@@ -388,7 +388,7 @@ void main() {
     expect(find.textContaining('peça o código à Júlia'), findsOneWidget);
   });
 
-  testWidgets('P157 · RN-185: Ganhos mostra o repasse preso', (t) async {
+  testWidgets('P158 · RN-185: Ganhos mostra o repasse preso', (t) async {
     await _abrir(t, const GanhosPage());
     expect(find.text('R\$ 120,00 presos'), findsOneWidget);
     expect(

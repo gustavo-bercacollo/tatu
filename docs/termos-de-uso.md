@@ -91,7 +91,7 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 6.5. **Recebimento.** O Profissional recebe por **Pix, numa chave do próprio CPF**. O valor de cada pagamento fica retido por **24 horas** depois da conclusão e depois é transferido, já descontada a taxa de intermediação.
 
-6.5.1. **Retorno e descontos.** O Profissional autoriza o Tatu a: (a) prender os próximos repasses, até o valor do serviço, enquanto houver um pedido de retorno aberto sobre um serviço dele; e (b) descontar dos repasses presos e futuros os valores devolvidos ao Cliente ou pagos a outro profissional por decisão do Tatu (seção 11). O valor descontado é o que o Profissional recebeu pelo serviço; a taxa do Tatu é devolvida pelo próprio Tatu. Sem saldo, o valor fica como dívida ligada ao CPF do Profissional, que não recebe chamados nem pode abrir outra conta até quitá-la. [Revisar com advogado: J-01 e J-05.]
+6.5.1. **Retorno e descontos.** O Profissional autoriza o Tatu a: (a) prender os próximos repasses, até o valor do serviço, enquanto houver um pedido de retorno aberto sobre um serviço dele; e (b) descontar dos repasses presos e futuros os valores devolvidos ao Cliente ou pagos a outro profissional por decisão do Tatu (seção 11). O valor descontado é o que o Profissional recebeu pelo serviço; a taxa do Tatu é devolvida pelo próprio Tatu. Sem saldo, o valor fica como dívida ligada à conta do Profissional no Tatu, identificada pelo CPF. Ele não recebe chamados nem pode abrir outra conta até quitá-la. Essa dívida existe só dentro do Tatu e não é registrada em serviços de proteção ao crédito sem aviso prévio e procedimento próprio. [Revisar com advogado: J-01 e J-05.]
 
 6.6. **Tributos.** O Profissional é responsável por seus próprios tributos, contribuições, inscrição como autônomo ou MEI e emissão de documentos fiscais, quando exigidos por lei.
 
@@ -173,7 +173,11 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 11.7. **Abuso.** Pedidos repetidos considerados improcedentes podem suspender o retorno mediado pelo app por um período (Anexo I), sem prejuízo dos direitos legais do Cliente, que pode reclamar pela Ajuda. Profissionais que não respondem, não comparecem ou têm recusas derrubadas na mediação recebem faltas e podem ter a conta pausada (seção 15).
 
-11.8. **Outros canais.** O Cliente pode, a qualquer momento, procurar os órgãos de defesa do consumidor ou o Judiciário.
+11.8. **Termo de garantia.** O recibo de cada serviço traz o termo de garantia: até quando vale o retorno sem custo, como pedir e o aviso de que os direitos do Código de Defesa do Consumidor continuam. O recibo pode ser baixado em PDF ou enviado por e-mail.
+
+11.9. **Revisão de decisão automática.** Quando uma decisão do retorno é tomada só pelo sistema (devolução automática, falta, retorno dado como cumprido, retorno considerado resolvido por falta de resposta ou pausa por faltas), a pessoa afetada pode tocar em "Pedir revisão" em até 7 dias. Uma pessoa do Tatu revisa em até 3 dias úteis (LGPD, art. 20).
+
+11.10. **Outros canais.** O Cliente pode, a qualquer momento, procurar os órgãos de defesa do consumidor ou o Judiciário.
 
 ## 12. Serviço à distância
 
@@ -314,6 +318,7 @@ Os valores abaixo vêm das regras de negócio e **são provisórios até a decis
 | Prazo para marcar o retorno | até 7 dias | RN-186 |
 | Resposta do Cliente ("Resolveu?") | 48 horas | RN-187 |
 | Mediação do Tatu | até 3 dias úteis | RN-191 |
+| Pedido de revisão de decisão automática | até 7 dias para pedir; resposta em até 3 dias úteis | RN-198 |
 | Pausa por faltas no retorno (Profissional) | 3 em 90 dias | RN-193 |
 | Suspensão do retorno mediado (Cliente) | 3 pedidos improcedentes em 6 meses: 6 meses sem retorno mediado | RN-193 |
 | Prazo máximo de um valor em aberto | 7 dias | RN-89 |
@@ -341,5 +346,5 @@ Os valores abaixo vêm das regras de negócio e **são provisórios até a decis
 
 | Versão | Data | O que mudou |
 | --- | --- | --- |
-| 1.1 | 24/11/2026 (rascunho) | Seção 11 reescrita: garantia legal, pagamento protegido, retorno mediado e mediação (RN-183 a RN-196). Itens 6.5.1, 6.7, 9.4 e 19.2 ajustados. Novos prazos no Anexo I. |
+| 1.1 | 24/11/2026 (rascunho) | Seção 11 reescrita: garantia legal, pagamento protegido, retorno mediado e mediação (RN-183 a RN-196). Itens 6.5.1, 6.7, 9.4 e 19.2 ajustados. Termo de garantia no recibo (11.8) e revisão de decisão automática (11.9). Novos prazos no Anexo I. |
 | 1.0 | [DATA DE PUBLICAÇÃO] | Primeira versão, baseada nas regras de negócio v22 (RN-01 a RN-149). |

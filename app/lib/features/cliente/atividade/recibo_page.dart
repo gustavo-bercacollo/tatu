@@ -10,7 +10,11 @@ import '../../../data/pedidos.dart';
 import '../../../shared/widgets/aviso_topo.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/linha_do_tempo.dart';
+import '../../../shared/widgets/opcao_selecionavel.dart' show LinkAzul;
 import '../../../shared/widgets/tela_interna.dart';
+import '../../../data/recibo.dart';
+import '../../../data/documentos_legais.dart';
+import '../../entrada/documentos_legais_page.dart';
 import '../conta/novo_email_page.dart';
 
 /// Recibo do pedido (todo pagamento passa pelo app).
@@ -33,6 +37,8 @@ class ReciboPage extends StatelessWidget {
       conta.definirEmail(email);
     }
     if (!context.mounted) return;
+    // RN-197: o e-mail leva o termo de garantia.
+    recibos.enviarEmail(pedido, conta.email!);
     mostrarAvisoTopo(
       context,
       titulo: 'Recibo enviado',
@@ -90,13 +96,24 @@ class ReciboPage extends StatelessWidget {
               LinhaRotuloValor(rotulo: 'Pedido', valor: p.numero),
             ],
           ),
+          const SizedBox(height: TatuMedidas.entreItens + 4),
+          // C144 · RN-197: termo de garantia.
+          _BlocoGarantia(garantia: garantiaDe(p)),
         ],
       ),
       rodape: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           FilledButton(
-            onPressed: () => _emBreve(context, 'Baixar PDF'),
+            onPressed: () {
+              // RN-197: o PDF leva o termo de garantia.
+              recibos.gerarPdf(p);
+              mostrarAvisoTopo(
+                context,
+                titulo: 'PDF pronto',
+                texto: 'Recibo ${p.numero}, com o termo de garantia.',
+              );
+            },
             child: const Text('Baixar PDF'),
           ),
           const SizedBox(height: 10),
@@ -104,6 +121,66 @@ class ReciboPage extends StatelessWidget {
             style: tatuBotaoSecundario(),
             onPressed: () => _enviarPorEmail(context),
             child: const Text('Enviar por e-mail'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// C144 · RN-197: "Garantia": até quando, como pedir, direitos do CDC e
+/// o link para a seção 11 dos Termos.
+class _BlocoGarantia extends StatelessWidget {
+  const _BlocoGarantia({required this.garantia});
+
+  final GarantiaRecibo garantia;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: TatuColors.bg,
+        borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: const BoxDecoration(
+                  color: TatuColors.onlineSoft,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  TablerIcons.shield_check,
+                  size: 18,
+                  color: TatuColors.onlineTexto,
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                GarantiaRecibo.titulo,
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+          const SizedBox(height: TatuMedidas.entreItens),
+          Text(
+            garantia.linhaRetorno,
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 4),
+          const Text(GarantiaRecibo.comoPedir, style: TatuTexto.nota),
+          const Text(GarantiaRecibo.direitos, style: TatuTexto.nota),
+          const SizedBox(height: 4),
+          LinkAzul(
+            GarantiaRecibo.link,
+            onTap: () =>
+                abrirSecaoDocumento(context, TipoDocumento.termos, '11.'),
           ),
         ],
       ),

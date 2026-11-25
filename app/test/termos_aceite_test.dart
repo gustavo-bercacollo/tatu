@@ -75,7 +75,7 @@ void main() {
     });
 
     test('Política: versão, essencial e seções', () {
-      expect(politica.versao, '1.0');
+      expect(politica.versao, '1.1');
       expect(politica.essencial, isNotEmpty);
       expect(politica.numeradas, 14);
     });
@@ -123,7 +123,7 @@ void main() {
       });
       final a = aceites.ultimo(_cpf, TipoAceite.cliente)!;
       expect(a.versaoTermos, '1.1');
-      expect(a.versaoPolitica, '1.0');
+      expect(a.versaoPolitica, '1.1');
       expect(a.em, DateTime(2026, 11, 20, 14, 32));
       expect(a.conta, _cpf);
     });
@@ -169,7 +169,7 @@ void main() {
       expect(find.text('Do que você precisa?'), findsOneWidget);
       final a = aceites.ultimo(contaDoAceite(), TipoAceite.cliente)!;
       expect(a.versaoTermos, '1.2');
-      expect(a.versaoPolitica, '1.0');
+      expect(a.versaoPolitica, '1.1');
       expect(a.em, DateTime(2026, 12, 5, 9));
       });
     });

@@ -15,7 +15,8 @@ import '../../shared/widgets/folha.dart';
 import '../../shared/widgets/retorno.dart';
 import '../../shared/widgets/tela_interna.dart';
 
-/// Painel interno do suporte (RN-190, RN-191): só os 3 casos de mediação.
+/// Painel interno do suporte (RN-190, RN-191): só os 3 casos de mediação,
+/// mais a fila de revisões de decisões automáticas (RN-198).
 /// Não é tela do cliente nem do profissional. No protótipo abre segurando
 /// o nome "tatu" na tela de boas-vindas.
 class PainelMediacaoPage extends StatelessWidget {
@@ -30,10 +31,11 @@ class PainelMediacaoPage extends StatelessWidget {
           for (final r in retornos.retornos)
             if (r.situacao == SituacaoRetorno.emMediacao) r,
         ];
+        final revisoes = retornos.revisoes;
         return TelaInterna(
           titulo: 'Mediações',
           fundoCinza: true,
-          corpo: casos.isEmpty
+          corpo: casos.isEmpty && revisoes.isEmpty
               ? const EstadoVazio(
                   icone: TablerIcons.shield_check,
                   titulo: 'Nenhuma mediação aberta',
@@ -79,6 +81,42 @@ class PainelMediacaoPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: TatuMedidas.entreItens),
+                    ],
+                    // RN-198: revisões de decisões automáticas.
+                    if (revisoes.isNotEmpty) ...[
+                      const SizedBox(height: TatuMedidas.entreItens),
+                      const Text('REVISÕES', style: TatuTexto.secao),
+                      const SizedBox(height: 8),
+                      for (final v in revisoes) ...[
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: TatuColors.bg,
+                            borderRadius: BorderRadius.circular(
+                              TatuMedidas.raioOpcao,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${v.decisao.rotulo} · ${v.quem}',
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${v.servico ?? 'Conta'} · responder até '
+                                '${dataCurta(v.respostaAte)}',
+                                style: TatuTexto.nota,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: TatuMedidas.entreItens),
+                      ],
                     ],
                   ],
                 ),
@@ -167,12 +205,13 @@ class CasoMediacaoPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: TatuMedidas.entreSecoes),
         children: [
           _Bloco(
-            titulo: 'RESUMO (IA)',
+            // RN-199: a IA só resume e sugere; quem decide é a pessoa.
+            titulo: 'RESUMO (IA) · SÓ SUGERE',
             filhos: [
               Text(resumoMediacao(r), style: const TextStyle(fontSize: 16)),
               const SizedBox(height: TatuMedidas.entreItens),
               Text(
-                'Sugestão: ${sugerida.rotulo}',
+                'Sugestão da IA: ${sugerida.rotulo} · quem decide é você',
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -202,8 +241,10 @@ class CasoMediacaoPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 6),
-              const Text(
-                'Serviço pronto · problema · no local (com data e hora)',
+              Text(
+                'Serviço pronto · problema · no local (com data e hora). '
+                'Acesso restrito ao suporte; apagadas depois de '
+                '${RegrasRetorno.guardaFotos.inDays ~/ 365} anos.',
                 style: TatuTexto.nota,
               ),
             ],

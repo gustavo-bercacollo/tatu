@@ -45,6 +45,24 @@ abstract final class RegrasRetorno {
   static const janelaNaoProcede = Duration(days: 182);
   static const semRetornoMediado = Duration(days: 182);
 
+  /// RN-198: prazo para pedir revisão de uma decisão automática.
+  static const prazoRevisao = Duration(days: 7);
+
+  /// RN-198: resposta da revisão, em dias úteis.
+  static const revisaoDiasUteis = 3;
+
+  /// RN-199: guarda das fotos e provas (exemplo: 5 anos, CDC art. 27).
+  /// Depois disso são apagadas.
+  static const guardaFotos = Duration(days: 365 * 5);
+
+  /// RN-199: a foto ainda pode ficar guardada?
+  static bool fotoGuardada(DateTime tiradaEm, DateTime agora) =>
+      agora.difference(tiradaEm) < guardaFotos;
+
+  /// RN-198: ainda dá para pedir revisão de uma decisão de [em]?
+  static bool podePedirRevisao(DateTime em, DateTime agora) =>
+      agora.difference(em) <= prazoRevisao;
+
   /// RN-196: reserva mensal para os serviços que o Tatu paga.
   static const reservaDaComissao = 0.01;
 
@@ -106,9 +124,13 @@ abstract final class RegrasRetorno {
   }
 
   /// RN-191: prazo da mediação em dias úteis (pula sábado e domingo).
-  static DateTime prazoMediacao(DateTime desde) {
+  static DateTime prazoMediacao(DateTime desde) =>
+      somarDiasUteis(desde, mediacaoDiasUteis);
+
+  /// [dias] úteis depois de [desde] (pula sábado e domingo).
+  static DateTime somarDiasUteis(DateTime desde, int dias) {
     var d = desde;
-    var faltam = mediacaoDiasUteis;
+    var faltam = dias;
     while (faltam > 0) {
       d = d.add(const Duration(days: 1));
       if (d.weekday != DateTime.saturday && d.weekday != DateTime.sunday) {
@@ -118,6 +140,15 @@ abstract final class RegrasRetorno {
     return d;
   }
 }
+
+const _mesesCurtos = [
+  'jan', 'fev', 'mar', 'abr', 'mai', 'jun',
+  'jul', 'ago', 'set', 'out', 'nov', 'dez',
+];
+
+/// "02 fev" (dia com dois dígitos, como no recibo e no cartão do retorno).
+String dataCurta(DateTime d) =>
+    '${d.day.toString().padLeft(2, '0')} ${_mesesCurtos[d.month - 1]}';
 
 /// "26 nov, 21:00".
 String diaHora(DateTime d) =>
@@ -235,6 +266,42 @@ enum SituacaoRetorno {
   encerrado,
 }
 
+/// RN-198: decisões tomadas só pelo sistema, que podem ser revistas.
+enum DecisaoAutomatica {
+  devolucaoAutomatica('Devolução automática'),
+  falta('Falta'),
+  cumpridoAusente('Retorno dado como cumprido'),
+  resolvidoSemResposta('Resolvido por falta de resposta'),
+  pausaPorFaltas('Pausa por faltas');
+
+  const DecisaoAutomatica(this.rotulo);
+  final String rotulo;
+}
+
+/// RN-198: pedido de revisão na fila do suporte.
+@immutable
+class PedidoRevisao {
+  const PedidoRevisao({
+    required this.decisao,
+    required this.quem,
+    required this.pedidoEm,
+    this.servico,
+  });
+
+  final DecisaoAutomatica decisao;
+
+  /// Nome de quem pediu (cliente ou profissional).
+  final String quem;
+
+  /// Número do serviço (nulo na pausa por faltas).
+  final String? servico;
+  final DateTime pedidoEm;
+
+  /// Uma pessoa do Tatu responde até aqui.
+  DateTime get respostaAte =>
+      RegrasRetorno.somarDiasUteis(pedidoEm, RegrasRetorno.revisaoDiasUteis);
+}
+
 /// RN-188: por que a resolução automática aconteceu.
 enum FalhaProfissional { naoRespondeu, naoMarcou, naoVeio }
 
@@ -348,6 +415,22 @@ class PedidoRetorno {
   /// RN-189: recusado e o cliente ainda não escolheu.
   DateTime? recusadoEm;
 
+  /// RN-198: quando o sistema decidiu sozinho (resolução automática,
+  /// cumprido por ausência ou "resolvido" sem resposta).
+  DateTime? decididoEm;
+
+  /// RN-187/RN-198: encerrado porque o cliente não respondeu "Resolveu?".
+  bool resolvidoSemResposta = false;
+
+  /// RN-198: decisão automática deste retorno (nula = nenhuma).
+  DecisaoAutomatica? get decisaoAutomatica => switch (situacao) {
+    SituacaoRetorno.resolvidoAutomatico => DecisaoAutomatica.devolucaoAutomatica,
+    SituacaoRetorno.cumpridoAusente => DecisaoAutomatica.cumpridoAusente,
+    SituacaoRetorno.encerrado when resolvidoSemResposta =>
+      DecisaoAutomatica.resolvidoSemResposta,
+    _ => null,
+  };
+
   String get primeiroProfissional => profissional.split(' ').first;
   String get primeiroCliente => cliente.split(' ').first;
 
@@ -380,11 +463,76 @@ class RetornosRepo extends ChangeNotifier {
   /// RN-193: "não procede" do cliente da conta (datas).
   final naoProcedeCliente = <DateTime>[];
 
+  /// RN-198: fila de revisões para o suporte.
+  final revisoes = <PedidoRevisao>[];
+
+  /// RN-198: [quem] já pediu revisão desta decisão?
+  PedidoRevisao? revisaoDe(String quem, DecisaoAutomatica d, String? servico) =>
+      revisoes
+          .where(
+            (r) => r.quem == quem && r.decisao == d && r.servico == servico,
+          )
+          .firstOrNull;
+
+  /// RN-198: pede a revisão (até 7 dias da decisão; uma por decisão).
+  /// Devolve o pedido, ou nulo se passou do prazo ou já pediu.
+  PedidoRevisao? pedirRevisao({
+    required DecisaoAutomatica decisao,
+    required String quem,
+    required DateTime decididoEm,
+    String? servico,
+    DateTime? agora,
+  }) {
+    final hoje = agora ?? clock.now();
+    if (!RegrasRetorno.podePedirRevisao(decididoEm, hoje)) return null;
+    if (revisaoDe(quem, decisao, servico) != null) return null;
+    final p = PedidoRevisao(
+      decisao: decisao,
+      quem: quem,
+      servico: servico,
+      pedidoEm: hoje,
+    );
+    revisoes.add(p);
+    notifyListeners();
+    return p;
+  }
+
+  /// RN-199: apaga as fotos guardadas há mais do prazo.
+  void apagarFotosAntigas({DateTime? agora}) {
+    final hoje = agora ?? clock.now();
+    bool velha(FotoProva f) => !RegrasRetorno.fotoGuardada(f.tiradaEm, hoje);
+    for (final r in retornos) {
+      r.fotos.removeWhere(velha);
+      if (r.fotoNoLocal != null && velha(r.fotoNoLocal!)) r.fotoNoLocal = null;
+    }
+    for (final e in provas.entries.toList()) {
+      final p = e.value;
+      if (p.fotos.any(velha)) {
+        provas[e.key] = PacoteProvas(
+          servico: p.servico,
+          valorConfirmado: p.valorConfirmado,
+          confirmadoEm: p.confirmadoEm,
+          codigoPorta: p.codigoPorta,
+          fotos: [
+            for (final f in p.fotos)
+              if (!velha(f)) f,
+          ],
+          chat: p.chat,
+          conclusaoConfirmadaEm: p.conclusaoConfirmadaEm,
+        );
+      }
+    }
+    final pronto = fotoServicoPronto;
+    if (pronto != null && velha(pronto)) fotoServicoPronto = null;
+    notifyListeners();
+  }
+
   /// RN-194: pacote de provas de cada serviço, pelo número.
   final provas = <String, PacoteProvas>{};
 
-  /// RN-192: dívidas sem saldo, pelo CPF (só dígitos). Com dívida, o CPF
-  /// não recebe chamados nem abre outra conta até quitar.
+  /// RN-192: dívidas sem saldo, ligadas à conta no Tatu (identificada
+  /// pelo CPF, só dígitos; não é negativação). Com dívida, não recebe
+  /// chamados nem abre outra conta até quitar.
   final dividasPorCpf = <String, double>{};
 
   bool cpfComDivida(String cpf) =>
@@ -420,6 +568,7 @@ class RetornosRepo extends ChangeNotifier {
         ),
       );
     naoProcedeCliente.clear();
+    revisoes.clear();
     provas.clear();
     dividasPorCpf.clear();
     fotoServicoPronto = null;
@@ -524,8 +673,10 @@ class RetornosRepo extends ChangeNotifier {
   }
 
   /// RN-187: o cliente não estava no dia: dado como cumprido.
-  void clienteAusente(PedidoRetorno r) {
-    r.situacao = SituacaoRetorno.cumpridoAusente;
+  void clienteAusente(PedidoRetorno r, {DateTime? agora}) {
+    r
+      ..situacao = SituacaoRetorno.cumpridoAusente
+      ..decididoEm = agora ?? clock.now();
     notifyListeners();
   }
 
@@ -576,12 +727,24 @@ class RetornosRepo extends ChangeNotifier {
     for (final r in retornos) {
       switch (r.situacao) {
         case SituacaoRetorno.aguardando when hoje.isAfter(r.respondaAte):
-          _resolverSozinho(r, FalhaProfissional.naoRespondeu, presos, falta);
+          _resolverSozinho(
+            r,
+            FalhaProfissional.naoRespondeu,
+            presos,
+            falta,
+            agora: hoje,
+          );
           mudou = true;
         case SituacaoRetorno.aceito
             when r.marcadoPara == null &&
                 hoje.isAfter(r.respondaAte.add(RegrasRetorno.marcarEm)):
-          _resolverSozinho(r, FalhaProfissional.naoMarcou, presos, falta);
+          _resolverSozinho(
+            r,
+            FalhaProfissional.naoMarcou,
+            presos,
+            falta,
+            agora: hoje,
+          );
           mudou = true;
         case SituacaoRetorno.aceito
             when r.marcadoPara != null &&
@@ -589,12 +752,21 @@ class RetornosRepo extends ChangeNotifier {
                   r.marcadoPara!.add(RegrasRetorno.toleranciaNaoVeio),
                 ):
           // RN-188: não apareceu (sem código na porta).
-          _resolverSozinho(r, FalhaProfissional.naoVeio, presos, falta);
+          _resolverSozinho(
+            r,
+            FalhaProfissional.naoVeio,
+            presos,
+            falta,
+            agora: hoje,
+          );
           mudou = true;
         case SituacaoRetorno.feito
             when hoje.difference(r.feitoEm!) > RegrasRetorno.resolveuEm:
           // RN-187: sem resposta em 48 horas, resolvido.
-          r.situacao = SituacaoRetorno.encerrado;
+          r
+            ..situacao = SituacaoRetorno.encerrado
+            ..resolvidoSemResposta = true
+            ..decididoEm = hoje;
           mudou = true;
         case SituacaoRetorno.recusado
             when hoje.difference(r.recusadoEm!) > RegrasRetorno.escolhaRecusa:
@@ -621,8 +793,10 @@ class RetornosRepo extends ChangeNotifier {
     PedidoRetorno r,
     FalhaProfissional motivo,
     double Function(String)? presos,
-    void Function(String)? falta,
-  ) {
+    void Function(String)? falta, {
+    DateTime? agora,
+  }) {
+    r.decididoEm = agora ?? clock.now();
     // Os presos deste próprio retorno contam (RN-185).
     final saldo = presos?.call(r.profissional) ?? presosDe(r.profissional);
     r

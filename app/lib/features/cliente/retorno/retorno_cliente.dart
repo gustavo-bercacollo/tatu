@@ -160,7 +160,7 @@ class CartaoAlgoErrado extends StatelessWidget {
                   icone: const IconeCirculo(TablerIcons.refresh),
                   titulo: 'O problema voltou?',
                   detalhe:
-                      'Peça um retorno sem custo até ${diaMes(p.retornoAte!)}.',
+                      'Peça um retorno sem custo até ${dataCurta(p.retornoAte!)}.',
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => PedirRetornoPage(pedido: p),
@@ -426,11 +426,26 @@ List<Widget> secaoRetornoCliente(
     case SituacaoRetorno.encerrado:
       linha = SituacaoCartaoRetorno(
         TablerIcons.check,
-        r.decisao == null
-            ? 'Encerrado'
-            : 'Decisão do Tatu: ${r.decisao!.rotulo.toLowerCase()}',
+        r.decisao != null
+            ? 'Decisão do Tatu: ${r.decisao!.rotulo.toLowerCase()}'
+            : r.resolvidoSemResposta
+            ? 'Dado como resolvido · sem resposta em '
+                  '${RegrasRetorno.resolveuEm.inHours} horas'
+            : 'Encerrado',
         TatuColors.onlineTexto,
       );
+  }
+  // C231 · RN-198: decisão só do sistema pode ser revista em 7 dias.
+  final automatica = r.decisaoAutomatica;
+  if (automatica != null && r.decididoEm != null) {
+    depois.add(
+      PedirRevisao(
+        decisao: automatica,
+        quem: r.cliente,
+        decididoEm: r.decididoEm!,
+        servico: r.servico,
+      ),
+    );
   }
   return [
     const SizedBox(height: 18),

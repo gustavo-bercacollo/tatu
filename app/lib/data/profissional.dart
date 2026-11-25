@@ -380,8 +380,8 @@ class ProfissionalRepo extends ChangeNotifier {
       .where((f) => clock.now().difference(f) < RegrasRetorno.janelaFaltas)
       .length;
 
-  /// RN-192: dívida sem saldo, ligada ao CPF. Enquanto houver, não recebe
-  /// chamados nem abre outra conta.
+  /// RN-192: dívida sem saldo, ligada à conta no Tatu (não é negativação).
+  /// Enquanto houver, não recebe chamados nem abre outra conta.
   double divida = 0;
 
   bool get comDivida => divida > 0;
@@ -393,7 +393,8 @@ class ProfissionalRepo extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// RN-192: desconto sem saldo vira dívida no CPF.
+  /// RN-192: desconto sem saldo vira dívida ligada à conta no Tatu
+  /// (identificada pelo CPF, só dentro do Tatu).
   void registrarDivida(double valor) {
     if (valor <= 0) return;
     divida += valor;

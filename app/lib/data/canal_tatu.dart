@@ -49,7 +49,18 @@ class DecisaoTatu {
     required this.texto,
     required this.rodape,
     this.rodapeAviso = false,
+    this.automatica = false,
+    this.revisaoServico,
+    this.revisaoEm,
+    this.revisaoQuem,
   });
+
+  /// RN-198: decisão só do sistema ("Resolvido automaticamente"), com
+  /// "Pedir revisão". A da mediação é de uma pessoa e não tem.
+  final bool automatica;
+  final String? revisaoServico;
+  final DateTime? revisaoEm;
+  final String? revisaoQuem;
 
   /// "Devolvemos R$ 150,00".
   final String titulo;

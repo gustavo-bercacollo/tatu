@@ -18,6 +18,7 @@ import '../../../data/profissional.dart';
 import '../../../data/servico_profissional.dart';
 import '../../../shared/widgets/conta_pausada.dart';
 import '../../../data/retorno.dart';
+import '../../../shared/widgets/retorno.dart' show PedirRevisao;
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../cliente/ajuda/abrir_ajuda.dart';
@@ -163,6 +164,19 @@ class _HomeProfissionalPageState extends State<HomeProfissionalPage> {
                       if (p.pausada) ...[
                         const SizedBox(height: TatuMedidas.entreItens + 4),
                         const _ContaPausada(),
+                        // RN-198: a pausa por faltas é automática.
+                        if (p.pausadaPorFaltas && !p.comDivida)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Center(
+                              child: PedirRevisao(
+                                decisao: DecisaoAutomatica.pausaPorFaltas,
+                                quem: p.nome,
+                                decididoEm: p.faltasRetorno.last,
+                                texto: 'Não foi isso? Pedir revisão',
+                              ),
+                            ),
+                          ),
                       ],
                     ],
                   ),
@@ -227,9 +241,10 @@ class _ContaPausada extends StatelessWidget {
     final p = profissional;
     return AvisoContaPausada(
       motivo: p.comDivida
-          // RN-192: dívida no CPF bloqueia chamados até quitar.
-          ? 'Você tem ${reais(p.divida)} de retorno para acertar com o '
-                'Tatu. Fale com o suporte para quitar.'
+          // RN-192: a dívida bloqueia chamados até quitar.
+          ? 'Você tem uma dívida ligada à sua conta no Tatu: '
+                '${reais(p.divida)} de retorno. Fale com o suporte para '
+                'quitar.'
           : p.pausadaPorFaltas
           // RN-193: 3 faltas no retorno em 90 dias.
           ? '${p.faltasRecentes} faltas em retornos em '

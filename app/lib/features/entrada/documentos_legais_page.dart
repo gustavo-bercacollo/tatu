@@ -23,6 +23,23 @@ void abrirDocumento(BuildContext context, TipoDocumento tipo) =>
       MaterialPageRoute(builder: (_) => DocumentoLegalPage(tipo: tipo)),
     );
 
+/// RN-197: abre uma seção pelo número ("11." = termo de garantia).
+Future<void> abrirSecaoDocumento(
+  BuildContext context,
+  TipoDocumento tipo,
+  String numero,
+) async {
+  final d = await documentosLegais.carregar(tipo);
+  if (!context.mounted) return;
+  final i = d.secoes.indexWhere((s) => s.titulo.startsWith('$numero '));
+  if (i < 0) return abrirDocumento(context, tipo);
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (_) => SecaoDocumentoPage(documento: d, indice: i),
+    ),
+  );
+}
+
 /// Espera o documento carregar (do `.md` empacotado). Se falhar, avisa e
 /// deixa tentar de novo.
 class _ComDocumento extends StatefulWidget {
