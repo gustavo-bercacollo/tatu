@@ -289,3 +289,111 @@ class FaixaVisitaPlano extends StatelessWidget {
     );
   }
 }
+
+/// RN-206: foto (iniciais do nome) com o selo de repetição no canto
+/// inferior direito: círculo escuro, ícone branco, borda branca.
+class FotoComSeloPlano extends StatelessWidget {
+  const FotoComSeloPlano({super.key, required this.nome, this.tamanho = 44});
+
+  final String nome;
+  final double tamanho;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: '$nome · Plano fixo',
+      child: SizedBox(
+        width: tamanho,
+        height: tamanho,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            ExcludeSemantics(
+              child: AvatarIniciais(nome: nome, tamanho: tamanho),
+            ),
+            Positioned(
+              right: -2,
+              bottom: -2,
+              child: Container(
+                width: TatuMedidas.seloFoto,
+                height: TatuMedidas.seloFoto,
+                decoration: BoxDecoration(
+                  color: TatuColors.action,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: TatuColors.bg, width: 2),
+                ),
+                child: const Icon(
+                  TablerIcons.repeat,
+                  size: 9,
+                  color: TatuColors.onAction,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// RN-206: barra do mês, um segmento por visita (feitas em preto, a de
+/// hoje em cinza, as próximas em cinza claro).
+class BarraVisitasDoMes extends StatelessWidget {
+  const BarraVisitasDoMes({super.key, required this.plano, required this.hoje});
+
+  final PlanoFixo plano;
+  final VisitaPlano hoje;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = plano;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          children: [
+            for (final (i, v) in p.visitas.indexed) ...[
+              if (i > 0) const SizedBox(width: 4),
+              Expanded(
+                child: Container(
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: v.situacao == SituacaoVisita.feita
+                        ? TatuColors.action
+                        : v == hoje
+                        ? TatuColors.textSecondary
+                        : TatuColors.trilho,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Visita ${p.numeroDa(hoje)} de ${p.visitas.length} de '
+                '${mesLongo(hoje.dia)}',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Text(
+              'toda ${p.dias.map(diaLongo).join(' e ')}',
+              style: const TextStyle(
+                fontSize: 13,
+                color: TatuColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}

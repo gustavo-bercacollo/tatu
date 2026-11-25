@@ -17,7 +17,8 @@ void main() {
   profissoesReguladas.carregar().ignore();
   catalogoServicos.carregar().ignore();
   // RN-200 a RN-205: planos fixos de demonstração (selo "Plano fixo").
-  sementeDemoPlanoFixo();
+  // RN-206: a Júlia sai para a visita 20 s depois (card "a caminho").
+  sementeDemoPlanoFixo(simularSaida: const Duration(seconds: 20));
   runApp(const TatuApp());
 }
 

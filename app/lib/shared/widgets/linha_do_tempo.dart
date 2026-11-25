@@ -138,26 +138,28 @@ class SeloVerde extends StatelessWidget {
   }
 }
 
-/// Selo preto pequeno (ex.: tempo de chegada "12 min").
+/// Selo preto pequeno (ex.: tempo de chegada "12 min"). Com [claro],
+/// cinza claro com texto preto (RN-206: "Hoje, 9h").
 class SeloPreto extends StatelessWidget {
-  const SeloPreto(this.texto, {super.key});
+  const SeloPreto(this.texto, {super.key, this.claro = false});
 
   final String texto;
+  final bool claro;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: const ShapeDecoration(
-        color: TatuColors.action,
-        shape: StadiumBorder(),
+      decoration: ShapeDecoration(
+        color: claro ? TatuColors.fill : TatuColors.action,
+        shape: const StadiumBorder(),
       ),
       child: Text(
         texto,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w700,
-          color: TatuColors.onAction,
+          color: claro ? TatuColors.textPrimary : TatuColors.onAction,
         ),
       ),
     );

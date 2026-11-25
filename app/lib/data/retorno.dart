@@ -72,7 +72,7 @@ abstract final class RegrasRetorno {
   /// RN-183: prazo da profissão, pelo catálogo (o pedido usa o nome do
   /// serviço: "Encanador").
   static int prazoDias(String servico) =>
-      catalogoServicos.porNome(servico)?.retornoDias ?? prazoPadraoDias;
+      catalogoServicos.encontrar(servico)?.retornoDias ?? prazoPadraoDias;
 
   /// RN-183: até quando dá para pedir retorno (conta da conclusão).
   static DateTime retornoAte(String servico, DateTime concluidoEm) =>

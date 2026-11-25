@@ -68,6 +68,7 @@ class _ServicosProfissionalPageState extends State<ServicosProfissionalPage> {
           builder: (_) => EspecialidadesPage(
             indice: profissional.profissoes.length - 1,
             edicao: true,
+            nova: true,
           ),
         ),
       );

@@ -237,9 +237,14 @@ void main() {
   });
 
   testWidgets('RN-97: como atende em cada profissão', (t) async {
+    // Advogado é L/D no catálogo: dá para escolher os dois.
+    profissional.definirProfissoes([
+      profissional.profissoes.first,
+      const ProfissaoEscolhida('Advogado', ['Contratos']),
+    ]);
     await _abrir(t, const ComoAtendePage(indice: 1, edicao: true));
     expect(find.text('Como você atende?'), findsOneWidget);
-    expect(find.text('Profissão: Designer.\nVocê pode mudar depois no Perfil.'), findsOneWidget);
+    expect(find.text('Profissão: Advogado.\nVocê pode mudar depois no Perfil.'), findsOneWidget);
     await t.tap(find.text('Os dois'));
     await t.pump();
     await t.tap(find.text('Salvar'));

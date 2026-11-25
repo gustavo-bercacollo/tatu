@@ -145,7 +145,7 @@ bool ehTecnologia(String profissao) =>
 /// de docs/catalogo-de-servicos.md). L → só no local; D → só à
 /// distância; L/D (ou profissão fora do catálogo) → os três.
 List<ModoAtendimento> modosPermitidos(String profissao) =>
-    switch (catalogoServicos.porNome(profissao)?.atende) {
+    switch (catalogoServicos.encontrar(profissao)?.atende) {
       AtendeCatalogo.local => const [ModoAtendimento.local],
       AtendeCatalogo.distancia => const [ModoAtendimento.distancia],
       _ => ModoAtendimento.values,

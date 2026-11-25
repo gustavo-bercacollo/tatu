@@ -58,4 +58,11 @@ class TatuMedidas {
   static const codigoDigitarAltura = 76.0; // caixas onde o profissional digita
   static const teclaAltura = 58.0; // teclado numérico
   static const raioTecla = 8.0;
+
+  /// RN-206: parte de baixo do card da visita do plano (barra do mês ou
+  /// etapas): a mesma altura nos dois estados.
+  static const progressoCartao = 46.0;
+
+  /// RN-206: selo de repetição no canto da foto.
+  static const seloFoto = 18.0;
 }

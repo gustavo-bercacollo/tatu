@@ -19,10 +19,15 @@ class EspecialidadesPage extends StatefulWidget {
     super.key,
     required this.indice,
     this.edicao = false,
+    this.nova = false,
   });
 
   final int indice;
   final bool edicao;
+
+  /// Profissão nova vinda de "Adicionar outra" (RN-97: depois das
+  /// especialidades, "Como você atende?" se houver mais de um modo).
+  final bool nova;
 
   @override
   State<EspecialidadesPage> createState() => _EspecialidadesPageState();
@@ -70,6 +75,36 @@ class _EspecialidadesPageState extends State<EspecialidadesPage> {
     final total = profissional.profissoes.length;
     final nav = Navigator.of(context);
     if (widget.edicao) {
+      // RN-97: profissão nova com mais de um modo no catálogo pergunta
+      // como atende; com um modo só, ele já foi salvo ao adicionar.
+      if (widget.nova && modoUnico(_prof.nome) == null) {
+        nav.pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => ComoAtendePage(
+              indice: widget.indice,
+              onContinuar: () {
+                if (_pedeRegistro &&
+                    !(profissoesReguladas.porNome(_prof.nome)?.usaCnh ??
+                        false)) {
+                  nav.pushReplacement(
+                    MaterialPageRoute(
+                      builder: (ctx) => RegistroProfissionalPage(
+                        profissao: _prof.nome,
+                        passo: null,
+                        onEnviar: () => Navigator.of(ctx).pop(),
+                      ),
+                    ),
+                  );
+                  return;
+                }
+                if (_pedeRegistro) profissional.registrarCnh(_prof.nome);
+                nav.pop();
+              },
+            ),
+          ),
+        );
+        return;
+      }
       // Profissão nova vinda de "Adicionar outra": pede o registro.
       if (_pedeRegistro &&
           !(profissoesReguladas.porNome(_prof.nome)?.usaCnh ?? false)) {

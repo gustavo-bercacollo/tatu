@@ -141,19 +141,10 @@ class _EmAndamento extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: TatuMedidas.entreSecoes),
       children: [
-        // RN-203: visita do plano: "Plano fixo · visita X de Y", sem valor.
+        // C222/C223 · RN-206: visita do plano, no mesmo formato dos outros
+        // cards (sem valor).
         for (final (p, v) in visitas) ...[
-          CartaoPlanoFixo(
-            nome: '${p.profissao} · ${p.primeiroNome}',
-            detalhe: 'Hoje às ${horaCurta(p.horario)}',
-            selo: SeloPlanoFixo.de(
-              p,
-              complemento: 'visita ${p.numeroDa(v)} de ${p.visitas.length}',
-            ),
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p)),
-            ),
-          ),
+          _CartaoVisitaPlano(plano: p, visita: v),
           const SizedBox(height: TatuMedidas.entreItens),
         ],
         for (final (i, p) in lista.indexed) ...[
@@ -205,6 +196,87 @@ class _Cartao extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(padding: const EdgeInsets.all(16), child: child),
+      ),
+    );
+  }
+}
+
+/// C222/C223 · RN-206: card da visita do plano. Agendada: pílula clara
+/// "Hoje, 9h" e a barra do mês. A caminho em diante: pílula escura com o
+/// tempo e as etapas Agendada → A caminho → Serviço → Feita. A parte de
+/// baixo tem a mesma altura nos dois estados.
+class _CartaoVisitaPlano extends StatelessWidget {
+  const _CartaoVisitaPlano({required this.plano, required this.visita});
+
+  final PlanoFixo plano;
+  final VisitaPlano visita;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = plano;
+    final v = visita;
+    final agendada = v.situacao == SituacaoVisita.agendada;
+    final feitas = switch (v.situacao) {
+      SituacaoVisita.aCaminho => 2,
+      SituacaoVisita.emServico => 3,
+      SituacaoVisita.feita => 4,
+      _ => 1,
+    };
+    return _Cartao(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              FotoComSeloPlano(nome: p.profissional),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      p.profissional,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      agendada
+                          ? '${p.profissao} · Plano fixo'
+                          : '${p.profissao} · visita ${p.numeroDa(v)} de '
+                                '${p.visitas.length}',
+                      style: TatuTexto.nota,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              if (agendada)
+                SeloPreto('Hoje, ${horaCurta(p.horario)}', claro: true)
+              else
+                SeloPreto(
+                  v.situacao == SituacaoVisita.aCaminho
+                      ? '${v.minutosParaChegar} min'
+                      : 'Trabalhando',
+                ),
+            ],
+          ),
+          const SizedBox(height: TatuMedidas.entreSecoes - 4),
+          SizedBox(
+            height: TatuMedidas.progressoCartao,
+            child: agendada
+                ? BarraVisitasDoMes(plano: p, hoje: v)
+                : LinhaDoTempoHorizontal(
+                    etapas: etapasVisitaPlano,
+                    feitas: feitas,
+                  ),
+          ),
+        ],
       ),
     );
   }

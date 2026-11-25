@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:clock/clock.dart';
 
 import 'conta.dart';
@@ -12,7 +14,10 @@ import 'servico_profissional.dart';
 /// Cliente: plano mensal com a Júlia (diarista), visita hoje, uma visita
 /// feita e uma cobrança. Profissional (Luiza Vilela): plano ativo com o
 /// Roberto (visita hoje) e plano pausado com o Bruno.
-void sementeDemoPlanoFixo() {
+///
+/// Com [simularSaida], a Júlia sai para a visita de hoje depois desse tempo
+/// (RN-206: o card muda para "a caminho").
+void sementeDemoPlanoFixo({Duration? simularSaida}) {
   final agora = clock.now();
   final dia = agora.weekday == DateTime.sunday ? DateTime.monday : agora.weekday;
   final inicio = DateTime(agora.year, agora.month, agora.day)
@@ -57,6 +62,10 @@ void sementeDemoPlanoFixo() {
     profissional: 'Júlia Costa',
     profissao: 'Diarista',
   );
+  final hoje = julia?.visitaDeHoje(agora);
+  if (julia != null && hoje != null && simularSaida != null) {
+    Timer(simularSaida, () => planosFixos.saiuParaVisita(hoje));
+  }
   julia?.cobrancas.add(
     CobrancaPlano(
       visitasFeitas: 4,

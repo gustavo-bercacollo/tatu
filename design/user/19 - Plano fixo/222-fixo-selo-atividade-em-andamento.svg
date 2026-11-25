@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
-  <title>Plano fixo · atividade em andamento (cliente)</title>
+  <title>Plano fixo · atividade em andamento, visita agendada (cliente)</title>
   <rect x="0" y="0" width="393" height="852" rx="0" fill="#F2F2F7"/>
   <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
   <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
@@ -9,27 +9,57 @@
   <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
   <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
   <text x="20" y="110" font-size="34" font-weight="700" fill="#000000" text-anchor="start" letter-spacing="-0.8">Atividade</text>
-  <rect x="20" y="132" width="353" height="32" rx="9" fill="#E3E3E8"/>
-  <rect x="22" y="134" width="174" height="28" rx="7" fill="#fff"/>
-  <text x="109" y="153" font-size="13" font-weight="600" fill="#000000" text-anchor="middle">Em andamento</text>
-  <text x="285" y="153" font-size="13" font-weight="500" fill="#8E8E93" text-anchor="middle">Concluídos</text>
-  <rect x="20" y="184" width="353" height="104" rx="18" fill="#fff"/>
+  <rect x="20" y="132" width="353" height="36" rx="10" fill="#E3E3E8"/>
+  <rect x="22" y="134" width="174" height="32" rx="8" fill="#fff"/>
+  <text x="109" y="155" font-size="14" font-weight="600" fill="#000000" text-anchor="middle">Em andamento</text>
+  <text x="285" y="155" font-size="14" font-weight="500" fill="#8E8E93" text-anchor="middle">Concluídos</text>
+  <rect x="20" y="188" width="353" height="140" rx="20" fill="#fff"/>
   <circle cx="56" cy="226" r="22" fill="#E4E4E7"/>
   <text x="56" y="230.84" font-size="13" font-weight="600" fill="#000000" text-anchor="middle">JC</text>
-  <text x="90" y="220" font-size="16" font-weight="600" fill="#000000" text-anchor="start">Diarista · Júlia</text>
-  <circle cx="94" cy="237" r="4" fill="#007AFF"/>
-  <text x="104" y="242" font-size="13" font-weight="600" fill="#007AFF" text-anchor="start">A caminho · chega em 8 min</text>
-  <rect x="90" y="254" width="159.9375" height="20" rx="10.0" fill="#EEEEF0"/>
-  <g transform="translate(98,258.0) scale(0.5)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
-  <text x="114" y="268.0" font-size="11" font-weight="600" fill="#000000" text-anchor="start">Plano fixo · visita 3 de 4</text>
-  <g transform="translate(349,219) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
-  <rect x="20" y="300" width="353" height="84" rx="18" fill="#fff"/>
-  <circle cx="56" cy="342" r="22" fill="#E4E4E7"/>
-  <text x="56" y="346.84" font-size="13" font-weight="600" fill="#000000" text-anchor="middle">LS</text>
-  <text x="90" y="336" font-size="16" font-weight="600" fill="#000000" text-anchor="start">Encanador · Luiza</text>
-  <circle cx="94" cy="353" r="4" fill="#1E8E3E"/>
-  <text x="104" y="358" font-size="13" font-weight="600" fill="#1E8E3E" text-anchor="start">Trabalhando · 25 min</text>
-  <g transform="translate(349,335) scale(0.5833333333333334)" fill="none" stroke="#C7C7CC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></g>
+  <circle cx="71.84" cy="241.84" r="9" fill="#1C1C1E" stroke="#fff" stroke-width="2"/>
+  <g transform="translate(66.34,236.34) scale(0.4583333333333333)" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="90" y="220" font-size="17" font-weight="600" fill="#000000" text-anchor="start">Júlia Costa</text>
+  <text x="90" y="242" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">Diarista · Plano fixo</text>
+  <rect x="274.828125" y="208" width="82.171875" height="30" rx="15" fill="#EEEEF0"/>
+  <text x="315.9140625" y="228" font-size="14" font-weight="600" fill="#000000" text-anchor="middle">Hoje, 9h</text>
+  <rect x="36.0" y="274" width="75.75" height="6" rx="3" fill="#1C1C1E"/>
+  <rect x="117.75" y="274" width="75.75" height="6" rx="3" fill="#8E8E93"/>
+  <rect x="199.5" y="274" width="75.75" height="6" rx="3" fill="#E5E5EA"/>
+  <rect x="281.25" y="274" width="75.75" height="6" rx="3" fill="#E5E5EA"/>
+  <text x="36" y="304" font-size="13" font-weight="600" fill="#000000" text-anchor="start">Visita 2 de 4 de novembro</text>
+  <text x="357" y="304" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="end">toda terça</text>
+  <rect x="20" y="344" width="353" height="140" rx="20" fill="#fff"/>
+  <circle cx="56" cy="382" r="22" fill="#E4E4E7"/>
+  <text x="56" y="386.84" font-size="13" font-weight="600" fill="#000000" text-anchor="middle">LS</text>
+  <text x="90" y="376" font-size="17" font-weight="600" fill="#000000" text-anchor="start">Luiza Souza</text>
+  <text x="90" y="398" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">Encanador · Vazamento na pia</text>
+  <rect x="287.546875" y="364" width="69.453125" height="30" rx="15" fill="#1C1C1E"/>
+  <text x="322.2734375" y="384" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">12 min</text>
+  <line x1="62.0" y1="432" x2="129.25" y2="432" stroke="#1C1C1E" stroke-width="2"/>
+  <line x1="129.25" y1="432" x2="196.5" y2="432" stroke="#1C1C1E" stroke-width="2"/>
+  <line x1="196.5" y1="432" x2="263.75" y2="432" stroke="#D1D1D6" stroke-width="2"/>
+  <line x1="263.75" y1="432" x2="331.0" y2="432" stroke="#D1D1D6" stroke-width="2"/>
+  <circle cx="62.0" cy="432" r="6" fill="#1C1C1E"/>
+  <text x="62.0" y="462" font-size="12" font-weight="400" fill="#000000" text-anchor="middle">Pedido</text>
+  <circle cx="129.25" cy="432" r="6" fill="#1C1C1E"/>
+  <text x="129.25" y="462" font-size="12" font-weight="400" fill="#000000" text-anchor="middle">Combinado</text>
+  <circle cx="196.5" cy="432" r="9" fill="#fff" stroke="#1C1C1E" stroke-width="2.5"/>
+  <circle cx="196.5" cy="432" r="4.5" fill="#1C1C1E"/>
+  <text x="196.5" y="462" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">A caminho</text>
+  <circle cx="263.75" cy="432" r="6" fill="#D1D1D6"/>
+  <text x="263.75" y="462" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="middle">Serviço</text>
+  <circle cx="331.0" cy="432" r="6" fill="#D1D1D6"/>
+  <text x="331.0" y="462" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="middle">Pagamento</text>
+  <rect x="20" y="500" width="353" height="150" rx="20" fill="#fff"/>
+  <circle cx="56" cy="538" r="22" fill="#EEEEF0"/>
+  <g transform="translate(45,527) scale(0.9166666666666666)" fill="none" stroke="#000000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"/></g>
+  <text x="90" y="532" font-size="17" font-weight="600" fill="#000000" text-anchor="start">Eletricista</text>
+  <text x="90" y="554" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">tomada da sala sem energia</text>
+  <rect x="263.328125" y="520" width="93.671875" height="30" rx="15" fill="#FFF4E0"/>
+  <text x="310.1640625" y="540" font-size="14" font-weight="600" fill="#A85F00" text-anchor="middle">Buscando</text>
+  <g transform="translate(36,578) scale(0.6666666666666666)" fill="none" stroke="#8E8E93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="60" y="591" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">Procurando em segundo plano · há 13 min</text>
+  <text x="196.5" y="628" font-size="15" font-weight="600" fill="#8E8E93" text-anchor="middle">Cancelar pedido</text>
   <rect x="0" y="769" width="393" height="83" rx="0" fill="#F9F9F9"/>
   <line x1="0" y1="769" x2="393" y2="769" stroke="#D9D9DC" stroke-width="0.5"/>
   <g transform="translate(53.5,778) scale(1.0)" fill="none" stroke="#8E8E93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></g>

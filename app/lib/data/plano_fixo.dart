@@ -22,6 +22,12 @@ enum StatusPlano {
 /// O que aconteceu com uma visita do plano.
 enum SituacaoVisita {
   agendada,
+
+  /// RN-206: a profissional saiu para a visita.
+  aCaminho,
+
+  /// RN-206: a visita começou (código na porta).
+  emServico,
   feita,
 
   /// RN-147: o profissional avisou "Não vou nesta semana" (sem
@@ -110,7 +116,28 @@ class VisitaPlano {
 
   final DateTime dia;
   SituacaoVisita situacao = SituacaoVisita.agendada;
+
+  /// RN-206: minutos até chegar (pílula escura "8 min").
+  int minutosParaChegar = 8;
+
+  /// Visita de hoje ainda acontecendo (agendada, a caminho ou em serviço).
+  bool get emAberto =>
+      situacao == SituacaoVisita.agendada ||
+      situacao == SituacaoVisita.aCaminho ||
+      situacao == SituacaoVisita.emServico;
 }
+
+/// RN-206: etapas da visita do plano (sem Pagamento: a cobrança é no fim
+/// do mês).
+const etapasVisitaPlano = ['Agendada', 'A caminho', 'Serviço', 'Feita'];
+
+const _mesesLongos = [
+  'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+  'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
+];
+
+/// "novembro".
+String mesLongo(DateTime d) => _mesesLongos[d.month - 1];
 
 /// RN-146: cobrança automática no fim de um período.
 @immutable
@@ -220,9 +247,7 @@ class PlanoFixo {
         }
         final semana = visitas.where((v) => _mesmaSemanaDe(v.dia, hoje));
         final temNaSemana = semana.any(
-          (v) =>
-              v.situacao == SituacaoVisita.agendada ||
-              v.situacao == SituacaoVisita.feita,
+          (v) => v.emAberto || v.situacao == SituacaoVisita.feita,
         );
         return temNaSemana ? EstadoPlano.ativo : EstadoPlano.semVisitaNaSemana;
     }
@@ -259,7 +284,7 @@ class PlanoFixo {
     return visitas
         .where(
           (v) =>
-              v.situacao == SituacaoVisita.agendada &&
+              v.emAberto &&
               v.dia.year == hoje.year &&
               v.dia.month == hoje.month &&
               v.dia.day == hoje.day,
@@ -498,6 +523,22 @@ class PlanosFixosRepo extends ChangeNotifier {
       s++;
       if (s > semanas + 1) break;
     }
+  }
+
+  /// RN-206: a profissional saiu para a visita do plano.
+  void saiuParaVisita(VisitaPlano v, {int minutos = 8}) {
+    if (v.situacao != SituacaoVisita.agendada) return;
+    v
+      ..situacao = SituacaoVisita.aCaminho
+      ..minutosParaChegar = minutos;
+    notifyListeners();
+  }
+
+  /// RN-206: a visita começou (código na porta).
+  void comecouVisita(VisitaPlano v) {
+    if (v.situacao != SituacaoVisita.aCaminho) return;
+    v.situacao = SituacaoVisita.emServico;
+    notifyListeners();
   }
 
   void visitaFeita(VisitaPlano v) {

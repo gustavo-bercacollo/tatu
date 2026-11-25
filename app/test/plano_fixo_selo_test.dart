@@ -175,18 +175,57 @@ void main() {
     });
   });
 
-  testWidgets('RN-201/RN-203: Atividade do cliente (visita e cobrança)', (
-    t,
-  ) async {
+  testWidgets('C222 · RN-206: card da visita agendada (cliente)', (t) async {
     await withClock(Clock.fixed(_terca), () async {
       sementeDemoPlanoFixo();
       await _abrir(t, const AtividadePage());
-      expect(find.text('Diarista · Júlia'), findsOneWidget);
-      expect(find.text('Plano fixo · visita 2 de 4'), findsOneWidget);
+      // Nome em cima, iniciais do nome ("JC"), profissão · Plano fixo.
+      expect(find.text('Júlia Costa'), findsOneWidget);
+      expect(find.text('JC'), findsOneWidget);
+      expect(find.text('Diarista · Plano fixo'), findsOneWidget);
+      expect(find.text('Hoje, 9h'), findsOneWidget);
+      expect(find.text('Visita 2 de 4 de novembro'), findsOneWidget);
+      expect(find.text('toda terça'), findsOneWidget);
+      // A pílula cinza saiu deste card.
+      expect(find.text('Plano fixo · visita 2 de 4'), findsNothing);
       await t.tap(find.text('Concluídos'));
       await t.pumpAndSettle();
       expect(find.text('Plano fixo · 4 visitas'), findsOneWidget);
       expect(find.text('R\$ 600,00'), findsOneWidget);
+    });
+  });
+
+  testWidgets('C223 · RN-206: a caminho, mesma altura do card', (t) async {
+    await withClock(Clock.fixed(_terca), () async {
+      sementeDemoPlanoFixo();
+      await _abrir(t, const AtividadePage());
+      Rect card() => t.getRect(
+        find.ancestor(
+          of: find.text('Júlia Costa'),
+          matching: find.byType(InkWell),
+        ).first,
+      );
+      final antes = card().height;
+      final p = planosFixos.ultimoCom(profissional: 'Júlia Costa')!;
+      planosFixos.saiuParaVisita(p.visitaDeHoje()!, minutos: 8);
+      await t.pumpAndSettle();
+      expect(find.text('8 min'), findsOneWidget);
+      expect(find.text('Diarista · visita 2 de 4'), findsOneWidget);
+      final daJulia = find.ancestor(
+        of: find.text('Júlia Costa'),
+        matching: find.byType(InkWell),
+      ).first;
+      for (final e in ['Agendada', 'A caminho', 'Serviço', 'Feita']) {
+        expect(
+          find.descendant(of: daJulia, matching: find.text(e)),
+          findsOneWidget,
+        );
+      }
+      expect(
+        find.descendant(of: daJulia, matching: find.text('Pagamento')),
+        findsNothing,
+      );
+      expect(card().height, antes);
     });
   });
 

@@ -153,6 +153,43 @@ class CatalogoServicosRepo extends ChangeNotifier {
 
   ProfissaoCatalogo? porNome(String nome) =>
       todas.where((p) => p.nome == nome).firstOrNull;
+
+  /// A profissão do catálogo para um nome do app, mesmo quando o app usa
+  /// um nome curto ou um sinônimo ("Montador" → Montador de móveis,
+  /// "Limpeza" → Diarista, "Encanadora" → Encanador). Ordem: nome exato,
+  /// sinônimo ("Também chamado de"), nome no masculino. Nulo = fora do
+  /// catálogo.
+  ProfissaoCatalogo? encontrar(String nome) {
+    final exato = porNome(nome);
+    if (exato != null) return exato;
+    final n = _normal(nome);
+    if (n.isEmpty) return null;
+    bool mesmoNome(ProfissaoCatalogo p) => _normal(p.nome) == n;
+    bool sinonimo(ProfissaoCatalogo p) =>
+        p.sinonimos.any((s) => _normal(s) == n);
+    final achou =
+        todas.where(mesmoNome).firstOrNull ??
+        todas.where(sinonimo).firstOrNull;
+    if (achou != null) return achou;
+    // "Encanadora", "Diarista" já é igual: tira o "a" do feminino.
+    if (n.endsWith('a') && n.length > 3) {
+      final m = n.substring(0, n.length - 1);
+      return todas.where((p) => _normal(p.nome) == m).firstOrNull;
+    }
+    return null;
+  }
+}
+
+/// Minúsculas, sem acento e sem espaços sobrando (para comparar nomes).
+String _normal(String s) {
+  const de = 'áàâãäéèêëíìîïóòôõöúùûüç';
+  const para = 'aaaaaeeeeiiiiooooouuuuc';
+  final b = StringBuffer();
+  for (final ch in s.toLowerCase().trim().split('')) {
+    final i = de.indexOf(ch);
+    b.write(i < 0 ? ch : para[i]);
+  }
+  return b.toString().replaceAll(RegExp(r'\s+'), ' ');
 }
 
 /// Instância única usada pelo app.
