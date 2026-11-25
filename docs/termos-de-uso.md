@@ -107,7 +107,7 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 ## 8. Valor, pagamento e taxa
 
-8.1. **Valor combinado.** O Profissional propõe o valor no chat. No serviço no local, ele pode separar **Visita** (pode ser zero) e **Serviço**. São até 3 rodadas de proposta; sem acordo, o chamado é encerrado sem custo.
+8.1. **Valor combinado.** O Profissional propõe o valor no chat. No serviço no local, ele pode separar **Visita** (pode ser zero) e **Serviço**. São até 3 rodadas de proposta; sem acordo, o chamado é encerrado sem custo. No último valor, o Cliente pode recusar: o chamado com aquele Profissional termina sem custo para nenhum dos dois, o Profissional não recebe de novo o mesmo pedido e o Cliente escolhe chamar outro Profissional ou cancelar o pedido. Recusar não conta como cancelamento nem como abandono.
 
 8.2. **Reserva e cobrança.** Ao confirmar, o total fica **reservado** no cartão padrão do Cliente. A cobrança acontece quando o Cliente **confirma a conclusão** depois que o Profissional toca em "Concluir serviço" (no local); sem resposta do Cliente em 2 horas, a conclusão é confirmada automaticamente ou quando o Cliente aprova a entrega (à distância).
 
@@ -117,7 +117,7 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 8.5. **Mudança de valor.** Se o serviço se mostrar diferente do descrito, o Profissional envia um novo valor pelo chat. Ele só vale se o Cliente aceitar. Se o Cliente recusar, o Profissional faz só o combinado ou encerra cobrando só a Visita.
 
-8.6. **Vários pagamentos na mesma conversa.** A conversa continua aberta depois do serviço. Cada novo valor combinado é um novo pagamento. Um valor não pode ficar aberto por mais de **7 dias**; depois disso o app pede para concluir ou dividir o trabalho em partes.
+8.6. **Vários pagamentos na mesma conversa.** A conversa continua aberta depois do serviço, mas **mensagem é só conversa**: mandar mensagem não cria chamado, valor nem cobrança. Um serviço novo com o mesmo Profissional começa de dois jeitos: pelo **"Pedir de novo"** (um chamado novo, que fica só para ele por 2 minutos e depois vai para outros Profissionais perto) ou por um **novo valor** que o Profissional envia no chat e o Cliente confirma. Não existe serviço no Tatu sem valor confirmado pelo Cliente no app; o que for combinado só na mensagem não tem garantia, contestação nem cobrança pelo Tatu. Cada novo valor combinado é um novo pagamento. Um valor não pode ficar aberto por mais de **7 dias**; depois disso o app pede para concluir ou dividir o trabalho em partes.
 
 8.7. **Parcelamento.** Valores a partir do mínimo do Anexo I podem ser parcelados no cartão, nas condições mostradas antes da confirmação. Eventuais juros são informados antes e pagos pelo Cliente.
 
