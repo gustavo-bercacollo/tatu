@@ -6,6 +6,7 @@ import 'features/entrada/boas_vindas_page.dart';
 import 'data/catalogo_servicos.dart';
 import 'data/demo_plano_fixo.dart';
 import 'data/documentos_legais.dart';
+import 'data/pedidos.dart';
 import 'data/profissoes_reguladas.dart';
 
 void main() {
@@ -17,8 +18,11 @@ void main() {
   profissoesReguladas.carregar().ignore();
   catalogoServicos.carregar().ignore();
   // RN-200 a RN-205: planos fixos de demonstração (selo "Plano fixo").
-  // RN-206: a Júlia sai para a visita 20 s depois (card "a caminho").
-  sementeDemoPlanoFixo(simularSaida: const Duration(seconds: 20));
+  // O cliente abre sem nada em andamento: a visita da Júlia é amanhã.
+  sementeDemoPlanoFixo(visitaHojeDoCliente: false);
+  // Sem pedido a caminho nem busca: a demonstração (aceite e
+  // deslocamento) começa no primeiro chamado do cliente.
+  pedidos.comecarSemAndamento();
   runApp(const TatuApp());
 }
 

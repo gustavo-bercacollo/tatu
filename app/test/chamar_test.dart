@@ -57,6 +57,19 @@ void main() {
     perfil.restaurar();
   });
 
+  testWidgets('Abertura do app: nada em andamento; 1º chamado já busca', (
+    t,
+  ) async {
+    pedidos.comecarSemAndamento();
+    expect(pedidos.semNadaEmAndamento, isTrue);
+    await _homePronta(t);
+    expect(find.textContaining('chega em'), findsNothing);
+    // Sem pedido a caminho, não pergunta nada: vai direto para a busca.
+    await t.tap(find.text('Chamar encanador'));
+    await _abriuBusca(t);
+    expect(find.text('Já tem um encanador a caminho'), findsNothing);
+  });
+
   testWidgets('Já tem encanador a caminho: ver pedido ou chamar outro', (
     t,
   ) async {

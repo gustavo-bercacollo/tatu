@@ -17,11 +17,27 @@ import 'servico_profissional.dart';
 ///
 /// Com [simularSaida], a Júlia sai para a visita de hoje depois desse tempo
 /// (RN-206: o card muda para "a caminho").
-void sementeDemoPlanoFixo({Duration? simularSaida}) {
+///
+/// Com [visitaHojeDoCliente] falso, a visita da Júlia fica para amanhã: o
+/// cliente abre o app sem nada em andamento (a demonstração começa no
+/// primeiro chamado).
+void sementeDemoPlanoFixo({
+  Duration? simularSaida,
+  bool visitaHojeDoCliente = true,
+}) {
   final agora = clock.now();
-  final dia = agora.weekday == DateTime.sunday ? DateTime.monday : agora.weekday;
-  final inicio = DateTime(agora.year, agora.month, agora.day)
-      .subtract(const Duration(days: 7));
+  final dia = agora.weekday == DateTime.sunday
+      ? DateTime.monday
+      : agora.weekday;
+  // Amanhã, sem domingo (domingo → segunda).
+  final amanha = agora.weekday >= DateTime.saturday
+      ? DateTime.monday
+      : agora.weekday + 1;
+  final inicio = DateTime(
+    agora.year,
+    agora.month,
+    agora.day,
+  ).subtract(const Duration(days: 7));
 
   PlanoFixo? plano({
     required String cliente,
@@ -29,6 +45,7 @@ void sementeDemoPlanoFixo({Duration? simularSaida}) {
     required String profissao,
     bool feminino = true,
     bool clienteFeminina = true,
+    int? diaDaVisita,
   }) {
     final p = planosFixos.pedir(
       cliente: cliente,
@@ -36,7 +53,7 @@ void sementeDemoPlanoFixo({Duration? simularSaida}) {
       endereco: 'Rua das Flores, 120 · $cliente',
       frequencia: FrequenciaPlano.mensal,
       visitasPorSemana: 1,
-      dias: [dia],
+      dias: [diaDaVisita ?? dia],
       horario: '9:00',
       profissao: profissao,
       feminino: feminino,
@@ -61,6 +78,7 @@ void sementeDemoPlanoFixo({Duration? simularSaida}) {
     cliente: conta.nomeCompleto,
     profissional: 'Júlia Costa',
     profissao: 'Diarista',
+    diaDaVisita: visitaHojeDoCliente ? null : amanha,
   );
   final hoje = julia?.visitaDeHoje(agora);
   if (julia != null && hoje != null && simularSaida != null) {

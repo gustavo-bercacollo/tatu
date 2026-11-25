@@ -152,8 +152,7 @@ class PedidoAndamento {
   Duration faltaConfirmar([DateTime? agora]) {
     final c = concluidoEm;
     if (c == null) return Prazos.confirmarConclusao;
-    final r =
-        Prazos.confirmarConclusao - (agora ?? clock.now()).difference(c);
+    final r = Prazos.confirmarConclusao - (agora ?? clock.now()).difference(c);
     return r.isNegative ? Duration.zero : r;
   }
 
@@ -509,7 +508,7 @@ class PedidosRepo extends ChangeNotifier {
   /// Buscas em segundo plano (uma por pedido sem ninguém ainda).
   final buscas = <BuscaSegundoPlano>[];
 
-  /// RN-211: profissionais que ficaram sem acordo de valor; não recebem de
+  /// RN-213: profissionais que ficaram sem acordo de valor; não recebem de
   /// novo o mesmo pedido.
   final recusados = <String>{};
   late List<PedidoConcluido> concluidos;
@@ -546,6 +545,16 @@ class PedidosRepo extends ChangeNotifier {
   /// próximo da lista, se houver.
   void _tirarAtual() {
     andamento = _outros.isEmpty ? null : _outros.removeAt(0);
+  }
+
+  /// Abertura do app: nenhum pedido em andamento nem busca (os testes
+  /// usam [restaurar], que já traz um pedido a caminho).
+  void comecarSemAndamento() {
+    _pararRelogios();
+    andamento = null;
+    _outros.clear();
+    buscas.clear();
+    notifyListeners();
   }
 
   void restaurar() {
@@ -658,7 +667,7 @@ class PedidosRepo extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// RN-210/RN-211: o cliente recusou o último valor de [profissional]:
+  /// RN-212/RN-213: o cliente recusou o último valor de [profissional]:
   /// o pedido com ele sai de "Em andamento" sem custo e ele não recebe de
   /// novo o mesmo pedido. Devolve o pedido que saiu (nulo se não havia).
   PedidoAndamento? semAcordo(String profissional) {
@@ -970,10 +979,12 @@ class PedidosRepo extends ChangeNotifier {
         codigoPorta: p.distancia ? null : p.codigo,
         fotos: [?retornos.fotoServicoPronto],
         chat: [
-          for (final m in conversas.conversas
-              .where((c) => c.nome == p.profissional)
-              .expand((c) => c.mensagens))
-            if (m.texto != null) '${m.minha ? 'Cliente' : 'Profissional'}: ${m.texto}',
+          for (final m
+              in conversas.conversas
+                  .where((c) => c.nome == p.profissional)
+                  .expand((c) => c.mensagens))
+            if (m.texto != null)
+              '${m.minha ? 'Cliente' : 'Profissional'}: ${m.texto}',
         ],
         conclusaoConfirmadaEm: agora,
       ),
