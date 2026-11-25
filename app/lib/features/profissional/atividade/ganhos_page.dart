@@ -1,4 +1,5 @@
 import '../retorno/retorno_profissional.dart' show CartaoRepassePreso;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -98,7 +99,9 @@ class _GanhosPageState extends State<GanhosPage> {
                 Row(
                   children: [
                     Icon(
-                      d >= 0 ? TablerIcons.trending_up : TablerIcons.trending_down,
+                      d >= 0
+                          ? TablerIcons.trending_up
+                          : TablerIcons.trending_down,
                       size: 16,
                       color: d >= 0
                           ? TatuColors.onlineTexto
@@ -402,7 +405,9 @@ class LinhaRecebimento extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: TatuColors.hairline, width: 0.5)),
+        border: Border(
+          bottom: BorderSide(color: TatuColors.hairline, width: 0.5),
+        ),
       ),
       child: Row(
         children: [
@@ -449,63 +454,122 @@ class RecebimentosPage extends StatelessWidget {
     titulo: 'Recebimentos',
     corpo: ListView(
       padding: const EdgeInsets.only(top: TatuMedidas.entreItens),
-      children: [
-        for (final s in ganhos.concluidos) LinhaRecebimento(s),
-      ],
+      children: [for (final s in ganhos.concluidos) LinhaRecebimento(s)],
     ),
   );
 }
 
-/// Barras dos dias da semana; hoje fica preto.
-class _Barras extends StatelessWidget {
+/// Barras dos dias da semana. Toque numa barra para ver quanto entrou
+/// naquele dia; começa em hoje. A barra escolhida fica preta.
+class _Barras extends StatefulWidget {
   const _Barras({required this.resumo});
 
   final ResumoGanhos resumo;
 
+  @override
+  State<_Barras> createState() => _BarrasState();
+}
+
+class _BarrasState extends State<_Barras> {
   static const _altura = 120.0;
+
+  late int _escolhida = widget.resumo.atual;
+
+  String _dia(int i) {
+    final r = widget.resumo;
+    final nome = i < r.dias.length ? r.dias[i] : r.rotulos[i];
+    return i == r.atual ? '$nome (hoje)' : nome;
+  }
+
+  /// Dia que ainda não chegou não tem valor para mostrar.
+  String _valor(int i) {
+    final r = widget.resumo;
+    if (r.atual >= 0 && i > r.atual) return 'Ainda não chegou';
+    return reais(r.barras[i]);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final maior = resumo.barras.reduce((a, b) => a > b ? a : b);
-    return Semantics(
-      label: 'Ganhos por dia da semana',
-      child: ExcludeSemantics(
-        child: Row(
+    final r = widget.resumo;
+    final maior = r.barras.reduce((a, b) => a > b ? a : b);
+    final e = _escolhida;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (e >= 0 && e < r.barras.length) ...[
+          Row(
+            children: [
+              Expanded(child: Text(_dia(e), style: TatuTexto.detalhe)),
+              Text(
+                _valor(e),
+                style: r.atual >= 0 && e > r.atual
+                    ? TatuTexto.detalhe
+                    : TatuTexto.detalhe.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: TatuColors.textPrimary,
+                      ),
+              ),
+            ],
+          ),
+          const SizedBox(height: TatuMedidas.entreItens),
+        ],
+        Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            for (var i = 0; i < resumo.barras.length; i++)
+            for (var i = 0; i < r.barras.length; i++)
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      height: maior == 0 || resumo.barras[i] == 0
-                          ? 3
-                          : 3 + (_altura - 3) * resumo.barras[i] / maior,
-                      margin: const EdgeInsets.symmetric(horizontal: 6),
-                      decoration: BoxDecoration(
-                        color: i == resumo.atual
-                            ? TatuColors.action
-                            : TatuColors.fillStrong,
-                        borderRadius: BorderRadius.circular(8),
+                child: Semantics(
+                  button: true,
+                  selected: i == e,
+                  label: '${_dia(i)}: ${_valor(i)}',
+                  child: ExcludeSemantics(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => setState(() => _escolhida = i),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // Área de toque com a altura toda do gráfico.
+                          SizedBox(
+                            height: _altura,
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 150),
+                                height: maior == 0 || r.barras[i] == 0
+                                    ? 3
+                                    : 3 + (_altura - 3) * r.barras[i] / maior,
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: i == e
+                                      ? TatuColors.action
+                                      : TatuColors.fillStrong,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            r.rotulos[i],
+                            style: i == e
+                                ? TatuTexto.nota.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: TatuColors.textPrimary,
+                                  )
+                                : TatuTexto.nota,
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      resumo.rotulos[i],
-                      style: i == resumo.atual
-                          ? TatuTexto.nota.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: TatuColors.textPrimary,
-                            )
-                          : TatuTexto.nota,
-                    ),
-                  ],
+                  ),
                 ),
               ),
           ],
         ),
-      ),
+      ],
     );
   }
 }

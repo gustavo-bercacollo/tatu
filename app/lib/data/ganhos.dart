@@ -49,6 +49,7 @@ class ResumoGanhos {
     this.esperandoCliente = 0,
     this.barras = const [],
     this.rotulos = const [],
+    this.dias = const [],
     this.atual = -1,
   });
 
@@ -80,6 +81,9 @@ class ResumoGanhos {
   /// Ganhos por dia (só na semana).
   final List<double> barras;
   final List<String> rotulos;
+
+  /// Nome por extenso de cada barra (aparece ao tocar nela).
+  final List<String> dias;
 
   /// Índice do dia de hoje nas barras.
   final int atual;
@@ -176,6 +180,15 @@ class GanhosRepo {
     comparacao: 'que na semana passada',
     barras: [99, 218, 145, 0, 0, 0, 0],
     rotulos: ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'],
+    dias: [
+      'Segunda',
+      'Terça',
+      'Quarta',
+      'Quinta',
+      'Sexta',
+      'Sábado',
+      'Domingo',
+    ],
     atual: 2,
   );
 
