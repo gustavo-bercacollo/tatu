@@ -1,3 +1,4 @@
+import '../suporte/painel_mediacao_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -43,13 +44,20 @@ class BoasVindasPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 64),
-          const Text(
-            'tatu',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 44,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -1.3,
+          // Protótipo: segurar o nome abre o painel interno do suporte
+          // (mediações, RN-190/RN-191). Não é uma tela dos usuários.
+          GestureDetector(
+            onLongPress: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const PainelMediacaoPage()),
+            ),
+            child: const Text(
+              'tatu',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 44,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -1.3,
+              ),
             ),
           ),
           const SizedBox(height: 92),

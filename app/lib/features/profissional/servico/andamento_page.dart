@@ -27,6 +27,8 @@ import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import '../../../shared/widgets/nota_icone.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
+import '../../../data/retorno.dart';
+import '../../entrada/camera_prova_page.dart';
 import 'codigo_porta.dart';
 import 'conclusao_page.dart';
 import 'rota.dart';
@@ -493,7 +495,22 @@ class EmAndamentoPage extends StatelessWidget {
   /// RN-31/RN-171: conclui, mas não cobra na hora: o cliente recebe a
   /// notificação e confirma. O profissional espera em "Aguardando a Ana
   /// confirmar" (e já pode ficar online).
-  void _concluir(BuildContext context) {
+  Future<void> _concluir(BuildContext context) async {
+    final s = servico;
+    // P57 · RN-40: no local, só conclui com 1 foto do serviço pronto,
+    // pela câmera do app (ela protege o profissional num retorno).
+    if (!s.distancia) {
+      final foto = await tirarFotoProva(
+        context,
+        titulo: 'Foto do serviço pronto',
+        aviso: 'Obrigatória para concluir',
+        texto:
+            'Ela protege você se ${s.feminino ? 'a' : 'o'} '
+            '${s.cliente.split(' ').first} reclamar depois.',
+      );
+      if (foto == null || !context.mounted) return;
+      retornos.fotoServicoPronto = foto;
+    }
     profissional.registrarVisita(semServico: false);
     atendimentoProfissional.encerrar();
     Navigator.of(context).pushReplacement(

@@ -11,6 +11,7 @@ import 'package:tatu/data/pedidos.dart';
 import 'package:tatu/data/plano_fixo.dart';
 import 'package:tatu/data/profissional.dart';
 import 'package:tatu/data/servico_profissional.dart';
+import 'package:tatu/features/cliente/atividade/pedido_concluido_page.dart';
 import 'package:tatu/features/cliente/mensagens/chat_page.dart';
 import 'package:tatu/features/profissional/chamado/chat_profissional_page.dart';
 import 'package:tatu/features/profissional/chamado/novo_chamado_page.dart';
@@ -67,6 +68,14 @@ void main() {
       find.widgetWithText(FilledButton, 'Chamar qualquer pintor'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('RN-176: "Pedir de novo" no detalhe do concluído', (t) async {
+    await _abrir(t, PedidoConcluidoPage(pedido: pedidos.concluidos.first));
+    await t.tap(find.text('Pedir de novo'));
+    await t.pumpAndSettle();
+    expect(find.text('Encanador · Vazamento na pia'), findsOneWidget);
+    expect(find.text('Chamar a Luiza'), findsNWidgets(2));
   });
 
   testWidgets('RN-180: com valor em aberto não mostra a dica', (t) async {

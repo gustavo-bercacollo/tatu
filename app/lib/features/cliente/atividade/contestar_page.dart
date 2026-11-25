@@ -1,29 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
+import '../../../data/pedidos.dart';
+import '../../../data/retorno.dart';
 import '../../../shared/widgets/aviso_topo.dart';
-import '../../../shared/widgets/botao_tracejado.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
+import '../../../shared/widgets/retorno.dart';
+import '../../entrada/camera_prova_page.dart';
+import '../retorno/retorno_cliente.dart';
 
 /// Motivos para contestar um serviço.
-const motivosContestacao = [
-  'Ficou mal feito',
-  'Não terminou o serviço',
-  'Cobrou diferente do combinado',
-  'Outro motivo',
-];
+const motivosContestacao = motivosAlgoErrado;
 
-/// "O que deu errado?": o cliente contesta o serviço em até 24 h.
-/// O valor do serviço fica retido até resolver; a visita não entra.
+/// C124 · "O que deu errado?" nas primeiras 24 horas (RN-45, RN-46): o
+/// valor fica retido até resolver e o profissional pode voltar primeiro,
+/// sem custo. Fotos só pela câmera do app (RN-184).
 class ContestarServicoPage extends StatefulWidget {
-  const ContestarServicoPage({super.key, this.aoEnviar});
+  const ContestarServicoPage({
+    super.key,
+    this.aoEnviar,
+    this.pedido,
+    this.nome,
+  });
 
   /// RN-31/RN-172: só ao enviar a contestação o valor fica retido e a
   /// confirmação pendente sai da Home e da Atividade. Voltar não muda nada.
   final VoidCallback? aoEnviar;
+
+  /// Serviço já concluído: ao enviar, vira o pedido de retorno (fluxo
+  /// único, RN-45) e abre o chat.
+  final PedidoConcluido? pedido;
+
+  /// "Luiza" (para "Primeiro a Luiza pode voltar").
+  final String? nome;
 
   @override
   State<ContestarServicoPage> createState() => _ContestarServicoPageState();
@@ -31,18 +42,40 @@ class ContestarServicoPage extends StatefulWidget {
 
 class _ContestarServicoPageState extends State<ContestarServicoPage> {
   int _motivo = 0;
+  final _fotos = <FotoProva>[];
 
-  void _emBreve(String o) => ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text('$o: em breve')));
+  String get _nome =>
+      widget.nome ?? widget.pedido?.primeiroNome ?? 'o profissional';
+
+  String get _aNome {
+    final p = widget.pedido;
+    if (p == null) return widget.nome == null ? _nome : 'a $_nome';
+    return '${p.feminino ? 'a' : 'o'} $_nome';
+  }
+
+  Future<void> _camera() async {
+    final f = await tirarFotoProva(context);
+    if (f != null && mounted) setState(() => _fotos.add(f));
+  }
 
   void _enviar() {
     widget.aoEnviar?.call();
+    final p = widget.pedido;
+    if (p != null) {
+      // RN-45/RN-46: o pedido de retorno, com o valor retido.
+      final r = pedirRetornoCliente(
+        p,
+        descricao: motivosContestacao[_motivo],
+        fotos: _fotos,
+        motivo: motivosContestacao[_motivo],
+      );
+      if (r != null) return abrirChatDoRetorno(context, p, substituir: true);
+    }
     // O aviso fica no Overlay raiz e continua na tela anterior.
     mostrarAvisoTopo(
       context,
-      titulo: 'Recebemos sua contestação',
-      texto: 'O valor do serviço fica retido até resolvermos.',
+      titulo: 'Recebemos seu aviso',
+      texto: 'O valor do serviço fica retido até resolver.',
     );
     Navigator.of(context).pop();
   }
@@ -52,8 +85,8 @@ class _ContestarServicoPageState extends State<ContestarServicoPage> {
     return CadastroScaffold(
       titulo: 'O que deu errado?',
       subtitulo:
-          'O valor do serviço fica retido até resolvermos. '
-          'A visita não entra na contestação.',
+          'O valor fica retido até resolver. Primeiro $_aNome pode voltar, '
+          'sem custo.',
       botao: 'Enviar',
       onBotao: _enviar,
       children: [
@@ -86,20 +119,12 @@ class _ContestarServicoPageState extends State<ContestarServicoPage> {
           const SizedBox(height: 8),
         ],
         const SizedBox(height: TatuMedidas.entreItens),
-        const Text('Fotos ajudam a resolver mais rápido', style: TatuTexto.nota),
-        const SizedBox(height: TatuMedidas.entreItens),
-        Row(
-          spacing: TatuMedidas.entreItens,
-          children: [
-            QuadradoFoto(
-              icone: TablerIcons.plus,
-              rotulo: 'Adicionar foto',
-              onTap: () => _emBreve('Adicionar foto'),
-            ),
-            const QuadradoFoto(),
-            const QuadradoFoto(),
-          ],
+        const Text(
+          'Tire fotos do problema agora (só pela câmera)',
+          style: TatuTexto.nota,
         ),
+        const SizedBox(height: TatuMedidas.entreItens),
+        FotosProva(fotos: _fotos, onCamera: _camera),
       ],
     );
   }

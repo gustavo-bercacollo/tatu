@@ -66,7 +66,7 @@ class VoceNaoEstavaPage extends StatelessWidget {
       principal: 'Pedir de novo',
       onPrincipal: () => irParaAba(context, AbaCliente.inicio),
       // RN-81: discordou? Avisa o suporte em até 24 h.
-      link: 'Algo errado? Avise em até 24h',
+      link: 'Algo errado? Avise o Tatu', // RN-108
       onLink: () => abrirSuporte(context, conteudoCliente),
     );
   }

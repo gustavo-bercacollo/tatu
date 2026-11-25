@@ -40,6 +40,9 @@ import '../../entrada/ligacao_page.dart';
 import '../../../data/ligacao.dart';
 import 'package:clock/clock.dart';
 
+import '../../../data/retorno.dart';
+import '../retorno/retorno_profissional.dart';
+
 import '../../../data/plano_fixo.dart';
 import '../plano_fixo/plano_fixo_profissional.dart';
 
@@ -142,6 +145,8 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     super.initState();
     _antes = _mensagens.length;
     _mensagens.addAll(widget.depois);
+    // RN-188: confere os prazos do retorno ao abrir.
+    WidgetsBinding.instance.addPostFrameCallback((_) => conferirRetornos());
     // RN-155: abriu, leu; o contador da aba diminui na hora.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       for (final c in conversasProfissional.conversas) {
@@ -343,7 +348,11 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     } else if (_rodada >= maxRodadas) {
       atendimentoProfissional.encerrar();
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const SemAcordoPage()),
+        MaterialPageRoute(
+          builder: (_) => SemAcordoPage(
+            cliente: '${widget.chamado.feminino ? 'A' : 'O'} $_nome',
+          ),
+        ),
       );
     } else {
       setState(() {
@@ -704,7 +713,11 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: Listenable.merge([atendimentoProfissional, planosFixos]),
+    listenable: Listenable.merge([
+      atendimentoProfissional,
+      planosFixos,
+      retornos,
+    ]),
     builder: (context, _) => _tela(context),
   );
 
@@ -820,6 +833,14 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
         ],
         if (_concluida && _mensagens.length == _antes) ..._marco(),
         if (fim == null) ..._planoNoChat(),
+        // P152 a P155 · RN-186: pedido de retorno deste cliente.
+        if (fim == null ? retornos.doCliente(c.cliente) : null
+            case final r?)
+          ...secaoRetornoProfissional(
+            context,
+            r,
+            onOutroValor: _enviarValor,
+          ),
         const SizedBox(height: TatuMedidas.entreSecoes),
         if (fim != null) ...[
           // RN-131: o Tatu avisa o que o profissional recebe.
@@ -1210,9 +1231,14 @@ class _EnderecoLiberado extends StatelessWidget {
   }
 }
 
-/// P28 · As 3 rodadas acabaram sem acordo: o chamado é encerrado.
+/// P28 · RN-198: o cliente recusou o último valor: o chamado é encerrado
+/// sem custo e não conta contra o profissional (nem como cancelamento,
+/// RN-64, nem como abandono, RN-79).
 class SemAcordoPage extends StatelessWidget {
-  const SemAcordoPage({super.key});
+  const SemAcordoPage({super.key, this.cliente = 'A Ana'});
+
+  /// "A Ana", "O Carlos".
+  final String cliente;
 
   @override
   Widget build(BuildContext context) {
@@ -1221,9 +1247,10 @@ class SemAcordoPage extends StatelessWidget {
       icone: const IconePermissao(TablerIcons.x, cor: TatuColors.textPrimary),
       titulo: 'Sem acordo de valor',
       texto:
-          'Vocês usaram as 3 rodadas.\n'
-          'O chamado foi encerrado e você\n'
-          'continua online para novos chamados.',
+          '$cliente recusou o último valor.\n'
+          'O chamado foi encerrado sem custo e\n'
+          'não conta contra você. Você continua\n'
+          'online para novos chamados.',
       principal: 'Voltar para o início',
       onPrincipal: () => Navigator.of(context).popUntil((r) => r.isFirst),
     );

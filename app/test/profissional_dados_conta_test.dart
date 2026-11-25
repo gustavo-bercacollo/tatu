@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/conta.dart';
 import 'package:tatu/data/profissional.dart';
+import 'package:tatu/data/retorno.dart';
 import 'package:tatu/features/profissional/cadastro/verificacao_page.dart';
 import 'package:tatu/features/profissional/perfil/perfil_profissional_page.dart';
 
@@ -48,7 +49,20 @@ void main() {
     expect(find.text('Total da semana'), findsOneWidget);
   });
 
+  testWidgets('RN-185: com retorno aberto, não encerra o perfil', (t) async {
+    retornos.restaurar(); // a demo tem um retorno aberto da Júlia
+    await _dados(t);
+    await t.tap(find.text('Encerrar perfil profissional'));
+    await t.pumpAndSettle();
+    expect(find.textContaining('um retorno aberto'), findsOneWidget);
+    final botao = t.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Encerrar perfil profissional'),
+    );
+    expect(botao.onPressed, isNull);
+  });
+
   testWidgets('Encerrar perfil profissional volta ao modo cliente', (t) async {
+    retornos.retornos.clear();
     await _dados(t);
     await t.tap(find.text('Encerrar perfil profissional'));
     await t.pumpAndSettle();

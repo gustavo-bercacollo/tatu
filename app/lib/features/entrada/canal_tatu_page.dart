@@ -1,3 +1,4 @@
+import '../../shared/widgets/retorno.dart' show CartaoDecisaoTatu;
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -282,6 +283,17 @@ class _CanalTatuPageState extends State<CanalTatuPage> {
           _CartaoDicas(
             cartao: c,
             onTap: () => widget.onDestino(context, c.link),
+          ),
+        );
+      }
+      // RN-191: a decisão do Tatu sobre um retorno.
+      if (m.decisao case final d?) {
+        partes.add(
+          CartaoDecisaoTatu(
+            titulo: d.titulo,
+            texto: d.texto,
+            rodape: d.rodape,
+            rodapeAviso: d.rodapeAviso,
           ),
         );
       }

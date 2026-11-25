@@ -1,0 +1,669 @@
+import 'package:clock/clock.dart';
+import 'package:flutter/foundation.dart';
+
+import 'catalogo_servicos.dart';
+import 'codigo_porta.dart';
+import 'plano_fixo.dart' show diaMes, diaLongo;
+import 'profissional.dart' show taxaTatu;
+
+/// RN-183 a RN-196: "Algo errado?" e retorno depois do serviço.
+///
+/// Todos os números marcados como exemplo nas regras ficam aqui. Mudou um
+/// número, muda só aqui (ver "Números do retorno" em Decisões em aberto).
+abstract final class RegrasRetorno {
+  /// RN-45/RN-46: pagamento protegido (valor ainda retido).
+  static const protegido = Duration(hours: 24);
+
+  /// RN-186: tempo do profissional para responder ao pedido.
+  static const respostaProfissional = Duration(hours: 48);
+
+  /// RN-186: o retorno aceito precisa ser marcado em até 7 dias.
+  static const marcarEm = Duration(days: 7);
+
+  /// RN-187: tempo do cliente para responder "Resolveu?".
+  static const resolveuEm = Duration(hours: 48);
+
+  /// RN-189: sem escolha depois da recusa, encerra.
+  static const escolhaRecusa = Duration(days: 7);
+
+  /// RN-191: prazo da mediação humana.
+  static const mediacaoDiasUteis = 3;
+
+  /// RN-187/RN-80: espera do profissional na porta no dia do retorno.
+  static const esperaNaPorta = Duration(minutes: 15);
+
+  /// RN-188: passou disso da hora marcada sem código na porta, o
+  /// profissional "não veio" (exemplo).
+  static const toleranciaNaoVeio = Duration(hours: 2);
+
+  /// RN-193: faltas do profissional que pausam a conta.
+  static const faltasParaPausar = 3;
+  static const janelaFaltas = Duration(days: 90);
+
+  /// RN-193: "não procede" do cliente que tiram o retorno mediado.
+  static const naoProcedeLimite = 3;
+  static const janelaNaoProcede = Duration(days: 182);
+  static const semRetornoMediado = Duration(days: 182);
+
+  /// RN-196: reserva mensal para os serviços que o Tatu paga.
+  static const reservaDaComissao = 0.01;
+
+  /// RN-183: "Na dúvida, 90."
+  static const prazoPadraoDias = retornoPadraoDias;
+
+  /// RN-183: prazo da profissão, pelo catálogo (o pedido usa o nome do
+  /// serviço: "Encanador").
+  static int prazoDias(String servico) =>
+      catalogoServicos.porNome(servico)?.retornoDias ?? prazoPadraoDias;
+
+  /// RN-183: até quando dá para pedir retorno (conta da conclusão).
+  static DateTime retornoAte(String servico, DateTime concluidoEm) =>
+      concluidoEm.add(Duration(days: prazoDias(servico)));
+
+  /// RN-45: nas primeiras 24 horas, "Pagamento protegido".
+  static bool protegidoAgora(DateTime concluidoEm, DateTime agora) =>
+      agora.isBefore(concluidoEm.add(protegido));
+
+  /// RN-188: com os repasses presos cobrindo o valor, devolve; senão, o
+  /// Tatu paga outro profissional (até o valor do serviço).
+  static ResolucaoAutomatica resolucao({
+    required double valorServico,
+    required double presos,
+  }) => presos >= valorServico
+      ? ResolucaoAutomatica.devolucao
+      : ResolucaoAutomatica.outroProfissional;
+
+  /// RN-192: só o valor do serviço volta. Do profissional sai o que ele
+  /// recebeu; a comissão o Tatu devolve do próprio caixa.
+  static Devolucao devolucao(double valorServico, {double fracao = 1}) {
+    final total = valorServico * fracao;
+    final doTatu = total * taxaTatu;
+    return Devolucao(
+      total: total,
+      doProfissional: total - doTatu,
+      doTatu: doTatu,
+    );
+  }
+
+  /// RN-193: faltas dentro da janela pausam a conta.
+  static bool pausaPorFaltas(List<DateTime> faltas, DateTime agora) =>
+      faltas.where((f) => agora.difference(f) < janelaFaltas).length >=
+      faltasParaPausar;
+
+  /// RN-193: 3 "não procede" em 6 meses tiram o retorno mediado por 6
+  /// meses (contados do último). Devolve até quando (nulo = pode pedir).
+  static DateTime? semRetornoMediadoAte(
+    List<DateTime> naoProcede,
+    DateTime agora,
+  ) {
+    final recentes = naoProcede
+        .where((d) => agora.difference(d) < janelaNaoProcede)
+        .toList()
+      ..sort();
+    if (recentes.length < naoProcedeLimite) return null;
+    final ate = recentes.last.add(semRetornoMediado);
+    return agora.isBefore(ate) ? ate : null;
+  }
+
+  /// RN-191: prazo da mediação em dias úteis (pula sábado e domingo).
+  static DateTime prazoMediacao(DateTime desde) {
+    var d = desde;
+    var faltam = mediacaoDiasUteis;
+    while (faltam > 0) {
+      d = d.add(const Duration(days: 1));
+      if (d.weekday != DateTime.saturday && d.weekday != DateTime.sunday) {
+        faltam--;
+      }
+    }
+    return d;
+  }
+}
+
+/// "26 nov, 21:00".
+String diaHora(DateTime d) =>
+    '${diaMes(d)}, ${d.hour.toString().padLeft(2, '0')}:'
+    '${d.minute.toString().padLeft(2, '0')}';
+
+/// "Sexta, 28 nov · 14h".
+String quandoRetorno(DateTime d) {
+  final dia = diaLongo(d.weekday);
+  final h = d.minute == 0
+      ? '${d.hour}h'
+      : '${d.hour}h${d.minute.toString().padLeft(2, '0')}';
+  return '${dia[0].toUpperCase()}${dia.substring(1)}, ${diaMes(d)} · $h';
+}
+
+/// RN-188: o que acontece quando o profissional falha.
+enum ResolucaoAutomatica { devolucao, outroProfissional }
+
+/// RN-192: quanto volta ao cliente e de onde sai.
+@immutable
+class Devolucao {
+  const Devolucao({
+    required this.total,
+    required this.doProfissional,
+    required this.doTatu,
+  });
+
+  final double total;
+
+  /// Descontado dos repasses presos e futuros do profissional.
+  final double doProfissional;
+
+  /// A comissão, devolvida pelo Tatu.
+  final double doTatu;
+}
+
+/// RN-184: foto tirada na hora pela câmera do app (nunca da galeria).
+@immutable
+class FotoProva {
+  const FotoProva({required this.tiradaEm, this.imagem});
+
+  /// Nula no protótipo quando não há câmera (só a marca de data e hora).
+  final Uint8List? imagem;
+  final DateTime tiradaEm;
+}
+
+/// Motivos do cliente em "O que deu errado?" (nas primeiras 24 horas).
+const motivosAlgoErrado = [
+  'Ficou mal feito',
+  'Não terminou o serviço',
+  'Cobrou diferente do combinado',
+  'Outro motivo',
+];
+
+/// RN-186: motivos obrigatórios da recusa.
+const motivosRecusaRetorno = [
+  'Não é o mesmo problema',
+  'Mau uso depois do serviço',
+  'Não consigo ir até lá',
+  'Outro motivo',
+];
+
+/// RN-191: as 4 decisões fixas da mediação.
+enum DecisaoMediacao {
+  refazerComOutro('Refazer com outro profissional'),
+  devolver50('Devolver 50%'),
+  devolver100('Devolver 100%'),
+  naoProcede('Não procede');
+
+  const DecisaoMediacao(this.rotulo);
+  final String rotulo;
+
+  /// Fração do valor do serviço que volta ao cliente.
+  double get fracao => switch (this) {
+    DecisaoMediacao.devolver50 => 0.5,
+    DecisaoMediacao.devolver100 => 1,
+    _ => 0,
+  };
+}
+
+/// RN-190: os 3 casos que vão para a mediação humana.
+enum MotivoMediacao {
+  contestouRecusa,
+  continuouProblema,
+  contestouOutroProblema,
+}
+
+/// Em que ponto está o pedido de retorno.
+enum SituacaoRetorno {
+  /// RN-186: esperando o profissional (48 horas).
+  aguardando,
+
+  /// RN-186/RN-187: aceito e marcado.
+  aceito,
+
+  /// RN-186: "É outro problema": foto no local + novo valor (RN-181).
+  outroProblema,
+
+  /// RN-186/RN-189: recusado com motivo; o cliente escolhe.
+  recusado,
+
+  /// RN-187: o profissional fez o retorno; falta "Resolveu?".
+  feito,
+
+  /// RN-187: cliente ausente no dia: dado como cumprido.
+  cumpridoAusente,
+
+  /// RN-188: resolvido sozinho a favor do cliente.
+  resolvidoAutomatico,
+
+  /// RN-190/RN-191: na mediação do Tatu.
+  emMediacao,
+
+  /// Encerrado (resolveu, "Ok, entendi", decisão do Tatu, prazos).
+  encerrado,
+}
+
+/// RN-188: por que a resolução automática aconteceu.
+enum FalhaProfissional { naoRespondeu, naoMarcou, naoVeio }
+
+/// RN-194: o pacote de provas de um serviço, guardado sozinho para
+/// responder a contestações no cartão (chargeback).
+@immutable
+class PacoteProvas {
+  const PacoteProvas({
+    required this.servico,
+    required this.valorConfirmado,
+    required this.confirmadoEm,
+    required this.codigoPorta,
+    required this.fotos,
+    required this.chat,
+    required this.conclusaoConfirmadaEm,
+  });
+
+  /// Número do pedido ("#TT-48213").
+  final String servico;
+  final double valorConfirmado;
+  final DateTime confirmadoEm;
+  final String? codigoPorta;
+  final List<FotoProva> fotos;
+  final List<String> chat;
+  final DateTime conclusaoConfirmadaEm;
+}
+
+/// Pedido de retorno de um serviço (RN-184: um por serviço).
+class PedidoRetorno {
+  PedidoRetorno({
+    required this.servico,
+    required this.servicoNome,
+    required this.descricaoServico,
+    required this.diaServico,
+    required this.profissional,
+    required this.profissionalFeminino,
+    required this.cliente,
+    required this.clienteFeminina,
+    required this.valorServico,
+    required this.descricao,
+    required this.fotos,
+    required this.pedidoEm,
+    required this.retido,
+    this.motivo,
+    this.pagamento = 'Visa 4242',
+  });
+
+  /// Número do serviço ("#TT-48213").
+  final String servico;
+
+  /// "Encanador" (para "Chamar outro encanador").
+  final String servicoNome;
+
+  /// "Vazamento na pia".
+  final String descricaoServico;
+
+  /// "04 nov".
+  final String diaServico;
+
+  final String profissional;
+  final bool profissionalFeminino;
+  final String cliente;
+  final bool clienteFeminina;
+
+  /// RN-192: só o valor do serviço (sem visita nem gorjeta).
+  final double valorServico;
+
+  /// O que o cliente escreveu.
+  final String descricao;
+
+  /// RN-184: fotos tiradas na hora.
+  final List<FotoProva> fotos;
+  final DateTime pedidoEm;
+
+  /// RN-46: pedido nas primeiras 24 horas: o valor continua retido.
+  final bool retido;
+
+  /// Motivo de "O que deu errado?" (nas primeiras 24 horas).
+  final String? motivo;
+
+  /// Onde a devolução cai ("Visa 4242").
+  final String pagamento;
+
+  SituacaoRetorno situacao = SituacaoRetorno.aguardando;
+
+  /// RN-186: aceito e marcado para.
+  DateTime? marcadoPara;
+
+  /// RN-187: o retorno começa com o código na porta (RN-39).
+  String codigo = RegrasCodigo.gerar();
+
+  /// RN-186: motivo da recusa.
+  String? motivoRecusa;
+
+  /// RN-186: "É outro problema": foto no local e descrição.
+  FotoProva? fotoNoLocal;
+  String? outroProblema;
+
+  /// RN-187: quando o retorno foi feito (conta o "Resolveu?").
+  DateTime? feitoEm;
+
+  /// RN-188.
+  FalhaProfissional? falha;
+  ResolucaoAutomatica? resolucao;
+
+  /// RN-190/RN-191.
+  MotivoMediacao? motivoMediacao;
+  DateTime? mediacaoDesde;
+  DecisaoMediacao? decisao;
+
+  /// RN-189: recusado e o cliente ainda não escolheu.
+  DateTime? recusadoEm;
+
+  String get primeiroProfissional => profissional.split(' ').first;
+  String get primeiroCliente => cliente.split(' ').first;
+
+  /// "a Luiza", "o Carlos".
+  String get oProfissional =>
+      '${profissionalFeminino ? 'a' : 'o'} $primeiroProfissional';
+  String get oCliente => '${clienteFeminina ? 'a' : 'o'} $primeiroCliente';
+
+  /// RN-186: até quando o profissional responde.
+  DateTime get respondaAte => pedidoEm.add(RegrasRetorno.respostaProfissional);
+
+  /// RN-185: retorno aberto prende os repasses do profissional.
+  bool get aberto =>
+      situacao != SituacaoRetorno.encerrado &&
+      situacao != SituacaoRetorno.resolvidoAutomatico &&
+      situacao != SituacaoRetorno.cumpridoAusente;
+
+  /// RN-190: uma mediação por serviço.
+  bool get jaMediado => mediacaoDesde != null;
+}
+
+/// Retornos do app (cliente e profissional). Versão simulada.
+class RetornosRepo extends ChangeNotifier {
+  RetornosRepo() {
+    restaurar();
+  }
+
+  final retornos = <PedidoRetorno>[];
+
+  /// RN-193: "não procede" do cliente da conta (datas).
+  final naoProcedeCliente = <DateTime>[];
+
+  /// RN-194: pacote de provas de cada serviço, pelo número.
+  final provas = <String, PacoteProvas>{};
+
+  /// RN-192: dívidas sem saldo, pelo CPF (só dígitos). Com dívida, o CPF
+  /// não recebe chamados nem abre outra conta até quitar.
+  final dividasPorCpf = <String, double>{};
+
+  bool cpfComDivida(String cpf) =>
+      (dividasPorCpf[cpf.replaceAll(RegExp(r'\D'), '')] ?? 0) > 0;
+
+  /// RN-40: a última foto do serviço pronto (protótipo: o profissional e o
+  /// cliente estão no mesmo aparelho; no backend vai com o serviço).
+  FotoProva? fotoServicoPronto;
+
+  void restaurar() {
+    retornos
+      ..clear()
+      // Protótipo: um pedido de retorno chegando para a profissional da
+      // demo (Júlia, serviço de 04 nov).
+      ..add(
+        PedidoRetorno(
+          servico: '#TT-47002',
+          servicoNome: 'Encanador',
+          descricaoServico: 'Troca de torneira',
+          diaServico: '04 nov',
+          profissional: 'Luiza Vilela',
+          profissionalFeminino: true,
+          cliente: 'Júlia Costa',
+          clienteFeminina: true,
+          valorServico: 120,
+          descricao: 'A torneira voltou a pingar no mesmo lugar.',
+          fotos: [
+            FotoProva(tiradaEm: clock.now()),
+            FotoProva(tiradaEm: clock.now()),
+          ],
+          pedidoEm: clock.now(),
+          retido: false,
+        ),
+      );
+    naoProcedeCliente.clear();
+    provas.clear();
+    dividasPorCpf.clear();
+    fotoServicoPronto = null;
+    notifyListeners();
+  }
+
+  /// O retorno de um serviço (pelo número).
+  PedidoRetorno? doServico(String numero) =>
+      retornos.where((r) => r.servico == numero).firstOrNull;
+
+  /// O retorno mais recente com [profissional] (lado do cliente).
+  PedidoRetorno? comProfissional(String profissional) => retornos.reversed
+      .where((r) => r.profissional == profissional)
+      .firstOrNull;
+
+  /// O retorno mais recente de [cliente] (lado do profissional).
+  PedidoRetorno? doCliente(String cliente) =>
+      retornos.reversed.where((r) => r.cliente == cliente).firstOrNull;
+
+  /// RN-185: retornos abertos de [profissional] (prendem repasses).
+  Iterable<PedidoRetorno> abertosDe(String profissional) =>
+      retornos.where((r) => r.profissional == profissional && r.aberto);
+
+  /// RN-185: quanto fica preso dos repasses de [profissional].
+  double presosDe(String profissional) =>
+      abertosDe(profissional).fold(0, (s, r) => s + r.valorServico);
+
+  /// RN-193: o cliente da conta perdeu o retorno mediado?
+  DateTime? semRetornoMediadoAte([DateTime? agora]) =>
+      RegrasRetorno.semRetornoMediadoAte(
+        naoProcedeCliente,
+        agora ?? clock.now(),
+      );
+
+  /// RN-184: um pedido por serviço.
+  bool podePedir(String numero) => doServico(numero) == null;
+
+  /// RN-45/RN-184: o cliente pede o retorno.
+  PedidoRetorno? pedir(PedidoRetorno r) {
+    if (!podePedir(r.servico)) return null;
+    retornos.add(r);
+    notifyListeners();
+    return r;
+  }
+
+  // ---------- Profissional (RN-186) ----------
+
+  /// "Aceitar retorno": marca dia e hora em até 7 dias ([quando] nulo =
+  /// aceitou e ainda vai marcar; RN-188 conta os 7 dias).
+  bool aceitar(PedidoRetorno r, DateTime? quando, {DateTime? agora}) {
+    final hoje = agora ?? clock.now();
+    if (r.situacao != SituacaoRetorno.aguardando) return false;
+    if (quando != null && quando.isAfter(hoje.add(RegrasRetorno.marcarEm))) {
+      return false;
+    }
+    r
+      ..situacao = SituacaoRetorno.aceito
+      ..marcadoPara = quando;
+    notifyListeners();
+    return true;
+  }
+
+  /// "Recusar": motivo obrigatório.
+  bool recusar(PedidoRetorno r, String motivo, {DateTime? agora}) {
+    if (motivo.trim().isEmpty || r.situacao != SituacaoRetorno.aguardando) {
+      return false;
+    }
+    r
+      ..situacao = SituacaoRetorno.recusado
+      ..motivoRecusa = motivo
+      ..recusadoEm = agora ?? clock.now();
+    notifyListeners();
+    return true;
+  }
+
+  /// "É outro problema": foto no local obrigatória (depois vem o valor).
+  bool outroProblema(PedidoRetorno r, FotoProva foto, String descricao) {
+    if (r.situacao != SituacaoRetorno.aguardando) return false;
+    r
+      ..situacao = SituacaoRetorno.outroProblema
+      ..fotoNoLocal = foto
+      ..outroProblema = descricao;
+    notifyListeners();
+    return true;
+  }
+
+  /// RN-187: o código na porta foi digitado e o retorno terminou.
+  /// Devolve falso com o código errado.
+  bool digitarCodigo(PedidoRetorno r, String codigo, {DateTime? agora}) {
+    if (r.situacao != SituacaoRetorno.aceito || codigo != r.codigo) {
+      return false;
+    }
+    feito(r, agora: agora);
+    return true;
+  }
+
+  void feito(PedidoRetorno r, {DateTime? agora}) {
+    r
+      ..situacao = SituacaoRetorno.feito
+      ..feitoEm = agora ?? clock.now();
+    notifyListeners();
+  }
+
+  /// RN-187: o cliente não estava no dia: dado como cumprido.
+  void clienteAusente(PedidoRetorno r) {
+    r.situacao = SituacaoRetorno.cumpridoAusente;
+    notifyListeners();
+  }
+
+  // ---------- Cliente ----------
+
+  /// RN-187: "Sim, resolveu" encerra; "Não, continua o problema" vai à
+  /// mediação (RN-190).
+  void resolveu(PedidoRetorno r, bool sim, {DateTime? agora}) {
+    if (sim) {
+      r.situacao = SituacaoRetorno.encerrado;
+      notifyListeners();
+      return;
+    }
+    mediar(r, MotivoMediacao.continuouProblema, agora: agora);
+  }
+
+  /// RN-189: "Ok, entendi" encerra.
+  void okEntendi(PedidoRetorno r) {
+    r.situacao = SituacaoRetorno.encerrado;
+    notifyListeners();
+  }
+
+  /// RN-190: só nos 3 casos e uma vez por serviço. RN-193: sem retorno
+  /// mediado, não abre. Devolve se abriu.
+  bool mediar(PedidoRetorno r, MotivoMediacao motivo, {DateTime? agora}) {
+    final hoje = agora ?? clock.now();
+    if (r.jaMediado || semRetornoMediadoAte(hoje) != null) return false;
+    r
+      ..situacao = SituacaoRetorno.emMediacao
+      ..motivoMediacao = motivo
+      ..mediacaoDesde = hoje;
+    notifyListeners();
+    return true;
+  }
+
+  // ---------- Prazos (RN-187 a RN-189) ----------
+
+  /// Confere os prazos de todos os retornos e resolve o que venceu.
+  /// [presos] diz quanto o profissional tem de repasses presos.
+  /// [falta] registra a falta do profissional (RN-193).
+  void conferirPrazos({
+    DateTime? agora,
+    double Function(String profissional)? presos,
+    void Function(String profissional)? falta,
+  }) {
+    final hoje = agora ?? clock.now();
+    var mudou = false;
+    for (final r in retornos) {
+      switch (r.situacao) {
+        case SituacaoRetorno.aguardando when hoje.isAfter(r.respondaAte):
+          _resolverSozinho(r, FalhaProfissional.naoRespondeu, presos, falta);
+          mudou = true;
+        case SituacaoRetorno.aceito
+            when r.marcadoPara == null &&
+                hoje.isAfter(r.respondaAte.add(RegrasRetorno.marcarEm)):
+          _resolverSozinho(r, FalhaProfissional.naoMarcou, presos, falta);
+          mudou = true;
+        case SituacaoRetorno.aceito
+            when r.marcadoPara != null &&
+                hoje.isAfter(
+                  r.marcadoPara!.add(RegrasRetorno.toleranciaNaoVeio),
+                ):
+          // RN-188: não apareceu (sem código na porta).
+          _resolverSozinho(r, FalhaProfissional.naoVeio, presos, falta);
+          mudou = true;
+        case SituacaoRetorno.feito
+            when hoje.difference(r.feitoEm!) > RegrasRetorno.resolveuEm:
+          // RN-187: sem resposta em 48 horas, resolvido.
+          r.situacao = SituacaoRetorno.encerrado;
+          mudou = true;
+        case SituacaoRetorno.recusado
+            when hoje.difference(r.recusadoEm!) > RegrasRetorno.escolhaRecusa:
+          // RN-189: sem escolha em 7 dias, encerra.
+          r.situacao = SituacaoRetorno.encerrado;
+          mudou = true;
+        default:
+      }
+    }
+    if (mudou) notifyListeners();
+  }
+
+  /// RN-188: o profissional não veio (sem código na porta).
+  void naoVeio(
+    PedidoRetorno r, {
+    double Function(String profissional)? presos,
+    void Function(String profissional)? falta,
+  }) {
+    _resolverSozinho(r, FalhaProfissional.naoVeio, presos, falta);
+    notifyListeners();
+  }
+
+  void _resolverSozinho(
+    PedidoRetorno r,
+    FalhaProfissional motivo,
+    double Function(String)? presos,
+    void Function(String)? falta,
+  ) {
+    // Os presos deste próprio retorno contam (RN-185).
+    final saldo = presos?.call(r.profissional) ?? presosDe(r.profissional);
+    r
+      ..falha = motivo
+      ..resolucao = RegrasRetorno.resolucao(
+        valorServico: r.valorServico,
+        presos: saldo,
+      )
+      ..situacao = SituacaoRetorno.resolvidoAutomatico;
+    falta?.call(r.profissional);
+  }
+
+  // ---------- Mediação (RN-191) ----------
+
+  /// A pessoa do suporte decide. A decisão encerra o pedido, sem recurso.
+  /// RN-193: "não procede" conta para o cliente; recusa ou "outro
+  /// problema" derrubados contam falta para o profissional.
+  void decidir(
+    PedidoRetorno r,
+    DecisaoMediacao d, {
+    DateTime? agora,
+    void Function(String profissional)? falta,
+  }) {
+    if (r.situacao != SituacaoRetorno.emMediacao) return;
+    r
+      ..decisao = d
+      ..situacao = SituacaoRetorno.encerrado;
+    if (d == DecisaoMediacao.naoProcede) {
+      naoProcedeCliente.add(agora ?? clock.now());
+    } else if (r.motivoMediacao != MotivoMediacao.continuouProblema) {
+      falta?.call(r.profissional);
+    }
+    notifyListeners();
+  }
+
+  /// RN-194: guarda o pacote de provas ao confirmar a conclusão.
+  void guardarProvas(PacoteProvas p) {
+    provas[p.servico] = p;
+    notifyListeners();
+  }
+}
+
+/// Instância única usada pelo app enquanto não há backend.
+final retornos = RetornosRepo();

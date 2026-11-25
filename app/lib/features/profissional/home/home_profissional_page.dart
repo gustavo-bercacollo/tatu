@@ -17,6 +17,8 @@ import '../../../data/regras_distancia.dart';
 import '../../../data/profissional.dart';
 import '../../../data/servico_profissional.dart';
 import '../../../shared/widgets/conta_pausada.dart';
+import '../../../data/retorno.dart';
+import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../cliente/ajuda/abrir_ajuda.dart';
 import '../../../shared/widgets/avatar_usuario.dart';
@@ -224,7 +226,16 @@ class _ContaPausada extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = profissional;
     return AvisoContaPausada(
-      motivo: p.pausadaPorSinais
+      motivo: p.comDivida
+          // RN-192: dívida no CPF bloqueia chamados até quitar.
+          ? 'Você tem ${reais(p.divida)} de retorno para acertar com o '
+                'Tatu. Fale com o suporte para quitar.'
+          : p.pausadaPorFaltas
+          // RN-193: 3 faltas no retorno em 90 dias.
+          ? '${p.faltasRecentes} faltas em retornos em '
+                '${RegrasRetorno.janelaFaltas.inDays} dias. '
+                'Fale com o suporte para voltar.'
+          : p.pausadaPorSinais
           // RN-106: sinais à distância sem entrega.
           ? '${p.sinaisSemEntregaRecentes} sinais sem entrega em '
                 '${RegrasDistancia.janelaSinais.inDays} dias. '

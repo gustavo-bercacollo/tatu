@@ -78,10 +78,18 @@ class BolinhaEscolha extends StatelessWidget {
 
 /// Link azul em negrito (ex.: "Não é sobre um pedido", "Trocar número").
 class LinkAzul extends StatelessWidget {
-  const LinkAzul(this.texto, {super.key, required this.onTap});
+  const LinkAzul(
+    this.texto, {
+    super.key,
+    required this.onTap,
+    this.perigo = false,
+  });
 
   final String texto;
   final VoidCallback onTap;
+
+  /// Vermelho, para ação que encerra algo (ex.: "Recusar valor").
+  final bool perigo;
 
   @override
   Widget build(BuildContext context) {
@@ -95,10 +103,10 @@ class LinkAzul extends StatelessWidget {
           child: Text(
             texto,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w600,
-              color: TatuColors.verified,
+              color: perigo ? TatuColors.danger : TatuColors.verified,
             ),
           ),
         ),

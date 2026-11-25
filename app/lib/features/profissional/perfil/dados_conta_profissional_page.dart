@@ -1,3 +1,4 @@
+import '../../../data/retorno.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -195,17 +196,32 @@ class EncerrarPerfilPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // RN-185/RN-192: com retorno aberto ou dívida, não encerra.
+    final abertos = retornos.abertosDe(profissional.nome).length;
+    final bloqueio = profissional.comDivida
+        ? 'Você tem ${reais(profissional.divida)} de retorno para acertar '
+              'com o Tatu. Quite antes de encerrar.'
+        : abertos > 0
+        ? 'Você tem ${abertos == 1 ? 'um retorno aberto' : '$abertos retornos abertos'}. '
+              'Resolva antes de encerrar.'
+        : null;
     return CadastroScaffold(
       titulo: 'Encerrar perfil profissional?',
       subtitulo: 'Sua conta de cliente continua.',
       botao: 'Encerrar perfil profissional',
       perigo: true,
-      onBotao: () => Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const PerfilEncerradoPage()),
-      ),
+      onBotao: bloqueio != null
+          ? null
+          : () => Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const PerfilEncerradoPage()),
+            ),
       botaoSecundario: 'Manter perfil',
       onSecundario: () => Navigator.of(context).pop(),
-      children: const [
+      children: [
+        if (bloqueio != null) ...[
+          CaixaAviso(bloqueio),
+          const SizedBox(height: TatuMedidas.entreItens),
+        ],
         LinhaConsequencia(TablerIcons.bell, 'Você para de receber chamados.'),
         LinhaConsequencia(
           TablerIcons.users,
@@ -215,7 +231,7 @@ class EncerrarPerfilPage extends StatelessWidget {
           TablerIcons.wallet,
           'Valores a receber caem no seu Pix normalmente.',
         ),
-        LinhaConsequencia(
+        const LinhaConsequencia(
           TablerIcons.refresh,
           'Para voltar, você refaz a verificação.',
         ),

@@ -1,3 +1,4 @@
+import '../retorno/retorno_profissional.dart' show CartaoRepassePreso;
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -120,6 +121,8 @@ class _GanhosPageState extends State<GanhosPage> {
                   _Barras(resumo: r),
                 ],
                 const SizedBox(height: TatuMedidas.entreSecoes),
+                // P157 · RN-185: repasses presos por retorno aberto.
+                CartaoRepassePreso(profissional: profissional.nome),
                 // RN-35: quando o dinheiro cai.
                 _Caixa(
                   child: Row(

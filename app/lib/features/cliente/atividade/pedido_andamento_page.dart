@@ -76,7 +76,10 @@ class _PedidoAndamentoPageState extends State<PedidoAndamentoPage> {
   void _algoErrado() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => ContestarServicoPage(aoEnviar: pedidos.algoErrado),
+        builder: (_) => ContestarServicoPage(
+          aoEnviar: pedidos.algoErrado,
+          nome: pedidos.andamento?.primeiroNome,
+        ),
       ),
     );
   }

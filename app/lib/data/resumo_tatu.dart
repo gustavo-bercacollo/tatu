@@ -31,9 +31,10 @@ const resumoCliente = [
     chaves: ['cobrado quando o serviço é concluído'],
   ),
   PontoResumo(
-    '24 horas para avisar se algo deu errado.',
+    // RN-108: nunca dizer que a garantia acaba em 24 horas.
+    'Algo errado? Pagamento protegido por 24 horas e retorno sem custo.',
     item: 5,
-    chaves: ['24 horas', 'algo deu errado'],
+    chaves: ['24 horas', 'retorno sem custo'],
   ),
 ];
 

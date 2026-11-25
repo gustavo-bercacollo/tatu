@@ -41,6 +41,25 @@ class CartaoTatu {
   final String link;
 }
 
+/// RN-191: cartão "Decisão do Tatu" (devolução, refazer, não procede).
+@immutable
+class DecisaoTatu {
+  const DecisaoTatu({
+    required this.titulo,
+    required this.texto,
+    required this.rodape,
+    this.rodapeAviso = false,
+  });
+
+  /// "Devolvemos R$ 150,00".
+  final String titulo;
+  final String texto;
+
+  /// "O pedido foi encerrado" ou "A recusa sem motivo contou 1 falta".
+  final String rodape;
+  final bool rodapeAviso;
+}
+
 /// Link azul no fim da mensagem ("Ver como funciona").
 @immutable
 class LinkTatu {
@@ -66,6 +85,7 @@ class MensagemTatu {
     this.cartao,
     this.textoDepois,
     this.link,
+    this.decisao,
   });
 
   factory MensagemTatu.fromJson(Map<String, dynamic> j) => MensagemTatu(
@@ -102,8 +122,15 @@ class MensagemTatu {
   final String? textoDepois;
   final LinkTatu? link;
 
+  /// RN-191: decisão da mediação (cartão entre os balões).
+  final DecisaoTatu? decisao;
+
   /// Quantos balões a mensagem ocupa (para "+ 2 mensagens").
-  int get baloes => 1 + (cartao == null ? 0 : 1) + (textoDepois == null ? 0 : 1);
+  int get baloes =>
+      1 +
+      (cartao == null ? 0 : 1) +
+      (decisao == null ? 0 : 1) +
+      (textoDepois == null ? 0 : 1);
 }
 
 /// RN-116: boas-vindas do cliente (primeira mensagem do app).

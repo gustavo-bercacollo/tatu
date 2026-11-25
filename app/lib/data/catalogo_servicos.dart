@@ -17,7 +17,12 @@ class ProfissaoCatalogo {
     this.sinonimos = const [],
     this.especialidades = const [],
     this.regulada = false,
+    this.retornoDias = retornoPadraoDias,
   });
+
+  /// RN-183: prazo para o cliente pedir retorno, contado da conclusão
+  /// (coluna "Retorno": 30 dias não durável, 90 durável).
+  final int retornoDias;
 
   /// "Encanador" (sem o "(a)" do documento).
   final String nome;
@@ -42,6 +47,14 @@ String _limpar(String s) => s
     .replaceAll(RegExp(r'\s+'), ' ')
     .trim();
 
+/// RN-183: "Na dúvida, 90 dias."
+const retornoPadraoDias = 90;
+
+/// "90 dias" → 90 (sem número, o padrão).
+int _dias(String? s) =>
+    int.tryParse(RegExp(r'\d+').firstMatch(s ?? '')?.group(0) ?? '') ??
+    retornoPadraoDias;
+
 AtendeCatalogo _atende(String s) => switch (s.trim().toUpperCase()) {
   'L' => AtendeCatalogo.local,
   'D' => AtendeCatalogo.distancia,
@@ -53,6 +66,9 @@ List<(String, List<ProfissaoCatalogo>)> lerCatalogo(String md) {
   final segmentos = <(String, List<ProfissaoCatalogo>)>[];
   String? atual;
   var lista = <ProfissaoCatalogo>[];
+  // Colunas lidas pelo cabeçalho ("Profissão", "Atende", "Retorno"…), para
+  // o documento poder ganhar colunas sem quebrar a leitura.
+  var col = <String, int>{};
   void fechar() {
     if (atual != null && lista.isNotEmpty) segmentos.add((atual, lista));
   }
@@ -74,21 +90,33 @@ List<(String, List<ProfissaoCatalogo>)> lerCatalogo(String md) {
     }
     if (atual == null || !l.startsWith('|') || l.contains('---')) continue;
     final c = l.split('|').map((x) => x.trim()).toList();
-    if (c.length < 6 || c[1] == 'Profissão') continue;
+    if (c.length > 1 && c[1] == 'Profissão') {
+      col = {for (final (i, n) in c.indexed) n: i};
+      continue;
+    }
+    if (c.length < 6) continue;
+    String? de(String nome) {
+      final i = col[nome];
+      return i == null || i >= c.length ? null : c[i];
+    }
+
+    final nome = de('Profissão') ?? c[1];
+    final sinonimos = de('Também chamado de') ?? '';
     lista.add(
       ProfissaoCatalogo(
-        nome: _limpar(c[1]),
+        nome: _limpar(nome),
         segmento: atual,
-        atende: _atende(c[2]),
+        atende: _atende(de('Atende') ?? ''),
         sinonimos: [
-          for (final x in c[3].split(','))
+          for (final x in sinonimos.split(','))
             if (_limpar(x).isNotEmpty) _limpar(x),
         ],
         especialidades: [
-          for (final x in c[4].split('·'))
+          for (final x in (de('Especialidades') ?? '').split('·'))
             if (x.trim().isNotEmpty) _limpar(x),
         ],
-        regulada: c[1].contains('Reg.') || c[3].contains('Reg.'),
+        regulada: nome.contains('Reg.') || sinonimos.contains('Reg.'),
+        retornoDias: _dias(de('Retorno')),
       ),
     );
   }

@@ -151,10 +151,11 @@ class ServicoFinalizadoPage extends StatelessWidget {
                   ),
                   const SizedBox(height: TatuMedidas.entreItens),
                   LinkAzul(
-                    'Algo errado? Avise em até 24h',
+                    // RN-108: sem dizer que acaba em 24 horas.
+                    'Algo errado? Avise o Tatu',
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => const ContestarServicoPage(),
+                        builder: (_) => ContestarServicoPage(pedido: pedido),
                       ),
                     ),
                   ),

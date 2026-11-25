@@ -83,6 +83,12 @@ class ReaisFormatter extends TextInputFormatter {
   }
 }
 
+/// "R$ 1.200,00" → 1200 (texto sem número → 0).
+double lerReais(String s) {
+  final limpo = s.replaceAll(RegExp(r'[^0-9,]'), '').replaceAll(',', '.');
+  return double.tryParse(limpo) ?? 0;
+}
+
 /// 40 → "R$ 40" (sem centavos quando o valor é redondo).
 String reaisInteiros(num v) => v == v.roundToDouble()
     ? reais(v).replaceFirst(RegExp(r',00$'), '')

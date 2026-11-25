@@ -111,6 +111,7 @@ Future<bool?> perguntar(
   bool esquerda = false,
   String? nota,
   String? aviso,
+  String? voltar,
 }) async {
   final alinhar = esquerda ? TextAlign.left : TextAlign.center;
   return mostrarFolha<bool>(
@@ -183,6 +184,22 @@ Future<bool?> perguntar(
               if (destacarCancelar) botaoCancelar else botaoConfirmar,
               const SizedBox(height: 10),
               if (destacarCancelar) botaoConfirmar else botaoCancelar,
+              // Terceira saída, em texto: fecha sem escolher (devolve null).
+              if (voltar != null) ...[
+                const SizedBox(height: 4),
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  style: TextButton.styleFrom(
+                    foregroundColor: TatuColors.textSecondary,
+                    textStyle: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  child: Text(voltar),
+                ),
+              ],
             ],
           ),
         ),

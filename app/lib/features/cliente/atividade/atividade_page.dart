@@ -1,3 +1,8 @@
+import '../../../data/retorno.dart';
+import '../../../shared/widgets/retorno.dart' show CartaoRetornoAtividade;
+import '../../../data/conta.dart';
+import '../../../data/conversas.dart';
+import '../mensagens/chat_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -88,12 +93,21 @@ class _EmAndamento extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: pedidos,
+    listenable: Listenable.merge([pedidos, retornos]),
     builder: (context, _) => _lista(context),
   );
 
+  /// RN-187: retornos aceitos do cliente (card "Retorno · sem custo").
+  List<PedidoRetorno> get _retornos => [
+    for (final r in retornos.retornos)
+      if (r.cliente == conta.nomeCompleto &&
+          r.situacao == SituacaoRetorno.aceito)
+        r,
+  ];
+
   Widget _lista(BuildContext context) {
-    if (pedidos.semNadaEmAndamento) {
+    final retornosMarcados = _retornos;
+    if (pedidos.semNadaEmAndamento && retornosMarcados.isEmpty) {
       return EstadoVazio(
         icone: TablerIcons.clock,
         titulo: 'Nenhum pedido agora',
@@ -126,6 +140,21 @@ class _EmAndamento extends StatelessWidget {
                   : TatuMedidas.entreItens,
             ),
           lista.isEmpty ? _NinguemAceitou(busca: b) : _BuscaCompacta(busca: b),
+        ],
+        for (final r in retornosMarcados) ...[
+          const SizedBox(height: TatuMedidas.entreItens),
+          CartaoRetornoAtividade(
+            retorno: r,
+            onTap: () {
+              final c = conversas.conversas
+                  .where((c) => c.nome == r.profissional)
+                  .firstOrNull;
+              if (c == null) return;
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => ChatPage(conversa: c)),
+              );
+            },
+          ),
         ],
       ],
     );

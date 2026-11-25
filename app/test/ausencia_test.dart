@@ -118,7 +118,7 @@ void main() {
     expect(find.text('Você não estava no local'), findsOneWidget);
     expect(find.text('A visita foi cobrada: R\$ 40,00'), findsOneWidget);
     expect(find.text('A Luiza esperou 10 minutos na porta.'), findsOneWidget);
-    expect(find.text('Algo errado? Avise em até 24h'), findsOneWidget);
+    expect(find.text('Algo errado? Avise o Tatu'), findsOneWidget);
     expect(pedidos.andamento, isNull);
     expect(conta.ausenciasRecentes, 1);
     expect(conta.pausadaPorAusencias, isFalse);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/retorno.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/atendimento_profissional.dart';
 import 'package:tatu/data/avaliacoes_de_clientes.dart';
@@ -53,6 +54,9 @@ void main() {
         findsOneWidget);
     await t.tap(find.text('Concluir serviço'));
     await t.pumpAndSettle();
+    // P57 · RN-40: foto obrigatória do serviço pronto.
+    await t.tap(find.bySemanticsLabel('Tirar foto'));
+    await t.pumpAndSettle();
     expect(find.text('Serviço concluído'), findsOneWidget);
     expect(find.text('Aguardando a Ana confirmar'), findsOneWidget);
     // Contagem das 2 horas (h:mm).
@@ -99,6 +103,9 @@ void main() {
     await _emAndamento(t);
     await t.tap(find.text('Concluir serviço'));
     await t.pumpAndSettle();
+    // P57 · RN-40: foto obrigatória do serviço pronto.
+    await t.tap(find.bySemanticsLabel('Tirar foto'));
+    await t.pumpAndSettle();
     await t.tap(find.text('Ficar online'));
     await t.pumpAndSettle();
     expect(profissional.online, isTrue);
@@ -143,6 +150,7 @@ void main() {
   });
 
   testWidgets('Cliente: serviço concluído e contestação', (t) async {
+    retornos.restaurar();
     await _abrir(
       t,
       ServicoFinalizadoPage(pedido: PedidosRepo().concluidos.first),
@@ -151,15 +159,18 @@ void main() {
     expect(find.text('R\$ 190,00 cobrado no Visa 4242'), findsOneWidget);
     expect(find.text('nº 000482'), findsOneWidget);
     expect(find.text('Avaliar a Luiza'), findsOneWidget);
-    await t.tap(find.text('Algo errado? Avise em até 24h'));
+    await t.tap(find.text('Algo errado? Avise o Tatu'));
     await t.pumpAndSettle();
     expect(find.text('O que deu errado?'), findsOneWidget);
     await t.tap(find.text('Cobrou diferente do combinado'));
     await t.pump();
     await t.tap(find.text('Enviar'));
     await t.pumpAndSettle();
-    expect(find.text('Recebemos sua contestação'), findsOneWidget);
-    await t.pump(const Duration(seconds: 4));
+    // RN-45: fluxo único: vira o pedido de retorno e abre o chat.
+    expect(find.text('Pedido de retorno'), findsOneWidget);
+    final r = retornos.comProfissional('Luiza Souza')!;
+    expect(r.motivo, 'Cobrou diferente do combinado');
+    expect(r.situacao, SituacaoRetorno.aguardando);
   });
 
   testWidgets('Cliente: serviço não realizado cobra só a visita', (t) async {

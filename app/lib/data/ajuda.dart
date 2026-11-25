@@ -58,21 +58,27 @@ const artigoPagamento = Artigo(
 
 /// RN-45 e RN-107: a garantia do Tatu é de 24 horas; depois, o problema é
 /// entre cliente e profissional, pelo mesmo chat.
+/// RN-45, RN-107, RN-108, RN-183 a RN-191: um fluxo só, "Algo errado?".
+/// Nunca dizer que a garantia acaba em 24 horas.
 const artigoReembolso = Artigo(
   'Como pedir reembolso?',
-  resumo: 'A garantia do Tatu vale por 24 horas depois do serviço.',
+  resumo: 'Algo errado? Primeiro o profissional volta, sem custo.',
   secoes: [
     (
-      'Em até 24 horas',
+      'Nas primeiras 24 horas',
       'Toque em “Algo errado?” no pedido concluído, conte o que houve e '
-          'mande fotos. O suporte olha o chat e decide: o profissional '
-          'refaz sem custo, reembolso parcial ou total.',
+          'tire fotos pela câmera do app. O pagamento fica protegido: o '
+          'valor do serviço fica retido até resolver.',
     ),
     (
-      'Depois de 24 horas',
-      'O pagamento já foi para o profissional. Fale com ele pelo mesmo '
-          'chat, que continua aberto: ele pode refazer ou mandar um novo '
-          'valor. Se preferir, faça um pedido novo com outro profissional.',
+      'Até o fim do prazo de retorno',
+      'Em “O problema voltou?”, peça um retorno sem custo até a data que '
+          'aparece no pedido. Se o profissional não responder, não marcar '
+          'ou não vier, o Tatu devolve o valor ou paga outro profissional.',
+    ),
+    (
+      'Depois do prazo',
+      'Fale com a Ajuda. A garantia legal do serviço continua valendo.',
     ),
   ],
 );

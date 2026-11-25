@@ -1,3 +1,7 @@
+import '../../../data/profissional.dart';
+import '../../../data/retorno.dart';
+import '../../../shared/widgets/retorno.dart' show CartaoRetornoAtividade;
+import '../retorno/retorno_profissional.dart' show abrirChatRetornoProfissional;
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -64,13 +68,35 @@ class _AtividadeProfissionalPageState extends State<AtividadeProfissionalPage> {
                   Expanded(
                     child: _aba == 0
                         ? ListenableBuilder(
-                            listenable: atendimentoProfissional,
-                            builder: (_, _) => atendimentoProfissional.ativo
+                            listenable: Listenable.merge([
+                              atendimentoProfissional,
+                              retornos,
+                            ]),
+                            builder: (_, _) => atendimentoProfissional.ativo ||
+                                    _retornosMarcados.isNotEmpty
                                 ? ListView(
                                     padding: const EdgeInsets.only(top: 16),
-                                    // Sem const: refaz a cada etapa.
-                                    // ignore: prefer_const_constructors
-                                    children: [_CartaoAtendimento()],
+                                    children: [
+                                      if (atendimentoProfissional.ativo)
+                                        // Sem const: refaz a cada etapa.
+                                        // ignore: prefer_const_constructors
+                                        _CartaoAtendimento(),
+                                      // RN-187: retorno aceito, sem custo.
+                                      for (final r in _retornosMarcados) ...[
+                                        const SizedBox(
+                                          height: TatuMedidas.entreItens,
+                                        ),
+                                        CartaoRetornoAtividade(
+                                          retorno: r,
+                                          profissional: true,
+                                          onTap: () =>
+                                              abrirChatRetornoProfissional(
+                                                context,
+                                                r,
+                                              ),
+                                        ),
+                                      ],
+                                    ],
                                   )
                                 : const EstadoVazio(
                                     icone: TablerIcons.clock,
@@ -91,6 +117,14 @@ class _AtividadeProfissionalPageState extends State<AtividadeProfissionalPage> {
     );
   }
 }
+
+/// RN-187: retornos aceitos deste profissional.
+List<PedidoRetorno> get _retornosMarcados => [
+  for (final r in retornos.retornos)
+    if (r.profissional == profissional.nome &&
+        r.situacao == SituacaoRetorno.aceito)
+      r,
+];
 
 /// Chamado aceito: cliente, o que é, etapa e linha do tempo. Toque abre
 /// a tela da etapa (chat, a caminho ou serviço em andamento).

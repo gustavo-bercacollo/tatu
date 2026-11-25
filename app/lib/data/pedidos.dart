@@ -7,6 +7,9 @@ import 'codigo_porta.dart';
 import 'conta.dart';
 import 'notificacoes.dart';
 import 'prazos.dart';
+import 'conversas.dart';
+import 'retorno.dart';
+import '../shared/formatadores.dart';
 import 'seguranca.dart';
 
 /// Etapas de um pedido, na ordem.
@@ -400,10 +403,28 @@ class PedidoConcluido {
     this.online = false,
     this.chegaEm = '~15 min',
     this.contestarAte,
+    this.concluidoEm,
+    this.valorServico,
   });
 
   /// RN-45/RN-171: até quando dá para contestar (24 h da confirmação).
   final DateTime? contestarAte;
+
+  /// RN-183: quando a conclusão foi confirmada (o prazo de retorno conta
+  /// daqui). Nulo nos pedidos cancelados.
+  final DateTime? concluidoEm;
+
+  /// RN-192: só o valor do serviço (sem visita nem gorjeta) volta numa
+  /// devolução. Nulo = o total.
+  final double? valorServico;
+
+  /// Valor do serviço para devolução (RN-192).
+  double get servicoParaDevolver => valorServico ?? lerReais(valor);
+
+  /// RN-183: até quando dá para pedir retorno.
+  DateTime? get retornoAte => concluidoEm == null
+      ? null
+      : RegrasRetorno.retornoAte(servico, concluidoEm!);
 
   final String servico;
   final String profissao;
@@ -466,6 +487,8 @@ class PedidoConcluido {
     online: online,
     chegaEm: chegaEm,
     contestarAte: contestarAte,
+    concluidoEm: concluidoEm,
+    valorServico: valorServico,
   );
 }
 
@@ -485,6 +508,10 @@ class PedidosRepo extends ChangeNotifier {
 
   /// Buscas em segundo plano (uma por pedido sem ninguém ainda).
   final buscas = <BuscaSegundoPlano>[];
+
+  /// RN-198: profissionais que ficaram sem acordo de valor; não recebem de
+  /// novo o mesmo pedido.
+  final recusados = <String>{};
   late List<PedidoConcluido> concluidos;
 
   /// Todos os pedidos em andamento, em pilha: o mais novo em cima. Abrir
@@ -527,6 +554,7 @@ class PedidosRepo extends ChangeNotifier {
     ausente = null;
     avisos.clear();
     confirmadoSozinho = null;
+    recusados.clear();
     _outros.clear();
     buscas.clear();
     andamento = PedidoAndamento(
@@ -548,7 +576,7 @@ class PedidosRepo extends ChangeNotifier {
         desde: DateTime.now().subtract(const Duration(minutes: 12)),
       ),
     );
-    concluidos = const [
+    concluidos = [
       PedidoConcluido(
         servico: 'Encanador',
         profissao: 'Encanadora',
@@ -563,6 +591,7 @@ class PedidosRepo extends ChangeNotifier {
         numero: '#TT-48213',
         editavelAte: '11 nov',
         online: true,
+        concluidoEm: DateTime(2026, 11, 4, 15, 2),
       ),
       PedidoConcluido(
         servico: 'Eletricista',
@@ -577,6 +606,7 @@ class PedidosRepo extends ChangeNotifier {
         mes: 'Novembro',
         numero: '#TT-47960',
         editavelAte: '09 nov',
+        concluidoEm: DateTime(2026, 11, 2, 10, 5),
         minhaAvaliacao: AvaliacaoEnviada(
           nota: 5,
           tags: ['Pontual', 'Educado'],
@@ -626,6 +656,21 @@ class PedidosRepo extends ChangeNotifier {
     final i = buscas.indexWhere((b) => b.servico == p.servico);
     if (i >= 0) buscas.removeAt(i);
     notifyListeners();
+  }
+
+  /// RN-197/RN-198: o cliente recusou o último valor de [profissional]:
+  /// o pedido com ele sai de "Em andamento" sem custo e ele não recebe de
+  /// novo o mesmo pedido. Devolve o pedido que saiu (nulo se não havia).
+  PedidoAndamento? semAcordo(String profissional) {
+    recusados.add(profissional);
+    final p = doProfissional(profissional);
+    if (p == null) {
+      notifyListeners();
+      return null;
+    }
+    abrir(p);
+    cancelarAndamento();
+    return p;
   }
 
   void cancelarAndamento() {
@@ -847,6 +892,11 @@ class PedidosRepo extends ChangeNotifier {
       numero: '#TT-${48300 + p.id}',
       online: true,
       contestarAte: agora.add(Prazos.contestar),
+      concluidoEm: agora,
+      // RN-192: a visita nunca volta numa devolução.
+      valorServico: (lerReais(valor.isEmpty ? p.valor : valor) - p.visita)
+          .clamp(0, double.infinity)
+          .toDouble(),
     );
   }
 
@@ -910,6 +960,24 @@ class PedidosRepo extends ChangeNotifier {
     final feito = _concluido(p, valor: p.valor, pagamento: p.pagamento);
     concluidos = [feito, ...concluidos];
     if (automatico) confirmadoSozinho = feito;
+    // RN-194: guarda sozinho o pacote de provas (chargeback).
+    final agora = clock.now();
+    retornos.guardarProvas(
+      PacoteProvas(
+        servico: feito.numero,
+        valorConfirmado: lerReais(p.valor),
+        confirmadoEm: p.confirmadoEm ?? agora,
+        codigoPorta: p.distancia ? null : p.codigo,
+        fotos: [?retornos.fotoServicoPronto],
+        chat: [
+          for (final m in conversas.conversas
+              .where((c) => c.nome == p.profissional)
+              .expand((c) => c.mensagens))
+            if (m.texto != null) '${m.minha ? 'Cliente' : 'Profissional'}: ${m.texto}',
+        ],
+        conclusaoConfirmadaEm: agora,
+      ),
+    );
     _tirarAtual();
     notifyListeners();
     return feito;

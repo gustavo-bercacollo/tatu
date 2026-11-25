@@ -255,6 +255,10 @@ class Conversa {
 
   bool get encerrada => encerramento != null;
 
+  /// RN-197/RN-198: o cliente recusou o último valor. A conversa fica só
+  /// para leitura, com "Sem acordo de valor", e sai de "Em andamento".
+  bool semAcordo = false;
+
   /// RN-140: o serviço do valor atual terminou (some o ligar).
   bool servicoConcluido = false;
 
@@ -296,7 +300,7 @@ class Conversa {
   bool _emAndamento;
 
   /// RN-129: encerrada pelo Tatu, sai de "Em andamento".
-  bool get emAndamento => _emAndamento && !encerrada;
+  bool get emAndamento => _emAndamento && !encerrada && !semAcordo;
   final bool online;
   int naoLidas;
 
@@ -481,6 +485,13 @@ class ConversasRepo extends ChangeNotifier {
     conversas = [c, ...conversas];
     notifyListeners();
     return c;
+  }
+
+  /// RN-197: o cliente recusou o 3º valor: nada é cobrado e a conversa
+  /// fica só para leitura.
+  void recusarValor(Conversa c) {
+    c.semAcordo = true;
+    notifyListeners();
   }
 
   /// O cliente confirma o valor: fica reservado e só é cobrado no fim.

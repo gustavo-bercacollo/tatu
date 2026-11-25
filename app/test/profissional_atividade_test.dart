@@ -54,6 +54,9 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
     expect(find.textContaining('+ R\$ 10 de gorjeta'), findsOneWidget);
+    await t.ensureVisible(find.text('Ver todos'));
+    await t.drag(find.byType(Scrollable).first, const Offset(0, -300));
+    await t.pumpAndSettle();
     await t.tap(find.text('Ver todos'));
     await t.pumpAndSettle();
     expect(find.text('Recebimentos'), findsOneWidget);

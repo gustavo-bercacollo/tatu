@@ -1,3 +1,4 @@
+import '../../../data/retorno.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -36,7 +37,9 @@ class _DadosProfissionalPageState extends State<DadosProfissionalPage> {
   }
 
   bool get _nomeOk => _nome.text.trim().contains(' ');
-  bool get _cpfOk => cpfValido(_cpf.text);
+  /// RN-192: CPF com dívida de retorno não abre outra conta.
+  bool get _cpfComDivida => retornos.cpfComDivida(_cpf.text);
+  bool get _cpfOk => cpfValido(_cpf.text) && !_cpfComDivida;
   bool get _celularOk => soDigitos(_celular.text).length == 11;
 
   bool _consultando = false;
@@ -101,7 +104,10 @@ class _DadosProfissionalPageState extends State<DadosProfissionalPage> {
             FilteringTextInputFormatter.digitsOnly,
             MascaraFormatter('###.###.###-##'),
           ],
-          errorText: (cpfCompleto || _cpfTocado) && !_cpfOk && cpfCompleto
+          errorText: cpfCompleto && _cpfComDivida
+              ? 'Este CPF tem uma dívida com o Tatu. Quite antes de abrir '
+                    'outra conta.'
+              : (cpfCompleto || _cpfTocado) && !_cpfOk && cpfCompleto
               ? 'CPF inválido. Confira os números.'
               : null,
           onChanged: (_) => setState(() => _cpfTocado = true),

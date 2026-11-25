@@ -139,9 +139,13 @@ class CartaoValorRecebido extends StatelessWidget {
     required this.onConfirmar,
     required this.onTrocar,
     required this.onPedirOutro,
+    this.onRecusar,
     this.onParcelas,
     this.nome = '',
   });
+
+  /// RN-197: no 3º valor (sem [onPedirOutro]), "Recusar valor".
+  final VoidCallback? onRecusar;
 
   /// "a Marina" (para "O sinal paga o tempo da Marina.").
   final String nome;
@@ -223,6 +227,15 @@ class CartaoValorRecebido extends StatelessWidget {
               : 'Reservamos agora. Só cobramos no fim.',
           style: TatuTexto.nota,
         ),
+        // RN-197: avisa antes que este é o último valor.
+        if (onPedirOutro == null && onRecusar != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            'Último valor. Se recusar, a conversa com $nome termina sem '
+            'custo.',
+            style: TatuTexto.nota,
+          ),
+        ],
         const SizedBox(height: TatuMedidas.entreItens + 4),
         FilledButton(
           onPressed: cartao == null ? onTrocar : onConfirmar,
@@ -231,6 +244,11 @@ class CartaoValorRecebido extends StatelessWidget {
         if (onPedirOutro != null) ...[
           const SizedBox(height: 4),
           Center(child: LinkAzul('Pedir outro valor', onTap: onPedirOutro!)),
+        ] else if (onRecusar != null) ...[
+          const SizedBox(height: 4),
+          Center(
+            child: LinkAzul('Recusar valor', onTap: onRecusar!, perigo: true),
+          ),
         ],
       ],
     );

@@ -204,6 +204,8 @@ class _ProcurandoPageState extends State<ProcurandoPage>
                 ),
                 ocupados: {
                   for (final p in pedidos.andamentos) p.profissional,
+                  // RN-198: quem ficou sem acordo não volta.
+                  ...pedidos.recusados,
                 },
               ) +
               (widget.anterior == null ? 0 : 1),

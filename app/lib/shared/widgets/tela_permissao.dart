@@ -30,7 +30,7 @@ class TelaPermissao extends StatelessWidget {
     this.onLink,
   });
 
-  /// Link azul embaixo dos botões (ex.: "Algo errado? Avise em até 24h").
+  /// Link azul embaixo dos botões (ex.: "Algo errado? Avise o Tatu").
   final String? link;
   final VoidCallback? onLink;
 

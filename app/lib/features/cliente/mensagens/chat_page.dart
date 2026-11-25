@@ -24,6 +24,10 @@ import '../atividade/pedido_concluido_page.dart';
 import '../pagamento/pagamento_page.dart';
 import 'package:clock/clock.dart';
 
+import '../../../data/retorno.dart';
+import '../../../data/retorno_acoes.dart';
+import '../retorno/retorno_cliente.dart';
+
 import '../../../data/arquivos_seguros.dart';
 import '../../../data/regras_distancia.dart';
 import '../../entrada/chat_encerrado.dart';
@@ -32,6 +36,9 @@ import '../chamar/procurando_page.dart';
 import '../../entrada/denunciar_arquivo.dart';
 import '../atividade/avaliar_page.dart';
 import '../atividade/pedir_de_novo_sheet.dart';
+import '../../../shared/widgets/abas_cliente.dart';
+import '../../../shared/widgets/aviso_topo.dart';
+import '../abas.dart';
 import 'cartao_valor.dart';
 import 'denunciar_page.dart';
 import 'entrega_distancia.dart';
@@ -78,10 +85,20 @@ class _ChatPageState extends State<ChatPage> {
       conversas.aprovarSozinhas();
       // RN-155: abriu, leu; o contador da aba diminui na hora.
       conversas.marcarLida(_c);
+      // RN-187/RN-188: confere os prazos do retorno e, se ele foi feito,
+      // pergunta "Resolveu?".
+      conferirPrazosRetorno();
+      final r = _retorno;
+      if (r != null && r.situacao == SituacaoRetorno.feito && mounted) {
+        perguntarResolveu(context, r);
+      }
     });
   }
 
   Conversa get _c => widget.conversa;
+
+  /// RN-184: o pedido de retorno com este profissional (nulo = nenhum).
+  PedidoRetorno? get _retorno => retornos.comProfissional(_c.nome);
 
   @override
   void dispose() {
@@ -339,6 +356,7 @@ class _ChatPageState extends State<ChatPage> {
           onTrocar: _trocarPagamento,
           onParcelas: () => _parcelas(v),
           onPedirOutro: v.rodada < maxRodadasValor ? _pedirOutro : null,
+          onRecusar: _recusar,
         ),
         SituacaoValor.pediuOutro => CartaoValorPedido(
           valor: v,
@@ -376,6 +394,46 @@ class _ChatPageState extends State<ChatPage> {
         confirmadoEm: clock.now(),
       ),
     );
+  }
+
+  /// RN-197: "Recusar valor" no 3º valor: chamar outro ou cancelar.
+  Future<void> _recusar() async {
+    final ela = '${_c.artigo} ${_c.primeiroNome}';
+    final chamarOutro = await perguntar(
+      context,
+      titulo: 'Recusar o valor?',
+      texto:
+          'A conversa com $ela termina e nada é cobrado. '
+          'Você pode chamar outro profissional.',
+      confirmar: 'Recusar e chamar outro',
+      cancelar: 'Recusar e cancelar pedido',
+      voltar: 'Voltar',
+      iconeAviso: false,
+    );
+    if (chamarOutro == null || !mounted) return;
+    // RN-198: sem custo; o pedido com ela sai e ela não volta.
+    conversas.recusarValor(_c);
+    final p = pedidos.semAcordo(_c.nome);
+    if (chamarOutro) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ProcurandoPage(
+            servico: _c.servico,
+            endereco: p?.endereco ?? _c.rua,
+            descricao: p?.descricao ?? _c.descricao,
+            distancia: _c.distancia,
+          ),
+        ),
+      );
+      return;
+    }
+    // O aviso fica no overlay de cima, então continua depois de sair.
+    mostrarAvisoTopo(
+      context,
+      titulo: 'Pedido cancelado',
+      texto: 'Nada foi cobrado.',
+    );
+    irParaAba(context, AbaCliente.inicio);
   }
 
   /// RN-176/RN-180: "Pedir de novo" a partir do chat de um serviço
@@ -788,7 +846,12 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([conversas, pagamentos, planosFixos]),
+      listenable: Listenable.merge([
+        conversas,
+        pagamentos,
+        planosFixos,
+        retornos,
+      ]),
       builder: (context, _) {
         final msgs = _c.mensagens;
         final ultimaFotoMinha = msgs.lastIndexWhere((m) => m.minha && m.foto);
@@ -805,7 +868,7 @@ class _ChatPageState extends State<ChatPage> {
                   onFechar: () => conversas.verDicaLigar(_c),
                 )
               : null,
-          rodapeColado: fim != null,
+          rodapeColado: fim != null || _c.semAcordo,
           mensagens: [
             CartaoPedidoChat(
               servico: _c.servico,
@@ -938,7 +1001,14 @@ class _ChatPageState extends State<ChatPage> {
                 const SizedBox(height: TatuMedidas.entreSecoes),
                 NotaChat(fim.nota!),
               ],
+            ] else if (_c.semAcordo) ...[
+              // RN-198: só leitura depois da recusa do último valor.
+              const SizedBox(height: TatuMedidas.entreSecoes),
+              const MarcadorChat('Sem acordo de valor'),
             ] else ...[
+              // RN-183 a RN-191: o pedido de retorno e o que veio depois.
+              if (_retorno case final r?)
+                ...secaoRetornoCliente(context, r, endereco: _c.rua),
               ..._planoNoChat(),
               ..._valor(),
               ..._semEntrega(),
@@ -946,7 +1016,7 @@ class _ChatPageState extends State<ChatPage> {
           ],
           // RN-132: só leitura depois que o Tatu encerra.
           // RN-42: fora isso, a conversa nunca fecha.
-          rodape: fim != null
+          rodape: fim != null || _c.semAcordo
               ? const RodapeConversaEncerrada()
               : Column(
             mainAxisSize: MainAxisSize.min,

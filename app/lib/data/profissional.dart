@@ -7,6 +7,7 @@ import 'consulta_registro.dart';
 import 'prazos.dart';
 import 'profissoes_reguladas.dart';
 import 'regras_distancia.dart';
+import 'retorno.dart';
 
 /// Profissões que aparecem como atalho no cadastro ("Outros" abre a lista).
 const profissoesPrincipais = [
@@ -367,10 +368,51 @@ class ProfissionalRepo extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Conta pausada (por visitas sem serviço ou por abandonos): não fica
-  /// online até falar com o suporte.
+  /// RN-193: faltas no retorno (não respondeu, não marcou, não veio,
+  /// recusa ou "outro problema" derrubados na mediação).
+  final List<DateTime> faltasRetorno = [];
+
+  /// RN-193: 3 faltas em 90 dias (exemplo) pausam a conta.
+  bool get pausadaPorFaltas =>
+      RegrasRetorno.pausaPorFaltas(faltasRetorno, clock.now());
+
+  int get faltasRecentes => faltasRetorno
+      .where((f) => clock.now().difference(f) < RegrasRetorno.janelaFaltas)
+      .length;
+
+  /// RN-192: dívida sem saldo, ligada ao CPF. Enquanto houver, não recebe
+  /// chamados nem abre outra conta.
+  double divida = 0;
+
+  bool get comDivida => divida > 0;
+
+  /// RN-193: soma 1 falta.
+  void registrarFalta() {
+    faltasRetorno.add(clock.now());
+    if (pausada) online = false;
+    notifyListeners();
+  }
+
+  /// RN-192: desconto sem saldo vira dívida no CPF.
+  void registrarDivida(double valor) {
+    if (valor <= 0) return;
+    divida += valor;
+    final doc = cpf.replaceAll(RegExp(r'\D'), '');
+    if (doc.isNotEmpty) {
+      retornos.dividasPorCpf[doc] = (retornos.dividasPorCpf[doc] ?? 0) + valor;
+    }
+    online = false;
+    notifyListeners();
+  }
+
+  /// Conta pausada (por visitas sem serviço, abandonos, sinais, faltas no
+  /// retorno ou dívida): não fica online até falar com o suporte.
   bool get pausada =>
-      pausadaPorVisitas || pausadaPorAbandonos || pausadaPorSinais;
+      pausadaPorVisitas ||
+      pausadaPorAbandonos ||
+      pausadaPorSinais ||
+      pausadaPorFaltas ||
+      comDivida;
 
   /// RN-77: registra um abandono (chamado devolvido à busca).
   void registrarAbandono() {
@@ -479,6 +521,8 @@ class ProfissionalRepo extends ChangeNotifier {
     visitas.clear();
     abandonos.clear();
     sinaisSemEntrega.clear();
+    faltasRetorno.clear();
+    divida = 0;
     notifyListeners();
   }
 

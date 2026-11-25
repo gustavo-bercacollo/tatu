@@ -6,13 +6,13 @@ import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/ajuda.dart';
 import '../../../data/pedidos.dart';
-import '../../../shared/widgets/abas_cliente.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/estrelas.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/tela_interna.dart';
-import '../abas.dart';
 import '../ajuda/chat_suporte_page.dart';
+import '../retorno/retorno_cliente.dart';
+import 'pedir_de_novo_sheet.dart';
 
 /// Pedido concluído: profissional, sua avaliação, resumo e total.
 class PedidoConcluidoPage extends StatelessWidget {
@@ -88,13 +88,16 @@ class PedidoConcluidoPage extends StatelessWidget {
               LinhaRotuloValor(rotulo: 'Total', valor: p.valor, destaque: true),
             ],
           ),
+          // RN-45/RN-183: "Pagamento protegido" ou "O problema voltou?".
+          CartaoAlgoErrado(pedido: p),
         ],
       ),
       rodape: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           FilledButton(
-            onPressed: () => irParaAba(context, AbaCliente.inicio),
+            // RN-176: abre o pedido já preenchido (mesma pessoa ou qualquer).
+            onPressed: () => abrirPedirDeNovo(context, p),
             child: const Text('Pedir de novo'),
           ),
           const SizedBox(height: 10),

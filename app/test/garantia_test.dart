@@ -4,9 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/data/ajuda.dart';
 import 'package:tatu/data/documentos_legais.dart';
 
-/// Garantia do Tatu de 24 horas (RN-45, RN-107, RN-108).
+/// "Algo errado?" e garantia legal (RN-45, RN-107, RN-108, RN-183).
 void main() {
-  test('RN-108: termos dizem que o Tatu intermedia e a garantia é de 24 h', () {
+  test('RN-108: termos dizem que o Tatu intermedia e mantêm a garantia legal', () {
     // RN-150: o texto vem de docs/termos-de-uso.md.
     final d = DocumentoLegal.ler(
       TipoDocumento.termos,
@@ -18,14 +18,21 @@ void main() {
     ].join(' ').replaceAll('**', '');
     expect(texto, contains('plataforma de intermediação'));
     expect(texto, contains('24 horas'));
-    expect(texto, contains('garantia legal do serviço, que é do profissional'));
+    expect(texto, contains('Garantia legal'));
+    expect(texto, contains('nada nestes Termos a reduz'));
+    expect(texto, isNot(contains('A garantia do Tatu é esse prazo de 24 horas')));
   });
 
-  test('RN-107: depois de 24 h, chama o profissional pelo mesmo chat', () {
+  test('RN-107: depois de 24 h, o Tatu continua no caso (retorno)', () {
     final secoes = {for (final s in artigoReembolso.secoes) s.$1: s.$2};
-    expect(secoes.keys, ['Em até 24 horas', 'Depois de 24 horas']);
-    expect(secoes['Depois de 24 horas'], contains('mesmo chat'));
-    expect(secoes['Depois de 24 horas'], contains('outro profissional'));
+    expect(secoes.keys, [
+      'Nas primeiras 24 horas',
+      'Até o fim do prazo de retorno',
+      'Depois do prazo',
+    ]);
+    expect(secoes['Até o fim do prazo de retorno'], contains('retorno sem custo'));
+    expect(secoes['Até o fim do prazo de retorno'], contains('outro profissional'));
+    expect(secoes['Depois do prazo'], contains('garantia legal'));
   });
 
   test('RN-107: nenhum texto do app promete garantia sem prazo', () {
