@@ -16,7 +16,11 @@ class TatuChip extends StatelessWidget {
     this.iconeFixo,
     this.pequeno = false,
     this.desabilitado = false,
+    this.contorno = false,
   });
+
+  /// Fundo branco com contorno escuro (ex.: "Tornar fixa", RN-209).
+  final bool contorno;
 
   final String label;
   final VoidCallback onTap;
@@ -50,10 +54,16 @@ class TatuChip extends StatelessWidget {
       child: Material(
         color: selecionado
             ? TatuColors.action
+            : contorno
+            ? TatuColors.bg
             : desabilitado
             ? TatuColors.surfaceGrouped
             : TatuColors.fill,
-        shape: const StadiumBorder(),
+        shape: contorno
+            ? const StadiumBorder(
+                side: BorderSide(color: TatuColors.textPrimary, width: 1.5),
+              )
+            : const StadiumBorder(),
         child: InkWell(
           onTap: onTap,
           customBorder: const StadiumBorder(),

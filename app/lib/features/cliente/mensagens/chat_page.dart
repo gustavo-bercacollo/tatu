@@ -56,6 +56,62 @@ void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
   ..hideCurrentSnackBar()
   ..showSnackBar(SnackBar(content: Text('$o: em breve')));
 
+/// RN-176: "Pedir de novo" com o profissional desta conversa (o último
+/// serviço feito, ou o pedido da conversa).
+void pedirDeNovoDaConversa(BuildContext context, Conversa c) {
+  final feito = pedidos.concluidos
+      .where((p) => p.profissional == c.nome && !p.cancelado)
+      .firstOrNull;
+  abrirPedirDeNovo(
+    context,
+    feito ??
+        PedidoConcluido(
+          servico: c.servico,
+          profissao: c.profissao,
+          profissional: c.nome,
+          descricao: c.descricao,
+          endereco: c.rua,
+          pagamento: '',
+          valor: '',
+          dia: c.concluidoEm ?? '',
+          hora: '',
+          mes: '',
+          online: c.online,
+        ),
+  );
+}
+
+/// Perfil do profissional desta conversa (C14–C15).
+void verPerfilDaConversa(
+  BuildContext context,
+  Conversa c, {
+  String voltar = 'Voltar para a conversa',
+}) {
+  final p = filaEncontrados.firstWhere(
+    (p) => p.nome == c.nome,
+    orElse: () => ProfissionalEncontrado(
+      nome: c.nome,
+      profissao: c.profissao,
+      feminino: c.feminino,
+      nota: '4,9',
+      servicos: 120,
+      chegaEm: '',
+    ),
+  );
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (ctx) => PerfilPublicoPage(
+        perfil: perfilDe(p),
+        avatar: AvatarIniciais(nome: p.nome, tamanho: 96),
+        rodape: FilledButton(
+          onPressed: () => Navigator.of(ctx).pop(),
+          child: Text(voltar),
+        ),
+      ),
+    ),
+  );
+}
+
 /// Chat com o profissional do pedido.
 class ChatPage extends StatefulWidget {
   const ChatPage({
@@ -406,7 +462,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  /// RN-208: "Recusar valor" no 3º valor: chamar outro ou cancelar.
+  /// RN-210: "Recusar valor" no 3º valor: chamar outro ou cancelar.
   Future<void> _recusar() async {
     final ela = '${_c.artigo} ${_c.primeiroNome}';
     final chamarOutro = await perguntar(
@@ -421,7 +477,7 @@ class _ChatPageState extends State<ChatPage> {
       iconeAviso: false,
     );
     if (chamarOutro == null || !mounted) return;
-    // RN-209: sem custo; o pedido com ela sai e ela não volta.
+    // RN-211: sem custo; o pedido com ela sai e ela não volta.
     conversas.recusarValor(_c);
     final p = pedidos.semAcordo(_c.nome);
     if (chamarOutro) {
@@ -448,28 +504,7 @@ class _ChatPageState extends State<ChatPage> {
 
   /// RN-176/RN-180: "Pedir de novo" a partir do chat de um serviço
   /// concluído (serviço, descrição e endereço do último pedido).
-  void _pedirDeNovo() {
-    final feito = pedidos.concluidos
-        .where((p) => p.profissional == _c.nome && !p.cancelado)
-        .firstOrNull;
-    abrirPedirDeNovo(
-      context,
-      feito ??
-          PedidoConcluido(
-            servico: _c.servico,
-            profissao: _c.profissao,
-            profissional: _c.nome,
-            descricao: _c.descricao,
-            endereco: _c.rua,
-            pagamento: '',
-            valor: '',
-            dia: _c.concluidoEm ?? '',
-            hora: '',
-            mes: '',
-            online: _c.online,
-          ),
-    );
-  }
+  void _pedirDeNovo() => pedirDeNovoDaConversa(context, _c);
 
   /// RN-180: a dica aparece no chat de um serviço concluído, quando não
   /// há atendimento nem valor em aberto (mensagem é só conversa).
@@ -844,31 +879,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   /// Perfil do profissional (C14–C15) a partir do chat.
-  void _verPerfil() {
-    final p = filaEncontrados.firstWhere(
-      (p) => p.nome == _c.nome,
-      orElse: () => ProfissionalEncontrado(
-        nome: _c.nome,
-        profissao: _c.profissao,
-        feminino: _c.feminino,
-        nota: '4,9',
-        servicos: 120,
-        chegaEm: '',
-      ),
-    );
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (ctx) => PerfilPublicoPage(
-          perfil: perfilDe(p),
-          avatar: AvatarIniciais(nome: p.nome, tamanho: 96),
-          rodape: FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Voltar para a conversa'),
-          ),
-        ),
-      ),
-    );
-  }
+  void _verPerfil() => verPerfilDaConversa(context, _c);
 
   /// Chave de cada balão, para o menu abrir no lugar dele (RN-134).
   final _chaves = <MensagemChat, GlobalKey>{};
@@ -1083,7 +1094,7 @@ class _ChatPageState extends State<ChatPage> {
                 NotaChat(fim.nota!),
               ],
             ] else if (_c.semAcordo) ...[
-              // RN-209: só leitura depois da recusa do último valor.
+              // RN-211: só leitura depois da recusa do último valor.
               const SizedBox(height: TatuMedidas.entreSecoes),
               const MarcadorChat('Sem acordo de valor'),
             ] else ...[

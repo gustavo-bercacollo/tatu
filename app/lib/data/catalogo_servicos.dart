@@ -18,7 +18,12 @@ class ProfissaoCatalogo {
     this.especialidades = const [],
     this.regulada = false,
     this.retornoDias = retornoPadraoDias,
+    this.fixo = false,
   });
+
+  /// RN-209: costuma virar plano fixo (coluna "Fixo": Sim). Só então o card
+  /// de Concluídos mostra "Tornar fixa/fixo".
+  final bool fixo;
 
   /// RN-183: prazo para o cliente pedir retorno, contado da conclusão
   /// (coluna "Retorno": 30 dias não durável, 90 durável).
@@ -117,6 +122,7 @@ List<(String, List<ProfissaoCatalogo>)> lerCatalogo(String md) {
         ],
         regulada: nome.contains('Reg.') || sinonimos.contains('Reg.'),
         retornoDias: _dias(de('Retorno')),
+        fixo: (de('Fixo') ?? '').trim().toLowerCase() == 'sim',
       ),
     );
   }

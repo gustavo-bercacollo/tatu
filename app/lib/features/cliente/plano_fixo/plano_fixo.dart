@@ -1,3 +1,5 @@
+import '../../../data/conta.dart';
+import 'dart:async';
 import '../mensagens/chat_page.dart';
 import '../../../data/conversas.dart';
 import 'package:flutter/material.dart';
@@ -745,3 +747,69 @@ class PlanoFixoPage extends StatelessWidget {
 ButtonStyle botaoBranco() => tatuBotaoSecundario().copyWith(
   backgroundColor: const WidgetStatePropertyAll(TatuColors.bg),
 );
+
+/// Protótipo: o profissional responde com o valor por visita depois disso
+/// (nulo nos testes).
+Duration? respostaValorPlano = const Duration(seconds: 2);
+
+/// "Tornar Júlia fixa" / "Tornar Carlos fixo".
+String textoTornarFixo(String nome, bool feminino) =>
+    'Tornar ${nome.split(' ').first} fix${feminino ? 'a' : 'o'}';
+
+/// RN-144/RN-208/RN-209: "Tornar [nome] fixa" fora do chat (segurando a
+/// conversa ou no card de Concluídos). Abre a mesma tela de escolha; com
+/// plano já existente, abre o plano. Depois do pedido, abre a conversa,
+/// onde chega o valor por visita.
+Future<void> tornarFixo(
+  BuildContext context, {
+  required String profissional,
+  required String profissao,
+  required bool feminino,
+  required String endereco,
+}) async {
+  final nav = Navigator.of(context);
+  final conversa = conversas.conversas
+      .where((c) => c.nome == profissional)
+      .firstOrNull;
+  final atual = planosFixos.planoCom(profissional);
+  if (atual != null) {
+    if (atual.status != StatusPlano.pendente) {
+      nav.push(MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: atual)));
+    } else if (conversa != null) {
+      nav.push(MaterialPageRoute(builder: (_) => ChatPage(conversa: conversa)));
+    }
+    return;
+  }
+  final e = await escolherPlano(
+    context,
+    nome: profissional.split(' ').first,
+    feminino: feminino,
+  );
+  if (e == null || !context.mounted) return;
+  final p = planosFixos.pedir(
+    cliente: conta.nomeCompleto,
+    profissional: profissional,
+    endereco: endereco,
+    frequencia: e.frequencia,
+    visitasPorSemana: e.vezes,
+    dias: e.dias,
+    horario: e.horario,
+    profissao: profissao,
+    feminino: feminino,
+  );
+  // RN-145: passaria de 2 visitas na semana (com os avulsos).
+  if (p == null) return mostrarLimiteSemana(context);
+  final espera = respostaValorPlano;
+  if (espera != null) {
+    Timer(espera, () => planosFixos.enviarValor(p, 150));
+  }
+  if (conversa != null) {
+    nav.push(MaterialPageRoute(builder: (_) => ChatPage(conversa: conversa)));
+  } else {
+    mostrarAvisoTopo(
+      context,
+      titulo: 'Pedido de plano fixo enviado',
+      texto: '${feminino ? 'Ela' : 'Ele'} responde com o valor por visita.',
+    );
+  }
+}

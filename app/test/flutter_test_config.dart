@@ -4,6 +4,7 @@ import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/data/catalogo_servicos.dart';
 import 'package:tatu/data/retorno.dart';
+import 'package:tatu/features/cliente/plano_fixo/plano_fixo.dart';
 import 'package:tatu/features/cliente/retorno/retorno_cliente.dart';
 import 'package:tatu/features/entrada/camera_prova_page.dart';
 
@@ -17,5 +18,6 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   CameraProvaPage.semCameraAoVivo = () async =>
       FotoProva(tiradaEm: clock.now());
   simularAceiteRetorno = null;
+  respostaValorPlano = null;
   await testMain();
 }

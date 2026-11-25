@@ -509,7 +509,7 @@ class PedidosRepo extends ChangeNotifier {
   /// Buscas em segundo plano (uma por pedido sem ninguém ainda).
   final buscas = <BuscaSegundoPlano>[];
 
-  /// RN-209: profissionais que ficaram sem acordo de valor; não recebem de
+  /// RN-211: profissionais que ficaram sem acordo de valor; não recebem de
   /// novo o mesmo pedido.
   final recusados = <String>{};
   late List<PedidoConcluido> concluidos;
@@ -658,7 +658,7 @@ class PedidosRepo extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// RN-208/RN-209: o cliente recusou o último valor de [profissional]:
+  /// RN-210/RN-211: o cliente recusou o último valor de [profissional]:
   /// o pedido com ele sai de "Em andamento" sem custo e ele não recebe de
   /// novo o mesmo pedido. Devolve o pedido que saiu (nulo se não havia).
   PedidoAndamento? semAcordo(String profissional) {

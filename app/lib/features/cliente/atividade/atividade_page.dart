@@ -1,3 +1,5 @@
+import '../plano_fixo/plano_fixo.dart' show tornarFixo;
+import '../../../data/catalogo_servicos.dart';
 import '../plano_fixo/plano_fixo.dart' show PlanoFixoPage;
 import '../../../shared/widgets/selo_plano_fixo.dart';
 import '../../../data/plano_fixo.dart';
@@ -780,6 +782,15 @@ class _Concluidos extends StatelessWidget {
   }
 }
 
+/// RN-209: "Tornar fixa" no card de Concluídos: profissão com Fixo: Sim
+/// no catálogo e ainda sem plano com a pessoa.
+bool _mostraTornarFixo(PedidoConcluido p) =>
+    !p.cancelado &&
+    (catalogoServicos.encontrar(p.servico)?.fixo ??
+        catalogoServicos.encontrar(p.profissao)?.fixo ??
+        false) &&
+    planosFixos.planoCom(p.profissional) == null;
+
 class _CartaoConcluido extends StatelessWidget {
   const _CartaoConcluido({required this.pedido});
 
@@ -863,6 +874,21 @@ class _CartaoConcluido extends StatelessWidget {
                         pequeno: true,
                         onTap: () => abrirPedirDeNovo(context, p),
                       ),
+                      // C215 · RN-209: só profissões "Fixo: Sim" no
+                      // catálogo e sem plano com a pessoa.
+                      if (_mostraTornarFixo(p))
+                        TatuChip(
+                          label: 'Tornar ${p.feminino ? 'fixa' : 'fixo'}',
+                          contorno: true,
+                          pequeno: true,
+                          onTap: () => tornarFixo(
+                            context,
+                            profissional: p.profissional,
+                            profissao: p.profissao,
+                            feminino: p.feminino,
+                            endereco: p.endereco,
+                          ),
+                        ),
                       if (!p.cancelado)
                         TatuChip(
                           label: 'Recibo',

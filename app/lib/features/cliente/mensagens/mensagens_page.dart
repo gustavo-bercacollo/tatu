@@ -1,3 +1,6 @@
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import '../plano_fixo/plano_fixo.dart' show tornarFixo, textoTornarFixo;
+import '../../../shared/widgets/menu_contexto.dart';
 import '../../../shared/widgets/selo_plano_fixo.dart';
 import '../../../data/plano_fixo.dart';
 import 'package:flutter/material.dart';
@@ -173,14 +176,76 @@ class _Grupo extends StatelessWidget {
   );
 }
 
-class _LinhaConversa extends StatelessWidget {
+/// RN-208: o que dá para fazer segurando a conversa.
+enum _AcaoConversa { perfil, plano, pedirDeNovo }
+
+class _LinhaConversa extends StatefulWidget {
   const _LinhaConversa({required this.conversa, required this.onTap});
 
   final Conversa conversa;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => LinhaConversa(
+  State<_LinhaConversa> createState() => _LinhaConversaState();
+}
+
+class _LinhaConversaState extends State<_LinhaConversa> {
+  final _chave = GlobalKey();
+
+  Conversa get conversa => widget.conversa;
+
+  /// C214 · RN-208: segurar a conversa: "Ver perfil", "Tornar [nome]
+  /// fixa" (ou "Ver plano fixo") e "Pedir de novo". Qualquer profissão.
+  Future<void> _segurar() async {
+    final c = conversa;
+    final da = c.feminino ? 'da' : 'do';
+    final temPlano = planosFixos.planoCom(c.nome) != null;
+    final acao = await mostrarMenuContexto<_AcaoConversa>(
+      context,
+      alvo: _chave,
+      destaque: _linha(segurar: false),
+      itens: [
+        ItemMenuContexto(
+          _AcaoConversa.perfil,
+          TablerIcons.user,
+          'Ver perfil $da ${c.primeiroNome}',
+        ),
+        ItemMenuContexto(
+          _AcaoConversa.plano,
+          TablerIcons.calendar_repeat,
+          temPlano
+              ? 'Ver plano fixo'
+              : textoTornarFixo(c.nome, c.feminino),
+        ),
+        const ItemMenuContexto(
+          _AcaoConversa.pedirDeNovo,
+          TablerIcons.refresh,
+          'Pedir de novo',
+        ),
+      ],
+    );
+    if (acao == null || !mounted) return;
+    switch (acao) {
+      case _AcaoConversa.perfil:
+        verPerfilDaConversa(context, c, voltar: 'Voltar');
+      case _AcaoConversa.plano:
+        await tornarFixo(
+          context,
+          profissional: c.nome,
+          profissao: c.profissao,
+          feminino: c.feminino,
+          endereco: c.rua,
+        );
+      case _AcaoConversa.pedirDeNovo:
+        pedirDeNovoDaConversa(context, c);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      KeyedSubtree(key: _chave, child: _linha(segurar: true));
+
+  Widget _linha({required bool segurar}) => LinhaConversa(
     // RN-132: conta suspensa vira "Conta indisponível".
     nome: conversa.nomeVisivel,
     iniciais: conversa.primeiroNome,
@@ -197,7 +262,8 @@ class _LinhaConversa extends StatelessWidget {
         : SeloPlanoFixo.de(
             planosFixos.ultimoCom(profissional: conversa.nome),
           ),
-    onTap: onTap,
+    onTap: widget.onTap,
+    onLongPress: segurar && !conversa.encerrada ? _segurar : null,
   );
 }
 

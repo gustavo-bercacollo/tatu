@@ -1103,7 +1103,11 @@ class LinhaConversa extends StatelessWidget {
     this.selo,
     this.avatar,
     this.titulo,
+    this.onLongPress,
   });
+
+  /// RN-208: segurar a conversa abre o menu de contexto.
+  final VoidCallback? onLongPress;
 
   final String nome;
 
@@ -1127,6 +1131,7 @@ class LinhaConversa extends StatelessWidget {
     final naoLida = naoLidas > 0;
     return InkWell(
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Padding(
         padding: const EdgeInsets.only(left: TatuMedidas.margem),
         child: Row(
