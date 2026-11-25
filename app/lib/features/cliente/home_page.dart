@@ -1,6 +1,7 @@
 import 'plano_fixo/plano_fixo.dart' show PlanoFixoPage;
 import '../../shared/widgets/selo_plano_fixo.dart';
 import '../../data/plano_fixo.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -15,7 +16,9 @@ import '../../data/ditado.dart';
 import '../../data/filtro_palavras.dart';
 import '../../shared/widgets/miniatura_anexo.dart';
 import '../../shared/widgets/ditado.dart';
+
 import 'dart:typed_data';
+
 import '../entrada/conta_suspensa_page.dart';
 import '../../data/conta.dart';
 import '../../data/enderecos.dart';
@@ -169,10 +172,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
   });
 
   Future<void> _outros() async {
-    final escolha = await escolherOutroServico(
-      context,
-      distancia: _distancia,
-    );
+    final escolha = await escolherOutroServico(context, distancia: _distancia);
     if (escolha == null || !mounted) return;
     setState(() => _manual = escolha);
     if (escolha == naoSeiServico && _descricao.text.trim().isEmpty) {
@@ -407,7 +407,8 @@ class _HomeClientePageState extends State<HomeClientePage> {
                                   plano: hoje,
                                   onTap: () => Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (_) => PlanoFixoPage(plano: hoje),
+                                      builder: (_) =>
+                                          PlanoFixoPage(plano: hoje),
                                     ),
                                   ),
                                 ),
@@ -477,10 +478,19 @@ class _HomeClientePageState extends State<HomeClientePage> {
                                 icone: _pelaIa ? TablerIcons.sparkles : null,
                                 onTap: () => _tocouServico(s),
                               ),
+                            // Escolhido em "Outros": vira chip selecionado
+                            // próprio; tocar de novo desmarca.
+                            if (_outro case final o?)
+                              TatuChip(
+                                label: o,
+                                selecionado: true,
+                                onTap: () => _tocouServico(o),
+                              ),
+                            // RN-161: mesmo padrão do cadastro: "Outros"
+                            // é seletor (seta) e nunca fica selecionado.
                             TatuChip(
-                              label: _outro ?? 'Outros',
-                              selecionado: _outro != null,
-                              seta: _outro != null,
+                              label: 'Outros',
+                              seletor: true,
                               onTap: _outros,
                             ),
                           ],
@@ -612,37 +622,37 @@ class _HomeClientePageState extends State<HomeClientePage> {
             ),
           )
         else
-        Expanded(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => abrirOndeServico(context),
-            child: Row(
-              children: [
-                const Icon(TablerIcons.map_pin, size: 18),
-                const SizedBox(width: 6),
-                Flexible(
-                  child: ListenableBuilder(
-                    listenable: enderecos,
-                    builder: (context, _) => Text(
-                      enderecos.atual.rua,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => abrirOndeServico(context),
+              child: Row(
+                children: [
+                  const Icon(TablerIcons.map_pin, size: 18),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: ListenableBuilder(
+                      listenable: enderecos,
+                      builder: (context, _) => Text(
+                        enderecos.atual.rua,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 4),
-                const Icon(
-                  TablerIcons.chevron_down,
-                  size: 14,
-                  color: TatuColors.textSecondary,
-                ),
-              ],
+                  const SizedBox(width: 4),
+                  const Icon(
+                    TablerIcons.chevron_down,
+                    size: 14,
+                    color: TatuColors.textSecondary,
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
         Semantics(
           button: true,
           label: 'Perfil',
@@ -796,7 +806,11 @@ class _HomeClientePageState extends State<HomeClientePage> {
         ),
         const SizedBox(width: 8),
         // RN-137: microfone à direita; nome "Ditar" no leitor de tela.
-        _BotaoCaixa(icone: TablerIcons.microphone, rotulo: 'Ditar', onTap: _ditar),
+        _BotaoCaixa(
+          icone: TablerIcons.microphone,
+          rotulo: 'Ditar',
+          onTap: _ditar,
+        ),
       ],
     );
   }

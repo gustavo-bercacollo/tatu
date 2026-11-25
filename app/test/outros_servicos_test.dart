@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/features/cliente/home_page.dart';
+import 'package:tatu/shared/widgets/tatu_chip.dart';
 
 Future<void> _abrirOutros(WidgetTester t) async {
   t.view.physicalSize = const Size(1179, 2556); // 393×852
@@ -26,7 +27,16 @@ void main() {
     await t.tap(find.text('Marceneiro'));
     await t.pumpAndSettle();
     expect(find.text('Marceneiro'), findsOneWidget);
-    expect(find.text('Outros'), findsNothing);
+    // RN-161: "Outros" continua como seletor, nunca selecionado.
+    final outros = t.widget<TatuChip>(find.widgetWithText(TatuChip, 'Outros'));
+    expect(outros.seletor, isTrue);
+    expect(outros.selecionado, isFalse);
+    expect(
+      t
+          .widget<TatuChip>(find.widgetWithText(TatuChip, 'Marceneiro'))
+          .selecionado,
+      isTrue,
+    );
     expect(find.text('Chamar marceneiro'), findsOneWidget);
 
     // Escolher um serviço da Home volta o chip para "Outros".

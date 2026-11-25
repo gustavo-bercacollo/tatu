@@ -78,6 +78,9 @@ class _FolhaPedirDeNovo extends StatefulWidget {
 class _FolhaPedirDeNovoState extends State<_FolhaPedirDeNovo> {
   /// Mesmo profissional (só se estiver online) ou qualquer um.
   late bool _mesmo = widget.pedido.online;
+
+  /// RN-144: "Precisa toda semana?" escolhido (borda só ao tocar).
+  bool _fixo = false;
   late String _endereco = widget.pedido.endereco;
 
   Future<void> _trocarEndereco() async {
@@ -90,6 +93,10 @@ class _FolhaPedirDeNovoState extends State<_FolhaPedirDeNovo> {
     final p = widget.pedido;
     final artigo = p.feminino ? 'a' : 'o';
     final servico = p.servico.toLowerCase();
+    final tornarFixoTexto = textoTornarFixo(
+      p.profissional,
+      p.feminino,
+    ).replaceFirst('Tornar ', 'Tornar $artigo ');
     return SafeArea(
       top: false,
       child: Padding(
@@ -119,8 +126,13 @@ class _FolhaPedirDeNovoState extends State<_FolhaPedirDeNovo> {
             Opacity(
               opacity: p.online ? 1 : 0.5,
               child: _Opcao(
-                selecionado: _mesmo,
-                onTap: p.online ? () => setState(() => _mesmo = true) : null,
+                selecionado: _mesmo && !_fixo,
+                onTap: p.online
+                    ? () => setState(() {
+                        _mesmo = true;
+                        _fixo = false;
+                      })
+                    : null,
                 icone: _AvatarStatus(nome: p.profissional, online: p.online),
                 titulo: 'Chamar $artigo ${p.primeiroNome}',
                 detalhe: p.online
@@ -130,8 +142,11 @@ class _FolhaPedirDeNovoState extends State<_FolhaPedirDeNovo> {
             ),
             const SizedBox(height: TatuMedidas.entreItens),
             _Opcao(
-              selecionado: !_mesmo,
-              onTap: () => setState(() => _mesmo = false),
+              selecionado: !_mesmo && !_fixo,
+              onTap: () => setState(() {
+                _mesmo = false;
+                _fixo = false;
+              }),
               icone: Container(
                 width: 44,
                 height: 44,
@@ -148,13 +163,20 @@ class _FolhaPedirDeNovoState extends State<_FolhaPedirDeNovo> {
             // serviço fixo daqui (só sem plano com ela).
             if (planosFixos.planoCom(p.profissional) == null) ...[
               const SizedBox(height: TatuMedidas.entreItens),
-              _OpcaoTornarFixo(
-                texto: textoTornarFixo(
-                  p.profissional,
-                  p.feminino,
-                ).replaceFirst('Tornar ', 'Tornar $artigo '),
-                onTap: () =>
-                    Navigator.of(context).pop((false, _endereco, true)),
+              _Opcao(
+                selecionado: _fixo,
+                onTap: () => setState(() => _fixo = true),
+                icone: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: const BoxDecoration(
+                    color: TatuColors.bg,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(TablerIcons.calendar_repeat, size: 22),
+                ),
+                titulo: 'Precisa toda semana?',
+                detalhe: tornarFixoTexto,
               ),
             ],
             const SizedBox(height: TatuMedidas.entreItens + 4),
@@ -186,70 +208,18 @@ class _FolhaPedirDeNovoState extends State<_FolhaPedirDeNovo> {
             ),
             const SizedBox(height: TatuMedidas.entreItens + 4),
             FilledButton(
-              onPressed: () =>
-                  Navigator.of(context).pop((_mesmo, _endereco, false)),
+              onPressed: () => Navigator.of(
+                context,
+              ).pop((_mesmo && !_fixo, _endereco, _fixo)),
               child: Text(
-                _mesmo
+                _fixo
+                    ? tornarFixoTexto
+                    : _mesmo
                     ? 'Chamar $artigo ${p.primeiroNome}'
                     : 'Chamar qualquer $servico',
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// RN-144: "Precisa toda semana? Tornar a [nome] fixa": cartão com
-/// contorno escuro, ícone de calendário e a ação embaixo, em cinza.
-class _OpcaoTornarFixo extends StatelessWidget {
-  const _OpcaoTornarFixo({required this.texto, required this.onTap});
-
-  final String texto;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: 'Precisa toda semana? $texto',
-      child: ExcludeSemantics(
-        child: Material(
-          color: TatuColors.bg,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
-            side: const BorderSide(color: TatuColors.textPrimary, width: 1.5),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onTap,
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Row(
-                children: [
-                  const Icon(TablerIcons.calendar, size: 22),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Precisa toda semana?',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(texto, style: TatuTexto.nota),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ),
       ),
     );
