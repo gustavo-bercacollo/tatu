@@ -843,13 +843,6 @@ class _ChatPageState extends State<ChatPage> {
   /// começa (num plano ativo, fica o valor de hoje).
   void _recusarPlano(PlanoFixo p) => planosFixos.recusarValor(p);
 
-  /// RN-210: "Último serviço avulso com a [nome]: R$ X".
-  double? get _ultimoAvulso {
-    final c = pedidos.concluidos
-        .where((x) => x.profissional == _c.nome)
-        .firstOrNull;
-    return c == null ? null : lerReais(c.valor);
-  }
 
   /// RN-202/RN-205: o plano com esta pessoa, mesmo encerrado.
   PlanoFixo? get _planoVisivel => planosFixos.ultimoCom(profissional: _c.nome);
@@ -916,7 +909,6 @@ class _ChatPageState extends State<ChatPage> {
         CartaoPropostaPlano(
           plano: p,
           novoValor: novo != null,
-          ultimoAvulso: _ultimoAvulso,
           onConfirmar: () => _confirmarPlano(p),
           onOutroValor: () => _outroValorPlano(p),
           onRecusar: () => _recusarPlano(p),

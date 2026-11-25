@@ -314,7 +314,6 @@ class CartaoPropostaPlano extends StatelessWidget {
     required this.onOutroValor,
     required this.onRecusar,
     required this.onTrocarCartao,
-    this.ultimoAvulso,
     this.novoValor = false,
   });
 
@@ -323,9 +322,6 @@ class CartaoPropostaPlano extends StatelessWidget {
   final VoidCallback onOutroValor;
   final VoidCallback onRecusar;
   final VoidCallback onTrocarCartao;
-
-  /// RN-210: "Último serviço avulso com a [nome]: R$ X" (quando existir).
-  final double? ultimoAvulso;
 
   /// RN-148: proposta de novo valor num plano ativo.
   final bool novoValor;
@@ -423,14 +419,6 @@ class CartaoPropostaPlano extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (ultimoAvulso case final v?) ...[
-                  const SizedBox(height: 10),
-                  Text(
-                    'Último serviço avulso com $artigo ${p.primeiroNome}: '
-                    '${reaisInteiros(v)}',
-                    style: TatuTexto.legenda,
-                  ),
-                ],
                 const SizedBox(height: 8),
                 Text(
                   // RN-146: cobrança automática, só pelo que foi feito.
