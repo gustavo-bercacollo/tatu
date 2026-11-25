@@ -1,6 +1,6 @@
 # Política de Privacidade do Tatu
 
-**Versão 1.0 · Vigente a partir de [DATA DE PUBLICAÇÃO]**
+**Versão 1.1 · Vigente a partir de [DATA DE PUBLICAÇÃO]**
 
 > **Rascunho para revisão jurídica.** Este texto foi escrito a partir das regras de negócio oficiais do Tatu (`docs/regras-de-negocio.md`) e da Lei Geral de Proteção de Dados (Lei 13.709/2018, "LGPD"). Antes de publicar, um advogado precisa revisar o documento, preencher os campos entre colchetes, confirmar os fornecedores e os prazos de guarda. Apague este aviso na versão publicada.
 
@@ -43,6 +43,7 @@ Fale com o encarregado para qualquer dúvida ou pedido sobre seus dados.
 | Localização ao vivo durante um alerta de segurança ou acompanhamento | Avisar seus contatos de confiança e a central do Tatu | Proteção da vida e da incolumidade física (art. 7º, VII); legítimo interesse |
 | Descrição do pedido, fotos e arquivos anexados | Explicar o serviço ao profissional | Execução de contrato |
 | Texto ditado por voz | Transformar sua fala em texto para você conferir e enviar | Execução de contrato; consentimento ao ativar o microfone |
+| Fotos do serviço pronto (tiradas pelo Profissional ao concluir) e fotos do problema e do local no retorno, sempre pela câmera do app, com data e hora | Servir de prova no retorno, na mediação e em contestações no cartão (chargeback). Podem mostrar partes do interior do imóvel do Cliente: tire só o necessário | Execução de contrato; exercício regular de direitos (art. 7º, VI) |
 | Mensagens, propostas de valor e arquivos do chat | Combinar o serviço, servir de prova em contestações e denúncias | Execução de contrato; exercício regular de direitos (art. 7º, VI) |
 | Ligações pelo app (dados da chamada, sem gravação de áudio, salvo aviso em contrário) | Permitir a ligação sem mostrar seu número | Execução de contrato |
 | Avaliações dadas e recebidas | Mostrar a reputação e melhorar a qualidade | Execução de contrato; legítimo interesse |
@@ -79,7 +80,9 @@ Quem ativa a preferência de atendimento entre mulheres (Cliente ou Profissional
 
 3.2. **Abuso infantil.** Quando há suspeita, preservamos o conteúdo e os dados necessários e **comunicamos às autoridades competentes**, como exige a lei. Nesses casos podemos não avisar a pessoa investigada.
 
-3.3. **Decisões automatizadas.** Algumas decisões são tomadas por sistemas: sugestão de serviço a partir da descrição, ordem de chamados, bloqueio de arquivos e mensagens, pausa automática por repetições (abandonos, ausências, sinais sem entrega). Você pode **pedir revisão** de uma decisão automatizada pelo suporte (art. 20 da LGPD).
+3.3. **Decisões automatizadas.** Algumas decisões são tomadas por sistemas: sugestão de serviço a partir da descrição, ordem de chamados, bloqueio de arquivos e mensagens, pausa automática por repetições (abandonos, ausências, sinais sem entrega) e, no retorno, devolução automática, faltas, retorno dado como cumprido e retorno considerado resolvido por falta de resposta. Você pode **pedir revisão** de uma decisão automatizada (art. 20 da LGPD): no retorno, pelo botão "Pedir revisão", em até 7 dias; nos demais casos, pelo suporte. Uma pessoa do Tatu revisa.
+
+3.4. **IA na mediação.** Quando o Tatu media um retorno, um sistema de inteligência artificial organiza as fotos, o chat e o histórico do serviço num resumo e sugere uma decisão. **Quem decide é sempre uma pessoa da equipe do Tatu.**
 
 ## 4. O que a outra parte vê
 
@@ -120,6 +123,7 @@ Alguns fornecedores podem guardar ou processar dados fora do Brasil. Quando isso
 | Registros de acesso ao app (IP, data e hora) | 6 meses, como exige o Marco Civil da Internet |
 | Pagamentos, recibos e repasses | [5 anos], por obrigação fiscal e contábil |
 | Mensagens, propostas e arquivos do chat | Enquanto a conta existir e por [prazo] depois, para contestações e defesa em processos |
+| Fotos do serviço e provas do retorno | [5 anos] depois do serviço (prazo do Código de Defesa do Consumidor para ações por danos, art. 27), com acesso restrito ao suporte |
 | Documento e selfie de verificação | Enquanto a conta existir e por [prazo] depois, para prevenção a fraude e apuração de denúncias |
 | Denúncias e provas de casos graves (inclusive abuso infantil) | Pelo tempo exigido por lei ou por autoridade |
 | Localização ao vivo de alerta/acompanhamento | [prazo curto] depois do fim do atendimento, salvo se virar prova de denúncia |
@@ -181,4 +185,5 @@ Encarregado de dados: **[NOME]** · **[E-MAIL DO ENCARREGADO]**
 
 | Versão | Data | O que mudou |
 | --- | --- | --- |
+| 1.1 | 24/11/2026 (rascunho) | Fotos do serviço e do retorno (finalidade, base legal e guarda), decisões automáticas do retorno com "Pedir revisão" e IA na mediação (RN-197 a RN-199). |
 | 1.0 | [DATA DE PUBLICAÇÃO] | Primeira versão, baseada nas regras de negócio v22. |
