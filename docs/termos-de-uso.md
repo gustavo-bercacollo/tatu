@@ -1,6 +1,6 @@
 # Termos de Uso do Tatu
 
-**Versão 1.0 · Vigente a partir de [DATA DE PUBLICAÇÃO]**
+**Versão 1.1 · Vigente a partir de [DATA DE PUBLICAÇÃO]**
 
 > **Rascunho para revisão jurídica.** Este texto foi escrito a partir das regras de negócio oficiais do Tatu (`docs/regras-de-negocio.md`). Antes de publicar, um advogado precisa revisar o documento, preencher os campos entre colchetes e confirmar os valores do Anexo I. Apague este aviso na versão publicada.
 
@@ -17,7 +17,7 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 - O **valor é combinado entre cliente e profissional** no chat. Todo pagamento é feito **pelo app**. Pagamento por fora é proibido.
 - Ao confirmar o valor, ele fica **reservado** no cartão e só é **cobrado quando o serviço é concluído**.
 - O Tatu cobra uma **taxa de intermediação** do profissional (Anexo I). Gorjetas vão 100% para o profissional, menos a taxa do cartão.
-- Você tem **24 horas** depois da conclusão para avisar que algo deu errado. Depois disso, vale a garantia legal do serviço, que é do profissional.
+- Se algo der errado, avise em **"Algo errado?"**: nas primeiras **24 horas** o pagamento fica protegido, e depois você pode pedir um **retorno sem custo** em até **30 ou 90 dias**, conforme o serviço. Isso se soma aos seus direitos pelo Código de Defesa do Consumidor.
 - Assédio, discriminação, golpe, conteúdo sexual e qualquer conteúdo envolvendo menores levam a **suspensão ou banimento**. Casos de crime são **comunicados às autoridades**.
 
 ---
@@ -89,11 +89,13 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 6.4. **Online e chamados.** O app sempre abre offline; ficar online é uma escolha do Profissional a cada uso. Recusar um chamado por motivo de segurança nunca gera penalidade.
 
-6.5. **Recebimento.** O Profissional recebe por **Pix, numa chave do próprio CPF**. O valor de cada pagamento fica retido por **24 horas** depois da conclusão (prazo de contestação) e depois é transferido, já descontada a taxa de intermediação.
+6.5. **Recebimento.** O Profissional recebe por **Pix, numa chave do próprio CPF**. O valor de cada pagamento fica retido por **24 horas** depois da conclusão e depois é transferido, já descontada a taxa de intermediação.
+
+6.5.1. **Retorno e descontos.** O Profissional autoriza o Tatu a: (a) prender os próximos repasses, até o valor do serviço, enquanto houver um pedido de retorno aberto sobre um serviço dele; e (b) descontar dos repasses presos e futuros os valores devolvidos ao Cliente ou pagos a outro profissional por decisão do Tatu (seção 11). O valor descontado é o que o Profissional recebeu pelo serviço; a taxa do Tatu é devolvida pelo próprio Tatu. Sem saldo, o valor fica como dívida ligada ao CPF do Profissional, que não recebe chamados nem pode abrir outra conta até quitá-la. [Revisar com advogado: J-01 e J-05.]
 
 6.6. **Tributos.** O Profissional é responsável por seus próprios tributos, contribuições, inscrição como autônomo ou MEI e emissão de documentos fiscais, quando exigidos por lei.
 
-6.7. **Encerrar o perfil profissional** mantém a conta de Cliente. Para voltar, é preciso refazer a verificação.
+6.7. **Encerrar o perfil profissional** mantém a conta de Cliente. Para voltar, é preciso refazer a verificação. Não é possível encerrar o perfil com pedido de retorno aberto ou dívida com o Tatu.
 
 ## 7. Como funciona um pedido
 
@@ -137,7 +139,7 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 9.3. A ligação entre as partes é feita **pelo app**, sem mostrar o número de ninguém, e só fica disponível entre a confirmação do valor e a conclusão.
 
-9.4. O Profissional pode registrar fotos ao chegar e ao concluir, que podem ser usadas numa contestação.
+9.4. Em serviço no local, o Profissional tira **uma foto obrigatória do serviço pronto** ao concluir, pela câmera do app. Fotos ao chegar são opcionais. As fotos levam data e hora e podem ser usadas no retorno e na mediação (seção 11).
 
 9.5. Quem recebe o Profissional no local deve ser maior de idade.
 
@@ -155,17 +157,23 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 10.6. Abandonos e ausências repetidos levam à pausa da conta (seção 15).
 
-## 11. Contestação e garantia
+## 11. Algo errado, retorno e garantia
 
-11.1. O Cliente pode avisar que **algo deu errado em até 24 horas** depois da conclusão, em "Algo errado?", com motivo e fotos. Durante a análise, o valor do serviço fica retido (a Visita não entra na contestação).
+11.1. **Garantia legal.** O Código de Defesa do Consumidor garante ao Cliente reclamar de problemas no serviço em **30 dias** (serviço não durável) ou **90 dias** (serviço durável), contados do fim do serviço; se o problema estava oculto, o prazo conta de quando ele aparecer. Essa garantia é obrigatória e nada nestes Termos a reduz.
 
-11.2. O suporte do Tatu decide com base no chat, nas fotos e nas informações das partes: o Profissional refaz sem custo, reembolso parcial ou reembolso total. A decisão é comunicada no app.
+11.2. **Extras do Tatu.** Além da garantia legal, o Tatu oferece, nos termos do art. 50 do CDC: (a) **pagamento protegido por 24 horas**; e (b) **retorno mediado pelo app** durante o prazo de retorno de cada serviço. O prazo (30 ou 90 dias) é definido por profissão e aparece no app como uma data ("retorno sem custo até [data]").
 
-11.3. **A garantia do Tatu é esse prazo de 24 horas**, enquanto o dinheiro está retido. Depois dele, o pagamento é repassado ao Profissional.
+11.3. **Como pedir.** Em "Algo errado?", o Cliente descreve o problema e envia fotos tiradas na hora pela câmera do app. Fotos da galeria não são aceitas. Há um pedido de retorno por serviço, no mesmo endereço. Pedidos feitos nas primeiras 24 horas mantêm o valor do serviço retido até o caso terminar. A Visita e a gorjeta não entram.
 
-11.4. **Isso não elimina seus direitos legais.** Pelo Código de Defesa do Consumidor, o Profissional responde pelo serviço que prestou, inclusive pelos prazos legais de reclamação (por exemplo, 90 dias para serviço durável). Depois das 24 horas, o Cliente pode falar com o mesmo Profissional pelo chat, que continua aberto, ou buscar outro.
+11.4. **Resposta do Profissional.** O Profissional tem **48 horas** para: aceitar o retorno e marcá-lo em até **7 dias**; informar que é outro problema, com foto no local e novo valor; ou recusar, informando o motivo. O retorno aceito não tem custo para o Cliente nem taxa do Tatu e começa com o código de 4 dígitos. Ao final, se o Cliente não responder em 48 horas se o problema foi resolvido, o retorno é considerado resolvido. Se o Cliente não estiver no local no horário marcado, o retorno é considerado cumprido.
 
-11.5. Quem contesta repetidamente e sem razão pode perder o direito à contestação ou ter a conta encerrada.
+11.5. **Resolução automática.** Se o Profissional não responder em 48 horas, não marcar o retorno em 7 dias ou não comparecer, o Tatu resolve a favor do Cliente, sem análise: devolve o valor do serviço ou, quando não for possível recuperar o valor do Profissional, paga outro profissional para refazer o serviço, até o valor pago.
+
+11.6. **Mediação.** O Tatu analisa o caso quando o Cliente contesta a recusa, quando o problema continua depois do retorno ou quando contesta a informação de "outro problema". A análise usa as fotos, o chat e o histórico das partes e termina em até 3 dias úteis com uma destas decisões: refazer com outro profissional, devolver 50%, devolver 100% ou não procede. Há uma mediação por serviço, e a decisão é comunicada pelo canal oficial do Tatu. [Revisar com advogado: J-04.]
+
+11.7. **Abuso.** Pedidos repetidos considerados improcedentes podem suspender o retorno mediado pelo app por um período (Anexo I), sem prejuízo dos direitos legais do Cliente, que pode reclamar pela Ajuda. Profissionais que não respondem, não comparecem ou têm recusas derrubadas na mediação recebem faltas e podem ter a conta pausada (seção 15).
+
+11.8. **Outros canais.** O Cliente pode, a qualquer momento, procurar os órgãos de defesa do consumidor ou o Judiciário.
 
 ## 12. Serviço à distância
 
@@ -264,7 +272,7 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 19.1. O Tatu se esforça para manter o app disponível e seguro, mas podem ocorrer interrupções por manutenção, falhas de internet, de operadoras ou de terceiros.
 
-19.2. O Tatu responde pelos danos que causar diretamente, na forma da lei. O Tatu **não responde** por danos causados exclusivamente pela conduta do Cliente ou do Profissional, pelo resultado técnico do serviço prestado pelo Profissional, nem por acordos feitos fora do app.
+19.2. O Tatu responde pelos danos que causar diretamente, na forma da lei. O Tatu **não responde** por danos causados exclusivamente pela conduta do Cliente ou do Profissional, nem por acordos feitos fora do app. Problemas no resultado do serviço seguem a seção 11. [Revisar com advogado: J-03.]
 
 19.3. Nada nestes Termos limita direitos que o Código de Defesa do Consumidor garante ao Cliente.
 
@@ -300,7 +308,14 @@ Os valores abaixo vêm das regras de negócio e **são provisórios até a decis
 | Rodadas de proposta de valor | até 3 | RN-27 |
 | Taxa de intermediação do Tatu | 10% sobre cada pagamento, inclusive visita | RN-34, RN-88 |
 | Retenção antes do repasse ao Profissional | 24 horas | RN-35 |
-| Prazo de contestação ("Algo errado?") | 24 horas | RN-45 |
+| Pagamento protegido ("Algo errado?" com valor retido) | 24 horas | RN-45, RN-46 |
+| Prazo de retorno | 30 dias (não durável) ou 90 dias (durável), por profissão | RN-183 |
+| Resposta do Profissional ao retorno | 48 horas | RN-186 |
+| Prazo para marcar o retorno | até 7 dias | RN-186 |
+| Resposta do Cliente ("Resolveu?") | 48 horas | RN-187 |
+| Mediação do Tatu | até 3 dias úteis | RN-191 |
+| Pausa por faltas no retorno (Profissional) | 3 em 90 dias | RN-193 |
+| Suspensão do retorno mediado (Cliente) | 3 pedidos improcedentes em 6 meses: 6 meses sem retorno mediado | RN-193 |
 | Prazo máximo de um valor em aberto | 7 dias | RN-89 |
 | Parcelamento | a partir de R$ 300, até 6 vezes | RN-91 |
 | Gorjeta | opcional, até R$ 100, 0% de taxa do Tatu | RN-141, RN-142 |
@@ -326,4 +341,5 @@ Os valores abaixo vêm das regras de negócio e **são provisórios até a decis
 
 | Versão | Data | O que mudou |
 | --- | --- | --- |
+| 1.1 | 24/11/2026 (rascunho) | Seção 11 reescrita: garantia legal, pagamento protegido, retorno mediado e mediação (RN-183 a RN-196). Itens 6.5.1, 6.7, 9.4 e 19.2 ajustados. Novos prazos no Anexo I. |
 | 1.0 | [DATA DE PUBLICAÇÃO] | Primeira versão, baseada nas regras de negócio v22 (RN-01 a RN-149). |
