@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:tatu/shared/widgets/tatu_chip.dart';
 import 'package:tatu/core/theme/tatu_theme.dart';
 import 'package:tatu/data/catalogo_servicos.dart';
 import 'package:tatu/data/profissional.dart';
@@ -102,5 +104,43 @@ void main() {
     expect(sugestoesProfissao.sugerir('afinador', profissional: 'Rafael'),
         isNull);
     expect(sugestoesProfissao.filaSuporte, hasLength(1));
+  });
+
+  testWidgets('C04 · RN-161: "Outros" é seletor e nunca fica selecionado', (
+    t,
+  ) async {
+    t.view.physicalSize = const Size(1179, 2556);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
+    await t.pumpWidget(
+      MaterialApp(theme: tatuTheme(), home: const ServicosProfissionalPage()),
+    );
+    TatuChip outros() =>
+        t.widget<TatuChip>(find.widgetWithText(TatuChip, 'Outros'));
+    expect(outros().seletor, isTrue);
+    expect(outros().selecionado, isFalse);
+    // Seta para baixo, como no campo "Estado".
+    expect(
+      find.descendant(
+        of: find.widgetWithText(TatuChip, 'Outros'),
+        matching: find.byIcon(TablerIcons.chevron_down),
+      ),
+      findsOneWidget,
+    );
+
+    // Escolhe Diarista na lista: vira botão selecionado; "Outros" não.
+    await t.tap(find.text('Outros'));
+    await t.pumpAndSettle();
+    await t.enterText(find.byType(TextField).last, 'Diarista');
+    await t.pump();
+    await t.tap(find.text('Diarista').last);
+    await t.pumpAndSettle();
+    expect(
+      t.widget<TatuChip>(find.widgetWithText(TatuChip, 'Diarista')).selecionado,
+      isTrue,
+    );
+    expect(outros().selecionado, isFalse);
+    // Só a Diarista conta no limite.
+    expect(find.text('1 selecionado'), findsOneWidget);
   });
 }

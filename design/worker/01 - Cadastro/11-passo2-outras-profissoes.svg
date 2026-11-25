@@ -33,8 +33,9 @@
   <text x="40" y="392.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Chaveiro</text>
   <rect x="128.671875" y="368" width="104.9375" height="38" rx="19.0" fill="#EEEEF0"/>
   <text x="144.671875" y="392.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Jardineiro</text>
-  <rect x="242.109375" y="368.5" width="80.015625" height="37" rx="19.0" fill="none" stroke="#8E8E93" stroke-width="1" stroke-dasharray="4 3"/>
+  <rect x="242.359375" y="368.75" width="95.515625" height="36.5" rx="19.0" fill="#fff" stroke="#C7C7CC" stroke-width="1.5"/>
   <text x="257.609375" y="392.0" font-size="15" font-weight="600" fill="#000000" text-anchor="start">Outros</text>
+  <g transform="translate(312.625,381.0) scale(0.5)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6 -6"/></g>
   <rect x="0" y="0" width="393" height="852" rx="0" fill="#000" opacity="0.38"/>
   <rect x="0" y="60" width="393" height="822" rx="30" fill="#fff"/>
   <rect x="178.5" y="68" width="36" height="5" rx="2.5" fill="#C7C7CC"/>

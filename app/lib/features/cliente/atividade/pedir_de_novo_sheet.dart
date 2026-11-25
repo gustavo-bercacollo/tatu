@@ -144,6 +144,19 @@ class _FolhaPedirDeNovoState extends State<_FolhaPedirDeNovo> {
               titulo: 'Chamar qualquer $servico',
               detalhe: 'Quem estiver mais perto',
             ),
+            // RN-144: quem chama sempre a mesma pessoa pode tornar o
+            // serviço fixo daqui (só sem plano com ela).
+            if (planosFixos.planoCom(p.profissional) == null) ...[
+              const SizedBox(height: TatuMedidas.entreItens),
+              _OpcaoTornarFixo(
+                texto: textoTornarFixo(
+                  p.profissional,
+                  p.feminino,
+                ).replaceFirst('Tornar ', 'Tornar $artigo '),
+                onTap: () =>
+                    Navigator.of(context).pop((false, _endereco, true)),
+              ),
+            ],
             const SizedBox(height: TatuMedidas.entreItens + 4),
             Row(
               children: [
@@ -181,20 +194,62 @@ class _FolhaPedirDeNovoState extends State<_FolhaPedirDeNovo> {
                     : 'Chamar qualquer $servico',
               ),
             ),
-            // RN-144: quem chama sempre a mesma pessoa pode tornar o
-            // serviço fixo daqui (só sem plano com ela).
-            if (planosFixos.planoCom(p.profissional) == null) ...[
-              const SizedBox(height: 4),
-              Center(
-                child: LinkAzul(
-                  'Precisa toda semana? '
-                  '${textoTornarFixo(p.profissional, p.feminino).replaceFirst('Tornar ', 'Tornar $artigo ')}',
-                  onTap: () =>
-                      Navigator.of(context).pop((false, _endereco, true)),
-                ),
-              ),
-            ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// RN-144: "Precisa toda semana? Tornar a [nome] fixa": cartão com
+/// contorno escuro, ícone de calendário e a ação embaixo, em cinza.
+class _OpcaoTornarFixo extends StatelessWidget {
+  const _OpcaoTornarFixo({required this.texto, required this.onTap});
+
+  final String texto;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Precisa toda semana? $texto',
+      child: ExcludeSemantics(
+        child: Material(
+          color: TatuColors.bg,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+            side: const BorderSide(color: TatuColors.textPrimary, width: 1.5),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                children: [
+                  const Icon(TablerIcons.calendar, size: 22),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Precisa toda semana?',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(texto, style: TatuTexto.nota),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

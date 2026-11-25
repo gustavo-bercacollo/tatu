@@ -124,8 +124,10 @@ void main() {
     await _abrir(t, const AtividadePage(aba: 1));
     await t.tap(find.text('Pedir de novo').first);
     await t.pumpAndSettle();
-    expect(find.text('Precisa toda semana? Tornar a Luiza fixa'), findsOneWidget);
-    await t.tap(find.text('Precisa toda semana? Tornar a Luiza fixa'));
+    // Cartão com contorno: título e a ação embaixo.
+    expect(find.text('Precisa toda semana?'), findsOneWidget);
+    expect(find.text('Tornar a Luiza fixa'), findsOneWidget);
+    await t.tap(find.text('Precisa toda semana?'));
     await t.pumpAndSettle();
     // Abre a mesma tela de escolha do plano.
     expect(find.text('Tornar Luiza fixa'), findsOneWidget);

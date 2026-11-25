@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 25/11/2026 (v39)
+Atualizado em 25/11/2026 (v40)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -45,7 +45,7 @@ Uma pessoa tem uma conta só, que pode ter os dois perfis: cliente e profissiona
 | RN-158 | Registro não encontrado: o profissional vê "Não encontramos seu registro" e pode corrigir o número ou falar com o suporte. |
 | RN-159 | Registro conferido aparece no perfil para o cliente: "Registro conferido · [conselho] [número]/[UF]". |
 | RN-160 | Registro cancelado, suspenso ou vencido (ex.: CNH) pausa só aquela profissão. O Tatu confere de novo periodicamente e antes do vencimento. Profissões da seção "Fora do Tatu por enquanto" não podem ser cadastradas. |
-| RN-161 | No cadastro, a escolha da profissão segue o mesmo padrão do pedido do cliente: as principais aparecem como botões e "Outros" abre todas as profissões do Tatu separadas por segmento, com as mais procuradas no topo e busca (aceita sinônimos, ex.: "bombeiro hidráulico" → Encanador). A lista vem de `docs/catalogo-de-servicos.md`. |
+| RN-161 | No cadastro, a escolha da profissão segue o mesmo padrão do pedido do cliente: as principais aparecem como botões e "Outros" abre todas as profissões do Tatu separadas por segmento, com as mais procuradas no topo e busca (aceita sinônimos, ex.: "bombeiro hidráulico" → Encanador). A lista vem de `docs/catalogo-de-servicos.md`. **"Outros" não é profissão:** o botão é branco, com contorno cinza e uma seta para baixo, nunca fica preto (selecionado) e só abre a lista "Outras profissões". |
 | RN-162 | Não achou a profissão: "Não achei a minha · Sugerir uma profissão ao Tatu". A sugestão fica em análise (até 2 dias úteis, exemplo) e, aprovada, entra no catálogo para todos. |
 | RN-114 | O cadastro atende ao ECA Digital (Lei 15.211/2025, em vigor desde 17/03/2026): a idade é verificada de forma confiável, não só declarada. Revisar com advogado junto com os termos (RN-108). |
 
@@ -406,11 +406,12 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 25/11/2026 | RN-144 | "Precisa toda semana? Tornar a [nome] fixa" na folha "Pedir de novo" (pedido do Gustavo). |
 | 25/11/2026 | RN-27, RN-210, RN-211 | Cliente recusa o 3º valor ("Recusar valor") e escolhe chamar outro ou cancelar. Sem custo e sem penalidade; o profissional não recebe de novo o mesmo pedido. |
+| 25/11/2026 | RN-161 | Botão "Outros" do cadastro com seta para baixo e contorno, sem estado de selecionado. |
 | 25/11/2026 | RN-144, RN-208, RN-209 | "Tornar fixa" também segurando a conversa e no card de Concluídos (só profissões com Fixo: Sim no catálogo). Outras ideias adiadas. |
 | 25/11/2026 | RN-207 | Novo card do retorno em Atividade → Em andamento: data e hora completas, selo "Retorno · sem custo", dica do código e etapas quando o profissional sai. |
 | 25/11/2026 | RN-201, RN-206 | Novo card da visita do plano em Atividade → Em andamento: selo na foto, barra do mês e etapas quando a profissional sai. |
-| 25/11/2026 | RN-144 | "Precisa toda semana? Tornar a [nome] fixa" na folha "Pedir de novo" (pedido do Gustavo). |
 | 24/11/2026 | RN-202 | Botão "Mensagem" na tela do plano fixo. |
 | 24/11/2026 | RN-83, RN-86, RN-200 a RN-205 | Identificação do plano fixo: selo único "Plano fixo", barra no chat, fixo × avulso, faixa no dia da visita e estados. "Seus profissionais" adiado. |
 | 24/11/2026 | RN-191, RN-192, RN-197 a RN-199 | Ajustes legais do retorno: termo de garantia no recibo, revisão de decisão automática (LGPD art. 20), guarda das fotos, dívida só dentro do Tatu. |

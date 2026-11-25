@@ -17,10 +17,16 @@ class TatuChip extends StatelessWidget {
     this.pequeno = false,
     this.desabilitado = false,
     this.contorno = false,
+    this.seletor = false,
   });
 
   /// Fundo branco com contorno escuro (ex.: "Tornar fixa", RN-209).
   final bool contorno;
+
+  /// Abre uma lista e nunca fica selecionado (ex.: "Outros", RN-161):
+  /// fundo branco, contorno cinza e seta para baixo cinza (a mesma do
+  /// campo "Estado").
+  final bool seletor;
 
   final String label;
   final VoidCallback onTap;
@@ -54,7 +60,7 @@ class TatuChip extends StatelessWidget {
       child: Material(
         color: selecionado
             ? TatuColors.action
-            : contorno
+            : contorno || seletor
             ? TatuColors.bg
             : desabilitado
             ? TatuColors.surfaceGrouped
@@ -62,6 +68,10 @@ class TatuChip extends StatelessWidget {
         shape: contorno
             ? const StadiumBorder(
                 side: BorderSide(color: TatuColors.textPrimary, width: 1.5),
+              )
+            : seletor
+            ? const StadiumBorder(
+                side: BorderSide(color: TatuColors.chevron, width: 1.5),
               )
             : const StadiumBorder(),
         child: InkWell(
@@ -95,9 +105,15 @@ class TatuChip extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (seta) ...[
+                if (seta || seletor) ...[
                   const SizedBox(width: 6),
-                  Icon(TablerIcons.chevron_down, size: 16, color: cor),
+                  Icon(
+                    TablerIcons.chevron_down,
+                    size: 16,
+                    color: seletor && !desabilitado
+                        ? TatuColors.textSecondary
+                        : cor,
+                  ),
                 ],
               ],
             ),

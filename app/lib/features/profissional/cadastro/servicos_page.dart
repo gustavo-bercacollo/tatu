@@ -120,7 +120,14 @@ class _ServicosProfissionalPageState extends State<ServicosProfissionalPage> {
                 desabilitado: _cheio && !_escolhidas.contains(nome),
                 onTap: () => _alternar(nome),
               ),
-            TatuChip(label: 'Outros', desabilitado: _cheio, onTap: _outros),
+            // C04 · RN-161: "Outros" não é profissão: nunca fica
+            // selecionado nem conta no limite; só abre a lista.
+            TatuChip(
+              label: 'Outros',
+              seletor: true,
+              desabilitado: _cheio,
+              onTap: _outros,
+            ),
           ],
         ),
         const SizedBox(height: 18),
