@@ -35,6 +35,7 @@ import '../../shared/widgets/espaco_anuncio.dart';
 import '../../shared/widgets/avatar_usuario.dart';
 import '../../shared/widgets/folha.dart';
 import '../../shared/widgets/tatu_chip.dart';
+import '../../shared/widgets/borda_animada.dart';
 import '../../data/pedidos.dart';
 import 'abas.dart';
 import 'atividade/acompanhar.dart';
@@ -667,39 +668,49 @@ class _HomeClientePageState extends State<HomeClientePage> {
     );
   }
 
+  /// Borda animada da caixa: gira vazia e sem foco; toda preta ao
+  /// digitar; parada com texto; gravando, só a borda vermelha.
+  ModoBorda get _modoBorda => _gravando
+      ? ModoBorda.nenhuma
+      : _focoDescricao.hasFocus
+      ? ModoBorda.solida
+      : _descricao.text.isEmpty
+      ? ModoBorda.girando
+      : ModoBorda.parada;
+
   Widget _caixaDescricao() {
     final gravando = _gravando;
     return ListenableBuilder(
       listenable: _anexos,
-      builder: (context, _) => Container(
-        height: TatuMedidas.alturaDescricao,
-        decoration: BoxDecoration(
-          color: TatuColors.fill,
-          borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
-          border: Border.all(
-            color: gravando
-                ? TatuColors.danger
-                : _focoDescricao.hasFocus
-                ? TatuColors.textPrimary
-                : Colors.transparent,
-            width: 1.5,
+      builder: (context, _) => BordaAnimada(
+        modo: _modoBorda,
+        raio: TatuMedidas.raioCartao,
+        child: Container(
+          height: TatuMedidas.alturaDescricao,
+          decoration: BoxDecoration(
+            color: TatuColors.fill,
+            borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+            border: Border.all(
+              color: gravando ? TatuColors.danger : Colors.transparent,
+              width: 1.5,
+            ),
           ),
-        ),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 52),
-                child: gravando ? _ouvindoAgora() : _campoDescricao(),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 52),
+                  child: gravando ? _ouvindoAgora() : _campoDescricao(),
+                ),
               ),
-            ),
-            Positioned(
-              left: 12,
-              right: 10,
-              bottom: 12,
-              child: gravando ? _barraGravando() : _barraAnexos(),
-            ),
-          ],
+              Positioned(
+                left: 12,
+                right: 10,
+                bottom: 12,
+                child: gravando ? _barraGravando() : _barraAnexos(),
+              ),
+            ],
+          ),
         ),
       ),
     );
