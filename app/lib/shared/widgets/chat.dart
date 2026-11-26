@@ -22,10 +22,14 @@ class TelaChat extends StatelessWidget {
     required this.rodape,
     this.rodapeColado = false,
     this.sobre,
+    this.controle,
   });
 
   /// Por cima da conversa, abaixo do canto direito do topo (ex.: balão
   /// "Agora dá para ligar pelo Tatu", RN-140).
+  /// Rolagem da conversa (ex.: ir até o card do valor pendente, RN-230).
+  final ScrollController? controle;
+
   final Widget? sobre;
 
   final Widget topo;
@@ -60,7 +64,12 @@ class TelaChat extends StatelessWidget {
                       children: [
                         topo,
                         const SizedBox(height: TatuMedidas.entreSecoes),
-                        Expanded(child: ListView(children: mensagens)),
+                        Expanded(
+                          child: ListView(
+                            controller: controle,
+                            children: mensagens,
+                          ),
+                        ),
                       ],
                     ),
                   ),

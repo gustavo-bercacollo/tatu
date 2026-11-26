@@ -22,7 +22,7 @@ Future<Conversa> _chat(WidgetTester t) async {
 void main() {
   testWidgets('Valor recebido: confirmar reserva no cartão', (t) async {
     final c = await _chat(t);
-    expect(find.text('Luiza enviou um valor'), findsOneWidget);
+    expect(find.textContaining('Luiza enviou um valor · '), findsOneWidget);
     expect(find.text('Visita R\$ 40 · Serviço R\$ 150'), findsOneWidget);
     expect(find.text('R\$ 190,00'), findsOneWidget);
     expect(find.text('Visa final 4242'), findsOneWidget);

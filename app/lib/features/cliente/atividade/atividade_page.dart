@@ -4,7 +4,6 @@ import '../plano_fixo/plano_fixo.dart' show PlanoFixoPage;
 import '../../../shared/widgets/selo_plano_fixo.dart';
 import '../../../data/plano_fixo.dart';
 import '../../../data/retorno.dart';
-import '../retorno/retorno_cliente.dart' show remarcarRetorno;
 import '../../../data/conta.dart';
 import '../../../data/conversas.dart';
 import '../mensagens/chat_page.dart';
@@ -17,6 +16,8 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/pedidos.dart';
+import '../../../shared/formatadores.dart';
+import '../../../data/profissional.dart' show profissaoNoGenero;
 import '../../../shared/widgets/icone_profissao.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
@@ -281,10 +282,12 @@ class _CartaoVisitaPlano extends StatelessWidget {
   }
 }
 
-/// C234/C235 · RN-207: card do retorno (cliente). Agendado: selo verde
-/// "Retorno · sem custo", data e hora completas e a dica do código. A
-/// caminho em diante: pílula escura com o tempo e as etapas Agendado → A
-/// caminho → Retorno → Feito. A parte de baixo tem a mesma altura.
+/// C253/C255 · RN-207: card do retorno (cliente). Subtítulo só com a
+/// profissão. Agendado: pílula clara "Agendado", data e hora com
+/// calendário e o código com cadeado. A caminho em diante: pílula escura
+/// com o tempo e as etapas Agendado → A caminho → Retorno → Feito. Nos dois
+/// estados, o rodapé "Retorno · sem custo" e "do serviço de [data]". O
+/// meio tem a mesma altura.
 class _CartaoRetornoCliente extends StatelessWidget {
   const _CartaoRetornoCliente({required this.retorno, required this.onTap});
 
@@ -296,11 +299,6 @@ class _CartaoRetornoCliente extends StatelessWidget {
     final r = retorno;
     final caminho = r.aCaminho;
     final m = r.marcadoPara;
-    const verde = TextStyle(
-      fontSize: 13,
-      fontWeight: FontWeight.w600,
-      color: TatuColors.onlineTexto,
-    );
     return _Cartao(
       onTap: onTap,
       child: Column(
@@ -322,32 +320,15 @@ class _CartaoRetornoCliente extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    if (caminho)
-                      // Uma linha só (o card tem a mesma altura sempre).
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text.rich(
-                          TextSpan(
-                            style: TatuTexto.nota,
-                            children: [
-                              TextSpan(text: '${r.servicoNome} · '),
-                              const TextSpan(
-                                text: 'Retorno · sem custo',
-                                style: verde,
-                              ),
-                            ],
-                          ),
-                          maxLines: 1,
-                        ),
-                      )
-                    else
-                      Text(
-                        '${r.servicoNome} · ${r.descricaoServico}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TatuTexto.nota,
+                    Text(
+                      profissaoNoGenero(
+                        r.servicoNome,
+                        feminino: r.profissionalFeminino,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TatuTexto.nota,
+                    ),
                   ],
                 ),
               ),
@@ -355,7 +336,7 @@ class _CartaoRetornoCliente extends StatelessWidget {
               if (caminho)
                 SeloPreto('${r.minutosParaChegar} min')
               else
-                const SeloVerde('Retorno · sem custo', pequeno: true),
+                const SeloPreto('Agendado', claro: true),
             ],
           ),
           const SizedBox(height: TatuMedidas.entreItens + 4),
@@ -370,9 +351,8 @@ class _CartaoRetornoCliente extends StatelessWidget {
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Divider(height: 1),
-                      const SizedBox(height: TatuMedidas.entreItens),
                       Row(
                         children: [
                           const Icon(TablerIcons.calendar, size: 18),
@@ -388,41 +368,43 @@ class _CartaoRetornoCliente extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       Row(
                         children: [
+                          const Icon(
+                            TablerIcons.lock,
+                            size: 16,
+                            color: TatuColors.textSecondary,
+                          ),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               // RN-214: remarcação esperando o outro lado.
                               r.remarcacao != null
                                   ? 'Remarcação pedida · aguardando '
                                         '${r.oProfissional}'
-                                  : 'Na hora, passe o código para '
-                                        '${r.profissionalFeminino ? 'a' : 'o'} '
-                                        '${r.primeiroProfissional}.',
+                                  : 'Código ${r.codigo} · passe para '
+                                        '${r.oProfissional} na hora',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TatuTexto.nota,
                             ),
                           ),
-                          // C244 · RN-214: remarcar uma vez, até 12 h antes.
-                          if (retornos.podeRemarcar(r, cliente: true))
-                            GestureDetector(
-                              onTap: () =>
-                                  remarcarRetorno(context, r, cliente: true),
-                              child: const Text(
-                                'Remarcar',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: TatuColors.verified,
-                                ),
-                              ),
-                            ),
                         ],
                       ),
                     ],
                   ),
+          ),
+          // RN-207: rodapé nos dois estados.
+          const SizedBox(height: TatuMedidas.entreItens),
+          const Divider(height: 1),
+          const SizedBox(height: TatuMedidas.entreItens),
+          Row(
+            children: [
+              const SeloVerde('Retorno · sem custo', pequeno: true),
+              const Spacer(),
+              Text('do serviço de ${r.diaServico}', style: TatuTexto.legenda),
+            ],
           ),
         ],
       ),
@@ -736,7 +718,7 @@ class _Concluidos extends StatelessWidget {
 
   Widget _lista(BuildContext context) {
     final lista = pedidos.concluidos;
-    // RN-201/RN-203: cobranças do plano fixo ("Plano fixo · N visitas").
+    // RN-233: um card por plano e por mês (cobrança do período).
     final cobrancas = [
       for (final p in planosFixos.planos)
         if (p.cliente == conta.nomeCompleto)
@@ -766,23 +748,7 @@ class _Concluidos extends StatelessWidget {
         if (i > 0) {
           itens.add(const SizedBox(height: TatuMedidas.entreItens + 4));
         }
-        itens.add(
-          CartaoPlanoFixo(
-            nome: p.profissional,
-            detalhe: p.profissao,
-            selo: SeloPlanoFixo(
-              'Plano fixo · ${c.visitasFeitas} '
-              '${c.visitasFeitas == 1 ? 'visita' : 'visitas'}',
-            ),
-            valor: c.total,
-            onTap: () => Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p))),
-          ),
-        );
-      }
-      if (lista.isNotEmpty) {
-        itens.add(const SizedBox(height: TatuMedidas.entreItens + 4));
+        itens.add(_CartaoPlanoConcluido(plano: p, cobranca: c));
       }
     }
     for (final p in lista) {
@@ -817,6 +783,161 @@ bool _mostraTornarFixo(PedidoConcluido p) =>
         catalogoServicos.encontrar(p.profissao)?.fixo ??
         false) &&
     planosFixos.planoCom(p.profissional) == null;
+
+/// C238 · RN-233: o mês do plano fixo em Concluídos. Topo: foto com o
+/// selo do plano, nome, "[profissão] · Plano fixo", total e "N visitas
+/// pagas". Meio: um quadradinho por visita ("07 nov" · "✓ R$ 150"; suspensa
+/// ou não feita, apagada e sem valor). Embaixo: "Ver plano" e "Recibos".
+class _CartaoPlanoConcluido extends StatelessWidget {
+  const _CartaoPlanoConcluido({required this.plano, required this.cobranca});
+
+  final PlanoFixo plano;
+  final CobrancaPlano cobranca;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = plano;
+    final c = cobranca;
+    void verPlano() =>
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p)));
+    return _Cartao(
+      onTap: verPlano,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FotoComSeloPlano(nome: p.profissional),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      p.profissional,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text('${p.profissao} · Plano fixo', style: TatuTexto.nota),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    reais(c.total),
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  _Pago(
+                    '${c.visitasFeitas} '
+                    '${c.visitasFeitas == 1 ? 'visita paga' : 'visitas pagas'}',
+                  ),
+                ],
+              ),
+            ],
+          ),
+          if (c.visitas.isNotEmpty) ...[
+            const SizedBox(height: TatuMedidas.entreItens + 4),
+            Row(
+              spacing: 8,
+              children: [
+                for (final v in c.visitas) Expanded(child: _VisitaPaga(v)),
+              ],
+            ),
+          ],
+          const SizedBox(height: TatuMedidas.entreItens),
+          const Divider(height: 0.5),
+          const SizedBox(height: TatuMedidas.entreItens),
+          Row(
+            spacing: 8,
+            children: [
+              TatuChip(
+                label: 'Ver plano',
+                iconeFixo: TablerIcons.repeat,
+                selecionado: true,
+                pequeno: true,
+                onTap: verPlano,
+              ),
+              TatuChip(
+                label: 'Recibos',
+                iconeFixo: TablerIcons.receipt,
+                pequeno: true,
+                onTap: () => ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    const SnackBar(content: Text('Recibos do plano: em breve')),
+                  ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// RN-233: quadradinho de uma visita do mês do plano.
+class _VisitaPaga extends StatelessWidget {
+  const _VisitaPaga(this.visita);
+
+  final VisitaCobrada visita;
+
+  @override
+  Widget build(BuildContext context) {
+    final valor = visita.valor;
+    return Opacity(
+      opacity: valor == null ? 0.4 : 1,
+      child: Container(
+        height: TatuMedidas.alturaVisitaPlano,
+        decoration: BoxDecoration(
+          color: TatuColors.surfaceGrouped,
+          borderRadius: BorderRadius.circular(TatuMedidas.raioVisitaPlano),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              dataCurta(visita.dia),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+            ),
+            if (valor != null) ...[
+              const SizedBox(height: 4),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    TablerIcons.check,
+                    size: 12,
+                    color: TatuColors.onlineTexto,
+                  ),
+                  const SizedBox(width: 3),
+                  Text(
+                    reaisInteiros(valor),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: TatuColors.onlineTexto,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _CartaoConcluido extends StatelessWidget {
   const _CartaoConcluido({required this.pedido});
@@ -953,7 +1074,9 @@ class _CartaoConcluido extends StatelessWidget {
 }
 
 class _Pago extends StatelessWidget {
-  const _Pago();
+  const _Pago([this.texto = 'Pago']);
+
+  final String texto;
 
   @override
   Widget build(BuildContext context) {
@@ -969,9 +1092,9 @@ class _Pago extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        const Text(
-          'Pago',
-          style: TextStyle(fontSize: 15, color: TatuColors.onlineTexto),
+        Text(
+          texto,
+          style: const TextStyle(fontSize: 15, color: TatuColors.onlineTexto),
         ),
       ],
     );

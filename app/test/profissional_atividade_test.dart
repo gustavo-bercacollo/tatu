@@ -64,9 +64,13 @@ void main() {
     expect(find.text('Joana Reis'), findsOneWidget);
     await t.tap(find.byType(BackCircleButton));
     await t.pumpAndSettle();
-    await t.tap(find.text('Ver taxas do Tatu'));
+    // RN-232: sem "Ver taxas do Tatu" no fim; a linha da taxa abre a folha.
+    expect(find.text('Ver taxas do Tatu'), findsNothing);
+    await t.ensureVisible(find.text('Taxa do Tatu (10%)'));
+    await t.tap(find.text('Taxa do Tatu (10%)'));
     await t.pumpAndSettle();
-    expect(find.text('Taxas do Tatu'), findsOneWidget);
+    expect(find.text('Taxa do Tatu'), findsOneWidget);
+    expect(find.text('Gorjetas são 100% suas, sem taxa.'), findsOneWidget);
     await t.tap(find.text('Entendi'));
     await t.pumpAndSettle();
     // Aba: sem voltar.

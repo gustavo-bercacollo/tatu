@@ -5,6 +5,17 @@ abstract final class RegrasValor {
   /// para concluir ou dividir o trabalho em partes.
   static const validade = Duration(days: 7);
 
+  /// RN-229: validade do valor enviado (exemplos; mude só aqui): chamado
+  /// imediato e novo valor durante o serviço…
+  static const validadeImediata = Duration(minutes: 30);
+
+  /// …e serviço agendado, à distância e plano fixo.
+  static const validadeAgendada = Duration(hours: 24);
+
+  /// RN-229: a validade de um valor.
+  static Duration validadeDo({bool distancia = false, bool agendado = false}) =>
+      distancia || agendado ? validadeAgendada : validadeImediata;
+
   /// RN-91: parcelamento no cartão a partir deste total…
   static const parcelarAPartirDe = 300.0;
 

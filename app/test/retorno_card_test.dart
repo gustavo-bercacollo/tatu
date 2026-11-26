@@ -59,19 +59,23 @@ void main() {
       MaterialApp(theme: tatuTheme(), home: const AtividadePage(aba: 0)),
     );
     await t.pumpAndSettle();
-    final card = find.ancestor(
-      of: find.text('Rafael Lima'),
-      matching: find.byType(InkWell),
-    ).first;
+    final card = find
+        .ancestor(of: find.text('Rafael Lima'), matching: find.byType(InkWell))
+        .first;
     Finder dentro(String texto) =>
         find.descendant(of: card, matching: find.text(texto));
 
-    // C234: agendado.
+    // C253 · RN-207: agendado (subtítulo só com a profissão).
     expect(dentro('RL'), findsOneWidget);
-    expect(dentro('Eletricista · tomada da sala'), findsOneWidget);
+    expect(dentro('Eletricista'), findsOneWidget);
+    expect(dentro('Agendado'), findsOneWidget);
     expect(dentro('Retorno · sem custo'), findsOneWidget);
+    expect(dentro('do serviço de ${r.diaServico}'), findsOneWidget);
     expect(dentro('Sexta, 27 nov · 14h'), findsOneWidget);
-    expect(dentro('Na hora, passe o código para o Rafael.'), findsOneWidget);
+    expect(
+      dentro('Código ${r.codigo} · passe para o Rafael na hora'),
+      findsOneWidget,
+    );
     final altura = t.getRect(card).height;
 
     // C235: a caminho.
@@ -81,7 +85,10 @@ void main() {
     expect(
       find.descendant(
         of: card,
-        matching: find.textContaining('Retorno · sem custo', findRichText: true),
+        matching: find.textContaining(
+          'Retorno · sem custo',
+          findRichText: true,
+        ),
       ),
       findsOneWidget,
     );
@@ -89,6 +96,7 @@ void main() {
       expect(dentro(e), findsOneWidget, reason: e);
     }
     expect(dentro('Sexta, 27 nov · 14h'), findsNothing);
+    expect(dentro('do serviço de ${r.diaServico}'), findsOneWidget);
     expect(t.getRect(card).height, altura);
   });
 }

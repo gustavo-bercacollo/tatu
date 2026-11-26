@@ -176,6 +176,8 @@ class _ChatPageState extends State<ChatPage> {
     _timer?.cancel();
     _campo.dispose();
     _prazoPagamento?.cancel();
+    _timerValidade?.cancel();
+    _rolagem.dispose();
     super.dispose();
   }
 
@@ -204,9 +206,9 @@ class _ChatPageState extends State<ChatPage> {
       pedidos.valorConfirmado(sinal: v.sinal);
       // RN-165: no local, vai direto para o acompanhamento.
       if (!_c.distancia) {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const PedidoAndamentoPage()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const PedidoAndamentoPage()));
       }
     }
     // RN-99/RN-100: à distância, protótipo: chega uma prévia e depois a
@@ -215,10 +217,7 @@ class _ChatPageState extends State<ChatPage> {
       _timer?.cancel();
       _timer = Timer(widget.resposta * 2, () {
         conversas.receberPrevia(_c);
-        _timer = Timer(
-          widget.resposta * 2,
-          () => conversas.receberEntrega(_c),
-        );
+        _timer = Timer(widget.resposta * 2, () => conversas.receberEntrega(_c));
       });
     }
   }
@@ -240,9 +239,8 @@ class _ChatPageState extends State<ChatPage> {
   /// RN-223: "Usar outro cartão": escolhe o cartão e tenta de novo.
   Future<void> _outroCartao(ValorProposta v) async {
     final antes = pagamentos.padrao;
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const PagamentoPage()),
-    );
+    await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const PagamentoPage()));
     if (!mounted) return;
     final agora = pagamentos.padrao;
     if (agora != null && agora.id != antes?.id) _confirmarValor(v);
@@ -457,40 +455,88 @@ class _ChatPageState extends State<ChatPage> {
     ];
   }
 
+  /// RN-230: o card do valor (para a barra "Valor pendente" saber se ele
+  /// saiu da tela e para rolar até ele).
+  final _chaveValor = GlobalKey();
+  final _rolagem = ScrollController();
+
+  /// RN-230: o card do valor pendente está fora da tela?
+  bool _valorFora = false;
+
+  bool _conferindo = false;
+
+  void _conferirNoFimDoQuadro() {
+    if (_conferindo) return;
+    _conferindo = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _conferindo = false;
+      if (mounted) _verValorFora();
+    });
+  }
+
+  /// Mensagem nova (enviada ou recebida): a conversa desce até o fim.
+  int? _qtdMensagens;
+
+  void _descerSeChegouMensagem() {
+    final n = _c.mensagens.length;
+    final antes = _qtdMensagens;
+    _qtdMensagens = n;
+    if (antes == null || n <= antes || !_rolagem.hasClients) return;
+    _rolagem.jumpTo(_rolagem.position.maxScrollExtent);
+  }
+
   List<Widget> _valor() {
     final v = _c.valor;
     // RN-212: nenhum card de valor some depois de combinado (à distância
     // também; o marcador no chat continua).
     if (v == null) return const [];
+    // C114 · RN-229: expirado, vira linha cinza com "Pedir de novo".
+    if (v.situacao == SituacaoValor.expirado) {
+      return [
+        const SizedBox(height: 18),
+        CartaoValorExpirado(
+          nome: _c.nome,
+          total: v.total,
+          em: v.expiradoEm ?? v.valeAte,
+          onPedirDeNovo: () => _pedirValorDeNovo(),
+        ),
+      ];
+    }
     return [
       const SizedBox(height: TatuMedidas.entreSecoes),
       // RN-87: numa conversa que já teve serviço, é um valor novo.
+      // C112 · RN-229: com a hora em que chegou.
       NotaChat(
-        '${_c.primeiroNome} enviou ${v.novo ? 'um novo valor' : 'um valor'}',
+        '${_c.primeiroNome} enviou ${v.novo ? 'um novo valor' : 'um valor'}'
+        ' · ${horaMinuto(v.enviadoEm)}',
       ),
       const SizedBox(height: TatuMedidas.entreItens),
-      switch (v.situacao) {
-        SituacaoValor.aguardandoVoce => CartaoValorRecebido(
-          valor: v,
-          nome: '${_c.artigo} ${_c.primeiroNome}',
-          onConfirmar: () => _confirmarValor(v),
-          onOutroCartao: () => _outroCartao(v),
-          onPix: () => _pagarComPix(v),
-          onTrocar: _trocarPagamento,
-          onParcelas: () => _parcelas(v),
-          onPedirOutro: v.rodada < maxRodadasValor ? _pedirOutro : null,
-          onRecusar: _recusar,
-        ),
-        SituacaoValor.pediuOutro => CartaoValorPedido(
-          valor: v,
-          nome: '${_c.artigo} ${_c.primeiroNome}',
-        ),
-        // RN-203: com plano fixo, o valor do chat é um serviço avulso.
-        SituacaoValor.confirmado => CartaoValorConfirmado(
-          valor: v,
-          avulso: _barraPlano != null,
-        ),
-      },
+      KeyedSubtree(
+        key: _chaveValor,
+        child: switch (v.situacao) {
+          SituacaoValor.aguardandoVoce => CartaoValorRecebido(
+            valor: v,
+            nome: '${_c.artigo} ${_c.primeiroNome}',
+            onConfirmar: () => _confirmarValor(v),
+            onOutroCartao: () => _outroCartao(v),
+            onPix: () => _pagarComPix(v),
+            onTrocar: _trocarPagamento,
+            onParcelas: () => _parcelas(v),
+            onPedirOutro: v.rodada < maxRodadasValor ? _pedirOutro : null,
+            onRecusar: _recusar,
+          ),
+          SituacaoValor.pediuOutro => CartaoValorPedido(
+            valor: v,
+            nome: '${_c.artigo} ${_c.primeiroNome}',
+          ),
+          // RN-203: com plano fixo, o valor do chat é um serviço avulso.
+          SituacaoValor.confirmado => CartaoValorConfirmado(
+            valor: v,
+            avulso: _barraPlano != null,
+          ),
+          SituacaoValor.expirado => const SizedBox.shrink(),
+        },
+      ),
       // RN-181: o novo valor confirmado no chat virou um serviço.
       if (v.novo && v.situacao == SituacaoValor.confirmado) ...[
         const SizedBox(height: TatuMedidas.entreSecoes),
@@ -500,6 +546,132 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ],
     ];
+  }
+
+  /// RN-229: "Pedir de novo": avisa o profissional; protótipo: ele manda
+  /// o valor de novo.
+  void _pedirValorDeNovo() {
+    conversas.pedirValorDeNovo(_c);
+    _timer?.cancel();
+    _timer = Timer(widget.resposta, () {
+      conversas.profissionalReenviaValor(_c);
+      _contarValidade();
+    });
+  }
+
+  Timer? _timerValidade;
+  DateTime? _validadeContada;
+
+  /// RN-229: quando passar da validade, o valor expira sozinho.
+  void _contarValidade() {
+    final v = _c.valor;
+    if (v == null || v.situacao != SituacaoValor.aguardandoVoce) {
+      _timerValidade?.cancel();
+      _validadeContada = null;
+      return;
+    }
+    if (_validadeContada == v.valeAte) return;
+    _validadeContada = v.valeAte;
+    _timerValidade?.cancel();
+    final falta = v.valeAte.difference(clock.now());
+    _timerValidade = Timer(
+      falta.isNegative ? Duration.zero : falta,
+      () => conversas.conferirValidade(_c),
+    );
+  }
+
+  /// RN-230: o card fica depois de [n] mensagens; fixado na primeira vez
+  /// que aparece.
+  int _ancora(String chave) =>
+      _c.ancoras.putIfAbsent(chave, () => _c.mensagens.length);
+
+  /// RN-230: cards de valor, plano e retorno no lugar em que foram
+  /// enviados (chave = antes de qual mensagem).
+  Map<int, List<Widget>> _cartoesNoLugar() {
+    final n = _c.mensagens.length;
+    final m = <int, List<Widget>>{};
+    void por(int ancora, List<Widget> ws) {
+      if (ws.isEmpty) return;
+      (m[ancora.clamp(0, n)] ??= []).addAll(ws);
+    }
+
+    // RN-183 a RN-191 / RN-231: o pedido de retorno e o que veio depois.
+    if (_retorno case final r?) {
+      por(
+        _ancora('retorno:${r.servico}'),
+        secaoRetornoCliente(context, r, endereco: _c.rua),
+      );
+      // RN-231: a aceitação vira um aviso pequeno no lugar em que veio.
+      final m0 = r.marcadoPara;
+      if (r.situacao == SituacaoRetorno.aceito && m0 != null) {
+        por(_ancora('retorno-aceito:${r.servico}'), [
+          const SizedBox(height: 18),
+          NotaChat(
+            '${r.oProfissional[0].toUpperCase()}${r.oProfissional.substring(1)}'
+            ' aceitou · ${quandoCurto(m0)}',
+          ),
+        ]);
+      }
+    }
+    por(_ancora('plano'), _planoNoChat());
+    // RN-229: valores que expiraram porque veio outro.
+    for (final e in _c.valoresExpirados) {
+      por(e.ancora ?? n, [
+        const SizedBox(height: 18),
+        CartaoValorExpirado(nome: _c.nome, total: e.total, em: e.em),
+      ]);
+    }
+    final v = _c.valor;
+    if (v != null) por(v.ancora ??= n, _valor());
+    return m;
+  }
+
+  /// RN-230: o valor pendente saiu da tela? (rolou para cima ou para
+  /// baixo dele).
+  void _verValorFora() {
+    final v = _c.valor;
+    final pendente = v != null && v.situacao == SituacaoValor.aguardandoVoce;
+    var fora = false;
+    if (pendente) {
+      final ctx = _chaveValor.currentContext;
+      final caixa = ctx?.findRenderObject() as RenderBox?;
+      final vista = ctx == null ? null : Scrollable.maybeOf(ctx);
+      final janela = vista?.context.findRenderObject() as RenderBox?;
+      if (caixa == null || janela == null || !caixa.attached) {
+        fora = _rolagem.hasClients;
+      } else {
+        final topo = janela.localToGlobal(Offset.zero).dy;
+        final base = topo + janela.size.height;
+        final y = caixa.localToGlobal(Offset.zero).dy;
+        fora = y + caixa.size.height < topo + 8 || y > base - 8;
+      }
+    }
+    if (fora != _valorFora && mounted) setState(() => _valorFora = fora);
+  }
+
+  /// RN-230: tocar na barra rola até o card.
+  Future<void> _irAoValor() async {
+    for (var i = 0; i < 20; i++) {
+      final ctx = _chaveValor.currentContext;
+      if (ctx != null) {
+        // O contexto é lido de novo a cada volta (depois do quadro).
+        await Scrollable.ensureVisible(
+          // ignore: use_build_context_synchronously
+          ctx,
+          duration: const Duration(milliseconds: 300),
+          alignment: 0.1,
+        );
+        return;
+      }
+      if (!_rolagem.hasClients) return;
+      final p = _rolagem.position;
+      // O card está acima (a conversa subiu): sobe uma tela por vez.
+      _rolagem.jumpTo(
+        (p.pixels - p.viewportDimension).clamp(0, p.maxScrollExtent),
+      );
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted) return;
+    }
   }
 
   /// RN-181: confirmado o novo valor enviado no chat, vira um atendimento
@@ -582,15 +754,32 @@ class _ChatPageState extends State<ChatPage> {
 
   /// Topo do chat com a barra fixa do plano logo abaixo (RN-202).
   Widget _comBarraDoPlano(Widget topo) {
-    final b = _barraPlano;
-    if (b == null) return topo;
+    final v = _c.valor;
+    // C113 · RN-230: valor pendente fora da tela: barra laranja (embaixo
+    // da barra do plano, quando houver as duas).
+    final pendente =
+        v != null && v.situacao == SituacaoValor.aguardandoVoce && _valorFora
+        ? BarraPlano(
+            'Valor pendente · ${reaisInteiros(v.total)}',
+            direita: 'vale até ${horaMinuto(v.valeAte)}',
+            laranja: true,
+          )
+        : null;
+    final plano = _barraPlano;
+    if (plano == null && pendente == null) return topo;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         topo,
-        const SizedBox(height: TatuMedidas.entreItens),
-        BarraPlanoFixo(barra: b, onTap: _abrirPlano),
+        if (plano != null) ...[
+          const SizedBox(height: TatuMedidas.entreItens),
+          BarraPlanoFixo(barra: plano, onTap: _abrirPlano),
+        ],
+        if (pendente != null) ...[
+          const SizedBox(height: TatuMedidas.entreItens),
+          BarraPlanoFixo(barra: pendente, onTap: _irAoValor),
+        ],
       ],
     );
   }
@@ -899,7 +1088,6 @@ class _ChatPageState extends State<ChatPage> {
   /// começa (num plano ativo, fica o valor de hoje).
   void _recusarPlano(PlanoFixo p) => planosFixos.recusarValor(p);
 
-
   /// RN-202/RN-205: o plano com esta pessoa, mesmo encerrado.
   PlanoFixo? get _planoVisivel => planosFixos.ultimoCom(profissional: _c.nome);
 
@@ -925,9 +1113,8 @@ class _ChatPageState extends State<ChatPage> {
   /// C228 · RN-225: "Atualizar pagamento": escolhe o cartão e reserva de
   /// novo; dando certo, a visita volta e a profissional é avisada.
   Future<void> _atualizarPagamentoVisita(PlanoFixo p, VisitaPlano v) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const PagamentoPage()),
-    );
+    await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const PagamentoPage()));
     if (!mounted) return;
     if (planosFixos.atualizarPagamentoVisita(p, v)) {
       mostrarAvisoTopo(
@@ -1074,200 +1261,219 @@ class _ChatPageState extends State<ChatPage> {
         final ultimaFotoMinha = msgs.lastIndexWhere((m) => m.minha && m.foto);
         final algumaFalhou = msgs.any((m) => m.envio == EnvioMensagem.falhou);
         final fim = _c.encerramento;
-        return TelaChat(
-          // RN-132: encerrada pelo Tatu, o nome vira "Conta indisponível".
-          topo: fim != null
-              ? TopoContaIndisponivel(detalhe: _c.servico)
-              : _comBarraDoPlano(
-                  _Topo(
-                    conversa: _c,
-                    onMenu: _menu,
-                    onLigar: _ligar,
-                    // RN-202: "[profissão] · Plano fixo".
-                    subtitulo: _barraPlano == null
-                        ? null
-                        : '${_c.profissao} · Plano fixo',
-                  ),
-                ),
-          // C104 · RN-140: o ligar acabou de ser liberado.
-          sobre: _c.podeLigar && !_c.dicaLigarVista
-              ? BalaoLigarLiberado(onFechar: () => conversas.verDicaLigar(_c))
-              : null,
-          rodapeColado: fim != null || _c.semAcordo,
-          mensagens: [
-            CartaoPedidoChat(
-              servico: _c.servico,
-              descricao: _c.descricao,
-              lado: _c.rua,
-            ),
-            const SizedBox(height: TatuMedidas.entreSecoes),
-            if (fim == null)
-              NotaChat(
-                'Você aceitou ${_c.artigo} ${_c.primeiroNome}. '
-                'Combinem os detalhes e o valor por aqui.',
-              ),
-            const SizedBox(height: TatuMedidas.entreItens + 4),
-            ..._visitasDoPlano(),
-            for (final (i, m) in msgs.indexed)
-              if (m.concluido != null)
-                // RN-42: o serviço acabou, a conversa continua.
-                Padding(
-                  padding: const EdgeInsets.only(top: 18),
-                  child: MarcoConcluido(m.concluido!),
-                )
-              else if (m.divisor != null)
-                // RN-179/RN-181: começa um atendimento novo na conversa.
-                Padding(
-                  padding: const EdgeInsets.only(top: 18),
-                  child: DivisorChat(m.divisor!, nota: m.divisorNota),
-                )
-              else if (m.dia != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 18),
-                  child: SeparadorDia(m.dia!),
-                )
-              else if (m.bloqueada)
-                // RN-120: barrado; só quem enviou vê.
-                const Padding(
-                  padding: EdgeInsets.only(top: 18),
-                  child: BalaoBloqueado(),
-                )
-              else if (m.marcador != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 18),
-                  child: MarcadorChat(m.marcador!),
-                )
-              else if (m.previaEm != null)
-                // RN-99: prévia protegida, só no app.
-                Padding(
-                  padding: const EdgeInsets.only(top: 18),
-                  child: BalaoPrevia(
-                    valida: RegrasDistancia.previaValida(
-                      m.previaEm!,
-                      clock.now(),
+        // RN-230: cards no lugar em que foram enviados.
+        final antes = fim == null && !_c.semAcordo
+            ? _cartoesNoLugar()
+            : const <int, List<Widget>>{};
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          _descerSeChegouMensagem();
+          _verValorFora();
+          // RN-229: conta a validade do valor que está na tela.
+          conversas.conferirValidade(_c);
+          _contarValidade();
+        });
+        return NotificationListener<ScrollNotification>(
+          // A rolagem avisa no meio do layout: confere no fim do quadro.
+          onNotification: (_) {
+            _conferirNoFimDoQuadro();
+            return false;
+          },
+          child: TelaChat(
+            controle: _rolagem,
+            // RN-132: encerrada pelo Tatu, o nome vira "Conta indisponível".
+            topo: fim != null
+                ? TopoContaIndisponivel(detalhe: _c.servico)
+                : _comBarraDoPlano(
+                    _Topo(
+                      conversa: _c,
+                      onMenu: _menu,
+                      onLigar: _ligar,
+                      // RN-202: "[profissão] · Plano fixo".
+                      subtitulo: _barraPlano == null
+                          ? null
+                          : '${_c.profissao} · Plano fixo',
                     ),
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => PreviaProtegidaPage(
-                          de: _c.primeiroNome,
-                          enviadaEm: m.previaEm!,
+                  ),
+            // C104 · RN-140: o ligar acabou de ser liberado.
+            sobre: _c.podeLigar && !_c.dicaLigarVista
+                ? BalaoLigarLiberado(onFechar: () => conversas.verDicaLigar(_c))
+                : null,
+            rodapeColado: fim != null || _c.semAcordo,
+            mensagens: [
+              CartaoPedidoChat(
+                servico: _c.servico,
+                descricao: _c.descricao,
+                lado: _c.rua,
+              ),
+              const SizedBox(height: TatuMedidas.entreSecoes),
+              if (fim == null)
+                NotaChat(
+                  'Você aceitou ${_c.artigo} ${_c.primeiroNome}. '
+                  'Combinem os detalhes e o valor por aqui.',
+                ),
+              const SizedBox(height: TatuMedidas.entreItens + 4),
+              ..._visitasDoPlano(),
+              for (final (i, m) in msgs.indexed) ...[
+                ...?antes[i],
+                if (m.concluido != null)
+                  // RN-42: o serviço acabou, a conversa continua.
+                  Padding(
+                    padding: const EdgeInsets.only(top: 18),
+                    child: MarcoConcluido(m.concluido!),
+                  )
+                else if (m.divisor != null)
+                  // RN-179/RN-181: começa um atendimento novo na conversa.
+                  Padding(
+                    padding: const EdgeInsets.only(top: 18),
+                    child: DivisorChat(m.divisor!, nota: m.divisorNota),
+                  )
+                else if (m.dia != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 18),
+                    child: SeparadorDia(m.dia!),
+                  )
+                else if (m.bloqueada)
+                  // RN-120: barrado; só quem enviou vê.
+                  const Padding(
+                    padding: EdgeInsets.only(top: 18),
+                    child: BalaoBloqueado(),
+                  )
+                else if (m.marcador != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 18),
+                    child: MarcadorChat(m.marcador!),
+                  )
+                else if (m.previaEm != null)
+                  // RN-99: prévia protegida, só no app.
+                  Padding(
+                    padding: const EdgeInsets.only(top: 18),
+                    child: BalaoPrevia(
+                      valida: RegrasDistancia.previaValida(
+                        m.previaEm!,
+                        clock.now(),
+                      ),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => PreviaProtegidaPage(
+                            de: _c.primeiroNome,
+                            enviadaEm: m.previaEm!,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                )
-              else if (m.entrega != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 18),
-                  child: GestureDetector(
-                    onLongPress: () => _denunciar(m),
-                    child: _entrega(m),
-                  ),
-                )
-              else if (m.arquivo != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 18),
-                  child: GestureDetector(
-                    onLongPress: m.minha ? null : () => _denunciar(m),
-                    child: BalaoArquivo(
-                      nome: m.arquivo!,
-                      detalhe: m.arquivoDetalhe ?? '',
-                      minha: m.minha,
+                  )
+                else if (m.entrega != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 18),
+                    child: GestureDetector(
+                      onLongPress: () => _denunciar(m),
+                      child: _entrega(m),
+                    ),
+                  )
+                else if (m.arquivo != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 18),
+                    child: GestureDetector(
+                      onLongPress: m.minha ? null : () => _denunciar(m),
+                      child: BalaoArquivo(
+                        nome: m.arquivo!,
+                        detalhe: m.arquivoDetalhe ?? '',
+                        minha: m.minha,
+                      ),
+                    ),
+                  )
+                else if (m.denunciada)
+                  // RN-134: só quem denunciou vê isso no lugar da mensagem.
+                  const Padding(
+                    padding: EdgeInsets.only(top: 18),
+                    child: MensagemDenunciada(),
+                  )
+                else
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: _primeiroDoBloco(msgs, i)
+                          ? (i == 0 ? 0 : 18)
+                          : espacoAntesDoBalao(
+                              anteriorMinha: msgs[i - 1].minha,
+                              minha: m.minha,
+                            ),
+                    ),
+                    child: GestureDetector(
+                      key: _chaves.putIfAbsent(m, GlobalKey.new),
+                      // RN-123: foto recebida pode ser denunciada.
+                      // RN-134: mensagem de texto do outro também.
+                      onLongPress: m.minha || _c.encerrada
+                          ? null
+                          : m.foto
+                          ? () => _denunciar(m)
+                          : () => _segurar(m),
+                      child: BalaoChat(
+                        texto: m.texto,
+                        minha: m.minha,
+                        outro: '${_c.artigo} ${_c.primeiroNome}',
+                        foto: m.foto,
+                        imagem: m.imagem,
+                        legenda: i == ultimaFotoMinha && m.hora != null
+                            ? 'Enviada · ${m.hora}'
+                            : null,
+                        falhou: m.envio == EnvioMensagem.falhou,
+                        onTentarDeNovo: () => conversas.reenviar(m),
+                      ),
                     ),
                   ),
-                )
-              else if (m.denunciada)
-                // RN-134: só quem denunciou vê isso no lugar da mensagem.
-                const Padding(
-                  padding: EdgeInsets.only(top: 18),
-                  child: MensagemDenunciada(),
-                )
-              else
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: _primeiroDoBloco(msgs, i)
-                        ? (i == 0 ? 0 : 18)
-                        : espacoAntesDoBalao(
-                            anteriorMinha: msgs[i - 1].minha,
-                            minha: m.minha,
-                          ),
-                  ),
-                  child: GestureDetector(
-                    key: _chaves.putIfAbsent(m, GlobalKey.new),
-                    // RN-123: foto recebida pode ser denunciada.
-                    // RN-134: mensagem de texto do outro também.
-                    onLongPress: m.minha || _c.encerrada
-                        ? null
-                        : m.foto
-                        ? () => _denunciar(m)
-                        : () => _segurar(m),
-                    child: BalaoChat(
-                      texto: m.texto,
-                      minha: m.minha,
-                      outro: '${_c.artigo} ${_c.primeiroNome}',
-                      foto: m.foto,
-                      imagem: m.imagem,
-                      legenda: i == ultimaFotoMinha && m.hora != null
-                          ? 'Enviada · ${m.hora}'
-                          : null,
-                      falhou: m.envio == EnvioMensagem.falhou,
-                      onTentarDeNovo: () => conversas.reenviar(m),
-                    ),
-                  ),
-                ),
-            if (fim != null) ...[
-              // RN-130: o Tatu avisa e oferece outro profissional.
-              const SizedBox(height: TatuMedidas.entreSecoes),
-              CartaoTatuChat(
-                texto: fim.mensagem,
-                botao: fim.chamarOutro ? 'Chamar outro profissional' : null,
-                onBotao: _chamarOutro,
-              ),
-              if (fim.nota != null) ...[
-                const SizedBox(height: TatuMedidas.entreSecoes),
-                NotaChat(fim.nota!),
               ],
-            ] else if (_c.semAcordo) ...[
-              // RN-301: só leitura depois da recusa do último valor.
-              const SizedBox(height: TatuMedidas.entreSecoes),
-              const MarcadorChat('Sem acordo de valor'),
-            ] else ...[
-              // RN-183 a RN-191: o pedido de retorno e o que veio depois.
-              if (_retorno case final r?)
-                ...secaoRetornoCliente(context, r, endereco: _c.rua),
-              ..._planoNoChat(),
-              ..._valor(),
-              ..._semEntrega(),
-            ],
-          ],
-          // RN-132: só leitura depois que o Tatu encerra.
-          // RN-42: fora isso, a conversa nunca fecha.
-          rodape: fim != null || _c.semAcordo
-              ? const RodapeConversaEncerrada()
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (conversas.semInternet || algumaFalhou) ...[
-                      const _SemInternet(),
-                      const SizedBox(height: TatuMedidas.entreItens),
-                    ],
-                    if (_mostraDicaPedirDeNovo) ...[
-                      DicaPedirDeNovo(onPedir: _pedirDeNovo),
-                      const SizedBox(height: TatuMedidas.entreItens),
-                    ],
-                    // RN-85: contato não passa pelo chat.
-                    BarraMensagem(
-                      controller: _campo,
-                      onEnviar: _enviar,
-                      onCamera: _anexar,
-                      porQue:
-                          // RN-107: garantia de 24 horas por serviço.
-                          'Pelo Tatu o serviço tem garantia de 24h. Chame '
-                          '${_c.artigo} ${_c.primeiroNome} de novo pelo app.',
-                    ),
-                  ],
+              if (fim != null) ...[
+                // RN-130: o Tatu avisa e oferece outro profissional.
+                const SizedBox(height: TatuMedidas.entreSecoes),
+                CartaoTatuChat(
+                  texto: fim.mensagem,
+                  botao: fim.chamarOutro ? 'Chamar outro profissional' : null,
+                  onBotao: _chamarOutro,
                 ),
+                if (fim.nota != null) ...[
+                  const SizedBox(height: TatuMedidas.entreSecoes),
+                  NotaChat(fim.nota!),
+                ],
+              ] else if (_c.semAcordo) ...[
+                // RN-301: só leitura depois da recusa do último valor.
+                const SizedBox(height: TatuMedidas.entreSecoes),
+                const MarcadorChat('Sem acordo de valor'),
+              ] else ...[
+                // RN-230: os cards enviados depois da última mensagem.
+                ...?antes[msgs.length],
+                ..._semEntrega(),
+              ],
+            ],
+            // RN-132: só leitura depois que o Tatu encerra.
+            // RN-42: fora isso, a conversa nunca fecha.
+            rodape: fim != null || _c.semAcordo
+                ? const RodapeConversaEncerrada()
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (conversas.semInternet || algumaFalhou) ...[
+                        const _SemInternet(),
+                        const SizedBox(height: TatuMedidas.entreItens),
+                      ],
+                      if (_mostraDicaPedirDeNovo) ...[
+                        DicaPedirDeNovo(onPedir: _pedirDeNovo),
+                        const SizedBox(height: TatuMedidas.entreItens),
+                      ],
+                      // RN-85: contato não passa pelo chat.
+                      BarraMensagem(
+                        controller: _campo,
+                        onEnviar: _enviar,
+                        onCamera: _anexar,
+                        porQue:
+                            // RN-107: garantia de 24 horas por serviço.
+                            'Pelo Tatu o serviço tem garantia de 24h. Chame '
+                            '${_c.artigo} ${_c.primeiroNome} de novo pelo app.',
+                      ),
+                    ],
+                  ),
+          ),
         );
       },
     );

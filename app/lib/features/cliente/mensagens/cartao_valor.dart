@@ -12,6 +12,7 @@ import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/campo_valor.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
+import '../../../shared/widgets/avatar_iniciais.dart';
 
 /// Cada lado pode propor até 3 valores.
 const maxRodadasValor = 3;
@@ -225,6 +226,22 @@ class CartaoValorRecebido extends StatelessWidget {
         Text(detalheValor(valor), style: TatuTexto.detalhe),
         const SizedBox(height: 4),
         _Total(valor.total),
+        // C112 · RN-229: até quando o valor vale.
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            const Icon(
+              TablerIcons.clock,
+              size: 14,
+              color: TatuColors.textSecondary,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              'Vale até ${horaMinuto(valor.valeAte)}',
+              style: TatuTexto.legenda,
+            ),
+          ],
+        ),
         const SizedBox(height: TatuMedidas.entreItens + 4),
         // RN-102/RN-103: sinal cobrado agora, restante quando aprovar.
         if (valor.sinal > 0) ...[
@@ -307,6 +324,95 @@ class CartaoValorRecebido extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+/// "17:55".
+String horaMinuto(DateTime d) =>
+    '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+
+/// C114 · RN-229: valor expirado, encolhido numa linha cinza: "[nome] ·
+/// R$ X · Valor expirado · [hora]", com "Pedir de novo" (quando é o
+/// último valor).
+class CartaoValorExpirado extends StatelessWidget {
+  const CartaoValorExpirado({
+    super.key,
+    required this.nome,
+    required this.total,
+    required this.em,
+    this.onPedirDeNovo,
+  });
+
+  /// "Luiza Souza" (o avatar) e o primeiro nome no texto.
+  final String nome;
+  final double total;
+  final DateTime em;
+  final VoidCallback? onPedirDeNovo;
+
+  @override
+  Widget build(BuildContext context) {
+    return FractionallySizedBox(
+      alignment: Alignment.centerLeft,
+      widthFactor: 0.91,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: TatuMedidas.alturaLinha),
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
+          border: Border.all(color: TatuColors.contornoClaro, width: 1.2),
+        ),
+        child: Row(
+          children: [
+            AvatarIniciais(
+              nome: nome,
+              tamanho: TatuMedidas.avatarPropostaPequeno,
+            ),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${nome.split(' ').first} · ${reais(total)}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: TatuColors.textSecondary,
+                    ),
+                  ),
+                  Text(
+                    'Valor expirado · ${horaMinuto(em)}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: TatuColors.textoTerciario,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (onPedirDeNovo != null)
+              GestureDetector(
+                onTap: onPedirDeNovo,
+                behavior: HitTestBehavior.opaque,
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    'Pedir de novo',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: TatuColors.verified,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

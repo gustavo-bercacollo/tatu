@@ -318,7 +318,10 @@ void main() {
     expect(r.retido, isFalse);
     await t.scrollUntilVisible(find.text('Pedido de retorno'), 200,
         scrollable: _lista);
-    expect(find.textContaining('Aguardando a Luiza'), findsOneWidget);
+    // C250 · RN-231: card único, pílula "Aguardando" e até quando ela responde.
+    expect(find.text('Aguardando'), findsOneWidget);
+    expect(find.textContaining('A Luiza responde até'), findsOneWidget);
+    expect(find.textContaining('Você pode:'), findsOneWidget);
   });
 
   testWidgets('C223 · RN-45: nas primeiras 24 h, "Pagamento protegido"', (

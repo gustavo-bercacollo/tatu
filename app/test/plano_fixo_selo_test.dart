@@ -154,21 +154,17 @@ void main() {
       final c = conversas.conversas.firstWhere((c) => c.nome == 'Júlia Costa');
       await _abrir(t, ChatPage(conversa: c));
       expect(find.text('Diarista · Plano fixo'), findsOneWidget);
-      expect(
-        find.text('Plano fixo · toda terça, 9h'),
-        findsOneWidget,
-      );
+      expect(find.text('Plano fixo · toda terça, 9h'), findsOneWidget);
       expect(find.text('Próxima: 24 nov'), findsOneWidget);
-      expect(
-        find.text('Visita do plano · 17 nov · feita'),
-        findsOneWidget,
-      );
+      expect(find.text('Visita do plano · 17 nov · feita'), findsOneWidget);
       // O marcador não cobre a primeira mensagem.
       final marcador = t.getRect(
-        find.ancestor(
-          of: find.text('Visita do plano · 17 nov · feita'),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .ancestor(
+              of: find.text('Visita do plano · 17 nov · feita'),
+              matching: find.byType(Container),
+            )
+            .first,
       );
       final balao = t.getRect(find.text('Tudo limpinho! Deixei a chave.'));
       expect(balao.top - marcador.bottom, greaterThanOrEqualTo(12));
@@ -190,8 +186,13 @@ void main() {
       expect(find.text('Plano fixo · visita 2 de 4'), findsNothing);
       await t.tap(find.text('Concluídos'));
       await t.pumpAndSettle();
-      expect(find.text('Plano fixo · 4 visitas'), findsOneWidget);
+      // C238 · RN-233: o mês do plano, com as visitas pagas.
+      expect(find.text('Plano fixo · 4 visitas'), findsNothing);
       expect(find.text('R\$ 600,00'), findsOneWidget);
+      expect(find.text('4 visitas pagas'), findsOneWidget);
+      expect(find.text('R\$ 150'), findsNWidgets(4));
+      expect(find.text('Ver plano'), findsOneWidget);
+      expect(find.text('Recibos'), findsOneWidget);
     });
   });
 
@@ -200,10 +201,12 @@ void main() {
       sementeDemoPlanoFixo();
       await _abrir(t, const AtividadePage());
       Rect card() => t.getRect(
-        find.ancestor(
-          of: find.text('Júlia Costa'),
-          matching: find.byType(InkWell),
-        ).first,
+        find
+            .ancestor(
+              of: find.text('Júlia Costa'),
+              matching: find.byType(InkWell),
+            )
+            .first,
       );
       final antes = card().height;
       final p = planosFixos.ultimoCom(profissional: 'Júlia Costa')!;
@@ -211,10 +214,12 @@ void main() {
       await t.pumpAndSettle();
       expect(find.text('8 min'), findsOneWidget);
       expect(find.text('Diarista · visita 2 de 4'), findsOneWidget);
-      final daJulia = find.ancestor(
-        of: find.text('Júlia Costa'),
-        matching: find.byType(InkWell),
-      ).first;
+      final daJulia = find
+          .ancestor(
+            of: find.text('Júlia Costa'),
+            matching: find.byType(InkWell),
+          )
+          .first;
       for (final e in ['Agendada', 'A caminho', 'Serviço', 'Feita']) {
         expect(
           find.descendant(of: daJulia, matching: find.text(e)),
@@ -229,9 +234,7 @@ void main() {
     });
   });
 
-  testWidgets('RN-201/RN-204: profissional (Mensagens e Atividade)', (
-    t,
-  ) async {
+  testWidgets('RN-201/RN-204: profissional (Mensagens e Atividade)', (t) async {
     await withClock(Clock.fixed(_terca), () async {
       sementeDemoPlanoFixo();
       await _abrir(t, const MensagensProfissionalPage());

@@ -183,7 +183,32 @@ class EntregaDistancia {
 
 /// Conversa com um profissional sobre um pedido.
 /// Em que ponto está o valor que o profissional enviou.
-enum SituacaoValor { aguardandoVoce, pediuOutro, confirmado }
+enum SituacaoValor {
+  aguardandoVoce,
+  pediuOutro,
+  confirmado,
+
+  /// RN-229: passou da validade (ou o pedido foi cancelado): o card vira
+  /// uma linha cinza e não dá mais para confirmar.
+  expirado,
+}
+
+/// RN-229: valor que expirou porque a mesma pessoa mandou outro: fica no
+/// lugar em que foi enviado, como linha cinza.
+@immutable
+class ValorExpirado {
+  const ValorExpirado({
+    required this.total,
+    required this.em,
+    required this.ancora,
+  });
+
+  final double total;
+  final DateTime em;
+
+  /// RN-230: depois de quantas mensagens ele foi enviado.
+  final int? ancora;
+}
 
 /// Valor enviado pelo profissional: visita + serviço. [rodada] é qual
 /// dos 3 valores possíveis este é.
@@ -199,7 +224,23 @@ class ValorProposta {
     this.distancia = false,
     this.parcelas = 1,
     this.sinal = 0,
-  });
+    DateTime? enviadoEm,
+    Duration? validade,
+    this.ancora,
+  }) : enviadoEm = enviadoEm ?? clock.now(),
+       validade = validade ?? RegrasValor.validadeDo(distancia: distancia);
+
+  /// RN-229: quando chegou e por quanto tempo vale.
+  final DateTime enviadoEm;
+  final Duration validade;
+  DateTime get valeAte => enviadoEm.add(validade);
+
+  /// RN-229: quando expirou (nulo = não expirou).
+  DateTime? expiradoEm;
+
+  /// RN-230: depois de quantas mensagens ele foi enviado (nulo = ainda
+  /// não fixado; o chat fixa na primeira vez que mostra).
+  int? ancora;
 
   /// RN-102/RN-103: sinal cobrado ao confirmar (0 = sem sinal).
   final double sinal;
@@ -288,6 +329,13 @@ class Conversa {
 
   /// Valor enviado pelo profissional (null = ainda não enviou).
   ValorProposta? valor;
+
+  /// RN-229: valores que expiraram porque veio outro (linhas cinza).
+  final valoresExpirados = <ValorExpirado>[];
+
+  /// RN-230: onde cada card (plano, retorno…) fica na conversa: depois de
+  /// quantas mensagens.
+  final ancoras = <String, int>{};
 
   final String nome;
   final String profissao;
@@ -509,6 +557,7 @@ class ConversasRepo extends ChangeNotifier {
     final v = c.valor;
     if (v == null) return false;
     if (v.pagamento?.expirado ?? false) return false;
+    if (v.situacao == SituacaoValor.expirado) return false;
     final usado = cartao ?? pagamentos.padrao;
     if (!pix && !pagamentos.reservar(usado)) {
       v.pagamento = PagamentoValor(
@@ -793,11 +842,81 @@ class ConversasRepo extends ChangeNotifier {
     final v = c.valor;
     if (v == null || v.situacao != SituacaoValor.pediuOutro) return;
     final meio = ((v.total + (v.pedido ?? v.total)) / 2 / 10).round() * 10.0;
+    _novoValor(
+      c,
+      servico: (meio - v.visita).clamp(0, double.infinity).toDouble(),
+      rodada: v.rodada + 1,
+    );
+    notifyListeners();
+  }
+
+  /// RN-229/RN-230: chega um valor novo da mesma pessoa: o anterior expira
+  /// (linha cinza no lugar dele) e o novo entra depois das mensagens.
+  void _novoValor(Conversa c, {required double servico, required int rodada}) {
+    final v = c.valor!;
+    c.valoresExpirados.add(
+      ValorExpirado(total: v.total, em: clock.now(), ancora: v.ancora),
+    );
+    c.valor = ValorProposta(
+      visita: v.visita,
+      servico: servico,
+      rodada: rodada,
+      descricao: v.descricao,
+      novo: v.novo,
+      distancia: v.distancia,
+      parcelas: v.parcelas,
+      sinal: v.sinal,
+      validade: v.validade,
+      ancora: c.mensagens.length,
+    );
+  }
+
+  /// RN-229: passou da validade sem confirmar: expira (nada é cobrado).
+  /// Com o pagamento em andamento, vale a RN-223.
+  void conferirValidade(Conversa c, {DateTime? agora}) {
+    final v = c.valor;
+    if (v == null || v.pagamento != null) return;
+    if (v.situacao != SituacaoValor.aguardandoVoce &&
+        v.situacao != SituacaoValor.pediuOutro) {
+      return;
+    }
+    if ((agora ?? clock.now()).isBefore(v.valeAte)) return;
     v
-      ..servico = (meio - v.visita).clamp(0, double.infinity).toDouble()
-      ..rodada += 1
-      ..pedido = null
-      ..situacao = SituacaoValor.aguardandoVoce;
+      ..situacao = SituacaoValor.expirado
+      ..expiradoEm = v.valeAte;
+    notifyListeners();
+  }
+
+  /// RN-229: o pedido foi cancelado: o valor em aberto expira.
+  void expirarPorCancelamento(Conversa c) {
+    final v = c.valor;
+    if (v == null ||
+        v.situacao == SituacaoValor.confirmado ||
+        v.situacao == SituacaoValor.expirado) {
+      return;
+    }
+    v
+      ..situacao = SituacaoValor.expirado
+      ..expiradoEm = clock.now();
+    notifyListeners();
+  }
+
+  /// RN-229: "Pedir de novo": avisa o profissional que o cliente quer um
+  /// novo valor.
+  void pedirValorDeNovo(Conversa c) {
+    c.mensagens.add(
+      MensagemChat.marcador(
+        'Você pediu um novo valor ${c.feminino ? 'à' : 'ao'} ${c.primeiroNome}',
+      ),
+    );
+    notifyListeners();
+  }
+
+  /// Protótipo: o profissional manda o valor de novo.
+  void profissionalReenviaValor(Conversa c) {
+    final v = c.valor;
+    if (v == null || v.situacao != SituacaoValor.expirado) return;
+    _novoValor(c, servico: v.servico, rodada: v.rodada);
     notifyListeners();
   }
 

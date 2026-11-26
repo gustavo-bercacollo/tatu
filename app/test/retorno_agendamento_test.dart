@@ -372,16 +372,27 @@ void main() {
       expect(r.marcadoPara, dom);
     });
 
-    testWidgets('C244: remarcar pelo card da Atividade', (t) async {
+    testWidgets('C244: remarcar pelo chat aberto no card da Atividade', (
+      t,
+    ) async {
       final r = retornos.pedir(_pedido())!;
       final daqui3 = DateTime.now().add(const Duration(days: 3));
       retornos.aceitar(r, DateTime(daqui3.year, daqui3.month, daqui3.day, 14));
       // O prazo conta do pedido: hoje.
       await _abrir(t, const AtividadePage());
+      // C253 · RN-207: o card da Atividade não tem "Remarcar"; abre o chat.
+      expect(find.text('Remarcar'), findsNothing);
+      await t.scrollUntilVisible(
+        find.text('Retorno · sem custo'),
+        200,
+        scrollable: _lista,
+      );
+      await t.tap(find.text('Retorno · sem custo'));
+      await t.pumpAndSettle();
       await t.scrollUntilVisible(
         find.text('Remarcar'),
         200,
-        scrollable: _lista,
+        scrollable: find.byType(Scrollable).last,
       );
       await t.tap(find.text('Remarcar'));
       await t.pumpAndSettle();

@@ -194,14 +194,30 @@ class CobrancaPlano {
     required this.visitasFeitas,
     required this.total,
     required this.comissao,
+    this.visitas = const [],
   });
 
   final int visitasFeitas;
   final double total;
   final double comissao;
 
+  /// RN-233: cada visita do período, com o valor pago (nulo quando a
+  /// visita foi suspensa ou não aconteceu).
+  final List<VisitaCobrada> visitas;
+
   /// O que vai para o Pix do profissional.
   double get repasse => total - comissao;
+}
+
+/// RN-233: uma visita do período fechado ("07 nov" · "✓ R$ 150").
+@immutable
+class VisitaCobrada {
+  const VisitaCobrada(this.dia, {this.valor});
+
+  final DateTime dia;
+
+  /// Nulo: suspensa ou não feita (aparece apagada, sem valor).
+  final double? valor;
 }
 
 /// RN-210: uma proposta de valor por visita.
@@ -420,9 +436,8 @@ class PlanoFixo {
   }
 
   /// RN-225: visita suspensa por pagamento (nula = nenhuma).
-  VisitaPlano? get visitaSuspensa => visitas
-      .where((v) => v.situacao == SituacaoVisita.suspensa)
-      .firstOrNull;
+  VisitaPlano? get visitaSuspensa =>
+      visitas.where((v) => v.situacao == SituacaoVisita.suspensa).firstOrNull;
 
   /// RN-202/RN-205: barra do chat para quem está vendo ([cliente] ou
   /// profissional). Nula quando o plano está encerrado.
@@ -909,6 +924,13 @@ class PlanosFixosRepo extends ChangeNotifier {
       visitasFeitas: p.feitas,
       total: total,
       comissao: RegrasPlanoFixo.comissao(total),
+      visitas: [
+        for (final v in p.visitas)
+          VisitaCobrada(
+            v.dia,
+            valor: v.situacao == SituacaoVisita.feita ? p.valorPorVisita : null,
+          ),
+      ],
     );
     p.cobrancas.add(c);
     // RN-148: novo valor aceito vale do próximo período em diante.

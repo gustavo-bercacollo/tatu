@@ -52,6 +52,8 @@ void main() {
     await t.enterText(find.byType(TextField), 'Pode ser às 15h?');
     await t.testTextInput.receiveAction(TextInputAction.send);
     await t.pump();
+    // RN-230: a conversa desce até a mensagem nova (próximo quadro).
+    await t.pump();
     expect(find.text('Pode ser às 15h?'), findsOneWidget);
     expect(conversas.conversas.first.naoLidas, 0);
   });
@@ -62,10 +64,14 @@ void main() {
     await t.enterText(find.byType(TextField), 'Pode ser às 15h?');
     await t.testTextInput.receiveAction(TextInputAction.send);
     await t.pump();
+    // RN-230: a conversa desce até a mensagem nova (próximo quadro).
+    await t.pump();
     expect(find.text('Sem internet. Reconectando...'), findsOneWidget);
     expect(find.text('Não enviada · Tentar de novo'), findsOneWidget);
 
     conversas.definirSemInternet(false);
+    await t.ensureVisible(find.text('Não enviada · Tentar de novo'));
+    await t.pump();
     await t.tap(find.text('Não enviada · Tentar de novo'));
     await t.pump();
     expect(find.text('Não enviada · Tentar de novo'), findsNothing);

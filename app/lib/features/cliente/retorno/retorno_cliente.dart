@@ -28,6 +28,9 @@ import '../../entrada/camera_prova_page.dart';
 import '../atividade/contestar_page.dart';
 import '../chamar/procurando_page.dart';
 import '../mensagens/chat_page.dart';
+import '../../../shared/widgets/icone_profissao.dart';
+import '../../../shared/widgets/linha_do_tempo.dart';
+import '../../../data/profissional.dart' show profissaoNoGenero;
 
 /// Protótipo: o profissional aceita o retorno sozinho depois disso (nulo
 /// nos testes, que controlam cada resposta).
@@ -343,24 +346,9 @@ List<Widget> secaoRetornoCliente(
         'Aceito · falta combinar o horário',
         TatuColors.onlineTexto,
       );
-      depois.add(
-        CartaoSituacaoRetorno(
-          titulo: 'Retorno aceito · sem custo',
-          nota: r.horarios.isEmpty
-              ? '${_maiuscula(r.oProfissional)} vai marcar o dia até '
-                    '${diaMes(r.marcarAte)}.'
-              : '${_maiuscula(r.oProfissional)} vai escolher um dos seus '
-                    'horários.',
-        ),
-      );
+    // RN-231: sem bloco verde solto; o card diz o que falta.
     case SituacaoRetorno.aceito:
-      depois.add(
-        CartaoSituacaoRetorno(
-          titulo: 'Retorno aceito · sem custo',
-          linha: quandoRetorno(r.marcadoPara!),
-          nota: 'Na hora, passe o código ${r.codigo} para ${r.oProfissional}.',
-        ),
-      );
+      // RN-231: data, código e "Sem custo" ficam no próprio card.
       // RN-214: a profissional pediu para remarcar; você escolhe a hora.
       final rem = r.remarcacao;
       if (rem != null) {
@@ -536,7 +524,14 @@ List<Widget> secaoRetornoCliente(
       ),
       const SizedBox(height: 18),
     ],
-    CartaoPedidoRetorno(pedido: r, meu: true, situacao: linha),
+    // C250/C252 · RN-231: um card só, que muda de estado.
+    CartaoRetornoChat(
+      retorno: r,
+      linha: linha,
+      onRemarcar: retornos.podeRemarcar(r, cliente: true)
+          ? () => remarcarRetorno(context, r, cliente: true)
+          : null,
+    ),
     for (final w in depois) ...[const SizedBox(height: 18), w],
   ];
 }
@@ -1116,4 +1111,230 @@ class _ItemAnalise extends StatelessWidget {
       ],
     ),
   );
+}
+
+/// C250/C252 · RN-231: o pedido de retorno no chat do cliente, num card
+/// só que muda de estado. Topo: ícone do serviço, "Pedido de retorno",
+/// profissão e data do serviço e a pílula de status. Meio: a descrição
+/// entre aspas e as fotos. Embaixo: o que vale agora. Contorno preto
+/// enquanto aguarda; cinza depois.
+class CartaoRetornoChat extends StatelessWidget {
+  const CartaoRetornoChat({
+    super.key,
+    required this.retorno,
+    this.linha,
+    this.onRemarcar,
+  });
+
+  final PedidoRetorno retorno;
+
+  /// Linha dos outros estados (recusado, outro problema, mediação…).
+  final SituacaoCartaoRetorno? linha;
+  final VoidCallback? onRemarcar;
+
+  /// (texto, cor do texto, fundo) da pílula.
+  (String, Color, Color) get _pilula => switch (retorno.situacao) {
+    SituacaoRetorno.aguardando => (
+      'Aguardando',
+      TatuColors.warningTexto,
+      TatuColors.warningSoft,
+    ),
+    SituacaoRetorno.aceito => (
+      'Aceito',
+      TatuColors.onlineTexto,
+      TatuColors.onlineSoft,
+    ),
+    SituacaoRetorno.feito => (
+      'Feito',
+      TatuColors.onlineTexto,
+      TatuColors.onlineSoft,
+    ),
+    SituacaoRetorno.recusado => (
+      'Recusado',
+      TatuColors.textSecondary,
+      TatuColors.fill,
+    ),
+    SituacaoRetorno.resolvidoAutomatico
+        when retorno.falha == FalhaProfissional.naoRespondeu =>
+      ('Sem resposta', TatuColors.textSecondary, TatuColors.fill),
+    SituacaoRetorno.emMediacao => (
+      'Em análise',
+      TatuColors.textSecondary,
+      TatuColors.fill,
+    ),
+    SituacaoRetorno.outroProblema => (
+      'Outro problema',
+      TatuColors.textSecondary,
+      TatuColors.fill,
+    ),
+    _ => ('Encerrado', TatuColors.textSecondary, TatuColors.fill),
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final r = retorno;
+    final (txt, cor, fundo) = _pilula;
+    final aguardando = r.situacao == SituacaoRetorno.aguardando;
+    final marcado = r.situacao == SituacaoRetorno.aceito ? r.marcadoPara : null;
+    final cinza = const TextStyle(
+      fontSize: 13,
+      color: TatuColors.textSecondary,
+    );
+    final embaixo = <Widget>[
+      if (aguardando) ...[
+        Text(
+          '${_maiuscula(r.oProfissional)} responde até '
+          '${diaHora(r.respondaAte)}',
+          style: cinza,
+        ),
+        if (r.horarios.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(
+            'Você pode: ${r.horarios.map(textoOpcaoCurto).join(' · ')}',
+            style: cinza,
+          ),
+        ],
+      ] else if (marcado != null) ...[
+        Text(
+          quandoRetorno(marcado),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 6),
+        Text.rich(
+          TextSpan(
+            style: cinza,
+            children: [
+              const TextSpan(text: 'Código '),
+              TextSpan(
+                text: r.codigo,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: TatuColors.textPrimary,
+                ),
+              ),
+              const TextSpan(text: ' · passe na hora'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            const SeloVerde('Sem custo', pequeno: true),
+            const Spacer(),
+            if (onRemarcar != null)
+              GestureDetector(
+                onTap: onRemarcar,
+                behavior: HitTestBehavior.opaque,
+                child: const Text(
+                  'Remarcar',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: TatuColors.verified,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ] else if (r.semHorario) ...[
+        Text(
+          r.sugerido != null
+              ? 'Aceito · falta combinar o horário'
+              : r.horarios.isEmpty
+              ? '${_maiuscula(r.oProfissional)} vai marcar o dia até '
+                    '${diaMes(r.marcarAte)}.'
+              : '${_maiuscula(r.oProfissional)} vai escolher um dos seus '
+                    'horários.',
+          style: cinza,
+        ),
+      ] else if (linha case final l?)
+        Text(l.texto, style: cinza),
+    ];
+    return Align(
+      alignment: Alignment.centerRight,
+      child: FractionallySizedBox(
+        widthFactor: 0.91,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+          decoration: BoxDecoration(
+            color: TatuColors.bg,
+            borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+            border: Border.all(
+              color: aguardando ? TatuColors.action : TatuColors.chevron,
+              width: 1.5,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  IconeProfissaoCirculo(r.servicoNome),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Pedido de retorno',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          '${profissaoNoGenero(r.servicoNome, feminino: r.profissionalFeminino)}'
+                          ' · serviço de ${r.diaServico}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TatuTexto.legenda,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: ShapeDecoration(
+                      color: fundo,
+                      shape: const StadiumBorder(),
+                    ),
+                    child: Text(
+                      txt,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: cor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text('“${r.descricao}”', style: const TextStyle(fontSize: 14)),
+              if (r.fotos.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    for (final f in r.fotos)
+                      MiniaturaProva(foto: f, pequena: true),
+                  ],
+                ),
+              ],
+              if (embaixo.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                const Divider(height: 1, color: TatuColors.trilho),
+                const SizedBox(height: 12),
+                ...embaixo,
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -84,11 +84,16 @@ void sementeDemoPlanoFixo({
   if (julia != null && hoje != null && simularSaida != null) {
     Timer(simularSaida, () => planosFixos.saiuParaVisita(hoje));
   }
+  // RN-233: o mês passado, com as 4 visitas pagas (uma por semana).
   julia?.cobrancas.add(
     CobrancaPlano(
       visitasFeitas: 4,
       total: 600,
       comissao: RegrasPlanoFixo.comissao(600),
+      visitas: [
+        for (var s = 4; s >= 1; s--)
+          VisitaCobrada(inicio.subtract(Duration(days: 7 * s)), valor: 150),
+      ],
     ),
   );
   if (!conversas.conversas.any((c) => c.nome == 'Júlia Costa')) {

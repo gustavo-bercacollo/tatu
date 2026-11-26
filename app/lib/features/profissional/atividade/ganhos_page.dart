@@ -11,12 +11,12 @@ import '../../../data/profissional.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/back_circle_button.dart';
+import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import '../../../shared/widgets/segmento.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../../shared/widgets/tela_interna.dart';
 import '../abas.dart';
-import '../cadastro/taxas_sheet.dart';
 
 /// P30 · Ganhos: o dinheiro de hoje, da semana ou do mês. Total com a
 /// comparação ao período anterior, barras da semana, próximo Pix (RN-35),
@@ -197,9 +197,11 @@ class _GanhosPageState extends State<GanhosPage> {
                         verde: true,
                       ),
                       const Divider(height: 1),
+                      // C86 · RN-232: tocar na linha explica a taxa.
                       _Linha(
                         'Taxa do Tatu (${(taxaTatu * 100).round()}%)',
                         '− ${reais(r.taxa)}',
+                        onTap: () => mostrarTaxaDoTatu(context),
                       ),
                       const Divider(height: 1),
                       _Linha('Recebido', reais(r.total), destaque: true),
@@ -216,13 +218,15 @@ class _GanhosPageState extends State<GanhosPage> {
                   ),
                 ),
                 const SizedBox(height: TatuMedidas.entreSecoes),
-                const Text('Últimos recebimentos', style: TatuTexto.grupo),
-                const SizedBox(height: TatuMedidas.tituloSecao),
-                for (final s in recebidos.take(3)) LinhaRecebimento(s),
-                const SizedBox(height: TatuMedidas.entreItens),
-                Wrap(
-                  spacing: 20,
+                // C85 · RN-232: "Ver todos" ao lado do título.
+                Row(
                   children: [
+                    const Expanded(
+                      child: Text(
+                        'Últimos recebimentos',
+                        style: TatuTexto.grupo,
+                      ),
+                    ),
                     LinkAzul(
                       'Ver todos',
                       onTap: () => Navigator.of(context).push(
@@ -231,12 +235,10 @@ class _GanhosPageState extends State<GanhosPage> {
                         ),
                       ),
                     ),
-                    LinkAzul(
-                      'Ver taxas do Tatu',
-                      onTap: () => mostrarTaxas(context),
-                    ),
                   ],
                 ),
+                const SizedBox(height: TatuMedidas.tituloSecao),
+                for (final s in recebidos.take(3)) LinhaRecebimento(s),
               ],
             ),
           ),
@@ -352,6 +354,7 @@ class _Linha extends StatelessWidget {
     this.valor, {
     this.destaque = false,
     this.verde = false,
+    this.onTap,
   });
 
   final String rotulo;
@@ -359,35 +362,113 @@ class _Linha extends StatelessWidget {
   final bool destaque;
   final bool verde;
 
+  /// Com toque: ⓘ azul logo depois do rótulo (RN-232).
+  final VoidCallback? onTap;
+
   @override
-  Widget build(BuildContext context) => SizedBox(
-    height: TatuMedidas.alturaLinha - 4,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              rotulo,
-              overflow: TextOverflow.ellipsis,
-              style: destaque
-                  ? const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)
-                  : const TextStyle(
-                      fontSize: 16,
-                      color: TatuColors.textSecondary,
+  Widget build(BuildContext context) {
+    final texto = Text(
+      rotulo,
+      overflow: TextOverflow.ellipsis,
+      style: destaque
+          ? const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)
+          : const TextStyle(fontSize: 16, color: TatuColors.textSecondary),
+    );
+    final linha = SizedBox(
+      height: TatuMedidas.alturaLinha - 4,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            Expanded(
+              child: onTap == null
+                  ? texto
+                  : Row(
+                      children: [
+                        Flexible(child: texto),
+                        const SizedBox(width: 6),
+                        const Icon(
+                          TablerIcons.info_circle,
+                          size: 18,
+                          color: TatuColors.verified,
+                        ),
+                      ],
                     ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            valor,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: destaque ? FontWeight.w700 : FontWeight.w400,
-              color: verde ? TatuColors.onlineTexto : TatuColors.textPrimary,
+            const SizedBox(width: 8),
+            Text(
+              valor,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: destaque ? FontWeight.w700 : FontWeight.w400,
+                color: verde ? TatuColors.onlineTexto : TatuColors.textPrimary,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
+      ),
+    );
+    return onTap == null ? linha : InkWell(onTap: onTap, child: linha);
+  }
+}
+
+/// C86 · RN-232: folha "Taxa do Tatu", com o que a taxa cobre.
+Future<void> mostrarTaxaDoTatu(BuildContext context) {
+  final pct = '${(taxaTatu * 100).round()}%';
+  final itens = [
+    '$pct sobre o valor do serviço.',
+    'A visita também tem $pct.',
+    'Gorjetas são 100% suas, sem taxa.',
+    'A taxa já sai descontada no Pix.',
+  ];
+  return mostrarFolha<void>(
+    context,
+    builder: (ctx) => SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          TatuMedidas.margemCadastro,
+          8,
+          TatuMedidas.margemCadastro,
+          TatuMedidas.base,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const AlcaFolha(),
+            const SizedBox(height: TatuMedidas.entreSecoes),
+            const Text('Taxa do Tatu', style: TatuTexto.tituloFolha),
+            const SizedBox(height: TatuMedidas.entreItens),
+            for (final t in itens)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Row(
+                  children: [
+                    const Icon(
+                      TablerIcons.check,
+                      size: 18,
+                      color: TatuColors.onlineTexto,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        t,
+                        style: TatuTexto.corpo.copyWith(
+                          color: TatuColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: TatuMedidas.entreSecoes),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Entendi'),
+            ),
+          ],
+        ),
       ),
     ),
   );
