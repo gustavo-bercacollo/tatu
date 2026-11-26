@@ -16,10 +16,10 @@ import '../../../data/plano_fixo.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/aviso_topo.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
+import '../../../shared/widgets/campo_valor.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/segmento.dart';
-import '../../../shared/widgets/tatu_field.dart';
 import '../../../shared/widgets/tela_interna.dart';
 import '../../../shared/widgets/nota_icone.dart';
 
@@ -368,13 +368,9 @@ class _FolhaOutroValorPlanoState extends State<_FolhaOutroValorPlano> {
                 style: TatuTexto.nota,
               ),
               const SizedBox(height: TatuMedidas.entreItens + 4),
-              TatuField(
-                label: 'Sua proposta por visita',
+              CampoValorGrande(
+                rotulo: 'Sua proposta por visita',
                 controller: _campo,
-                autofocus: true,
-                hintText: 'R\$ 0',
-                keyboardType: TextInputType.number,
-                inputFormatters: [ReaisFormatter()],
                 onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: TatuMedidas.entreItens),

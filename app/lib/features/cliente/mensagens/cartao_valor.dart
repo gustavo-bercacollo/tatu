@@ -8,6 +8,7 @@ import '../../../data/conversas.dart';
 import '../../../data/pagamentos.dart';
 import '../../../data/regras_valor.dart';
 import '../../../shared/formatadores.dart';
+import '../../../shared/widgets/campo_valor.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 
@@ -458,11 +459,6 @@ class _FolhaPedirState extends State<_FolhaPedir> {
 
   @override
   Widget build(BuildContext context) {
-    const estilo = TextStyle(
-      fontSize: 30,
-      fontWeight: FontWeight.w700,
-      letterSpacing: -0.6,
-    );
     final artigo = widget.artigo.toUpperCase();
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
@@ -488,34 +484,10 @@ class _FolhaPedirState extends State<_FolhaPedir> {
                 style: TatuTexto.corpo,
               ),
               const SizedBox(height: TatuMedidas.entreItens + 4),
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-                decoration: BoxDecoration(
-                  color: TatuColors.fill,
-                  borderRadius: BorderRadius.circular(TatuMedidas.raioCampo),
-                  border: Border.all(color: TatuColors.textPrimary, width: 1.5),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Total (visita + serviço)', style: TatuTexto.nota),
-                    TextField(
-                      controller: _campo,
-                      autofocus: true,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [ReaisFormatter()],
-                      onChanged: (_) => setState(() {}),
-                      cursorColor: TatuColors.textPrimary,
-                      style: estilo,
-                      decoration: InputDecoration.collapsed(
-                        hintText: 'R\$ 0',
-                        hintStyle: estilo.copyWith(
-                          color: TatuColors.textDisabled,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              CampoValorGrande(
+                rotulo: 'Total (visita + serviço)',
+                controller: _campo,
+                onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: TatuMedidas.entreItens + 4),
               Text(
