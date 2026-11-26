@@ -8,6 +8,7 @@ import '../retorno/retorno_cliente.dart' show remarcarRetorno;
 import '../../../data/conta.dart';
 import '../../../data/conversas.dart';
 import '../mensagens/chat_page.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -23,7 +24,7 @@ import '../../../shared/widgets/estado_vazio.dart';
 import '../../../shared/widgets/estrelas.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/linha_do_tempo.dart';
-import '../../../shared/widgets/segmento.dart';
+import '../../../shared/widgets/abas_deslizantes.dart';
 import '../../../shared/widgets/tatu_chip.dart';
 import '../abas.dart';
 import '../chamar/procurando_page.dart';
@@ -49,8 +50,6 @@ class AtividadePage extends StatefulWidget {
 }
 
 class _AtividadePageState extends State<AtividadePage> {
-  late int _aba = widget.aba;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,15 +72,13 @@ class _AtividadePageState extends State<AtividadePage> {
                 children: [
                   const Text('Atividade', style: TatuTexto.tituloGrande),
                   const SizedBox(height: TatuMedidas.entreItens),
-                  Segmento(
-                    opcoes: const ['Em andamento', 'Concluídos'],
-                    selecionada: _aba,
-                    onMudar: (i) => setState(() => _aba = i),
-                  ),
+                  // Troca tocando na aba ou deslizando para os lados.
                   Expanded(
-                    child: _aba == 0
-                        ? const _EmAndamento()
-                        : const _Concluidos(),
+                    child: AbasDeslizantes(
+                      opcoes: const ['Em andamento', 'Concluídos'],
+                      inicial: widget.aba,
+                      paginas: const [_EmAndamento(), _Concluidos()],
+                    ),
                   ),
                 ],
               ),
@@ -172,9 +169,9 @@ class _EmAndamento extends StatelessWidget {
                   .where((c) => c.nome == r.profissional)
                   .firstOrNull;
               if (c == null) return;
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => ChatPage(conversa: c)),
-              );
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => ChatPage(conversa: c)));
             },
           ),
         ],
@@ -226,9 +223,9 @@ class _CartaoVisitaPlano extends StatelessWidget {
       _ => 1,
     };
     return _Cartao(
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p)),
-      ),
+      onTap: () =>
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -444,9 +441,9 @@ class _CartaoAndamento extends StatelessWidget {
     return _Cartao(
       onTap: () {
         pedidos.abrir(pedido);
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const PedidoAndamentoPage()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const PedidoAndamentoPage()));
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,7 +466,8 @@ class _CartaoAndamento extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       // RN-203: com plano fixo, o serviço do chat é avulso.
-                      planosFixos.ultimoCom(profissional: pedido.profissional)
+                      planosFixos
+                                  .ultimoCom(profissional: pedido.profissional)
                                   ?.selo() ==
                               null
                           ? '${pedido.servico} · ${pedido.descricao}'
@@ -765,7 +763,9 @@ class _Concluidos extends StatelessWidget {
         ),
       );
       for (final (i, (p, c)) in cobrancas.indexed) {
-        if (i > 0) itens.add(const SizedBox(height: TatuMedidas.entreItens + 4));
+        if (i > 0) {
+          itens.add(const SizedBox(height: TatuMedidas.entreItens + 4));
+        }
         itens.add(
           CartaoPlanoFixo(
             nome: p.profissional,
@@ -775,9 +775,9 @@ class _Concluidos extends StatelessWidget {
               '${c.visitasFeitas == 1 ? 'visita' : 'visitas'}',
             ),
             valor: c.total,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p)),
-            ),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p))),
           ),
         );
       }
