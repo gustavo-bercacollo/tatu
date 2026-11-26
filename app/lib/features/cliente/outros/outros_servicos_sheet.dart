@@ -204,11 +204,8 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
                     itens: [
                       for (final s in lista)
                         ItemLista(
-                          // RN-227: 52 px na seleção.
-                          iconeWidget: IconeProfissaoQuadrado(
-                            s.nome,
-                            fundo: TatuColors.bg,
-                          ),
+                          // RN-227: só o ícone próprio, no tamanho de antes.
+                          iconeWidget: IconeProfissao(s.nome, tamanho: 22),
                           texto: s.nome,
                           seta: false,
                           onTap: () => _escolher(s.nome),
@@ -247,11 +244,8 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
           itens: [
             for (final s in achados)
               ItemLista(
-                // RN-227: 52 px na seleção.
-                iconeWidget: IconeProfissaoQuadrado(
-                  s.nome,
-                  fundo: TatuColors.bg,
-                ),
+                // RN-227: só o ícone próprio, no tamanho de antes.
+                iconeWidget: IconeProfissao(s.nome, tamanho: 22),
                 texto: s.nome,
                 detalhe: s.detalhe,
                 seta: false,

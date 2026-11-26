@@ -9,6 +9,7 @@ import 'package:tatu/data/catalogo_servicos.dart';
 import 'package:tatu/data/icones_profissoes.dart';
 import 'package:tatu/features/cliente/home_page.dart';
 import 'package:tatu/shared/widgets/icone_profissao.dart';
+import 'package:tatu/shared/widgets/lista_agrupada.dart';
 import 'package:tatu/shared/widgets/tatu_chip.dart';
 
 /// Ícones das profissões (RN-227).
@@ -82,12 +83,15 @@ void main() {
       TatuColors.onAction,
     );
 
-    // "Outros": cada linha com o quadrado de 52 px.
+    // "Outros": mesmo estilo de antes, só com o ícone próprio.
     await t.tap(find.text('Outros'));
     await t.pumpAndSettle();
-    expect(find.byType(IconeProfissaoQuadrado), findsWidgets);
-    final q = t.getSize(find.byType(IconeProfissaoQuadrado).first);
-    expect(q, const Size(52, 52));
+    expect(find.byType(IconeProfissaoQuadrado), findsNothing);
+    final linha = find.descendant(
+      of: find.widgetWithText(ItemLista, 'Encanador'),
+      matching: find.byType(IconeProfissao),
+    );
+    expect(t.widget<IconeProfissao>(linha).tamanho, 22);
     expect(find.byType(SvgPicture), findsWidgets);
   });
 }

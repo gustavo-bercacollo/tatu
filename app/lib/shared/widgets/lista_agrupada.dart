@@ -106,11 +106,7 @@ class ItemLista extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: 16,
-            vertical: iconeWidget != null
-                ? 8
-                : detalhe == null
-                ? 0
-                : 12,
+            vertical: detalhe == null ? 0 : 12,
           ),
           child: Row(
             children: [
