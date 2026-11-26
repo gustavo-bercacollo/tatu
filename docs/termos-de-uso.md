@@ -1,6 +1,6 @@
 # Termos de Uso do Tatu
 
-**Versão 1.1 · Vigente a partir de [DATA DE PUBLICAÇÃO]**
+**Versão 1.2 · Vigente a partir de [DATA DE PUBLICAÇÃO]**
 
 > **Rascunho para revisão jurídica.** Este texto foi escrito a partir das regras de negócio oficiais do Tatu (`docs/regras-de-negocio.md`). Antes de publicar, um advogado precisa revisar o documento, preencher os campos entre colchetes e confirmar os valores do Anexo I. Apague este aviso na versão publicada.
 
@@ -109,9 +109,11 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 ## 8. Valor, pagamento e taxa
 
-8.1. **Valor combinado.** O Profissional propõe o valor no chat. No serviço no local, ele pode separar **Visita** (pode ser zero) e **Serviço**. São até 3 rodadas de proposta; sem acordo, o chamado é encerrado sem custo. No último valor, o Cliente pode recusar: o chamado com aquele Profissional termina sem custo para nenhum dos dois, o Profissional não recebe de novo o mesmo pedido e o Cliente escolhe chamar outro Profissional ou cancelar o pedido. Recusar não conta como cancelamento nem como abandono.
+8.1. **Valor combinado.** O Profissional propõe o valor no chat. No serviço no local, ele pode separar **Visita** (pode ser zero) e **Serviço**. São até 3 rodadas de proposta; sem acordo, o chamado é encerrado sem custo.
 
 8.2. **Reserva e cobrança.** Ao confirmar, o total fica **reservado** no cartão padrão do Cliente. A cobrança acontece quando o Cliente **confirma a conclusão** depois que o Profissional toca em "Concluir serviço" (no local); sem resposta do Cliente em 2 horas, a conclusão é confirmada automaticamente ou quando o Cliente aprova a entrega (à distância).
+
+8.2.1. **Pagamento recusado.** Se a reserva for recusada, nada é cobrado e o atendimento não começa até o Cliente usar outro cartão ou pagar com Pix. Sem pagamento em 10 minutos, o valor combinado expira, sem penalidade para as partes. Pagamento por Pix é feito na confirmação e fica guardado pelo Tatu até a conclusão.
 
 8.3. **Pagamento só pelo app.** Todo pagamento entre Cliente e Profissional por serviços combinados no Tatu deve passar pelo app. **É proibido pagar ou cobrar por fora**, em dinheiro, Pix direto ou qualquer outro meio. Quem paga por fora perde as garantias do Tatu (contestação, reembolso, suporte) e pode ter a conta suspensa.
 
@@ -119,7 +121,7 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 8.5. **Mudança de valor.** Se o serviço se mostrar diferente do descrito, o Profissional envia um novo valor pelo chat. Ele só vale se o Cliente aceitar. Se o Cliente recusar, o Profissional faz só o combinado ou encerra cobrando só a Visita.
 
-8.6. **Vários pagamentos na mesma conversa.** A conversa continua aberta depois do serviço, mas **mensagem é só conversa**: mandar mensagem não cria chamado, valor nem cobrança. Um serviço novo com o mesmo Profissional começa de dois jeitos: pelo **"Pedir de novo"** (um chamado novo, que fica só para ele por 2 minutos e depois vai para outros Profissionais perto) ou por um **novo valor** que o Profissional envia no chat e o Cliente confirma. Não existe serviço no Tatu sem valor confirmado pelo Cliente no app; o que for combinado só na mensagem não tem garantia, contestação nem cobrança pelo Tatu. Cada novo valor combinado é um novo pagamento. Um valor não pode ficar aberto por mais de **7 dias**; depois disso o app pede para concluir ou dividir o trabalho em partes.
+8.6. **Vários pagamentos na mesma conversa.** A conversa continua aberta depois do serviço. Cada novo valor combinado é um novo pagamento. Um valor não pode ficar aberto por mais de **7 dias**; depois disso o app pede para concluir ou dividir o trabalho em partes.
 
 8.7. **Parcelamento.** Valores a partir do mínimo do Anexo I podem ser parcelados no cartão, nas condições mostradas antes da confirmação. Eventuais juros são informados antes e pagos pelo Cliente.
 
@@ -197,9 +199,9 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 ## 13. Plano fixo
 
-13.1. O Cliente pode propor um **plano fixo** ao Profissional (semanal ou mensal, 1 ou 2 visitas por semana, dia e horário). O Profissional define o **valor por visita uma única vez**; se o Cliente confirmar, o plano fica ativo.
+13.1. O Cliente pode propor um **plano fixo** ao Profissional (semanal ou mensal, 1 ou 2 visitas por semana, dia e horário). O valor por visita é negociado entre as partes, em até 3 propostas; se o Cliente confirmar, o plano fica ativo.
 
-13.2. A cobrança é **automática no fim de cada período**, só pelas visitas realizadas.
+13.2. O valor de cada visita é **reservado na véspera** e **cobrado quando a visita é concluída**. Se a reserva for recusada, a visita fica suspensa até o Cliente atualizar o pagamento; sem atualização no prazo, a visita não acontece, sem cobrança e sem penalidade.
 
 13.3. **Limite de 2 visitas por semana.** Pelo Tatu, o mesmo Profissional pode ir **no máximo 2 vezes por semana ao mesmo endereço**, somando plano fixo e pedidos avulsos. A partir da 3ª visita semanal, a legislação pode caracterizar vínculo de emprego doméstico (Lei Complementar 150/2015), e esse tipo de contratação **não é intermediado pelo Tatu**.
 
@@ -346,5 +348,6 @@ Os valores abaixo vêm das regras de negócio e **são provisórios até a decis
 
 | Versão | Data | O que mudou |
 | --- | --- | --- |
+| 1.2 | 26/11/2026 (rascunho) | Pagamento recusado (8.2.1) e plano fixo cobrado a cada visita, com valor negociável (13.1 e 13.2). |
 | 1.1 | 24/11/2026 (rascunho) | Seção 11 reescrita: garantia legal, pagamento protegido, retorno mediado e mediação (RN-183 a RN-196). Itens 6.5.1, 6.7, 9.4 e 19.2 ajustados. Termo de garantia no recibo (11.8) e revisão de decisão automática (11.9). Novos prazos no Anexo I. |
 | 1.0 | [DATA DE PUBLICAÇÃO] | Primeira versão, baseada nas regras de negócio v22 (RN-01 a RN-149). |
