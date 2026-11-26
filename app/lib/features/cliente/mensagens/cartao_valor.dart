@@ -154,7 +154,7 @@ class CartaoValorRecebido extends StatelessWidget {
   /// RN-223/RN-224: cartão recusado: "Pagar com Pix".
   final VoidCallback? onPix;
 
-  /// RN-228: no 3º valor (sem [onPedirOutro]), "Recusar valor".
+  /// RN-300: no 3º valor (sem [onPedirOutro]), "Recusar valor".
   final VoidCallback? onRecusar;
 
   /// "a Marina" (para "O sinal paga o tempo da Marina.").
@@ -283,7 +283,7 @@ class CartaoValorRecebido extends StatelessWidget {
               : 'Reservamos agora. Só cobramos no fim.',
           style: TatuTexto.nota,
         ),
-        // RN-228: avisa antes que este é o último valor.
+        // RN-300: avisa antes que este é o último valor.
         if (onPedirOutro == null && onRecusar != null) ...[
           const SizedBox(height: 6),
           Text(

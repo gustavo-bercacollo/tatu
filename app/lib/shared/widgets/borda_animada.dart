@@ -20,8 +20,9 @@ enum ModoBorda {
 }
 
 /// RN-221 · Borda de 2 px desenhada por cima de [child], com o mesmo
-/// arredondamento: grafite com uma faixa clara que dá uma volta a cada 8
-/// segundos (Home do cliente, "O que está acontecendo?").
+/// arredondamento: grafite com uma faixa clara que dá UMA volta (8
+/// segundos) quando o app abre e depois fica grafite parada (Home do
+/// cliente, "O que está acontecendo?").
 ///
 /// Só o pintor redesenha (a tela não é reconstruída). A volta para com
 /// "Reduzir movimento", quando a tela não está visível (outra aba ou rota
@@ -43,8 +44,12 @@ class BordaAnimada extends StatefulWidget {
   /// Uma volta completa.
   static const volta = Duration(seconds: 8);
 
-  /// Desligado nos testes (uma animação sem fim não deixa a tela assentar).
+  /// Desligado nos testes (assim a tela assenta sem esperar o giro).
   static bool girar = true;
+
+  /// Já deu a volta desde que o app abriu: não gira de novo (só na
+  /// próxima vez que o app abrir).
+  static bool jaGirou = false;
 
   @override
   State<BordaAnimada> createState() => _BordaAnimadaState();
@@ -64,6 +69,12 @@ class _BordaAnimadaState extends State<BordaAnimada>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _giro.addStatusListener((s) {
+      if (s != AnimationStatus.completed) return;
+      // Uma volta e acabou: fica grafite parada.
+      BordaAnimada.jaGirou = true;
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -89,6 +100,7 @@ class _BordaAnimadaState extends State<BordaAnimada>
 
   bool get _gira =>
       BordaAnimada.girar &&
+      !BordaAnimada.jaGirou &&
       widget.modo == ModoBorda.girando &&
       !_reduzir &&
       _visivel &&
@@ -96,7 +108,7 @@ class _BordaAnimadaState extends State<BordaAnimada>
 
   void _atualizar() {
     if (_gira) {
-      if (!_giro.isAnimating) _giro.repeat();
+      if (!_giro.isAnimating) _giro.forward();
     } else if (_giro.isAnimating) {
       _giro.stop();
     }
@@ -114,7 +126,13 @@ class _BordaAnimadaState extends State<BordaAnimada>
     return CustomPaint(
       foregroundPainter: _PintorBorda(
         giro: _giro,
-        modo: widget.modo,
+        // Fora do giro (já deu a volta, foco, texto, "Reduzir
+        // movimento"): toda grafite.
+        modo: widget.modo == ModoBorda.nenhuma
+            ? ModoBorda.nenhuma
+            : _giro.isAnimating
+            ? ModoBorda.girando
+            : ModoBorda.solida,
         raio: widget.raio,
         largura: widget.largura,
       ),

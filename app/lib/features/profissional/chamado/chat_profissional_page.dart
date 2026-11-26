@@ -1467,7 +1467,7 @@ class _EnderecoLiberado extends StatelessWidget {
   }
 }
 
-/// P28 · RN-229: o cliente recusou o último valor: o chamado é encerrado
+/// P28 · RN-301: o cliente recusou o último valor: o chamado é encerrado
 /// sem custo e não conta contra o profissional (nem como cancelamento,
 /// RN-64, nem como abandono, RN-79).
 class SemAcordoPage extends StatelessWidget {

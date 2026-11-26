@@ -49,7 +49,8 @@ void main() {
     await _abrirOutros(t);
     await t.enterText(find.byType(TextField).last, 'desent');
     await t.pump();
-    expect(find.text('RESULTADOS'), findsOneWidget);
+    // RN-228: a seção leva o nome do modo atual.
+    expect(find.text('NO LOCAL'), findsOneWidget);
     expect(find.text('Encanador'), findsWidgets);
     expect(find.text('Desentupimento'), findsOneWidget);
 

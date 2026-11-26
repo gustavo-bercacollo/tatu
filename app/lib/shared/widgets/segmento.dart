@@ -13,7 +13,12 @@ class Segmento extends StatelessWidget {
     this.icones = const {},
     this.pequeno = false,
     this.posicao,
+    this.destacar = false,
   });
+
+  /// RN-228: contorno preto e brilho leve na opção escolhida (1 s, ao
+  /// trocar o modo pela busca).
+  final bool destacar;
 
   /// Posição contínua da marcação branca (0 = primeira aba, 1 = segunda…),
   /// para ela acompanhar o dedo ao deslizar o conteúdo (AbasDeslizantes).
@@ -63,6 +68,18 @@ class Segmento extends StatelessWidget {
                     duration: const Duration(milliseconds: 180),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
+                      border: destacar && i == selecionada
+                          ? Border.all(color: TatuColors.action, width: 1.5)
+                          : null,
+                      boxShadow: destacar && i == selecionada
+                          ? const [
+                              BoxShadow(
+                                color: TatuColors.sombra,
+                                blurRadius: 8,
+                                spreadRadius: 1,
+                              ),
+                            ]
+                          : null,
                       color: i == selecionada
                           ? TatuColors.bg
                           : Colors.transparent,

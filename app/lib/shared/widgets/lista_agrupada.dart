@@ -79,7 +79,11 @@ class ItemLista extends StatelessWidget {
     this.cor,
     this.seta = true,
     this.detalhe,
+    this.etiqueta,
   });
+
+  /// Pílula cinza à direita (ex.: "À distância", RN-228).
+  final String? etiqueta;
 
   final IconData? icone;
 
@@ -129,6 +133,27 @@ class ItemLista extends StatelessWidget {
                   ],
                 ),
               ),
+              if (etiqueta != null) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
+                  decoration: const ShapeDecoration(
+                    color: TatuColors.fill,
+                    shape: StadiumBorder(),
+                  ),
+                  child: Text(
+                    etiqueta!,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: TatuColors.textSecondary,
+                    ),
+                  ),
+                ),
+              ],
               if (valor != null) ...[
                 const SizedBox(width: 8),
                 Text(

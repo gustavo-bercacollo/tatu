@@ -58,12 +58,20 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
   @override
   Widget build(BuildContext context) {
     final termo = _busca.text.trim();
-    // RN-92: o cliente só acha o que atende no modo escolhido.
+    // RN-92: o modo escolhido primeiro.
     final achados = buscarServicos(
       termo,
       profissional: widget.profissional,
       distancia: widget.profissional ? null : widget.distancia,
     );
+    // RN-228: o que só existe no outro modo vem numa seção à parte (quem
+    // atende nos dois modos fica só no modo atual).
+    final doOutro = widget.profissional
+        ? const <ServicoCatalogo>[]
+        : [
+            for (final s in buscarServicos(termo, distancia: !widget.distancia))
+              if (!achados.any((a) => a.nome == s.nome)) s,
+          ];
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: Padding(
@@ -120,9 +128,9 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
             Expanded(
               child: termo.isEmpty
                   ? _lista()
-                  : achados.isEmpty
+                  : achados.isEmpty && doOutro.isEmpty
                   ? _nadaEncontrado()
-                  : _resultados(achados),
+                  : _resultados(achados, doOutro),
             ),
           ],
         ),
@@ -234,25 +242,56 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
     Navigator.of(context).pop();
   }
 
-  Widget _resultados(List<ServicoCatalogo> achados) {
+  Widget _resultados(
+    List<ServicoCatalogo> achados,
+    List<ServicoCatalogo> doOutro,
+  ) {
+    final outroModo = widget.distancia ? 'No local' : 'À distância';
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: TatuMedidas.entreSecoes),
       children: [
-        GrupoLista(
-          titulo: 'Resultados',
-          fundo: TatuColors.surfaceGrouped,
-          itens: [
-            for (final s in achados)
-              ItemLista(
-                // RN-227: só o ícone próprio, no tamanho de antes.
-                iconeWidget: IconeProfissao(s.nome, tamanho: 22),
-                texto: s.nome,
-                detalhe: s.detalhe,
-                seta: false,
-                onTap: () => _escolher(s.nome),
-              ),
-          ],
-        ),
+        if (achados.isNotEmpty)
+          GrupoLista(
+            // RN-228: a seção leva o nome do modo atual (cliente).
+            titulo: widget.profissional
+                ? 'Resultados'
+                : widget.distancia
+                ? 'À distância'
+                : 'No local',
+            fundo: TatuColors.surfaceGrouped,
+            itens: [
+              for (final s in achados)
+                ItemLista(
+                  // RN-227: só o ícone próprio, no tamanho de antes.
+                  iconeWidget: IconeProfissao(s.nome, tamanho: 22),
+                  texto: s.nome,
+                  detalhe: s.detalhe,
+                  seta: false,
+                  onTap: () => _escolher(s.nome),
+                ),
+            ],
+          ),
+        // C23 · RN-228: só no outro modo; tocar troca o modo do pedido.
+        if (doOutro.isNotEmpty) ...[
+          if (achados.isNotEmpty)
+            const SizedBox(height: TatuMedidas.entreSecoes),
+          GrupoLista(
+            titulo: 'Só ${outroModo.toLowerCase()}',
+            fundo: TatuColors.surfaceGrouped,
+            nota: 'Tocar muda o pedido para $outroModo.',
+            itens: [
+              for (final s in doOutro)
+                ItemLista(
+                  iconeWidget: IconeProfissao(s.nome, tamanho: 22),
+                  texto: s.nome,
+                  detalhe: s.detalhe,
+                  seta: false,
+                  etiqueta: outroModo,
+                  onTap: () => _escolher(s.nome),
+                ),
+            ],
+          ),
+        ],
         const SizedBox(height: TatuMedidas.entreSecoes),
         if (widget.profissional)
           _NaoAchei(onTap: _sugerir)

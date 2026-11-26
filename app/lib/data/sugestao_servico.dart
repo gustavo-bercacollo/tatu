@@ -4,7 +4,6 @@ const servicosHome = [
   'Eletricista',
   'Pedreiro',
   'Pintor',
-  'Montador',
 ];
 
 /// RN-92: serviços da Home no modo "À distância" (exemplos: decisão em
@@ -13,7 +12,6 @@ const servicosDistanciaHome = [
   'Designer',
   'Programador',
   'Professor',
-  'Contador',
   'Advogado',
 ];
 

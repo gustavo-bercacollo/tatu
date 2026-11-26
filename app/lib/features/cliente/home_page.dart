@@ -24,6 +24,7 @@ import '../../data/conta.dart';
 import '../../data/enderecos.dart';
 import '../../data/perfil.dart';
 import '../../data/servicos.dart';
+import '../../data/catalogo_servicos.dart';
 import '../../data/sugestao_servico.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import '../../shared/widgets/conta_pausada.dart';
@@ -84,6 +85,14 @@ class _HomeClientePageState extends State<HomeClientePage> {
   StreamSubscription<String>? _ouvindo;
   Timer? _espera;
 
+  /// RN-228: "[Profissão] é só à distância." depois de trocar o modo pela
+  /// busca (some ao mexer no serviço ou no modo).
+  String? _avisoModo;
+
+  /// RN-228: a chave do modo fica destacada por 1 segundo.
+  bool _destacarModo = false;
+  Timer? _timerDestaque;
+
   /// Escolha da pessoa; nunca é trocada pela IA.
   String? _manual;
 
@@ -103,8 +112,11 @@ class _HomeClientePageState extends State<HomeClientePage> {
   bool get _naoSei => _manual == naoSeiServico;
 
   /// Serviço escolhido em "Outros" (fica no lugar do chip "Outros").
-  String? get _outro =>
-      _manual != null && !_chips.contains(_manual) ? _manual : null;
+  /// Também o que a IA sugeriu fora dos chips (ex.: Montador, Contador).
+  String? get _outro {
+    final s = _servico;
+    return s != null && !_chips.contains(s) ? s : null;
+  }
 
   @override
   void initState() {
@@ -124,6 +136,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
   @override
   void dispose() {
     _relogio?.cancel();
+    _timerDestaque?.cancel();
     _ouvindo?.cancel();
     if (_gravando) ditado.parar();
     _anexos.dispose();
@@ -155,6 +168,8 @@ class _HomeClientePageState extends State<HomeClientePage> {
     if (_distancia == distancia) return;
     _distancia = distancia;
     _manual = null;
+    // RN-228: desfeita a troca pela busca, a linha some.
+    _avisoModo = null;
     _sugerido = widget.ia.sugerir(_descricao.text, distancia: distancia);
   });
 
@@ -169,7 +184,31 @@ class _HomeClientePageState extends State<HomeClientePage> {
     chamarProfissional(context, servico, distancia: _distancia);
   }
 
+  /// C24 · RN-228: troca o modo e já seleciona a profissão (o chip da
+  /// Home equivalente, se houver). A descrição fica. Sem aviso flutuante:
+  /// a chave desliza e fica destacada por 1 segundo, e a linha cinza
+  /// explica. Para desfazer, basta tocar no outro modo.
+  void _trocarModoPara(bool distancia, ProfissaoCatalogo c) {
+    final chips = distancia ? servicosDistanciaHome : servicosHome;
+    final chip = chips
+        .where((s) => catalogoServicos.encontrar(s)?.nome == c.nome)
+        .firstOrNull;
+    setState(() {
+      _distancia = distancia;
+      _manual = chip ?? c.nome;
+      _sugerido = null;
+      _avisoModo =
+          '${c.nome} é só ${distancia ? 'à distância' : 'no local'}.';
+      _destacarModo = true;
+    });
+    _timerDestaque?.cancel();
+    _timerDestaque = Timer(RegrasHome.destaqueModo, () {
+      if (mounted) setState(() => _destacarModo = false);
+    });
+  }
+
   void _tocouServico(String s) => setState(() {
+    _avisoModo = null;
     _manual = _servico == s && !_pelaIa ? null : s;
     if (_manual == null && _sugerido == s) _sugerido = null;
   });
@@ -177,7 +216,15 @@ class _HomeClientePageState extends State<HomeClientePage> {
   Future<void> _outros() async {
     final escolha = await escolherOutroServico(context, distancia: _distancia);
     if (escolha == null || !mounted) return;
-    setState(() => _manual = escolha);
+    // C24 · RN-228: profissão só do outro modo: troca o modo.
+    final c = catalogoServicos.encontrar(escolha);
+    if (c != null && !(_distancia ? c.remoto : c.local)) {
+      return _trocarModoPara(!_distancia, c);
+    }
+    setState(() {
+      _manual = escolha;
+      _avisoModo = null;
+    });
     if (escolha == naoSeiServico && _descricao.text.trim().isEmpty) {
       _focoDescricao.requestFocus();
     }
@@ -482,6 +529,9 @@ class _HomeClientePageState extends State<HomeClientePage> {
                                 pequeno: true,
                                 opcoes: const ['No local', 'À distância'],
                                 selecionada: _distancia ? 1 : 0,
+                                // RN-228: destaque de 1 s ao trocar pela
+                                // busca.
+                                destacar: _destacarModo,
                                 onMudar: (i) => _mudarModo(i == 1),
                               ),
                             ),
@@ -507,6 +557,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
                               TatuChip(
                                 label: o,
                                 selecionado: true,
+                                icone: _pelaIa ? TablerIcons.sparkles : null,
                                 profissao: o,
                                 onTap: () => _tocouServico(o),
                               ),
@@ -520,7 +571,33 @@ class _HomeClientePageState extends State<HomeClientePage> {
                             ),
                           ],
                         ),
-                        if (_pelaIa || _naoSei) ...[
+                        // C24 · RN-228: "Designer gráfico é só à
+                        // distância." no lugar da dica da IA.
+                        if (_avisoModo case final aviso?) ...[
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Icon(
+                                TablerIcons.arrows_exchange,
+                                size: 14,
+                                color: TatuColors.textSecondary,
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  aviso,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    letterSpacing: -0.1,
+                                    color: TatuColors.textSecondary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ] else if (_pelaIa || _naoSei) ...[
                           const SizedBox(height: 8),
                           Row(
                             children: [
@@ -945,4 +1022,10 @@ class FaixaPagamentoPendente extends StatelessWidget {
       ),
     );
   }
+}
+
+/// RN-228: medidas de tempo da Home.
+abstract final class RegrasHome {
+  /// A chave No local / À distância fica destacada por 1 segundo.
+  static const destaqueModo = Duration(seconds: 1);
 }

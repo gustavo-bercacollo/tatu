@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 26/11/2026 (v48)
+Atualizado em 26/11/2026 (v49)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -76,9 +76,9 @@ Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do própri
 | RN | Regra |
 | --- | --- |
 | RN-26 | O valor é combinado no chat. O profissional define dois valores: Visita (pode ser zero) e Serviço. O cliente confirma o total uma vez. |
-| RN-27 | São até 3 rodadas de proposta. Sem acordo, o chamado é encerrado e nada é cobrado. No 3º valor, o cliente confirma ou recusa (RN-228). |
-| RN-228 | No 3º valor, "Pedir outro valor" vira "Recusar valor" (vermelho) e o cartão avisa antes: "Último valor. Se recusar, a conversa com a [nome] termina sem custo." Recusar abre a folha "Recusar o valor?" com três saídas: "Recusar e chamar outro" (o pedido volta à busca, RN-18 a RN-20), "Recusar e cancelar pedido" (volta para a Home com "Pedido cancelado. Nada foi cobrado.") e "Voltar". Nada é cobrado, nem a visita, e o endereço exato nunca chega ao profissional (RN-28). |
-| RN-229 | Depois da recusa, o profissional vê "Sem acordo de valor" ("A [cliente] recusou o último valor. O chamado foi encerrado sem custo e não conta contra você.") e continua online. Ele não recebe de novo o mesmo pedido. Sem acordo não conta como cancelamento (RN-64) nem como abandono (RN-79) para nenhum dos dois. A conversa fica nas Mensagens dos dois só para leitura, com "Sem acordo de valor". |
+| RN-27 | São até 3 rodadas de proposta. Sem acordo, o chamado é encerrado e nada é cobrado. No 3º valor, o cliente confirma ou recusa (RN-300). |
+| RN-300 | No 3º valor, "Pedir outro valor" vira "Recusar valor" (vermelho) e o cartão avisa antes: "Último valor. Se recusar, a conversa com a [nome] termina sem custo." Recusar abre a folha "Recusar o valor?" com três saídas: "Recusar e chamar outro" (o pedido volta à busca, RN-18 a RN-20), "Recusar e cancelar pedido" (volta para a Home com "Pedido cancelado. Nada foi cobrado.") e "Voltar". Nada é cobrado, nem a visita, e o endereço exato nunca chega ao profissional (RN-28). |
+| RN-301 | Depois da recusa, o profissional vê "Sem acordo de valor" ("A [cliente] recusou o último valor. O chamado foi encerrado sem custo e não conta contra você.") e continua online. Ele não recebe de novo o mesmo pedido. Sem acordo não conta como cancelamento (RN-64) nem como abandono (RN-79) para nenhum dos dois. A conversa fica nas Mensagens dos dois só para leitura, com "Sem acordo de valor". |
 | RN-28 | O endereço exato só vai para o profissional depois que o valor é confirmado. Antes disso, ele vê só o bairro e a distância. |
 | RN-29 | Pagamento só pelo app: cartão ou Pix. Não existe pagamento "por fora" nem em dinheiro. |
 | RN-30 | Ao confirmar o valor, o total fica reservado no cartão padrão. Não é cobrado ainda. |
@@ -223,7 +223,7 @@ Quem cancela ou falha não transfere o custo para o outro lado nem para o Tatu.
 | RN-218 | **Como os selos funcionam.** Calculados só pelo app (código na porta, horários, decisões de retorno, pagamentos), em janela móvel de 90 dias: vêm e vão sozinhos. Não contam clientes ligados ao profissional (mesmo CPF, cartão, aparelho ou endereço). Conta pausada ou suspensa perde todos os selos. |
 | RN-219 | **Onde aparecem.** Perfil do profissional (seção "Selos", com uma frase de explicação em cada um) e, em tamanho pequeno, no card de quem aceitou o chamado. O profissional vê "Seus selos" no Perfil, com como cada um funciona e "Você tem" ou "Ainda não", **sem barra de progresso nem "faltam X"**. Selos **só informam**: não mudam quem recebe chamados, não dão desconto nem prioridade. |
 | RN-220 | **Visual.** Selo ondulado (mesmo formato do "Verificado"), preto com o ícone branco: Pontual = cronômetro com ✓; Resolve de primeira = alvo com flecha no centro; Clientes voltam = pessoa com seta de volta; Registro conferido = carteirinha com ✓. "Verificado" continua azul. "Ainda não" = selo cinza claro com ícone cinza. Arquivos em `design/icones-selos/`. |
-| RN-221 | **Borda animada na caixa da Home (cliente).** A caixa "O que está acontecendo?" tem uma borda de 2 px em grafite (#1C1C1E) com um brilho cinza claro que dá a volta devagar (uma volta a cada 8 segundos). Só gira com a caixa vazia e sem foco; ao tocar para digitar, para e fica grafite. Com "Reduzir movimento" ligado, fica parada. É o único elemento animado desse tipo no app. Alternativa guardada: versão metálica (prata). |
+| RN-221 | **Borda animada na caixa da Home (cliente).** A caixa "O que está acontecendo?" tem uma borda de 2 px em grafite (#1C1C1E) com um brilho claro (branco no centro) que dá **uma volta só (8 segundos) quando o app abre** e depois a borda fica grafite parada; voltar para a Home não gira de novo. Só gira com a caixa vazia e sem foco; ao tocar para digitar, para e fica grafite. Com "Reduzir movimento" ligado, fica parada. É o único elemento animado desse tipo no app. Alternativa guardada: versão metálica (prata). |
 
 ### Pagamento recusado
 
@@ -235,6 +235,7 @@ Quem cancela ou falha não transfere o custo para o outro lado nem para o Tatu.
 | RN-225 | **Plano fixo:** a reserva de cada visita é feita **na véspera**. Se for recusada, a visita fica **suspensa**: o cliente vê no chat "Não conseguimos reservar R$ X · a visita está suspensa" com "Atualizar pagamento" e o prazo ("até quinta, 20h"); a barra do chat mostra "Visita de [dia] suspensa · Atualizar" em laranja. A profissional vê "Visita de [dia] suspensa · Não precisa ir" e é avisada se o cliente resolver no prazo. Sem resolver, a visita não acontece, ninguém leva falta e não há cobrança. |
 | RN-226 | **Cobrança ao concluir:** com a reserva válida, não falha (o dinheiro já estava separado). Falha técnica: o Tatu tenta de novo sozinho, **o profissional recebe normalmente** (o valor estava reservado) e o cliente só vê "Pagamento pendente · Atualize o cartão para fazer novos pedidos" na Home se as tentativas não derem certo; com pendência, não faz pedido novo. **Gorjeta recusada:** "Não deu para enviar a gorjeta. Tentar outro cartão?"; o profissional não é avisado. |
 | RN-227 | **Ícones das profissões.** Cada uma das 75 profissões do catálogo tem um ícone próprio (24 × 24, traço 1,8, pontas arredondadas, sem preenchimento, cor do texto), em `design/icones-profissoes/` com o mapa `icones-profissoes.json`. Tamanhos: 52 px na seleção (quadrado arredondado cinza), 40 px em cards e listas (círculo cinza) e 16 px junto de texto. **Sem ícone próprio** (profissão nova ou sugerida): usa o ícone do segmento (9 segmentos); sem segmento, o crachá. O botão "Outros" usa a grade de quadradinhos. Profissão nova no catálogo só entra com ícone, ou cai na alternativa. |
+| RN-228 | **Profissão de outro modo na busca.** A busca de profissão procura nos dois modos. As do modo atual aparecem normalmente; as do outro vêm numa seção "Só à distância" (ou "Só no local"), com etiqueta cinza no item e a dica "Tocar muda o pedido para À distância". Tocar no item troca o modo e já seleciona a profissão: a chave No local / À distância desliza e fica destacada por 1 segundo, e a linha cinza abaixo dos serviços diz "[Profissão] é só à distância." (ou "só no local"). **Sem card ou aviso flutuante.** A descrição escrita não se perde. Para desfazer, basta tocar no outro modo na chave. Profissão que atende nos dois modos não troca o modo. Sem resultado em nenhum modo: "Sugerir esse serviço ao Tatu" (RN-162). |
 
 **Textos**
 
@@ -387,7 +388,7 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 - [ ] **Uso fora da finalidade (adiado).** Proposta: (1) IA confere se o pedido é um serviço do catálogo e bloqueia termos proibidos ("Esse pedido não é um serviço do Tatu"); (2) profissões sensíveis (ex.: massagem) com regra extra e "acompanhante" fora do catálogo; (3) trava de autopagamento (mesmo CPF, celular, aparelho, cartão ou Pix dos dois lados); (4) revisão de serviços sem chegada/código, valores muito acima do normal e muitos serviços caros entre as mesmas pessoas; (5) teto de valor e sem parcelamento nos primeiros serviços de conta nova; (6) fila de revisão, banimento e comunicação às autoridades; parceiro de pagamentos com antifraude.
 - [ ] **Números do retorno.** Exemplos a confirmar: 48 horas para o profissional responder, 7 dias para marcar, 48 horas para o cliente responder "Resolveu?", 12 horas de antecedência para remarcar, 3 dias úteis de mediação, 3 faltas em 90 dias, 3 "não procede" em 6 meses, reserva de 1% da comissão. Tempo para pagar depois de recusado: 10 minutos (exemplo). Classificação 30/90 dias do catálogo a validar com o advogado. Prazo de guarda das fotos (5 anos é exemplo, J-06).
 - [ ] **Seus profissionais (adiado).** Lista em Atividade com quem já atendeu o cliente e botão Chamar (RN-83). Saiu do app em 24/11/2026; decidir depois se volta e como.
-- [ ] **Último valor sem resposta.** O que acontece quando o cliente não confirma nem recusa o 3º valor. Sugestão: depois de um prazo (ex.: 10 minutos) vale como recusa e o pedido volta à busca (RN-228).
+- [ ] **Último valor sem resposta.** O que acontece quando o cliente não confirma nem recusa o 3º valor. Sugestão: depois de um prazo (ex.: 10 minutos) vale como recusa e o pedido volta à busca (RN-300).
 - [ ] **Mais lugares para "Tornar fixa" (adiado).** Ideias avaliadas e guardadas: sugestão "Quer a [nome] sempre?" depois de avaliar com 4 ou 5 estrelas; dica "Chama a [nome] sempre?" no chat a partir do 2º serviço. Testar a de depois de avaliar primeiro se poucos clientes criarem plano.
 - [ ] **Números dos selos.** Exemplos a confirmar: 95% de pontualidade nos últimos 20 agendados; 20 serviços em 90 dias sem retorno contra; 30% de recontratação com mínimo de 10 clientes. Validar com o advogado (J-07).
 - [ ] **Ligação pelo app.** Escolher como fazer a ligação sem mostrar o número: pela internet (mais barato) ou número intermediário (custo por minuto).
@@ -433,14 +434,17 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-33 | Como combinar a data do retorno sem troca infinita de mensagens. | Resolvido | RN-186, RN-213 a RN-215 |
 | P-34 | Medalhas e conquistas: reconhecer bons profissionais sem incentivar pressa, volume ou fraude. | Resolvido · validação jurídica pendente (J-07) | RN-217 a RN-220 |
 | P-35 | Profissões dividindo ícones genéricos. | Resolvido | RN-227 |
-| P-36 | Depois das 3 rodadas, o cliente não tem como recusar o valor. | Resolvido | RN-27, RN-228, RN-229 |
+| P-36 | Cliente busca profissão que só existe no outro modo (No local × À distância). | Resolvido | RN-228 |
+| P-100 | Depois das 3 rodadas, o cliente não tem como recusar o valor. | Resolvido | RN-27, RN-300, RN-301 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 26/11/2026 | RN-228 | Busca nos dois modos, seção "Só à distância" e troca de modo com um toque, sem aviso flutuante. |
+| 26/11/2026 | RN-27, RN-300, RN-301 | Recusa do 3º valor renumerada para RN-300/RN-301 e P-100 (números altos, para não colidir de novo com as regras novas). |
+| 26/11/2026 | RN-221 | Borda: uma volta só ao abrir o app, com o brilho mais largo e branco no centro (pedido do Gustavo). |
 | 26/11/2026 | RN-227 | Ícone próprio para as 75 profissões, ícones de segmento como alternativa e crachá para profissão sem segmento. |
-| 26/11/2026 | RN-27, RN-228, RN-229 | Recusa do 3º valor renumerada (era RN-227/RN-228 na v47; o RN-227 passou a ser dos ícones). |
 | 26/11/2026 | RN-146, RN-206, RN-222 a RN-226 | Pagamento recusado em cada etapa; "Pagamento garantido" para o profissional; Pix; plano fixo passa a reservar na véspera e cobrar a cada visita. P-08 resolvido. |
 | 26/11/2026 | RN-221 | Borda animada em grafite na caixa de descrição da Home. |
 | 26/11/2026 | RN-217 a RN-220 | Selos do profissional (Pontual, Resolve de primeira, Clientes voltam), sem medalhas de jogo; só informam, não mudam chamados. |

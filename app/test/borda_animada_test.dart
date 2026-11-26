@@ -31,14 +31,23 @@ Future<bool> _girando(WidgetTester t) async {
 
 void main() {
   // Aqui a borda gira de verdade (nos outros testes fica parada).
-  setUp(() => BordaAnimada.girar = true);
+  setUp(() {
+    BordaAnimada.girar = true;
+    BordaAnimada.jaGirou = false;
+  });
   tearDown(() => BordaAnimada.girar = false);
 
-  testWidgets('vazia e sem foco: gira sem parar', (t) async {
+  testWidgets('ao abrir: dá uma volta e para (não gira de novo)', (t) async {
     await t.pumpWidget(_caixa(ModoBorda.girando));
     expect(await _girando(t), isTrue);
     await t.pump(BordaAnimada.volta);
-    expect(await _girando(t), isTrue);
+    await t.pump();
+    expect(BordaAnimada.jaGirou, isTrue);
+    expect(await _girando(t), isFalse);
+    // Voltar para a Home não gira de novo (só ao abrir o app).
+    await t.pumpWidget(const SizedBox());
+    await t.pumpWidget(_caixa(ModoBorda.girando));
+    expect(await _girando(t), isFalse);
   });
 
   testWidgets('com foco (sólida) ou com texto (parada): não gira', (t) async {

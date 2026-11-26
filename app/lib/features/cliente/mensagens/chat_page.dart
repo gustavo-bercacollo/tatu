@@ -523,7 +523,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  /// RN-228: "Recusar valor" no 3º valor: chamar outro ou cancelar.
+  /// RN-300: "Recusar valor" no 3º valor: chamar outro ou cancelar.
   Future<void> _recusar() async {
     final ela = '${_c.artigo} ${_c.primeiroNome}';
     final chamarOutro = await perguntar(
@@ -538,7 +538,7 @@ class _ChatPageState extends State<ChatPage> {
       iconeAviso: false,
     );
     if (chamarOutro == null || !mounted) return;
-    // RN-229: sem custo; o pedido com ela sai e ela não volta.
+    // RN-301: sem custo; o pedido com ela sai e ela não volta.
     conversas.recusarValor(_c);
     final p = pedidos.semAcordo(_c.nome);
     if (chamarOutro) {
@@ -1228,7 +1228,7 @@ class _ChatPageState extends State<ChatPage> {
                 NotaChat(fim.nota!),
               ],
             ] else if (_c.semAcordo) ...[
-              // RN-229: só leitura depois da recusa do último valor.
+              // RN-301: só leitura depois da recusa do último valor.
               const SizedBox(height: TatuMedidas.entreSecoes),
               const MarcadorChat('Sem acordo de valor'),
             ] else ...[
