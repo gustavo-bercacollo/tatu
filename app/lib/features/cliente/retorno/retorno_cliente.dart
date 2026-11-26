@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:clock/clock.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -608,15 +609,9 @@ class _EscolherHorariosRetornoPageState
       ),
       children: [
         // RN-213/RN-215: pedido urgente aparece em destaque para ela.
-        GrupoCartao(
-          linhas: [
-            LinhaInterruptor(
-              texto: 'É urgente?',
-              detalhe: 'Pedir para hoje, se der',
-              valor: _urgente,
-              onMudar: (v) => setState(() => _urgente = v),
-            ),
-          ],
+        _ChaveUrgente(
+          valor: _urgente,
+          onMudar: (v) => setState(() => _urgente = v),
         ),
         const SizedBox(height: TatuMedidas.entreSecoes),
         GradeHorarios(
@@ -625,6 +620,70 @@ class _EscolherHorariosRetornoPageState
           onMudar: (l) => setState(() => _escolhidos = l),
         ),
       ],
+    );
+  }
+}
+
+/// C239 · RN-213/RN-215: caixa cinza com raio laranja, "É urgente?",
+/// "Pedir para hoje, se der" e o interruptor.
+class _ChaveUrgente extends StatelessWidget {
+  const _ChaveUrgente({required this.valor, required this.onMudar});
+
+  final bool valor;
+  final ValueChanged<bool> onMudar;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'É urgente? Pedir para hoje, se der',
+      toggled: valor,
+      child: ExcludeSemantics(
+        child: Material(
+          color: TatuColors.surfaceGrouped,
+          borderRadius: BorderRadius.circular(TatuMedidas.raioCaixa),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(TatuMedidas.raioCaixa),
+            onTap: () => onMudar(!valor),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+              child: Row(
+                children: [
+                  const Icon(
+                    TablerIcons.bolt,
+                    size: 20,
+                    color: TatuColors.warningTexto,
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'É urgente?',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          'Pedir para hoje, se der',
+                          style: TatuTexto.legenda,
+                        ),
+                      ],
+                    ),
+                  ),
+                  CupertinoSwitch(
+                    value: valor,
+                    activeTrackColor: TatuColors.online,
+                    inactiveTrackColor: TatuColors.trilho,
+                    onChanged: onMudar,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
