@@ -9,6 +9,7 @@ import '../../data/profissional.dart' show AvaliacaoRecebida;
 import '../../shared/widgets/back_circle_button.dart';
 import '../../shared/widgets/estrelas.dart';
 import '../../shared/widgets/opcao_selecionavel.dart';
+import '../../shared/widgets/selo.dart';
 import '../profissional/cadastro/resultado_page.dart';
 
 /// Perfil do profissional como o cliente vê. Usado na Prévia do
@@ -113,6 +114,16 @@ class _PerfilPublicoPageState extends State<PerfilPublicoPage> {
                         ),
                       ),
                       const Divider(height: 1),
+                      // C166 · RN-219: um card por selo, com uma frase.
+                      if (p.todosOsSelos.isNotEmpty) ...[
+                        const SizedBox(height: TatuMedidas.entreItens + 4),
+                        const Text('SELOS', style: TatuTexto.secao),
+                        const SizedBox(height: TatuMedidas.tituloSecao),
+                        for (final s in p.todosOsSelos) ...[
+                          CartaoSelo(s),
+                          const SizedBox(height: 8),
+                        ],
+                      ],
                       // RN-159: registro conferido no conselho pelo Tatu.
                       if (p.registros.isNotEmpty) ...[
                         const SizedBox(height: TatuMedidas.entreItens + 4),

@@ -46,6 +46,9 @@ class TatuMedidas {
   static const alturaCaixaDia = 52.0; // "Sáb 28" e "Manhã 8h–12h" (RN-213/RN-214)
   static const larguraCaixaDia = 61.0; // "Sáb 28" (RN-213/RN-214)
   static const raioCaixaHora = 12.0; // caixas de dia, período e hora (RN-213)
+  static const seloPequeno = 16.0; // selos no card de quem aceitou (RN-219)
+  static const seloCartao = 36.0; // selo no card do perfil (RN-219)
+  static const seloGrande = 40.0; // "Seus selos" do profissional (RN-219)
   static const alturaOpcaoLista = 46.0; // motivos de denúncia (RN-133)
   static const alturaSegmento = 36.0;
   static const alturaSegmentoPequeno = 28.0; // "No local | À distância"

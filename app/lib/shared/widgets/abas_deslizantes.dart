@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'segmento.dart';
 
-/// Abas em [Segmento] com o conteúdo lado a lado: troca tocando na aba ou
+/// RN-216 · Abas em [Segmento] com o conteúdo lado a lado: troca tocando na aba ou
 /// deslizando o dedo para os lados (Atividade do cliente e do
 /// profissional).
 ///

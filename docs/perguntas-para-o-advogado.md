@@ -1,6 +1,6 @@
 # Tatu · Perguntas para o advogado
 
-**Atualizado em 24/11/2026**
+**Atualizado em 26/11/2026**
 
 Dúvidas jurídicas que precisam de resposta antes do lançamento. Quando o advogado responder, registre aqui a resposta e ajuste as regras ligadas em `regras-de-negocio.md`.
 
@@ -15,10 +15,17 @@ Dúvidas jurídicas que precisam de resposta antes do lançamento. Quando o advo
 | J-05 | Podemos prender os repasses do profissional enquanto há retorno aberto, manter a dívida ligada ao CPF e impedir que ele receba chamados ou abra outra conta até quitar? | RN-185, RN-192, Termos 6.5.1 | Pendente |
 | J-06 | Por quanto tempo podemos guardar as fotos do serviço e do retorno, que podem mostrar o interior da casa do cliente? Propusemos 5 anos (prazo do CDC para ações por danos, art. 27), com acesso restrito. | RN-199, Política 2.1 e 7 | Pendente |
 
+## Selos do profissional (P-34 · RN-217 a RN-220)
+
+| Nº | Pergunta | Regras ligadas | Resposta |
+| --- | --- | --- | --- |
+| J-07 | Selos que só informam o cliente (Pontual, Resolve de primeira, Clientes voltam), calculados pelo app e sem efeito em chamados, preço ou prioridade, podem pesar como controle de comportamento numa discussão de vínculo de emprego? E o uso desses dados no perfil precisa de algo a mais na Política de Privacidade? | RN-217 a RN-220 | Pendente |
+
 ## Histórico
 
 | Data | O que mudou |
 | --- | --- |
+| 26/11/2026 | J-07 incluída (selos). |
 | 24/11/2026 | J-06 incluída (guarda das fotos). |
 | 24/11/2026 | J-02 ajustada (prazo separado em 30 e 90 dias); J-04 e J-05 incluídas. |
 | 24/11/2026 | Primeira versão, com as perguntas sobre garantia e retorno. |

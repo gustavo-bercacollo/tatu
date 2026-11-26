@@ -17,6 +17,9 @@ Future<void> _dados(WidgetTester t) async {
     MaterialApp(theme: tatuTheme(), home: const PerfilProfissionalPage()),
   );
   await t.scrollUntilVisible(find.text('Dados da conta'), 200);
+  // Um pouco mais (o item "Seus selos" empurrou a lista).
+  await t.drag(find.byType(Scrollable).first, const Offset(0, -150));
+  await t.pumpAndSettle();
   await t.tap(find.text('Dados da conta'));
   await t.pumpAndSettle();
 }

@@ -42,6 +42,7 @@ dependencies:
   url_launcher: ^6.3.3
   clock: ^1.1.3
   screen_protector: ^1.5.3
+  flutter_svg: ^2.5.1
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +80,8 @@ flutter:
   assets:
     - assets/avatares/
     - assets/sons/
+    # RN-220: selos do profissional (de design/icones-selos/).
+    - assets/selos/
     # RN-150: Termos e Política vêm de docs/ (fonte única).
     - ../docs/termos-de-uso.md
     - ../docs/politica-de-privacidade.md

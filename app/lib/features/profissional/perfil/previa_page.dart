@@ -5,6 +5,7 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../data/fotos_trabalho.dart';
 import '../../../data/perfil_publico.dart';
 import '../../../data/profissional.dart';
+import '../../../data/selos.dart';
 import '../../../shared/widgets/avatar_usuario.dart';
 import '../../entrada/perfil_publico_page.dart';
 import 'fotos_trabalho_page.dart';
@@ -38,6 +39,11 @@ class PreviaPage extends StatelessWidget {
         registros: [
           for (final r in p.registros.values)
             if (r.status == StatusRegistro.conferido) r.rotulo,
+        ],
+        // RN-219: os selos calculados, como o cliente vê.
+        selos: [
+          for (final s in emOrdem(p.selos))
+            if (Selo.calculados.contains(s)) s,
         ],
       ),
       avatar: AvatarUsuario(nome: p.nome, tamanho: 96),

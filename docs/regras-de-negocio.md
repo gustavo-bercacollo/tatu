@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 25/11/2026 (v43)
+Atualizado em 26/11/2026 (v45)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -76,9 +76,9 @@ Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do própri
 | RN | Regra |
 | --- | --- |
 | RN-26 | O valor é combinado no chat. O profissional define dois valores: Visita (pode ser zero) e Serviço. O cliente confirma o total uma vez. |
-| RN-27 | São até 3 rodadas de proposta. Sem acordo, o chamado é encerrado e nada é cobrado. No 3º valor, o cliente confirma ou recusa (RN-216). |
-| RN-216 | No 3º valor, "Pedir outro valor" vira "Recusar valor" (vermelho) e o cartão avisa antes: "Último valor. Se recusar, a conversa com a [nome] termina sem custo." Recusar abre a folha "Recusar o valor?" com três saídas: "Recusar e chamar outro" (o pedido volta à busca, RN-18 a RN-20), "Recusar e cancelar pedido" (volta para a Home com "Pedido cancelado. Nada foi cobrado.") e "Voltar". Nada é cobrado, nem a visita, e o endereço exato nunca chega ao profissional (RN-28). |
-| RN-217 | Depois da recusa, o profissional vê "Sem acordo de valor" ("A [cliente] recusou o último valor. O chamado foi encerrado sem custo e não conta contra você.") e continua online. Ele não recebe de novo o mesmo pedido. Sem acordo não conta como cancelamento (RN-64) nem como abandono (RN-79) para nenhum dos dois. A conversa fica nas Mensagens dos dois só para leitura, com "Sem acordo de valor". |
+| RN-27 | São até 3 rodadas de proposta. Sem acordo, o chamado é encerrado e nada é cobrado. No 3º valor, o cliente confirma ou recusa (RN-221). |
+| RN-221 | No 3º valor, "Pedir outro valor" vira "Recusar valor" (vermelho) e o cartão avisa antes: "Último valor. Se recusar, a conversa com a [nome] termina sem custo." Recusar abre a folha "Recusar o valor?" com três saídas: "Recusar e chamar outro" (o pedido volta à busca, RN-18 a RN-20), "Recusar e cancelar pedido" (volta para a Home com "Pedido cancelado. Nada foi cobrado.") e "Voltar". Nada é cobrado, nem a visita, e o endereço exato nunca chega ao profissional (RN-28). |
+| RN-222 | Depois da recusa, o profissional vê "Sem acordo de valor" ("A [cliente] recusou o último valor. O chamado foi encerrado sem custo e não conta contra você.") e continua online. Ele não recebe de novo o mesmo pedido. Sem acordo não conta como cancelamento (RN-64) nem como abandono (RN-79) para nenhum dos dois. A conversa fica nas Mensagens dos dois só para leitura, com "Sem acordo de valor". |
 | RN-28 | O endereço exato só vai para o profissional depois que o valor é confirmado. Antes disso, ele vê só o bairro e a distância. |
 | RN-29 | Pagamento só pelo app: cartão ou Pix. Não existe pagamento "por fora" nem em dinheiro. |
 | RN-30 | Ao confirmar o valor, o total fica reservado no cartão padrão. Não é cobrado ainda. |
@@ -213,6 +213,16 @@ Quem cancela ou falha não transfere o custo para o outro lado nem para o Tatu.
 | RN-213 | **Agendar o retorno.** No passo 2 do pedido de retorno, o cliente escolhe **até 3 horários** numa grade dos próximos 7 dias por período: **manhã (8h–12h), tarde (12h–18h) e noite (18h–21h)**; horários que já passaram ficam apagados. Chave **"É urgente? Pedir para hoje, se der"**. Ao aceitar, o profissional escolhe uma das opções e a hora dentro do período ("Aceitar · sexta, 27 nov, 9h"): fica marcado, sem confirmação do cliente. Se nenhuma serve, toca em "Sugerir outro horário" e escolhe dia e hora até 7 dias depois do pedido; o cliente recebe no chat "[nome] sugeriu outro horário" com "Confirmar horário" ou "Escolher outro" (volta à grade). Sem horário combinado até o fim do prazo, vale a RN-188 (não marcou). |
 | RN-214 | **Remarcar o retorno:** cliente e profissional podem remarcar **uma vez cada**, até **12 horas antes**, com o novo dia dentro do prazo. Quem pede escolhe o dia e o período; o outro escolhe a hora e confirma. Não existe segunda remarcação: faltou, vale a RN-187 (cliente ausente) ou a RN-188 (profissional não veio). |
 | RN-215 | **Lembretes e urgência:** os dois recebem lembrete na véspera e 1 hora antes do retorno. Pedido marcado como urgente aparece para o profissional em destaque: "Urgente · a [cliente] pediu hoje, se der". |
+| RN-216 | **Deslizar entre abas em Atividade** (cliente e profissional): além de tocar em "Em andamento" e "Concluídos", dá para trocar de aba deslizando o dedo para os lados. A marcação da aba acompanha o dedo. O gesto não começa na borda esquerda (para não brigar com o "voltar" do iPhone) e não dispara durante a rolagem vertical. **Em Ganhos não:** Dia, Semana e Mês continuam só por toque (deslizar ali, no futuro, seria para ir ao período anterior ou ao próximo). |
+
+### Selos do profissional
+
+| RN | Regra |
+| --- | --- |
+| RN-217 | **Selos, não medalhas.** O Tatu não tem pontos, níveis, ranking, sequência de dias nem medalhas para clientes. O profissional pode ter, além de "Verificado" e "Registro conferido", 3 selos: **Pontual** (chegou no horário combinado em pelo menos 95% dos serviços agendados, entre os últimos 20; só conta serviço com hora marcada: retorno, plano fixo e serviço agendado), **Resolve de primeira** (pelo menos 20 serviços nos últimos 90 dias e nenhum retorno com decisão contra ele, na mediação ou na resolução automática; o pedido de retorno sozinho não conta) e **Clientes voltam** (pelo menos 30% dos clientes, com no mínimo 10 clientes diferentes, pediram de novo ou viraram plano fixo). |
+| RN-218 | **Como os selos funcionam.** Calculados só pelo app (código na porta, horários, decisões de retorno, pagamentos), em janela móvel de 90 dias: vêm e vão sozinhos. Não contam clientes ligados ao profissional (mesmo CPF, cartão, aparelho ou endereço). Conta pausada ou suspensa perde todos os selos. |
+| RN-219 | **Onde aparecem.** Perfil do profissional (seção "Selos", com uma frase de explicação em cada um) e, em tamanho pequeno, no card de quem aceitou o chamado. O profissional vê "Seus selos" no Perfil, com como cada um funciona e "Você tem" ou "Ainda não", **sem barra de progresso nem "faltam X"**. Selos **só informam**: não mudam quem recebe chamados, não dão desconto nem prioridade. |
+| RN-220 | **Visual.** Selo ondulado (mesmo formato do "Verificado"), preto com o ícone branco: Pontual = cronômetro com ✓; Resolve de primeira = alvo com flecha no centro; Clientes voltam = pessoa com seta de volta; Registro conferido = carteirinha com ✓. "Verificado" continua azul. "Ainda não" = selo cinza claro com ícone cinza. Arquivos em `design/icones-selos/`. |
 
 **Textos**
 
@@ -366,8 +376,9 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 - [ ] **Uso fora da finalidade (adiado).** Proposta: (1) IA confere se o pedido é um serviço do catálogo e bloqueia termos proibidos ("Esse pedido não é um serviço do Tatu"); (2) profissões sensíveis (ex.: massagem) com regra extra e "acompanhante" fora do catálogo; (3) trava de autopagamento (mesmo CPF, celular, aparelho, cartão ou Pix dos dois lados); (4) revisão de serviços sem chegada/código, valores muito acima do normal e muitos serviços caros entre as mesmas pessoas; (5) teto de valor e sem parcelamento nos primeiros serviços de conta nova; (6) fila de revisão, banimento e comunicação às autoridades; parceiro de pagamentos com antifraude.
 - [ ] **Números do retorno.** Exemplos a confirmar: 48 horas para o profissional responder, 7 dias para marcar, 48 horas para o cliente responder "Resolveu?", 12 horas de antecedência para remarcar, 3 dias úteis de mediação, 3 faltas em 90 dias, 3 "não procede" em 6 meses, reserva de 1% da comissão. Classificação 30/90 dias do catálogo a validar com o advogado. Prazo de guarda das fotos (5 anos é exemplo, J-06).
 - [ ] **Seus profissionais (adiado).** Lista em Atividade com quem já atendeu o cliente e botão Chamar (RN-83). Saiu do app em 24/11/2026; decidir depois se volta e como.
-- [ ] **Último valor sem resposta.** O que acontece quando o cliente não confirma nem recusa o 3º valor. Sugestão: depois de um prazo (ex.: 10 minutos) vale como recusa e o pedido volta à busca (RN-216).
+- [ ] **Último valor sem resposta.** O que acontece quando o cliente não confirma nem recusa o 3º valor. Sugestão: depois de um prazo (ex.: 10 minutos) vale como recusa e o pedido volta à busca (RN-221).
 - [ ] **Mais lugares para "Tornar fixa" (adiado).** Ideias avaliadas e guardadas: sugestão "Quer a [nome] sempre?" depois de avaliar com 4 ou 5 estrelas; dica "Chama a [nome] sempre?" no chat a partir do 2º serviço. Testar a de depois de avaliar primeiro se poucos clientes criarem plano.
+- [ ] **Números dos selos.** Exemplos a confirmar: 95% de pontualidade nos últimos 20 agendados; 20 serviços em 90 dias sem retorno contra; 30% de recontratação com mínimo de 10 clientes. Validar com o advogado (J-07).
 - [ ] **Ligação pelo app.** Escolher como fazer a ligação sem mostrar o número: pela internet (mais barato) ou número intermediário (custo por minuto).
 
 ## 11. Problemas mapeados
@@ -409,14 +420,17 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-31 | Valor do plano fixo sem negociação, e "Pedir outro valor" fora do card. | Resolvido | RN-144, RN-148, RN-210 |
 | P-32 | Card do plano pobre e sumindo do chat depois de combinado. | Resolvido | RN-211, RN-212 |
 | P-33 | Como combinar a data do retorno sem troca infinita de mensagens. | Resolvido | RN-186, RN-213 a RN-215 |
-| P-34 | Depois das 3 rodadas, o cliente não tem como recusar o valor. | Resolvido | RN-27, RN-216, RN-217 |
+| P-34 | Medalhas e conquistas: reconhecer bons profissionais sem incentivar pressa, volume ou fraude. | Resolvido · validação jurídica pendente (J-07) | RN-217 a RN-220 |
+| P-35 | Depois das 3 rodadas, o cliente não tem como recusar o valor. | Resolvido | RN-27, RN-221, RN-222 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 26/11/2026 | RN-27, RN-221, RN-222 | Recusa do 3º valor renumerada (era RN-216/RN-217 na v43; esses números passaram a ser de "deslizar entre abas" e dos selos). |
+| 26/11/2026 | RN-217 a RN-220 | Selos do profissional (Pontual, Resolve de primeira, Clientes voltam), sem medalhas de jogo; só informam, não mudam chamados. |
+| 25/11/2026 | RN-216 | Deslizar para trocar de aba em Atividade; em Ganhos não. |
 | 25/11/2026 | RN-144 | "Precisa toda semana? Tornar a [nome] fixa" na folha "Pedir de novo" (pedido do Gustavo). |
-| 25/11/2026 | RN-27, RN-216, RN-217 | Cliente recusa o 3º valor ("Recusar valor") e escolhe chamar outro ou cancelar. Sem custo e sem penalidade; o profissional não recebe de novo o mesmo pedido. (Eram RN-210/211 na v40, RN-212/213 na v41 e RN-213/214 na v42; renumeradas porque esses números passaram a ser de outras regras.) |
 | 25/11/2026 | RN-210 | O card do plano não mostra mais "Último serviço avulso com a [nome]" (pedido do Gustavo). |
 | 25/11/2026 | RN-186, RN-213 a RN-215 | Agendamento do retorno: cliente dá até 3 horários, profissional escolhe um ou sugere outro, remarcar uma vez com 12 h de antecedência, lembretes e urgência. |
 | 25/11/2026 | RN-211, RN-212 | Card novo do plano no chat (quem propôs, rodada, semana em bolinhas, economia) e histórico da negociação; card não some depois de combinado. |

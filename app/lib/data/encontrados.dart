@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import 'perfil_publico.dart';
 import 'profissional.dart' show AvaliacaoRecebida;
+import 'selos.dart';
 
 /// Profissional que aceitou o pedido (tela "Profissional encontrado").
 @immutable
@@ -18,7 +19,11 @@ class ProfissionalEncontrado {
     this.especialidades = const ['Vazamentos', 'Registros', 'Pias'],
     this.sobre = '',
     this.registros = const [],
+    this.selos = const [],
   });
+
+  /// RN-217/RN-219: selos calculados pelo servidor (simulados).
+  final List<Selo> selos;
 
   /// RN-159: registros conferidos pelo Tatu.
   final List<String> registros;
@@ -56,6 +61,7 @@ const filaEncontrados = [
     nota: '4,9',
     servicos: 312,
     chegaEm: '12 min',
+    selos: [Selo.pontual, Selo.resolveDePrimeira, Selo.clientesVoltam],
     sobre:
         'Encanadora há 9 anos. Atendo vazamentos, troca de registros e '
         'instalação de louças.',
@@ -67,6 +73,7 @@ const filaEncontrados = [
     nota: '4,8',
     servicos: 187,
     chegaEm: '15 min',
+    selos: [Selo.pontual],
     distancia: '1,8 km',
     resposta: '3 min',
     especialidades: ['Vazamentos', 'Desentupimento', 'Caixa d’água'],
@@ -217,6 +224,7 @@ PerfilPublico perfilDe(ProfissionalEncontrado p) => PerfilPublico(
   verificado: true,
   feminino: p.feminino,
   registros: p.registros,
+  selos: p.selos,
   fotos: const [null, null, null, null],
   barrasNotas: const [0.9, 0.08, 0.02],
   avaliacoes: const [

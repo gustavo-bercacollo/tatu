@@ -18,6 +18,7 @@ import '../../entrada/perfil_publico_page.dart';
 import '../abas.dart';
 import '../mensagens/chat_page.dart';
 import '../../../shared/widgets/abas_cliente.dart';
+import '../../../shared/widgets/selo.dart';
 import 'procurando_page.dart';
 import 'som_encontrado.dart';
 
@@ -102,6 +103,7 @@ class _EncontradoPageState extends State<EncontradoPage> {
     resposta: _base.resposta,
     especialidades: _base.especialidades,
     sobre: _base.sobre,
+    selos: _base.selos,
   );
 
   @override
@@ -367,6 +369,11 @@ class _EncontradoPageState extends State<EncontradoPage> {
                       ),
                     ],
                   ),
+                  // RN-219: selos pequenos ("Pontual · Clientes voltam").
+                  if (p.selos.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    SelosPequenos(p.selos),
+                  ],
                 ],
               ),
             ),

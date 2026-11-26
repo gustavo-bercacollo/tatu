@@ -34,6 +34,7 @@ import 'preferencias_atendimento_page.dart';
 import 'previa_page.dart';
 import 'regiao_page.dart';
 import 'sobre_page.dart';
+import 'seus_selos_page.dart';
 import '../../cliente/privacidade/privacidade_page.dart';
 
 /// P31 · Perfil do profissional.
@@ -194,6 +195,13 @@ class PerfilProfissionalPage extends StatelessWidget {
                             context,
                             const AvaliacoesProfissionalPage(),
                           ),
+                        ),
+                        // P85 · RN-219: selos de confiança.
+                        ItemLista(
+                          icone: TablerIcons.rosette,
+                          texto: 'Seus selos',
+                          valor: '${p.selos.length}',
+                          onTap: () => _abrir(context, const SeusSelosPage()),
                         ),
                         ItemLista(
                           icone: TablerIcons.tools,

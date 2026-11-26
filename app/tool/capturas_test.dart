@@ -148,6 +148,7 @@ import 'package:tatu/features/entrada/celular_page.dart';
 import 'package:tatu/features/entrada/codigo_page.dart';
 import 'package:tatu/features/entrada/email_page.dart';
 import 'package:tatu/features/entrada/dados_cliente_page.dart';
+import 'package:tatu/shared/widgets/borda_animada.dart';
 
 Future<void> _carregarFontes() async {
   final inter = FontLoader('Inter');
@@ -248,6 +249,7 @@ void main() {
   consultaCpf = ConsultaCpfMock(demora: Duration.zero);
   ProtecaoTela.ativa = false;
   ToqueChamado.ativo = false;
+  BordaAnimada.girar = false;
   SomEncontrado.ativo = false;
   ProcurandoPage.aceitaEm = null;
   CameraVerificacaoPage.cameraAoVivo = false;

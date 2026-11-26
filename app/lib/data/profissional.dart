@@ -9,6 +9,7 @@ import 'prazos.dart';
 import 'profissoes_reguladas.dart';
 import 'regras_distancia.dart';
 import 'retorno.dart';
+import 'selos.dart';
 
 /// Profissões que aparecem como atalho no cadastro ("Outros" abre a lista).
 const profissoesPrincipais = [
@@ -523,7 +524,23 @@ class ProfissionalRepo extends ChangeNotifier {
   }
 
   /// Volta ao começo (sem cadastro).
+  /// RN-218: serviços que contam para os selos (no app, simulados; o
+  /// servidor calcula).
+  List<ServicoParaSelo> historicoSelos = [];
+
+  /// RN-217/RN-218: os selos agora. Conta pausada perde todos. Só
+  /// informam (RN-219): não entram em nada que decide chamados.
+  Set<Selo> get selos => calcularSelos(
+    servicos: historicoSelos,
+    verificado: verificacao == Verificacao.aprovada,
+    registroConferido: registros.values.any(
+      (r) => r.status == StatusRegistro.conferido,
+    ),
+    ativa: !pausada,
+  );
+
   void restaurar() {
+    historicoSelos = [];
     nome = '';
     cpf = '';
     nascimento = '';
@@ -577,6 +594,7 @@ class ProfissionalRepo extends ChangeNotifier {
     visitas.clear();
     abandonos.clear();
     sinaisSemEntrega.clear();
+    historicoSelos = historicoSelosDemo(clock.now());
     notifyListeners();
   }
 

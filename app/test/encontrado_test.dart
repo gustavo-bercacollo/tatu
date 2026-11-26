@@ -104,6 +104,13 @@ void main() {
     await t.tap(find.text('Ver perfil'));
     await t.pumpAndSettle();
     expect(find.text('Encanadora · 1,2 km de você'), findsOneWidget);
+    // RN-219: a seção de selos vem antes das especialidades.
+    expect(find.text('SELOS'), findsOneWidget);
+    await t.scrollUntilVisible(
+      find.text('Vazamentos'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Vazamentos'), findsOneWidget);
     expect(find.text('Aceitar Luiza'), findsOneWidget);
     await t.tap(find.text('Aceitar Luiza'));
