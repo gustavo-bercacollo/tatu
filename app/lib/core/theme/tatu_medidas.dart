@@ -35,6 +35,17 @@ class TatuMedidas {
   static const alturaChipPequeno = 34.0; // botões dentro de cartões
   static const alturaBotaoCartao = 44.0; // botão preto dentro de cartão (RN-130)
   static const alturaLinha = 52.0;
+  static const avatarProposta = 32.0; // card do plano no chat (RN-211)
+  static const avatarPropostaPequeno = 26.0; // proposta encolhida (RN-212)
+  static const diaSemana = 30.0; // bolinhas D S T Q Q S S do plano (RN-211)
+  static const bolinhaRodada = 8.0; // ● ○ ○ da rodada (RN-211)
+  static const alturaHorario = 38.0; // quadradinho da grade de horários (RN-213)
+  static const raioHorario = 10.0; // quadradinho da grade (RN-213)
+  static const larguraDiaGrade = 94.0; // coluna dos dias na grade (RN-213)
+  static const alturaCaixaHora = 40.0; // "9h" nas folhas do retorno (RN-213)
+  static const alturaCaixaDia = 52.0; // "Sáb 28" e "Manhã 8h–12h" (RN-213/RN-214)
+  static const larguraCaixaDia = 61.0; // "Sáb 28" (RN-213/RN-214)
+  static const raioCaixaHora = 12.0; // caixas de dia, período e hora (RN-213)
   static const alturaOpcaoLista = 46.0; // motivos de denúncia (RN-133)
   static const alturaSegmento = 36.0;
   static const alturaSegmentoPequeno = 28.0; // "No local | À distância"

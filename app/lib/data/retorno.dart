@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 
 import 'catalogo_servicos.dart';
 import 'codigo_porta.dart';
-import 'plano_fixo.dart' show diaMes, diaLongo;
+import 'plano_fixo.dart' show diaMes, diaLongo, diaCurto;
 import 'profissional.dart' show taxaTatu;
 
 /// RN-183 a RN-196: "Algo errado?" e retorno depois do serviço.
@@ -17,8 +17,27 @@ abstract final class RegrasRetorno {
   /// RN-186: tempo do profissional para responder ao pedido.
   static const respostaProfissional = Duration(hours: 48);
 
-  /// RN-186: o retorno aceito precisa ser marcado em até 7 dias.
+  /// RN-186/RN-213: o retorno precisa ser marcado em até 7 dias depois
+  /// do pedido.
   static const marcarEm = Duration(days: 7);
+
+  /// RN-213: até 3 horários que o cliente pode.
+  static const maxHorarios = 3;
+
+  /// RN-214: remarcar só até 12 horas antes (uma vez cada lado).
+  static const antecedenciaRemarcar = Duration(hours: 12);
+
+  /// RN-215: lembretes para os dois: na véspera (24 horas antes) e 1 hora
+  /// antes.
+  static const lembretes = [Duration(hours: 24), Duration(hours: 1)];
+
+  /// RN-213: último dia para o retorno (7 dias depois do pedido, até o
+  /// fim do dia).
+  static DateTime limiteMarcar(DateTime pedidoEm) =>
+      DateTime(pedidoEm.year, pedidoEm.month, pedidoEm.day + 7, 23, 59);
+
+  /// RN-213: horas do profissional ao sugerir outro horário.
+  static const horasSugestao = [8, 9, 10, 11, 14, 15, 16, 17];
 
   /// RN-187: tempo do cliente para responder "Resolveu?".
   static const resolveuEm = Duration(hours: 48);
@@ -165,6 +184,105 @@ String quandoRetorno(DateTime d) {
       ? '${d.hour}h'
       : '${d.hour}h${d.minute.toString().padLeft(2, '0')}';
   return '${dia[0].toUpperCase()}${dia.substring(1)}, ${diaMes(d)} · $h';
+}
+
+/// RN-213: períodos do dia para o retorno.
+enum PeriodoDia {
+  manha('Manhã', 'de manhã', 8, 12),
+  tarde('Tarde', 'à tarde', 12, 18),
+  noite('Noite', 'à noite', 18, 21);
+
+  const PeriodoDia(this.nome, this.expressao, this.inicio, this.fim);
+
+  /// "Manhã".
+  final String nome;
+
+  /// "de manhã" / "à tarde".
+  final String expressao;
+  final int inicio;
+  final int fim;
+
+  /// "8h–12h".
+  String get faixa => '${inicio}h–${fim}h';
+
+  /// "8h às 12h".
+  String get faixaLonga => '${inicio}h às ${fim}h';
+
+  /// Horas cheias dentro do período (manhã: 8h a 11h).
+  List<int> get horas => [for (var h = inicio; h < fim; h++) h];
+}
+
+/// RN-213: um dia e um período que o cliente pode.
+@immutable
+class OpcaoHorario {
+  const OpcaoHorario(this.dia, this.periodo);
+
+  /// Só a data (a hora é do período).
+  final DateTime dia;
+  final PeriodoDia periodo;
+
+  /// Já começou: fica apagado na grade.
+  bool passou(DateTime agora) =>
+      !agora.isBefore(DateTime(dia.year, dia.month, dia.day, periodo.inicio));
+
+  /// Dentro do período, na hora [h].
+  DateTime as(int h) => DateTime(dia.year, dia.month, dia.day, h);
+
+  @override
+  bool operator ==(Object other) =>
+      other is OpcaoHorario &&
+      other.periodo == periodo &&
+      other.dia.year == dia.year &&
+      other.dia.month == dia.month &&
+      other.dia.day == dia.day;
+
+  @override
+  int get hashCode => Object.hash(dia.year, dia.month, dia.day, periodo);
+}
+
+String _maiuscula(String s) =>
+    s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
+
+/// RN-213: "Hoje", "Amanhã", "Sexta".
+String nomeDoDia(DateTime d, DateTime agora) {
+  final hoje = DateTime(agora.year, agora.month, agora.day);
+  final dia = DateTime(d.year, d.month, d.day);
+  final dif = dia.difference(hoje).inDays;
+  if (dif == 0) return 'Hoje';
+  if (dif == 1) return 'Amanhã';
+  return _maiuscula(diaLongo(d.weekday));
+}
+
+/// RN-213: "Sexta de manhã".
+String textoOpcao(OpcaoHorario o, DateTime agora) =>
+    '${nomeDoDia(o.dia, agora)} ${o.periodo.expressao}';
+
+/// RN-213: "sex de manhã" (lista curta no card da sugestão).
+String textoOpcaoCurto(OpcaoHorario o) =>
+    '${diaCurto(o.dia.weekday).toLowerCase()} ${o.periodo.expressao}';
+
+/// RN-213: "sexta, 27 nov, 9h" (botões das folhas).
+String quandoCurto(DateTime d) {
+  final h = d.minute == 0
+      ? '${d.hour}h'
+      : '${d.hour}h${d.minute.toString().padLeft(2, '0')}';
+  return '${diaLongo(d.weekday)}, ${diaMes(d)}, $h';
+}
+
+/// RN-214: pedido de remarcação esperando o outro lado escolher a hora.
+@immutable
+class Remarcacao {
+  const Remarcacao({
+    required this.doCliente,
+    required this.dia,
+    required this.periodo,
+  });
+
+  final bool doCliente;
+  final DateTime dia;
+  final PeriodoDia periodo;
+
+  OpcaoHorario get opcao => OpcaoHorario(dia, periodo);
 }
 
 /// RN-188: o que acontece quando o profissional falha.
@@ -350,7 +468,9 @@ class PedidoRetorno {
     required this.retido,
     this.motivo,
     this.pagamento = 'Visa 4242',
-  });
+    List<OpcaoHorario>? horarios,
+    this.urgente = false,
+  }) : horarios = horarios ?? [];
 
   /// Número do serviço ("#TT-48213").
   final String servico;
@@ -392,6 +512,32 @@ class PedidoRetorno {
 
   /// RN-186: aceito e marcado para.
   DateTime? marcadoPara;
+
+  /// RN-213: até 3 horários que o cliente pode.
+  List<OpcaoHorario> horarios;
+
+  /// RN-213/RN-215: "É urgente? Pedir para hoje, se der".
+  bool urgente;
+
+  /// RN-213: horário que o profissional sugeriu (esperando o cliente).
+  DateTime? sugerido;
+
+  /// RN-214: cada lado remarca uma vez.
+  bool remarcouCliente = false;
+  bool remarcouProfissional = false;
+
+  /// RN-214: remarcação esperando o outro lado.
+  Remarcacao? remarcacao;
+
+  /// RN-215: lembretes já enviados (pela antecedência).
+  final lembretesEnviados = <Duration>{};
+
+  /// RN-213: último dia para o retorno.
+  DateTime get marcarAte => RegrasRetorno.limiteMarcar(pedidoEm);
+
+  /// RN-213: aceito, mas ainda sem horário combinado.
+  bool get semHorario =>
+      situacao == SituacaoRetorno.aceito && marcadoPara == null;
 
   /// RN-187: o retorno começa com o código na porta (RN-39).
   String codigo = RegrasCodigo.gerar();
@@ -572,6 +718,7 @@ class RetornosRepo extends ChangeNotifier {
           ],
           pedidoEm: clock.now(),
           retido: false,
+          horarios: _horariosDemo(clock.now()),
         ),
       );
     naoProcedeCliente.clear();
@@ -623,19 +770,129 @@ class RetornosRepo extends ChangeNotifier {
 
   // ---------- Profissional (RN-186) ----------
 
-  /// "Aceitar retorno": marca dia e hora em até 7 dias ([quando] nulo =
-  /// aceitou e ainda vai marcar; RN-188 conta os 7 dias).
+  /// RN-213: "Aceitar retorno": o profissional escolhe uma das opções do
+  /// cliente e a hora; fica marcado, sem confirmação do cliente. Vale
+  /// também depois de o cliente mandar novos horários ([quando] nulo =
+  /// aceitou e ainda vai marcar; a RN-188 conta o prazo).
   bool aceitar(PedidoRetorno r, DateTime? quando, {DateTime? agora}) {
+    final pode =
+        r.situacao == SituacaoRetorno.aguardando ||
+        (r.semHorario && quando != null);
+    if (!pode) return false;
+    if (quando != null && quando.isAfter(r.marcarAte)) return false;
+    r
+      ..situacao = SituacaoRetorno.aceito
+      ..marcadoPara = quando
+      ..sugerido = null;
+    notifyListeners();
+    return true;
+  }
+
+  /// RN-213: nenhuma opção serve: o profissional aceita e sugere outro
+  /// horário (até 7 dias depois do pedido); o cliente confirma.
+  bool sugerirHorario(PedidoRetorno r, DateTime quando, {DateTime? agora}) {
     final hoje = agora ?? clock.now();
-    if (r.situacao != SituacaoRetorno.aguardando) return false;
-    if (quando != null && quando.isAfter(hoje.add(RegrasRetorno.marcarEm))) {
+    final pode = r.situacao == SituacaoRetorno.aguardando || r.semHorario;
+    if (!pode || quando.isAfter(r.marcarAte) || !quando.isAfter(hoje)) {
       return false;
     }
     r
       ..situacao = SituacaoRetorno.aceito
-      ..marcadoPara = quando;
+      ..marcadoPara = null
+      ..sugerido = quando;
     notifyListeners();
     return true;
+  }
+
+  /// RN-213: o cliente confirma o horário sugerido.
+  bool confirmarSugerido(PedidoRetorno r) {
+    final s = r.sugerido;
+    if (!r.semHorario || s == null) return false;
+    r
+      ..marcadoPara = s
+      ..sugerido = null;
+    notifyListeners();
+    return true;
+  }
+
+  /// RN-213: "Escolher outro": o cliente manda novos horários; o
+  /// profissional escolhe de novo.
+  bool novosHorarios(
+    PedidoRetorno r,
+    List<OpcaoHorario> horarios, {
+    bool urgente = false,
+  }) {
+    if (!r.semHorario || horarios.isEmpty) return false;
+    r
+      ..horarios = horarios.take(RegrasRetorno.maxHorarios).toList()
+      ..urgente = urgente
+      ..sugerido = null;
+    notifyListeners();
+    return true;
+  }
+
+  // ---------- Remarcar (RN-214) ----------
+
+  /// [cliente] ainda pode remarcar? Uma vez cada lado, até 12 horas antes.
+  bool podeRemarcar(PedidoRetorno r, {required bool cliente, DateTime? agora}) {
+    final m = r.marcadoPara;
+    if (r.situacao != SituacaoRetorno.aceito || m == null || r.aCaminho) {
+      return false;
+    }
+    if (r.remarcacao != null) return false;
+    if (cliente ? r.remarcouCliente : r.remarcouProfissional) return false;
+    final hoje = agora ?? clock.now();
+    return !hoje.isAfter(m.subtract(RegrasRetorno.antecedenciaRemarcar));
+  }
+
+  /// RN-214: quem pede escolhe o dia e o período (dentro do prazo).
+  bool pedirRemarcar(
+    PedidoRetorno r, {
+    required bool cliente,
+    required DateTime dia,
+    required PeriodoDia periodo,
+    DateTime? agora,
+  }) {
+    if (!podeRemarcar(r, cliente: cliente, agora: agora)) return false;
+    final o = OpcaoHorario(dia, periodo);
+    if (o.as(periodo.inicio).isAfter(r.marcarAte)) return false;
+    if (o.passou(agora ?? clock.now())) return false;
+    r.remarcacao = Remarcacao(doCliente: cliente, dia: dia, periodo: periodo);
+    if (cliente) {
+      r.remarcouCliente = true;
+    } else {
+      r.remarcouProfissional = true;
+    }
+    notifyListeners();
+    return true;
+  }
+
+  /// RN-214: o outro lado escolhe a hora e confirma.
+  bool confirmarRemarcar(PedidoRetorno r, int hora) {
+    final p = r.remarcacao;
+    if (p == null || !p.periodo.horas.contains(hora)) return false;
+    r
+      ..marcadoPara = p.opcao.as(hora)
+      ..remarcacao = null
+      ..lembretesEnviados.clear();
+    notifyListeners();
+    return true;
+  }
+
+  /// RN-215: lembretes que já podem sair (e marca como enviados).
+  List<Duration> lembretesDevidos(PedidoRetorno r, {DateTime? agora}) {
+    final m = r.marcadoPara;
+    if (r.situacao != SituacaoRetorno.aceito || m == null) return const [];
+    final hoje = agora ?? clock.now();
+    if (!hoje.isBefore(m)) return const [];
+    final devidos = [
+      for (final d in RegrasRetorno.lembretes)
+        if (!r.lembretesEnviados.contains(d) &&
+            !hoje.isBefore(m.subtract(d)))
+          d,
+    ];
+    r.lembretesEnviados.addAll(devidos);
+    return devidos;
   }
 
   /// "Recusar": motivo obrigatório.
@@ -751,9 +1008,9 @@ class RetornosRepo extends ChangeNotifier {
             agora: hoje,
           );
           mudou = true;
+        // RN-213: sem horário combinado até 7 dias depois do pedido.
         case SituacaoRetorno.aceito
-            when r.marcadoPara == null &&
-                hoje.isAfter(r.respondaAte.add(RegrasRetorno.marcarEm)):
+            when r.marcadoPara == null && hoje.isAfter(r.marcarAte):
           _resolverSozinho(
             r,
             FalhaProfissional.naoMarcou,
@@ -854,6 +1111,18 @@ class RetornosRepo extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+/// Demo: amanhã de manhã e depois de amanhã à tarde.
+List<OpcaoHorario> _horariosDemo(DateTime agora) => [
+  OpcaoHorario(
+    DateTime(agora.year, agora.month, agora.day + 1),
+    PeriodoDia.manha,
+  ),
+  OpcaoHorario(
+    DateTime(agora.year, agora.month, agora.day + 2),
+    PeriodoDia.tarde,
+  ),
+];
 
 /// Instância única usada pelo app enquanto não há backend.
 final retornos = RetornosRepo();

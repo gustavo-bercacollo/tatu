@@ -302,9 +302,18 @@ void main() {
     expect(find.text('Foto do problema'), findsOneWidget);
     await t.tap(find.bySemanticsLabel('Tirar foto'));
     await t.pumpAndSettle();
+    // RN-213: passo 2 de 2: até 3 horários.
+    await t.tap(find.text('Continuar'));
+    await t.pumpAndSettle();
+    expect(find.text('2 de 2'), findsOneWidget);
+    expect(find.text('Quando você pode receber a Luiza?'), findsOneWidget);
+    await t.tap(find.bySemanticsLabel(RegExp(r'^Amanhã à tarde')));
+    await t.pump();
+    expect(find.text('1 de 3 · Amanhã à tarde'), findsOneWidget);
     await t.tap(find.text('Pedir retorno'));
     await t.pumpAndSettle();
     final r = retornos.doServico('#TT-48213')!;
+    expect(r.horarios, hasLength(1));
     expect(r.fotos, hasLength(1));
     expect(r.retido, isFalse);
     await t.scrollUntilVisible(find.text('Pedido de retorno'), 200,
@@ -378,8 +387,11 @@ void main() {
 
     await t.tap(find.text('Aceitar retorno'));
     await t.pumpAndSettle();
-    expect(find.text('Quando você volta?'), findsOneWidget);
-    await t.tap(find.text('Marcar retorno'));
+    // P157 · RN-213: escolhe uma das opções do cliente e a hora.
+    expect(find.text('Quando você vai?'), findsOneWidget);
+    await t.tap(find.text('9h'));
+    await t.pump();
+    await t.tap(find.textContaining('Aceitar · '));
     await t.pumpAndSettle();
     final r = retornos.doCliente('Júlia Costa')!;
     expect(r.situacao, SituacaoRetorno.aceito);

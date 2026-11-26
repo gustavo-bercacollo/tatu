@@ -50,6 +50,7 @@ import '../retorno/retorno_profissional.dart';
 
 import '../../../data/plano_fixo.dart';
 import '../plano_fixo/plano_fixo_profissional.dart';
+import '../../../shared/widgets/negociacao_plano.dart';
 import '../../cliente/plano_fixo/plano_fixo.dart' show respostaValorPlano;
 
 /// Cada lado pode propor até 3 valores.
@@ -294,59 +295,51 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     );
   }
 
+  /// RN-210 a RN-212: a negociação do plano fica no chat (histórico,
+  /// card da vez e, depois, o card confirmado ou o "sem acordo").
   List<Widget> _planoNoChat() {
     final p = _planoVisivel;
     if (p == null) return const [];
-    final estado = p.estado();
     // RN-148/RN-210: plano ativo com um novo valor em negociação.
     final novo = p.status == StatusPlano.ativo ? p.novoValor : null;
-    // RN-202: com o plano em andamento, a barra no topo já mostra.
-    if (novo == null &&
-        estado != EstadoPlano.aguardandoValor &&
-        estado != EstadoPlano.valorEnviado &&
-        estado != EstadoPlano.outroValorPedido &&
-        estado != EstadoPlano.encerrado) {
+    final n = novo ?? p.negociacao;
+    final encerrado = p.estado() == EstadoPlano.encerrado;
+    if (n.propostas.isEmpty && p.status != StatusPlano.pendente && !encerrado) {
       return const [];
     }
-    final n = novo ?? p.negociacao;
-    final cliente = '${p.clienteFeminina ? 'a' : 'o'} ${p.primeiroCliente}';
-    final valor = n.valor;
+    final suaVez =
+        n.vezDoProfissional && n.propostas.isNotEmpty && !n.ultimaProposta;
     return [
       const SizedBox(height: 18),
-      // RN-205: encerrado: só o divisor. RN-210: sem acordo.
-      if (estado == EstadoPlano.encerrado)
-        MarcadorChat(
-          p.semAcordo
-              ? 'Plano fixo sem acordo · '
-                    '${diaMes(p.encerradoEm ?? clock.now())}'
-              : 'Plano fixo encerrado · '
-                    '${diaMes(p.encerradoEm ?? clock.now())}',
-        )
-      else if (n.propostas.isEmpty)
-        CartaoPedidoPlano(plano: p, onEnviarValor: () => _valorDoPlano(p))
-      // P147 · RN-210: o cliente pediu outro valor.
-      else if (n.vezDoProfissional)
-        CartaoOutroValorPlano(
+      if (n.propostas.isNotEmpty) ...[
+        NegociacaoPlanoChat(
           plano: p,
+          souCliente: false,
           novoValor: novo != null,
           onAceitar: () => _aceitarValorPlano(p),
           onEnviarOutro: () => _valorDoPlano(p),
-        )
-      else if (n.aceita)
-        NotaChat(
-          'Você aceitou ${reaisInteiros(valor!)} por visita. '
-          'Aguardando $cliente confirmar.',
-        )
-      else if (n.ultimaProposta)
-        NotaChat(
-          'Último valor enviado · ${reaisInteiros(valor!)} por visita. '
-          'Aguardando $cliente.',
-        )
-      else
-        NotaChat(
-          'Valor do plano enviado · ${reaisInteiros(valor!)} por '
-          'visita. Aguardando $cliente.',
+          onVerPlano: _verPlano,
         ),
+        // P147 · RN-210: o próximo valor é o último.
+        if (suaVez) ...[
+          const SizedBox(height: TatuMedidas.entreItens),
+          Text(
+            'Seu próximo valor será o último '
+            '(${RegrasPlanoFixo.maxPropostas} de '
+            '${RegrasPlanoFixo.maxPropostas}).',
+            textAlign: TextAlign.center,
+            style: TatuTexto.legenda,
+          ),
+        ],
+      ] else if (!encerrado)
+        CartaoPedidoPlano(plano: p, onEnviarValor: () => _valorDoPlano(p)),
+      // RN-205: plano encerrado depois de ativo: o divisor embaixo.
+      if (encerrado && !p.semAcordo) ...[
+        if (n.propostas.isNotEmpty) const SizedBox(height: 18),
+        MarcadorChat(
+          'Plano fixo encerrado · ${diaMes(p.encerradoEm ?? clock.now())}',
+        ),
+      ],
     ];
   }
 
@@ -993,8 +986,11 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
                 onOutro: _enviarValor,
               ),
             ],
-            // À distância, o valor combinado vira marcador na conversa.
-            EstadoValor.combinado when c.distancia => const <Widget>[],
+            // RN-212: à distância, o card combinado também fica (além do
+            // marcador na conversa); sem endereço.
+            EstadoValor.combinado when c.distancia => [
+              _ValorCombinado(valor: _combinado),
+            ],
             EstadoValor.combinado => [
               // RN-181: o mesmo card preto que o cliente vê.
               if (_concluida) ...[
@@ -1330,7 +1326,7 @@ class _EnderecoLiberado extends StatelessWidget {
   }
 }
 
-/// P28 · RN-213: o cliente recusou o último valor: o chamado é encerrado
+/// P28 · RN-217: o cliente recusou o último valor: o chamado é encerrado
 /// sem custo e não conta contra o profissional (nem como cancelamento,
 /// RN-64, nem como abandono, RN-79).
 class SemAcordoPage extends StatelessWidget {

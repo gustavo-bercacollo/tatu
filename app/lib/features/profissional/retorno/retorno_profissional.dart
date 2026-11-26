@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,18 +9,20 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
-import '../../../data/plano_fixo.dart' show diaMes, diaCurto;
+import '../../../data/plano_fixo.dart' show diaMes, diaLongo;
 import '../../../data/retorno.dart';
 import '../../../data/retorno_acoes.dart';
 import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/campo_texto_longo.dart';
 import '../../../shared/widgets/folha.dart';
+import '../../../shared/widgets/horarios_retorno.dart';
 import '../../../shared/widgets/nota_icone.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import '../../../shared/widgets/retorno.dart';
-import '../../../shared/widgets/tatu_chip.dart';
 import '../../../data/conversas_profissional.dart';
+import '../../cliente/retorno/retorno_cliente.dart'
+    show CartaoConfirmarRemarcar, remarcarRetorno, simularAceiteRetorno;
 import '../../entrada/camera_prova_page.dart';
 import '../chamado/chat_profissional_page.dart';
 
@@ -41,6 +45,8 @@ List<Widget> secaoRetornoProfissional(
         TatuColors.warningTexto,
       );
       depois.addAll([
+        // RN-215: pedido urgente em destaque.
+        if (r.urgente) ...[_Urgente(r), const SizedBox(height: 12)],
         FilledButton(
           onPressed: () => aceitarRetorno(context, r),
           child: const Text('Aceitar retorno'),
@@ -67,8 +73,34 @@ List<Widget> secaoRetornoProfissional(
           style: TatuTexto.nota,
         ),
       ]);
+    case SituacaoRetorno.aceito when r.sugerido != null:
+      // P158 · RN-213: esperando o cliente confirmar.
+      depois.add(
+        CartaoSituacaoRetorno(
+          aviso: true,
+          titulo: 'Horário sugerido',
+          linha: quandoRetorno(r.sugerido!),
+          nota: 'Aguardando $a $cliente confirmar.',
+        ),
+      );
+    case SituacaoRetorno.aceito when r.marcadoPara == null:
+      // RN-213: o cliente mandou novos horários.
+      depois.addAll([
+        CartaoSituacaoRetorno(
+          titulo: 'Retorno aceito · sem custo',
+          nota: r.horarios.isEmpty
+              ? 'Marque até ${diaMes(r.marcarAte)}.'
+              : '${_maiuscula(r.oCliente)} mandou novos horários.',
+        ),
+        const SizedBox(height: TatuMedidas.entreItens),
+        FilledButton(
+          onPressed: () => aceitarRetorno(context, r),
+          child: const Text('Escolher horário'),
+        ),
+      ]);
     case SituacaoRetorno.aceito:
       final m = r.marcadoPara;
+      final rem = r.remarcacao;
       depois.addAll([
         CartaoSituacaoRetorno(
           titulo: 'Retorno aceito · sem custo',
@@ -77,6 +109,23 @@ List<Widget> secaoRetornoProfissional(
               'Na hora, peça o código à $cliente para começar.\n'
               'Ele aparece na sua Atividade.',
         ),
+        // RN-214: remarcação pedida por um dos lados.
+        if (rem != null) ...[
+          const SizedBox(height: TatuMedidas.entreItens),
+          rem.doCliente
+              ? CartaoConfirmarRemarcar(
+                  titulo: '$cliente pediu para remarcar',
+                  remarcacao: rem,
+                  onConfirmar: (h) => retornos.confirmarRemarcar(r, h),
+                )
+              : CartaoSituacaoRetorno(
+                  aviso: true,
+                  titulo: 'Remarcação pedida',
+                  nota:
+                      '${textoOpcao(rem.opcao, clock.now())}. '
+                      '${_maiuscula(r.oCliente)} escolhe a hora e confirma.',
+                ),
+        ],
         const SizedBox(height: TatuMedidas.entreItens),
         FilledButton(
           onPressed: () => digitarCodigoRetorno(context, r),
@@ -89,6 +138,14 @@ List<Widget> secaoRetornoProfissional(
             onTap: () => clienteNaoEstava(context, r),
           ),
         ),
+        // RN-214: o profissional também remarca uma vez.
+        if (retornos.podeRemarcar(r, cliente: false))
+          Center(
+            child: LinkAzul(
+              'Remarcar',
+              onTap: () => remarcarRetorno(context, r, cliente: false),
+            ),
+          ),
       ]);
     case SituacaoRetorno.outroProblema:
       linha = SituacaoCartaoRetorno(
@@ -117,18 +174,14 @@ List<Widget> secaoRetornoProfissional(
         ),
       );
     case SituacaoRetorno.resolvidoAutomatico:
-      linha = SituacaoCartaoRetorno(
-        TablerIcons.x,
-        switch (r.falha) {
-          FalhaProfissional.naoMarcou =>
-            'Você não marcou o retorno em ${RegrasRetorno.marcarEm.inDays} dias',
-          FalhaProfissional.naoVeio => 'Você não veio no retorno',
-          _ =>
-            'Você não respondeu em '
-                '${RegrasRetorno.respostaProfissional.inHours} horas',
-        },
-        TatuColors.danger,
-      );
+      linha = SituacaoCartaoRetorno(TablerIcons.x, switch (r.falha) {
+        FalhaProfissional.naoMarcou =>
+          'Você não marcou o retorno em ${RegrasRetorno.marcarEm.inDays} dias',
+        FalhaProfissional.naoVeio => 'Você não veio no retorno',
+        _ =>
+          'Você não respondeu em '
+              '${RegrasRetorno.respostaProfissional.inHours} horas',
+      }, TatuColors.danger);
       depois.addAll([
         CartaoSituacaoRetorno(
           aviso: true,
@@ -151,7 +204,7 @@ List<Widget> secaoRetornoProfissional(
       linha = SituacaoCartaoRetorno(
         TablerIcons.shield_check,
         'O Tatu está analisando · até '
-            '${diaMes(RegrasRetorno.prazoMediacao(r.mediacaoDesde!))}',
+        '${diaMes(RegrasRetorno.prazoMediacao(r.mediacaoDesde!))}',
         TatuColors.textSecondary,
       );
     case SituacaoRetorno.encerrado:
@@ -171,44 +224,45 @@ List<Widget> secaoRetornoProfissional(
   ];
 }
 
-/// P154 · RN-186: aceita e marca dia e hora em até 7 dias.
+/// P157 · RN-213: "Aceitar retorno": escolhe uma das opções do cliente e
+/// a hora; fica marcado, sem confirmação. Sem opção que sirva (ou sem
+/// opções), sugere outro horário (P158).
 Future<void> aceitarRetorno(BuildContext context, PedidoRetorno r) async {
-  final quando = await escolherQuandoRetorno(context, r);
-  if (quando == null) return;
-  retornos.aceitar(r, quando);
+  final agora = clock.now();
+  final opcoes = [
+    for (final o in r.horarios)
+      if (!o.passou(agora)) o,
+  ];
+  if (opcoes.isEmpty) return sugerirOutroHorario(context, r);
+  final e = await mostrarFolha<(DateTime?, bool)>(
+    context,
+    builder: (_) => _FolhaQuandoVai(retorno: r, opcoes: opcoes),
+  );
+  if (e == null || !context.mounted) return;
+  if (e.$2) return sugerirOutroHorario(context, r);
+  final quando = e.$1;
+  if (quando != null) retornos.aceitar(r, quando);
 }
 
-/// Folha "Quando você volta?": dia (próximos 7) e hora.
-Future<DateTime?> escolherQuandoRetorno(
-  BuildContext context,
-  PedidoRetorno r,
-) => mostrarFolha<DateTime>(
-  context,
-  builder: (_) => _FolhaQuando(retorno: r),
-);
-
-class _FolhaQuando extends StatefulWidget {
-  const _FolhaQuando({required this.retorno});
+class _FolhaQuandoVai extends StatefulWidget {
+  const _FolhaQuandoVai({required this.retorno, required this.opcoes});
 
   final PedidoRetorno retorno;
+  final List<OpcaoHorario> opcoes;
 
   @override
-  State<_FolhaQuando> createState() => _FolhaQuandoState();
+  State<_FolhaQuandoVai> createState() => _FolhaQuandoVaiState();
 }
 
-class _FolhaQuandoState extends State<_FolhaQuando> {
-  static const _horas = [8, 10, 14, 16, 18];
-  late final _hoje = clock.now();
-  int _dia = 1;
-  int _hora = 14;
+class _FolhaQuandoVaiState extends State<_FolhaQuandoVai> {
+  int _opcao = 0;
+  int? _hora;
 
   @override
   Widget build(BuildContext context) {
-    final dias = [
-      for (var i = 1; i <= RegrasRetorno.marcarEm.inDays; i++)
-        DateTime(_hoje.year, _hoje.month, _hoje.day + i),
-    ];
-    final escolhido = dias[_dia - 1];
+    final r = widget.retorno;
+    final o = widget.opcoes[_opcao];
+    final h = _hora;
     return SafeArea(
       top: false,
       child: Padding(
@@ -224,54 +278,82 @@ class _FolhaQuandoState extends State<_FolhaQuando> {
           children: [
             const AlcaFolha(),
             const SizedBox(height: TatuMedidas.entreSecoes),
-            const Text('Quando você volta?', style: TatuTexto.tituloFolha),
+            const Text('Quando você vai?', style: TatuTexto.tituloFolha),
             const SizedBox(height: 6),
             Text(
-              'Sem custo para ${widget.retorno.oCliente} e sem taxa. Em até '
-              '${RegrasRetorno.marcarEm.inDays} dias.',
-              style: TatuTexto.corpo,
+              '${_maiuscula(r.oCliente)} pode nestes horários:',
+              style: TatuTexto.detalhe,
             ),
-            const SizedBox(height: TatuMedidas.entreSecoes),
-            const Text('DIA', style: TatuTexto.secao),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final (i, d) in dias.indexed)
-                  TatuChip(
-                    label: '${diaCurto(d.weekday)} ${d.day}',
-                    selecionado: _dia == i + 1,
-                    onTap: () => setState(() => _dia = i + 1),
+            if (r.urgente) ...[
+              const SizedBox(height: TatuMedidas.entreItens),
+              _Urgente(r),
+            ],
+            const SizedBox(height: TatuMedidas.entreItens + 4),
+            for (final (i, x) in widget.opcoes.indexed) ...[
+              if (i > 0) const SizedBox(height: 10),
+              OpcaoSelecionavel(
+                selecionado: i == _opcao,
+                rotulo: textoOpcao(x, clock.now()),
+                onTap: () => setState(() {
+                  _opcao = i;
+                  _hora = null;
+                }),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 12, 14, 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${_maiuscula(diaLongo(x.dia.weekday))}, '
+                              '${diaMes(x.dia)}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${x.periodo.nome} · ${x.periodo.faixaLonga}',
+                              style: TatuTexto.nota,
+                            ),
+                          ],
+                        ),
+                      ),
+                      BolinhaEscolha(selecionado: i == _opcao),
+                    ],
                   ),
-              ],
+                ),
+              ),
+            ],
+            const SizedBox(height: TatuMedidas.entreSecoes),
+            Text(
+              'Que horas?',
+              style: TatuTexto.nota.copyWith(fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: TatuMedidas.entreSecoes),
-            const Text('HORA', style: TatuTexto.secao),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final h in _horas)
-                  TatuChip(
-                    label: '${h}h',
-                    selecionado: _hora == h,
-                    onTap: () => setState(() => _hora = h),
-                  ),
-              ],
+            const SizedBox(height: 10),
+            SeletorHora(
+              horas: o.periodo.horas,
+              selecionada: h,
+              onEscolher: (v) => setState(() => _hora = v),
             ),
             const SizedBox(height: TatuMedidas.entreSecoes),
             FilledButton(
-              onPressed: () => Navigator.of(context).pop(
-                DateTime(
-                  escolhido.year,
-                  escolhido.month,
-                  escolhido.day,
-                  _hora,
-                ),
+              onPressed: h == null
+                  ? null
+                  : () => Navigator.of(context).pop((o.as(h), false)),
+              child: Text(
+                h == null ? 'Aceitar' : 'Aceitar · ${quandoCurto(o.as(h))}',
               ),
-              child: const Text('Marcar retorno'),
+            ),
+            const SizedBox(height: 8),
+            Center(
+              child: LinkAzul(
+                'Nenhum serve? Sugerir outro horário',
+                onTap: () => Navigator.of(context).pop((null, true)),
+              ),
             ),
           ],
         ),
@@ -279,6 +361,127 @@ class _FolhaQuandoState extends State<_FolhaQuando> {
     );
   }
 }
+
+/// P158 · RN-213: sugere dia e hora (até 7 dias depois do pedido); o
+/// cliente confirma no chat.
+Future<void> sugerirOutroHorario(BuildContext context, PedidoRetorno r) async {
+  final quando = await mostrarFolha<DateTime>(
+    context,
+    builder: (_) => _FolhaSugerir(retorno: r),
+  );
+  if (quando == null) return;
+  final ok = retornos.sugerirHorario(r, quando);
+  // Protótipo: o cliente confirma o horário sugerido.
+  final espera = simularAceiteRetorno;
+  if (ok && espera != null) {
+    Timer(espera, () => retornos.confirmarSugerido(r));
+  }
+}
+
+class _FolhaSugerir extends StatefulWidget {
+  const _FolhaSugerir({required this.retorno});
+
+  final PedidoRetorno retorno;
+
+  @override
+  State<_FolhaSugerir> createState() => _FolhaSugerirState();
+}
+
+class _FolhaSugerirState extends State<_FolhaSugerir> {
+  late final _agora = clock.now();
+  DateTime? _dia;
+  int? _hora;
+
+  @override
+  Widget build(BuildContext context) {
+    final r = widget.retorno;
+    final ate = r.marcarAte;
+    final dias = [
+      for (var i = 1; i <= RegrasRetorno.marcarEm.inDays; i++)
+        DateTime(_agora.year, _agora.month, _agora.day + i),
+    ].where((d) => !d.isAfter(ate)).toList();
+    final d = _dia;
+    final h = _hora;
+    final quando = d == null || h == null
+        ? null
+        : DateTime(d.year, d.month, d.day, h);
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          TatuMedidas.margem,
+          10,
+          TatuMedidas.margem,
+          TatuMedidas.base,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const AlcaFolha(),
+            const SizedBox(height: TatuMedidas.entreSecoes),
+            const Text('Sugerir outro horário', style: TatuTexto.tituloFolha),
+            const SizedBox(height: 6),
+            Text(
+              'Dentro de ${RegrasRetorno.marcarEm.inDays} dias: até '
+              '${diaLongo(ate.weekday)}, ${diaMes(ate)}.',
+              style: TatuTexto.detalhe,
+            ),
+            const SizedBox(height: TatuMedidas.entreItens + 4),
+            SeletorDiasRetorno(
+              dias: dias,
+              selecionado: d,
+              onEscolher: (x) => setState(() => _dia = x),
+            ),
+            const SizedBox(height: TatuMedidas.entreSecoes),
+            Text(
+              'Horário',
+              style: TatuTexto.nota.copyWith(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 10),
+            SeletorHora(
+              horas: RegrasRetorno.horasSugestao,
+              selecionada: h,
+              onEscolher: (v) => setState(() => _hora = v),
+            ),
+            const SizedBox(height: TatuMedidas.entreSecoes),
+            NotaIcone(
+              icone: TablerIcons.info_circle,
+              texto:
+                  '${_maiuscula(r.oCliente)} precisa confirmar o novo horário.',
+            ),
+            const SizedBox(height: TatuMedidas.entreSecoes),
+            FilledButton(
+              onPressed: quando == null || !quando.isAfter(_agora)
+                  ? null
+                  : () => Navigator.of(context).pop(quando),
+              child: Text(
+                quando == null ? 'Enviar' : 'Enviar · ${quandoCurto(quando)}',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// RN-215: "Urgente · a [cliente] pediu hoje, se der".
+class _Urgente extends StatelessWidget {
+  const _Urgente(this.retorno);
+
+  final PedidoRetorno retorno;
+
+  @override
+  Widget build(BuildContext context) => CaixaAviso(
+    'Urgente · ${retorno.oCliente} pediu hoje, se der',
+    icone: TablerIcons.flame,
+    negrito: true,
+  );
+}
+
+String _maiuscula(String s) =>
+    s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
 
 /// P153 · RN-186: motivo obrigatório da recusa.
 Future<void> recusarRetorno(BuildContext context, PedidoRetorno r) async {
@@ -441,11 +644,7 @@ class _OutroProblemaPageState extends State<OutroProblemaPage> {
       children: [
         const Text('Foto no local', style: TatuTexto.nota),
         const SizedBox(height: TatuMedidas.entreItens),
-        FotosProva(
-          fotos: [?_foto],
-          onCamera: _camera,
-          maximo: 1,
-        ),
+        FotosProva(fotos: [?_foto], onCamera: _camera, maximo: 1),
         const SizedBox(height: TatuMedidas.entreSecoes),
         CampoTextoLongo(
           controller: _texto,

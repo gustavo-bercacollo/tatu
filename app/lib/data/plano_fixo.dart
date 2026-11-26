@@ -473,6 +473,30 @@ class PlanoFixo {
       'toda ${dias.map(diaLongo).join(' e ')}, ${horaCurta(horario)}';
 
   String get periodo => mensal ? 'mês' : 'semana';
+
+  /// RN-211: "Sex e sáb".
+  String get diasCurtos {
+    final nomes = [for (final d in dias) diaCurto(d).toLowerCase()];
+    final t = nomes.length < 2
+        ? nomes.join()
+        : '${nomes.sublist(0, nomes.length - 1).join(', ')} e ${nomes.last}';
+    return t.isEmpty ? t : t[0].toUpperCase() + t.substring(1);
+  }
+
+  /// RN-211: 1ª visita: a marcada ou, antes de começar, o próximo dia do
+  /// plano no horário escolhido.
+  DateTime primeiraVisita([DateTime? agora]) {
+    if (visitas.isNotEmpty) return visitas.first.dia;
+    final hoje = agora ?? clock.now();
+    final partes = horario.split(':');
+    final h = int.tryParse(partes.first) ?? 9;
+    final m = partes.length > 1 ? int.tryParse(partes[1]) ?? 0 : 0;
+    for (var i = 0; i < 8; i++) {
+      final d = DateTime(hoje.year, hoje.month, hoje.day + i, h, m);
+      if (dias.contains(d.weekday) && d.isAfter(hoje)) return d;
+    }
+    return hoje;
+  }
 }
 
 /// Planos fixos e pedidos avulsos. Versão simulada (sem backend).

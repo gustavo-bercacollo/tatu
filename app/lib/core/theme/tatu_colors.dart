@@ -11,6 +11,8 @@ class TatuColors {
   static const textPrimary = Color(0xFF000000);
   static const textSecondary = Color(0xFF8E8E93);
   static const chevron = Color(0xFFC7C7CC);
+  static const textoTerciario = Color(0xFFAEAEB2); // linha de baixo das propostas encolhidas (RN-212)
+  static const contornoClaro = Color(0xFFD1D1D6); // contorno das propostas encolhidas (RN-212)
   static const textDisabled = Color(0xFFB0B0B5);
   static const circle = Color(0xFFE4E4E7); // avatar e botões redondos
   static const tabBar = Color(0xFFF9F9F9);

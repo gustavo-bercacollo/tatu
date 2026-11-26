@@ -48,8 +48,51 @@ void conferirPrazosRetorno({DateTime? agora}) {
       _avisarResolvidoAutomatico(r);
     }
   }
+  // RN-215: lembretes na véspera e 1 hora antes, para os dois.
+  final hoje = agora ?? clock.now();
+  for (final r in retornos.retornos) {
+    for (final d in retornos.lembretesDevidos(r, agora: hoje)) {
+      _lembrar(r, d, hoje);
+    }
+  }
   // RN-199: fotos guardadas além do prazo são apagadas.
   retornos.apagarFotosAntigas(agora: agora);
+}
+
+/// RN-215: lembrete do retorno marcado, pelo canal do Tatu de cada lado.
+void _lembrar(PedidoRetorno r, Duration antes, DateTime agora) {
+  final m = r.marcadoPara!;
+  final q = quandoRetorno(m);
+  final quando = '${q[0].toLowerCase()}${q.substring(1)}';
+  final resumo = antes >= const Duration(hours: 24)
+      ? 'Retorno amanhã'
+      : 'Retorno em 1 hora';
+  final id = 'retorno-lembrete-${r.servico}-${m.toIso8601String()}-'
+      '${antes.inMinutes}';
+  if (_ehOCliente(r.cliente)) {
+    canalTatu.cliente.receber(
+      MensagemTatu(
+        id: '$id-cliente',
+        em: agora,
+        resumo: '$resumo com ${r.oProfissional}',
+        texto:
+            'Lembrete: o retorno com ${r.oProfissional} é $quando. Na hora, '
+            'passe o código ${r.codigo}.',
+      ),
+    );
+  }
+  if (_ehOProfissional(r.profissional)) {
+    canalTatu.profissional.receber(
+      MensagemTatu(
+        id: '$id-profissional',
+        em: agora,
+        resumo: '$resumo com ${r.oCliente}',
+        texto:
+            'Lembrete: o retorno com ${r.oCliente} é $quando. Peça o código '
+            'na porta para começar.',
+      ),
+    );
+  }
 }
 
 /// P157 · RN-198: o profissional recebe a decisão automática pelo canal

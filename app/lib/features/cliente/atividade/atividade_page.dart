@@ -4,6 +4,7 @@ import '../plano_fixo/plano_fixo.dart' show PlanoFixoPage;
 import '../../../shared/widgets/selo_plano_fixo.dart';
 import '../../../data/plano_fixo.dart';
 import '../../../data/retorno.dart';
+import '../retorno/retorno_cliente.dart' show remarcarRetorno;
 import '../../../data/conta.dart';
 import '../../../data/conversas.dart';
 import '../mensagens/chat_page.dart';
@@ -392,11 +393,37 @@ class _CartaoRetornoCliente extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        'Na hora, passe o código para '
-                        '${r.profissionalFeminino ? 'a' : 'o'} '
-                        '${r.primeiroProfissional}.',
-                        style: TatuTexto.nota,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              // RN-214: remarcação esperando o outro lado.
+                              r.remarcacao != null
+                                  ? 'Remarcação pedida · aguardando '
+                                        '${r.oProfissional}'
+                                  : 'Na hora, passe o código para '
+                                        '${r.profissionalFeminino ? 'a' : 'o'} '
+                                        '${r.primeiroProfissional}.',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TatuTexto.nota,
+                            ),
+                          ),
+                          // C244 · RN-214: remarcar uma vez, até 12 h antes.
+                          if (retornos.podeRemarcar(r, cliente: true))
+                            GestureDetector(
+                              onTap: () =>
+                                  remarcarRetorno(context, r, cliente: true),
+                              child: const Text(
+                                'Remarcar',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: TatuColors.verified,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ],
                   ),

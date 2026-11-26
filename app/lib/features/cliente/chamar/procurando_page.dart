@@ -204,7 +204,7 @@ class _ProcurandoPageState extends State<ProcurandoPage>
                 ),
                 ocupados: {
                   for (final p in pedidos.andamentos) p.profissional,
-                  // RN-213: quem ficou sem acordo não volta.
+                  // RN-217: quem ficou sem acordo não volta.
                   ...pedidos.recusados,
                 },
               ) +

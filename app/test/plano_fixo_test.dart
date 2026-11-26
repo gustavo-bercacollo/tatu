@@ -11,6 +11,7 @@ import 'package:tatu/features/profissional/chamado/chat_profissional_page.dart';
 import 'package:tatu/features/profissional/plano_fixo/plano_fixo_profissional.dart';
 import 'package:tatu/data/plano_fixo.dart';
 import 'package:tatu/data/profissional.dart';
+import 'package:tatu/shared/widgets/negociacao_plano.dart';
 
 /// Plano fixo (RN-144 a RN-149): regras de dados.
 
@@ -238,18 +239,23 @@ void main() {
       await t.tap(find.text('Tornar Luiza fixa'));
       await t.pumpAndSettle();
       expect(
-        find.text('Pelo Tatu, a mesma profissional vem até 2 vezes por semana.'),
+        find.text(
+          'Pelo Tatu, a mesma profissional vem até 2 vezes por semana.',
+        ),
         findsOneWidget,
       );
       await t.tap(find.text('Pedir valor à Luiza'));
       await t.pumpAndSettle();
-      expect(find.text('Pedido de plano fixo enviado à Luiza.'), findsOneWidget);
+      expect(
+        find.text('Pedido de plano fixo enviado à Luiza.'),
+        findsOneWidget,
+      );
       await t.pump(const Duration(seconds: 1));
       await t.pump();
-      expect(find.text('Luiza enviou o valor do plano'), findsOneWidget);
-      expect(find.text('R\$ 600 por mês'), findsOneWidget);
-      // RN-210: "Proposta 1 de 3" e "Pedir outro valor" dentro do card.
-      expect(find.text('Proposta 1 de 3'), findsOneWidget);
+      expect(find.text('propôs um plano mensal'), findsOneWidget);
+      expect(find.textContaining('R\$ 600', findRichText: true), findsWidgets);
+      // RN-210/RN-211: "1 de 3" e "Pedir outro valor" dentro do card.
+      expect(find.text('1 de 3'), findsOneWidget);
       await t.scrollUntilVisible(
         find.text('Pedir outro valor'),
         200,
@@ -258,7 +264,7 @@ void main() {
       expect(
         find.ancestor(
           of: find.text('Pedir outro valor'),
-          matching: find.byType(CartaoPropostaPlano),
+          matching: find.byType(NegociacaoPlanoChat),
         ),
         findsOneWidget,
       );
@@ -312,7 +318,8 @@ void main() {
       await t.tap(find.text('Enviar para Ana'));
       await t.pumpAndSettle();
       expect(p.valorPorVisita, 150);
-      expect(find.textContaining('Valor do plano enviado'), findsOneWidget);
+      // RN-211: a proposta dela fica à direita, aguardando a cliente.
+      expect(find.text('Aguardando a Ana responder'), findsOneWidget);
       expect(find.text('Enviar valor do plano'), findsNothing);
     });
 

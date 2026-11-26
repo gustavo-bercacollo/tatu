@@ -53,6 +53,7 @@ import '../../entrada/perfil_publico_page.dart';
 import '../../entrada/ligacao_page.dart';
 import '../../../data/plano_fixo.dart';
 import '../plano_fixo/plano_fixo.dart';
+import '../../../shared/widgets/negociacao_plano.dart';
 
 void _emBreve(BuildContext context, String o) => ScaffoldMessenger.of(context)
   ..hideCurrentSnackBar()
@@ -371,11 +372,9 @@ class _ChatPageState extends State<ChatPage> {
 
   List<Widget> _valor() {
     final v = _c.valor;
+    // RN-212: nenhum card de valor some depois de combinado (à distância
+    // também; o marcador no chat continua).
     if (v == null) return const [];
-    // À distância, depois de confirmar, vale o marcador no chat.
-    if (_c.distancia && v.situacao == SituacaoValor.confirmado) {
-      return const [];
-    }
     return [
       const SizedBox(height: TatuMedidas.entreSecoes),
       // RN-87: numa conversa que já teve serviço, é um valor novo.
@@ -466,7 +465,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  /// RN-212: "Recusar valor" no 3º valor: chamar outro ou cancelar.
+  /// RN-216: "Recusar valor" no 3º valor: chamar outro ou cancelar.
   Future<void> _recusar() async {
     final ela = '${_c.artigo} ${_c.primeiroNome}';
     final chamarOutro = await perguntar(
@@ -481,7 +480,7 @@ class _ChatPageState extends State<ChatPage> {
       iconeAviso: false,
     );
     if (chamarOutro == null || !mounted) return;
-    // RN-213: sem custo; o pedido com ela sai e ela não volta.
+    // RN-217: sem custo; o pedido com ela sai e ela não volta.
     conversas.recusarValor(_c);
     final p = pedidos.semAcordo(_c.nome);
     if (chamarOutro) {
@@ -866,54 +865,57 @@ class _ChatPageState extends State<ChatPage> {
     ];
   }
 
+  /// RN-211: valor do último serviço avulso com a pessoa (economia).
+  double? get _ultimoAvulso {
+    final c = pedidos.concluidos
+        .where((x) => x.profissional == _c.nome)
+        .firstOrNull;
+    return c == null ? null : lerReais(c.valor);
+  }
+
+  /// RN-210 a RN-212: a negociação do plano fica no chat (histórico,
+  /// card da vez e, depois, o card confirmado ou o "sem acordo").
   List<Widget> _planoNoChat() {
     final p = _planoVisivel;
     if (p == null || _c.encerrada) return const [];
-    final estado = p.estado();
     // RN-148/RN-210: plano ativo com um novo valor em negociação.
     final novo = p.status == StatusPlano.ativo ? p.novoValor : null;
-    // RN-202: ativo, pausado ou cancelado: a barra no topo já mostra.
-    if (novo == null &&
-        estado != EstadoPlano.aguardandoValor &&
-        estado != EstadoPlano.valorEnviado &&
-        estado != EstadoPlano.outroValorPedido &&
-        estado != EstadoPlano.encerrado) {
+    final n = novo ?? p.negociacao;
+    final encerrado = p.estado() == EstadoPlano.encerrado;
+    if (n.propostas.isEmpty && p.status != StatusPlano.pendente && !encerrado) {
       return const [];
     }
-    final n = novo ?? p.negociacao;
-    final para = '${_c.artigo == 'a' ? 'a' : 'o'} ${_c.primeiroNome}';
     return [
       const SizedBox(height: 18),
-      // RN-205: encerrado: sem selo e sem barra, só o divisor.
-      // RN-210: sem acordo, o plano não começou.
-      if (estado == EstadoPlano.encerrado)
-        MarcadorChat(
-          p.semAcordo
-              ? 'Plano fixo sem acordo · '
-                    '${diaMes(p.encerradoEm ?? clock.now())}'
-              : 'Plano fixo encerrado · '
-                    '${diaMes(p.encerradoEm ?? clock.now())}',
-        )
-      else if (n.propostas.isEmpty)
-        NotaChat(
-          'Pedido de plano fixo enviado ${_c.artigo == 'a' ? 'à' : 'ao'} '
-          '${_c.primeiroNome}.',
-        )
-      // RN-210: o cliente pediu outro valor; aguarda a resposta.
-      else if (n.vezDoProfissional)
-        NotaChat(
-          'Você pediu ${reaisInteiros(n.valor!)} por visita. '
-          'Aguardando $para.',
-        )
-      else
-        CartaoPropostaPlano(
+      if (n.propostas.isNotEmpty)
+        NegociacaoPlanoChat(
           plano: p,
+          souCliente: true,
           novoValor: novo != null,
+          ultimoAvulso: _ultimoAvulso,
+          cartao: p.cartao ?? pagamentos.padrao?.titulo,
           onConfirmar: () => _confirmarPlano(p),
           onOutroValor: () => _outroValorPlano(p),
           onRecusar: () => _recusarPlano(p),
           onTrocarCartao: () => _emBreve(context, 'Trocar cartão'),
+          onVerPlano: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => PlanoFixoPage(plano: p, doChat: true),
+            ),
+          ),
+        )
+      else if (!encerrado)
+        NotaChat(
+          'Pedido de plano fixo enviado ${_c.artigo == 'a' ? 'à' : 'ao'} '
+          '${_c.primeiroNome}.',
         ),
+      // RN-205: plano encerrado depois de ativo: o divisor embaixo.
+      if (encerrado && !p.semAcordo) ...[
+        if (n.propostas.isNotEmpty) const SizedBox(height: 18),
+        MarcadorChat(
+          'Plano fixo encerrado · ${diaMes(p.encerradoEm ?? clock.now())}',
+        ),
+      ],
     ];
   }
 
@@ -1139,7 +1141,7 @@ class _ChatPageState extends State<ChatPage> {
                 NotaChat(fim.nota!),
               ],
             ] else if (_c.semAcordo) ...[
-              // RN-213: só leitura depois da recusa do último valor.
+              // RN-217: só leitura depois da recusa do último valor.
               const SizedBox(height: TatuMedidas.entreSecoes),
               const MarcadorChat('Sem acordo de valor'),
             ] else ...[

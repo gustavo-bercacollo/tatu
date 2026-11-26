@@ -9,7 +9,7 @@ import 'package:tatu/features/cliente/chamar/procurando_page.dart';
 import 'package:tatu/features/cliente/mensagens/chat_page.dart';
 import 'package:tatu/features/profissional/chamado/chat_profissional_page.dart';
 
-/// Recusar o último valor da negociação (RN-27, RN-212, RN-213).
+/// Recusar o último valor da negociação (RN-27, RN-216, RN-217).
 
 Future<void> _carregarInter() async {
   final f = FontLoader('Inter');
@@ -56,7 +56,7 @@ void main() {
     pedidos.restaurar();
   });
 
-  testWidgets('RN-212: rodadas 1 e 2 pedem outro valor, sem recusar', (
+  testWidgets('RN-216: rodadas 1 e 2 pedem outro valor, sem recusar', (
     t,
   ) async {
     t.view.physicalSize = const Size(1179, 2556);
@@ -72,7 +72,7 @@ void main() {
     expect(find.textContaining('Último valor'), findsNothing);
   });
 
-  testWidgets('RN-212: no 3º valor, aviso e "Recusar valor"', (t) async {
+  testWidgets('RN-216: no 3º valor, aviso e "Recusar valor"', (t) async {
     await _ultimoValor(t);
     expect(find.text('Pedir outro valor'), findsNothing);
     expect(
@@ -83,7 +83,7 @@ void main() {
     );
   });
 
-  testWidgets('RN-212: "Voltar" não muda nada', (t) async {
+  testWidgets('RN-216: "Voltar" não muda nada', (t) async {
     await _ultimoValor(t);
     await _abrirFolha(t);
     expect(find.text('Recusar e chamar outro'), findsOneWidget);
@@ -94,7 +94,7 @@ void main() {
     expect(pedidos.doProfissional('Luiza Souza'), isNotNull);
   });
 
-  testWidgets('RN-212/RN-213: recusar e cancelar o pedido', (t) async {
+  testWidgets('RN-216/RN-217: recusar e cancelar o pedido', (t) async {
     await _ultimoValor(t);
     await _abrirFolha(t);
     await t.tap(find.text('Recusar e cancelar pedido'));
@@ -111,7 +111,7 @@ void main() {
     await t.pumpAndSettle();
   });
 
-  testWidgets('RN-212/RN-213: recusar e chamar outro (ela não volta)', (
+  testWidgets('RN-216/RN-217: recusar e chamar outro (ela não volta)', (
     t,
   ) async {
     await _ultimoValor(t);
@@ -127,7 +127,7 @@ void main() {
     await t.pump(const Duration(milliseconds: 500));
   });
 
-  testWidgets('RN-213: profissional vê que não conta contra ele', (t) async {
+  testWidgets('RN-217: profissional vê que não conta contra ele', (t) async {
     await t.pumpWidget(
       MaterialApp(
         theme: tatuTheme(),

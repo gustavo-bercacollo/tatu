@@ -9,7 +9,7 @@ import 'package:tatu/data/plano_fixo.dart';
 import 'package:tatu/features/cliente/mensagens/chat_page.dart';
 import 'package:tatu/features/cliente/plano_fixo/plano_fixo.dart';
 import 'package:tatu/features/profissional/chamado/chat_profissional_page.dart';
-import 'package:tatu/features/profissional/plano_fixo/plano_fixo_profissional.dart';
+import 'package:tatu/shared/widgets/negociacao_plano.dart';
 
 /// RN-210: valor do plano fixo negociável, até 3 propostas pelo valor por
 /// visita (RN-144, RN-148).
@@ -55,7 +55,7 @@ Future<void> _descer(WidgetTester t, String texto) async {
 
 /// [texto] dentro do card do plano (o chat também tem o do avulso).
 Finder _noCard(String texto) => find.descendant(
-  of: find.byType(CartaoPropostaPlano),
+  of: find.byType(NegociacaoPlanoChat),
   matching: find.text(texto),
 );
 
@@ -161,7 +161,8 @@ void main() {
   });
 
   group('Telas', () {
-    testWidgets('C217/C218: pedir outro valor pelo card', (t) async {
+    testWidgets('C217/C218: card novo e pedir outro valor', (t) async {
+      // Já houve avulso com a Luiza (R$ 150 em pedidos.concluidos).
       final p = _plano(cliente: conta.nomeCompleto);
       planosFixos.enviarValor(p, 150);
       await _abrir(
@@ -171,8 +172,24 @@ void main() {
           resposta: const Duration(seconds: 1),
         ),
       );
-      expect(find.text('Proposta 1 de 3'), findsOneWidget);
-      expect(find.text(r'R$ 1.200 por mês'), findsOneWidget);
+      // RN-211: quem propôs, rodada, total, conta e semana.
+      expect(_noCard('Luiza Souza'), findsOneWidget);
+      expect(_noCard('propôs um plano mensal'), findsOneWidget);
+      expect(_noCard('1 de 3'), findsOneWidget);
+      expect(
+        find.textContaining(r'R$ 1.200', findRichText: true),
+        findsWidgets,
+      );
+      expect(
+        _noCard(r'8 visitas × R$ 150 · cobrado no fim do mês'),
+        findsOneWidget,
+      );
+      expect(_noCard('D'), findsOneWidget);
+      expect(_noCard('S'), findsNWidgets(3));
+      expect(
+        find.textContaining('Sex e sáb, às 9h · 1ª visita:'),
+        findsOneWidget,
+      );
       // Barra do chat em laranja.
       expect(find.text('Plano fixo · confirme o valor'), findsOneWidget);
       await _descer(t, 'Confirmar plano');
@@ -181,47 +198,73 @@ void main() {
 
       expect(find.text('Quanto por visita?'), findsOneWidget);
       expect(find.text('Proposta 2 de 3'), findsOneWidget);
-      expect(
-        find.text(r'Ela pediu R$ 150 por visita (R$ 1.200 por mês).'),
-        findsOneWidget,
-      );
       await t.enterText(find.byType(TextField).last, '130');
       await t.pump();
       expect(find.text(r'8 visitas · R$ 1.040 por mês'), findsOneWidget);
       await t.tap(find.text('Enviar proposta'));
       await t.pumpAndSettle();
-      expect(
-        find.text(r'Você pediu R$ 130 por visita. Aguardando a Luiza.'),
-        findsOneWidget,
-      );
+      // C219: a proposta do cliente à direita, sem botões; a anterior
+      // encolhe.
+      expect(_noCard('Aguardando a Luiza responder'), findsOneWidget);
+      expect(_noCard('Você'), findsOneWidget);
+      expect(_noCard(r'Luiza · R$ 150 por visita'), findsOneWidget);
+      expect(_noCard('Proposta 1 · substituída'), findsOneWidget);
 
-      // A Luiza manda o último valor (protótipo: meio-termo).
+      // C220: a Luiza manda o último valor (protótipo: meio-termo).
       await t.pump(const Duration(seconds: 1));
       await t.pumpAndSettle();
-      expect(find.text('Luiza enviou a última proposta'), findsOneWidget);
-      expect(find.text('Proposta 3 de 3 · última'), findsOneWidget);
+      expect(_noCard('enviou a última proposta'), findsOneWidget);
+      expect(_noCard('Última'), findsOneWidget);
+      expect(_noCard(r'Você · R$ 130 por visita'), findsOneWidget);
+      expect(_noCard('Proposta 2 · substituída'), findsOneWidget);
       expect(_noCard('Pedir outro valor'), findsNothing);
+      expect(_noCard('Recusar'), findsOneWidget);
     });
 
-    testWidgets('C219: última proposta → Recusar → sem acordo', (t) async {
+    testWidgets('RN-211: economia vs. avulso só para o cliente', (t) async {
+      final p = _plano(cliente: conta.nomeCompleto);
+      planosFixos.enviarValor(p, 120);
+      await _abrir(t, ChatPage(conversa: conversas.conversas.first));
+      // Avulso R$ 150 × 8 − R$ 960 = R$ 240.
+      expect(_noCard(r'Economia de R$ 240 por mês vs. avulso'), findsOneWidget);
+    });
+
+    testWidgets('C221: confirmado, o card fica com "Ver plano"', (t) async {
+      final p = _plano(cliente: conta.nomeCompleto);
+      planosFixos
+        ..enviarValor(p, 150)
+        ..pedirOutroValor(p, 130)
+        ..enviarValor(p, 140)
+        ..confirmar(p, cartao: 'Visa 4242');
+      await _abrir(t, ChatPage(conversa: conversas.conversas.first));
+      expect(_noCard('Confirmado'), findsOneWidget);
+      expect(_noCard('Plano mensal'), findsOneWidget);
+      expect(_noCard('Proposta 1 · substituída'), findsOneWidget);
+      expect(_noCard('Proposta 2 · substituída'), findsOneWidget);
+      expect(_noCard('Confirmar plano'), findsNothing);
+      await _descer(t, 'Ver plano');
+      await t.tap(_noCard('Ver plano'));
+      await t.pumpAndSettle();
+      expect(find.byType(PlanoFixoPage), findsOneWidget);
+    });
+
+    testWidgets('C222: recusar → as 3 encolhidas e "Sem acordo"', (t) async {
       final p = _plano(cliente: conta.nomeCompleto);
       planosFixos
         ..enviarValor(p, 150)
         ..pedirOutroValor(p, 130)
         ..enviarValor(p, 140);
       await _abrir(t, ChatPage(conversa: conversas.conversas.first));
-      expect(
-        find.text(
-          'Sem acordo, o plano não começa. Serviços\n'
-          'avulsos com a Luiza continuam valendo.',
-        ),
-        findsOneWidget,
-      );
       await _descer(t, 'Recusar');
-      await t.tap(find.text('Recusar'));
+      await t.tap(_noCard('Recusar'));
       await t.pumpAndSettle();
       expect(p.semAcordo, isTrue);
-      expect(find.textContaining('Plano fixo sem acordo'), findsOneWidget);
+      expect(_noCard('Proposta 3 · recusada'), findsOneWidget);
+      expect(_noCard('Sem acordo · o plano não começou'), findsOneWidget);
+      expect(
+        _noCard('Serviços avulsos com a Luiza continuam valendo.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('P147: profissional aceita ou envia outro valor', (t) async {
@@ -230,27 +273,23 @@ void main() {
         ..enviarValor(p, 150)
         ..pedirOutroValor(p, 130);
       await _abrir(t, const ChatProfissionalPage());
-      expect(find.byType(CartaoOutroValorPlano), findsOneWidget);
-      expect(find.text('Ana pediu outro valor'), findsOneWidget);
+      expect(_noCard('Ana Martins'), findsOneWidget);
+      expect(_noCard('pediu outro valor'), findsOneWidget);
+      expect(_noCard('2 de 3'), findsOneWidget);
+      expect(_noCard(r'Você · R$ 150 por visita'), findsOneWidget);
+      // O profissional não vê economia nem cartão.
+      expect(find.textContaining('Economia'), findsNothing);
       expect(find.text('Plano fixo · responda'), findsOneWidget);
-      expect(
-        find.text(r'R$ 130 por visita · você pediu R$ 150'),
-        findsOneWidget,
-      );
+      await _descer(t, 'Enviar outro valor');
       expect(
         find.text('Seu próximo valor será o último (3 de 3).'),
         findsOneWidget,
       );
-      await _descer(t, 'Enviar outro valor');
-      await t.tap(find.text(r'Aceitar R$ 130 por visita'));
+      await t.tap(_noCard(r'Aceitar R$ 130 por visita'));
       await t.pumpAndSettle();
       expect(p.negociacao.aceita, isTrue);
-      expect(
-        find.text(
-          r'Você aceitou R$ 130 por visita. Aguardando a Ana confirmar.',
-        ),
-        findsOneWidget,
-      );
+      expect(_noCard('Aguardando a Ana responder'), findsOneWidget);
+      expect(_noCard('Proposta 2 · aceita'), findsOneWidget);
     });
   });
 }

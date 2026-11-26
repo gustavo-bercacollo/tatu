@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Retorno · cliente escolhe os horários</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#FFFFFF"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="40" cy="82" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,73) scale(0.75)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></g>
+  <text x="369" y="92" font-size="13" font-weight="500" fill="#8E8E93" text-anchor="end">2 de 2</text>
+  <text x="24" y="164" font-size="30" font-weight="700" fill="#000000" text-anchor="start" letter-spacing="-0.6">Quando você pode</text>
+  <text x="24" y="200" font-size="30" font-weight="700" fill="#000000" text-anchor="start" letter-spacing="-0.6">receber a Luiza?</text>
+  <text x="24" y="232" font-size="15" font-weight="400" fill="#8E8E93" text-anchor="start">Escolha até 3 horários nos próximos 7 dias.</text>
+  <rect x="20" y="252" width="353" height="56" rx="14" fill="#F2F2F7"/>
+  <g transform="translate(34,270) scale(0.8333333333333334)" fill="none" stroke="#A85F00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"/></g>
+  <text x="62" y="276" font-size="15" font-weight="600" fill="#000000" text-anchor="start">É urgente?</text>
+  <text x="62" y="294" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="start">Pedir para hoje, se der</text>
+  <rect x="306" y="264" width="51" height="31" rx="15.5" fill="#E9E9EA"/>
+  <circle cx="322" cy="279.5" r="13.5" fill="#fff"/>
+  <text x="158.5" y="334" font-size="13" font-weight="600" fill="#000000" text-anchor="middle">Manhã</text>
+  <text x="158.5" y="350" font-size="11" font-weight="400" fill="#8E8E93" text-anchor="middle">8h–12h</text>
+  <text x="245.5" y="334" font-size="13" font-weight="600" fill="#000000" text-anchor="middle">Tarde</text>
+  <text x="245.5" y="350" font-size="11" font-weight="400" fill="#8E8E93" text-anchor="middle">12h–18h</text>
+  <text x="332.5" y="334" font-size="13" font-weight="600" fill="#000000" text-anchor="middle">Noite</text>
+  <text x="332.5" y="350" font-size="11" font-weight="400" fill="#8E8E93" text-anchor="middle">18h–21h</text>
+  <text x="24" y="381" font-size="14" font-weight="600" fill="#000000" text-anchor="start">Hoje</text>
+  <text x="24" y="397" font-size="11" font-weight="400" fill="#8E8E93" text-anchor="start">25 nov</text>
+  <rect x="118" y="364" width="81" height="38" rx="10" fill="#F2F2F7"/>
+  <text x="158.5" y="388" font-size="13" font-weight="500" fill="#C7C7CC" text-anchor="middle">—</text>
+  <rect x="205" y="364" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <rect x="292" y="364" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <text x="24" y="427" font-size="14" font-weight="600" fill="#000000" text-anchor="start">Amanhã</text>
+  <text x="24" y="443" font-size="11" font-weight="400" fill="#8E8E93" text-anchor="start">26 nov</text>
+  <rect x="118" y="410" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <rect x="205" y="410" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <rect x="292" y="410" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <text x="24" y="473" font-size="14" font-weight="600" fill="#000000" text-anchor="start">Sexta</text>
+  <text x="24" y="489" font-size="11" font-weight="400" fill="#8E8E93" text-anchor="start">27 nov</text>
+  <rect x="118" y="456" width="81" height="38" rx="10" fill="#1C1C1E"/>
+  <g transform="translate(149.5,466) scale(0.75)" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></g>
+  <rect x="205" y="456" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <rect x="292" y="456" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <text x="24" y="519" font-size="14" font-weight="600" fill="#000000" text-anchor="start">Sábado</text>
+  <text x="24" y="535" font-size="11" font-weight="400" fill="#8E8E93" text-anchor="start">28 nov</text>
+  <rect x="118" y="502" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <rect x="205" y="502" width="81" height="38" rx="10" fill="#1C1C1E"/>
+  <g transform="translate(236.5,512) scale(0.75)" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></g>
+  <rect x="292" y="502" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <text x="24" y="565" font-size="14" font-weight="600" fill="#000000" text-anchor="start">Domingo</text>
+  <text x="24" y="581" font-size="11" font-weight="400" fill="#8E8E93" text-anchor="start">29 nov</text>
+  <rect x="118" y="548" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <rect x="205" y="548" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <rect x="292" y="548" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <text x="24" y="611" font-size="14" font-weight="600" fill="#000000" text-anchor="start">Segunda</text>
+  <text x="24" y="627" font-size="11" font-weight="400" fill="#8E8E93" text-anchor="start">30 nov</text>
+  <rect x="118" y="594" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <rect x="205" y="594" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <rect x="292" y="594" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <text x="24" y="657" font-size="14" font-weight="600" fill="#000000" text-anchor="start">Terça</text>
+  <text x="24" y="673" font-size="11" font-weight="400" fill="#8E8E93" text-anchor="start">1 dez</text>
+  <rect x="118" y="640" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <rect x="205" y="640" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <rect x="292" y="640" width="81" height="38" rx="10" fill="#EEEEF0"/>
+  <text x="24" y="710" font-size="13" font-weight="600" fill="#000000" text-anchor="start">2 de 3 · Sexta de manhã · Sábado à tarde</text>
+  <rect x="24" y="756" width="345" height="56" rx="28.0" fill="#1C1C1E"/>
+  <text x="196.5" y="790.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Pedir retorno</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>

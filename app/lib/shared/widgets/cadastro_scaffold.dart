@@ -27,6 +27,8 @@ class CadastroScaffold extends StatelessWidget {
     this.voltar = true,
     this.topo,
     this.notaAcimaBotao,
+    this.acimaBotao,
+    this.contador,
     this.link,
     this.onLink,
     this.linkAzul = false,
@@ -76,6 +78,12 @@ class CadastroScaffold extends StatelessWidget {
   /// Nota cinza centralizada logo acima do botão (ex.: "2 selecionados").
   final String? notaAcimaBotao;
 
+  /// Conteúdo livre logo acima do botão (ex.: resumo dos horários, RN-213).
+  final Widget? acimaBotao;
+
+  /// À direita do voltar (ex.: "2 de 2" do pedido de retorno).
+  final String? contador;
+
   /// Link de texto abaixo do botão (ex.: "Fazer isso depois").
   final String? link;
   final VoidCallback? onLink;
@@ -111,6 +119,15 @@ class CadastroScaffold extends StatelessWidget {
                         if (passo != null) ...[
                           const SizedBox(width: TatuMedidas.entreItens),
                           Expanded(child: BarraPassos(passo: passo!)),
+                        ],
+                        if (contador != null) ...[
+                          const Spacer(),
+                          Text(
+                            contador!,
+                            style: TatuTexto.nota.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ],
                       ],
                     ),
@@ -175,8 +192,16 @@ class CadastroScaffold extends StatelessWidget {
                       style: TatuTexto.nota,
                     ),
                   ],
+                  if (acimaBotao != null) ...[
+                    const SizedBox(height: 8),
+                    acimaBotao!,
+                  ],
                   if (botao != null) ...[
-                    SizedBox(height: notaAcimaBotao != null ? 10 : 16),
+                    SizedBox(
+                      height: notaAcimaBotao != null || acimaBotao != null
+                          ? 10
+                          : 16,
+                    ),
                     FilledButton(
                       onPressed: onBotao,
                       style:

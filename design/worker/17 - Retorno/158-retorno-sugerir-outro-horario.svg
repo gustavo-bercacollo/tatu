@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="852" viewBox="0 0 393 852" font-family="Inter, -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif">
+  <title>Retorno · profissional sugere outro horário</title>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#fff"/>
+  <text x="52" y="34" font-size="16" font-weight="600" fill="#000000" text-anchor="middle">9:41</text>
+  <rect x="298" y="27" width="3" height="5" rx="1" fill="#000000"/>
+  <rect x="303" y="24" width="3" height="8" rx="1" fill="#000000"/>
+  <rect x="308" y="21" width="3" height="11" rx="1" fill="#000000"/>
+  <rect x="313" y="18" width="3" height="14" rx="1" fill="#000000"/>
+  <rect x="331" y="21" width="24" height="12" rx="4" fill="none" stroke="#000000" stroke-width="1" opacity="0.5"/>
+  <rect x="333" y="23" width="17" height="8" rx="2.5" fill="#000000"/>
+  <circle cx="40" cy="82" r="18" fill="#EEEEF0"/>
+  <g transform="translate(31,73) scale(0.75)" fill="none" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></g>
+  <circle cx="146" cy="82" r="16" fill="#E4E4E7"/>
+  <text x="146" y="85.52" font-size="12" font-weight="600" fill="#000000" text-anchor="middle">AM</text>
+  <text x="169" y="80" font-size="16" font-weight="600" fill="#000000" text-anchor="start">Ana Martins</text>
+  <text x="169" y="98" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="start">Cliente</text>
+  <text x="196.5" y="136" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="middle">04 nov</text>
+  <rect x="20" y="154" width="353" height="52" rx="16" fill="#E6F7EA"/>
+  <g transform="translate(38,170) scale(0.8333333333333334)" fill="none" stroke="#1E8E3E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></g>
+  <text x="64" y="186" font-size="15" font-weight="600" fill="#1E8E3E" text-anchor="start">Serviço concluído · R$ 150,00 · 04 nov</text>
+  <text x="196.5" y="234" font-size="12" font-weight="500" fill="#8E8E93" text-anchor="middle">Hoje</text>
+  <rect x="20" y="250" width="353" height="176" rx="20" fill="#fff" stroke="#1C1C1E" stroke-width="1.5"/>
+  <g transform="translate(38,268) scale(0.75)" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="64" y="283" font-size="15" font-weight="700" fill="#000000" text-anchor="start">Pedido de retorno</text>
+  <text x="38" y="310" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="start">Serviço de 04 nov · Vazamento na pia</text>
+  <text x="38" y="336" font-size="15" font-weight="400" fill="#000000" text-anchor="start">A pia voltou a vazar no mesmo</text>
+  <text x="38" y="356" font-size="15" font-weight="400" fill="#000000" text-anchor="start">cano.</text>
+  <rect x="38" y="362" width="36" height="24" rx="6" fill="#EEEEF0"/>
+  <g transform="translate(48,366) scale(0.6666666666666666)" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 8h.01"/><path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12"/><path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5"/><path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3"/></g>
+  <rect x="82" y="362" width="36" height="24" rx="6" fill="#EEEEF0"/>
+  <g transform="translate(92,366) scale(0.6666666666666666)" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 8h.01"/><path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12"/><path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5"/><path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3"/></g>
+  <line x1="38" y1="396" x2="355" y2="396" stroke="#D9D9DC" stroke-width="0.5"/>
+  <g transform="translate(38,402) scale(0.6666666666666666)" fill="none" stroke="#A85F00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 7v5l3 3"/></g>
+  <text x="62" y="416" font-size="13" font-weight="600" fill="#A85F00" text-anchor="start">Responda até 26 nov, 21:00</text>
+  <rect x="20" y="440" width="353" height="50" rx="25.0" fill="#1C1C1E"/>
+  <text x="196.5" y="471.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Aceitar retorno</text>
+  <rect x="20" y="498" width="353" height="50" rx="25.0" fill="#EEEEF0"/>
+  <text x="196.5" y="529.0" font-size="17" font-weight="600" fill="#000000" text-anchor="middle">É outro problema · enviar valor</text>
+  <text x="196.5" y="578" font-size="16" font-weight="600" fill="#FF3B30" text-anchor="middle">Recusar</text>
+  <text x="196.5" y="610" font-size="12" font-weight="400" fill="#8E8E93" text-anchor="middle">Sem custo e sem taxa. Marque o retorno em até 7 dias.</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+  <rect x="0" y="0" width="393" height="852" rx="0" fill="#000" opacity="0.38"/>
+  <rect x="0" y="300" width="393" height="582" rx="30" fill="#fff"/>
+  <rect x="178.5" y="308" width="36" height="5" rx="2.5" fill="#C7C7CC"/>
+  <text x="24" y="352" font-size="22" font-weight="700" fill="#000000" text-anchor="start">Sugerir outro horário</text>
+  <text x="24" y="378" font-size="14" font-weight="400" fill="#8E8E93" text-anchor="start">Dentro de 7 dias: até quarta, 2 dez.</text>
+  <rect x="24" y="398" width="61" height="52" rx="12" fill="#EEEEF0"/>
+  <text x="54.5" y="416" font-size="14" font-weight="600" fill="#000000" text-anchor="middle">Qui</text>
+  <text x="54.5" y="432" font-size="11" font-weight="500" fill="#8E8E93" text-anchor="middle">26</text>
+  <rect x="93" y="398" width="61" height="52" rx="12" fill="#EEEEF0"/>
+  <text x="123.5" y="416" font-size="14" font-weight="600" fill="#000000" text-anchor="middle">Sex</text>
+  <text x="123.5" y="432" font-size="11" font-weight="500" fill="#8E8E93" text-anchor="middle">27</text>
+  <rect x="162" y="398" width="61" height="52" rx="12" fill="#EEEEF0"/>
+  <text x="192.5" y="416" font-size="14" font-weight="600" fill="#000000" text-anchor="middle">Sáb</text>
+  <text x="192.5" y="432" font-size="11" font-weight="500" fill="#8E8E93" text-anchor="middle">28</text>
+  <rect x="231" y="398" width="61" height="52" rx="12" fill="#1C1C1E"/>
+  <text x="261.5" y="416" font-size="14" font-weight="600" fill="#fff" text-anchor="middle">Dom</text>
+  <text x="261.5" y="432" font-size="11" font-weight="500" fill="#AEAEB2" text-anchor="middle">29</text>
+  <rect x="300" y="398" width="61" height="52" rx="12" fill="#EEEEF0"/>
+  <text x="330.5" y="416" font-size="14" font-weight="600" fill="#000000" text-anchor="middle">Seg</text>
+  <text x="330.5" y="432" font-size="11" font-weight="500" fill="#8E8E93" text-anchor="middle">30</text>
+  <text x="24" y="480" font-size="13" font-weight="600" fill="#8E8E93" text-anchor="start">Horário</text>
+  <rect x="24" y="492" width="79" height="40" rx="12" fill="#EEEEF0"/>
+  <text x="63.5" y="517.0" font-size="15" font-weight="600" fill="#000000" text-anchor="middle">8h</text>
+  <rect x="111" y="492" width="79" height="40" rx="12" fill="#EEEEF0"/>
+  <text x="150.5" y="517.0" font-size="15" font-weight="600" fill="#000000" text-anchor="middle">9h</text>
+  <rect x="198" y="492" width="79" height="40" rx="12" fill="#1C1C1E"/>
+  <text x="237.5" y="517.0" font-size="15" font-weight="600" fill="#fff" text-anchor="middle">10h</text>
+  <rect x="285" y="492" width="79" height="40" rx="12" fill="#EEEEF0"/>
+  <text x="324.5" y="517.0" font-size="15" font-weight="600" fill="#000000" text-anchor="middle">11h</text>
+  <rect x="24" y="540" width="79" height="40" rx="12" fill="#EEEEF0"/>
+  <text x="63.5" y="565.0" font-size="15" font-weight="600" fill="#000000" text-anchor="middle">14h</text>
+  <rect x="111" y="540" width="79" height="40" rx="12" fill="#EEEEF0"/>
+  <text x="150.5" y="565.0" font-size="15" font-weight="600" fill="#000000" text-anchor="middle">15h</text>
+  <rect x="198" y="540" width="79" height="40" rx="12" fill="#EEEEF0"/>
+  <text x="237.5" y="565.0" font-size="15" font-weight="600" fill="#000000" text-anchor="middle">16h</text>
+  <rect x="285" y="540" width="79" height="40" rx="12" fill="#EEEEF0"/>
+  <text x="324.5" y="565.0" font-size="15" font-weight="600" fill="#000000" text-anchor="middle">17h</text>
+  <rect x="20" y="600" width="353" height="48" rx="12" fill="#F2F2F7"/>
+  <g transform="translate(34,614) scale(0.75)" fill="none" stroke="#8E8E93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"/></g>
+  <text x="62" y="629" font-size="13" font-weight="400" fill="#8E8E93" text-anchor="start">A Ana precisa confirmar o novo horário.</text>
+  <rect x="24" y="662" width="345" height="56" rx="28.0" fill="#1C1C1E"/>
+  <text x="196.5" y="696.0" font-size="17" font-weight="600" fill="#fff" text-anchor="middle">Enviar · domingo, 29 nov, 10h</text>
+  <rect x="129.5" y="843" width="134" height="5" rx="2.5" fill="#000000"/>
+</svg>
