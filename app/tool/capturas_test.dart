@@ -149,6 +149,8 @@ import 'package:tatu/features/entrada/codigo_page.dart';
 import 'package:tatu/features/entrada/email_page.dart';
 import 'package:tatu/features/entrada/dados_cliente_page.dart';
 import 'package:tatu/shared/widgets/borda_animada.dart';
+import 'package:tatu/features/cliente/pagamento/pagar_pix_sheet.dart';
+import 'package:tatu/data/icones_profissoes.dart';
 
 Future<void> _carregarFontes() async {
   final inter = FontLoader('Inter');
@@ -238,6 +240,7 @@ void main() {
     await documentosLegais.carregarTodos();
     await profissoesReguladas.carregar();
     await catalogoServicos.carregar();
+    await iconesProfissoes.carregar();
     demoConferencia = null;
     // RN-39: código do desenho e sem o profissional digitar sozinho.
     RegrasCodigo.sorteio = null;
@@ -250,6 +253,8 @@ void main() {
   ProtecaoTela.ativa = false;
   ToqueChamado.ativo = false;
   BordaAnimada.girar = false;
+  simularPagamentoGarantido = null;
+  simularPixPago = null;
   SomEncontrado.ativo = false;
   ProcurandoPage.aceitaEm = null;
   CameraVerificacaoPage.cameraAoVivo = false;

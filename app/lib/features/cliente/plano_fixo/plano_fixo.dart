@@ -22,6 +22,8 @@ import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/segmento.dart';
 import '../../../shared/widgets/tela_interna.dart';
 import '../../../shared/widgets/nota_icone.dart';
+import '../../../data/pagamentos.dart';
+import '../mensagens/cartao_valor.dart' show AvisoPagamento;
 
 /// Escolhas da folha "Tornar [nome] fixa" (RN-144).
 @immutable
@@ -569,7 +571,6 @@ class PlanoFixoPage extends StatelessWidget {
     builder: (context, _) {
       final p = plano;
       final porVisita = reaisInteiros(p.valorPorVisita ?? 0);
-      final cobranca = p.proximaCobranca;
       final mudou = p.noProximoPeriodo != null;
       return TelaInterna(
         titulo: 'Plano fixo',
@@ -581,7 +582,8 @@ class PlanoFixoPage extends StatelessWidget {
               plano: p,
               nome: p.profissional,
               detalhe: '${p.profissao} · ${p.quando}',
-              rodape: '$porVisita por visita · cobrado no fim do ${p.periodo}',
+              // RN-146: cada visita é cobrada ao concluir.
+              rodape: '$porVisita por visita · cobrado a cada visita',
               // C216 · RN-202: volta para o chat com a profissional.
               acao: FilledButton.icon(
                 style: tatuBotaoSecundario().copyWith(
@@ -620,12 +622,13 @@ class PlanoFixoPage extends StatelessWidget {
                       color: TatuColors.action,
                     ),
                   ),
-                  if (cobranca != null) ...[
+                  if (p.proximaVisita case final prox?) ...[
                     const SizedBox(height: TatuMedidas.entreItens),
                     Text(
-                      // RN-146: no fim do período, só pelo que foi feito.
-                      'Próxima cobrança: ${diaMes(cobranca)} · até '
-                      '${reaisInteiros(p.valorDoPeriodo)}',
+                      // RN-146/RN-225: reservada na véspera, cobrada ao
+                      // concluir.
+                      'Próxima visita: ${diaMes(prox.dia)} · reservamos na '
+                      'véspera',
                       style: TatuTexto.nota,
                     ),
                   ],
@@ -771,6 +774,84 @@ Future<void> tornarFixo(
       context,
       titulo: 'Pedido de plano fixo enviado',
       texto: '${feminino ? 'Ela' : 'Ele'} responde com o valor por visita.',
+    );
+  }
+}
+
+/// C228 · RN-225: a reserva da véspera foi recusada: "Não conseguimos
+/// reservar R$ X · a visita está suspensa", "Atualizar pagamento" e o
+/// prazo.
+class CartaoVisitaSuspensa extends StatelessWidget {
+  const CartaoVisitaSuspensa({
+    super.key,
+    required this.plano,
+    required this.visita,
+    required this.onAtualizar,
+  });
+
+  final PlanoFixo plano;
+  final VisitaPlano visita;
+  final VoidCallback onAtualizar;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = plano;
+    final v = visita;
+    final ate = v.atualizarAte;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Plano fixo · visita de ${diaLongo(v.dia.weekday)}, ${diaMes(v.dia)}',
+          textAlign: TextAlign.center,
+          style: TatuTexto.legenda.copyWith(fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 10),
+        FractionallySizedBox(
+          alignment: Alignment.centerLeft,
+          widthFactor: 0.91,
+          child: Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+              border: Border.all(color: TatuColors.action, width: 1.5),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AvisoPagamento(
+                  titulo:
+                      'Não conseguimos reservar '
+                      '${reaisInteiros(p.valorPorVisita ?? 0)}',
+                  texto:
+                      '${pagamentos.padrao?.titulo ?? 'Cartão'} · a visita '
+                      'está suspensa',
+                  perigo: true,
+                ),
+                const SizedBox(height: TatuMedidas.entreItens),
+                FilledButton(
+                  onPressed: onAtualizar,
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(
+                      TatuMedidas.alturaBotaoCartao,
+                    ),
+                  ),
+                  child: const Text('Atualizar pagamento'),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (ate != null) ...[
+          const SizedBox(height: 10),
+          Text(
+            'Atualize até ${diaLongo(ate.weekday)}, ${horaCurta('${ate.hour}:00')}, '
+            'para ${p.feminino ? 'a' : 'o'} ${p.primeiroNome} ir.',
+            textAlign: TextAlign.center,
+            style: TatuTexto.legenda,
+          ),
+        ],
+      ],
     );
   }
 }

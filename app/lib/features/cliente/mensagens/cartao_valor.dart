@@ -4,6 +4,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
+import '../../../core/theme/tatu_theme.dart';
 import '../../../data/conversas.dart';
 import '../../../data/pagamentos.dart';
 import '../../../data/regras_valor.dart';
@@ -143,9 +144,17 @@ class CartaoValorRecebido extends StatelessWidget {
     this.onRecusar,
     this.onParcelas,
     this.nome = '',
+    this.onOutroCartao,
+    this.onPix,
   });
 
-  /// RN-221: no 3º valor (sem [onPedirOutro]), "Recusar valor".
+  /// RN-223: cartão recusado: "Usar outro cartão".
+  final VoidCallback? onOutroCartao;
+
+  /// RN-223/RN-224: cartão recusado: "Pagar com Pix".
+  final VoidCallback? onPix;
+
+  /// RN-228: no 3º valor (sem [onPedirOutro]), "Recusar valor".
   final VoidCallback? onRecusar;
 
   /// "a Marina" (para "O sinal paga o tempo da Marina.").
@@ -164,6 +173,52 @@ class CartaoValorRecebido extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cartao = pagamentos.padrao;
+    final pag = valor.pagamento;
+    // C110 · RN-223: reserva recusada (ou Pix gerado): o card mostra o
+    // motivo e as duas saídas; o atendimento fica parado.
+    if (pag != null && (pag.pendente || pag.expirado)) {
+      return _Cartao(
+        contorno: true,
+        children: [
+          Text(detalheValor(valor), style: TatuTexto.detalhe),
+          const SizedBox(height: 4),
+          _Total(valor.total),
+          const SizedBox(height: TatuMedidas.entreItens + 4),
+          if (pag.expirado)
+            const AvisoPagamento(
+              titulo: 'Valor expirado',
+              texto: 'Passou o prazo sem pagamento · nada foi cobrado',
+            )
+          else ...[
+            AvisoPagamento(
+              titulo: 'Cartão recusado',
+              texto: '${pag.cartaoRecusado ?? 'Cartão'} · nada foi cobrado',
+              perigo: true,
+            ),
+            const SizedBox(height: TatuMedidas.entreItens),
+            FilledButton(
+              onPressed: onOutroCartao,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(
+                  TatuMedidas.alturaBotaoCartao,
+                ),
+              ),
+              child: const Text('Usar outro cartão'),
+            ),
+            const SizedBox(height: 8),
+            FilledButton(
+              onPressed: onPix,
+              style: tatuBotaoSecundario().copyWith(
+                minimumSize: const WidgetStatePropertyAll(
+                  Size.fromHeight(TatuMedidas.alturaBotaoCartao),
+                ),
+              ),
+              child: const Text('Pagar com Pix'),
+            ),
+          ],
+        ],
+      );
+    }
     return _Cartao(
       contorno: true,
       children: [
@@ -228,7 +283,7 @@ class CartaoValorRecebido extends StatelessWidget {
               : 'Reservamos agora. Só cobramos no fim.',
           style: TatuTexto.nota,
         ),
-        // RN-221: avisa antes que este é o último valor.
+        // RN-228: avisa antes que este é o último valor.
         if (onPedirOutro == null && onRecusar != null) ...[
           const SizedBox(height: 6),
           Text(
@@ -252,6 +307,56 @@ class CartaoValorRecebido extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+/// RN-223/RN-225: caixa vermelha clara ("Cartão recusado · Visa final
+/// 4242 · nada foi cobrado") ou cinza (valor expirado).
+class AvisoPagamento extends StatelessWidget {
+  const AvisoPagamento({
+    super.key,
+    required this.titulo,
+    required this.texto,
+    this.perigo = false,
+  });
+
+  final String titulo;
+  final String texto;
+  final bool perigo;
+
+  @override
+  Widget build(BuildContext context) {
+    final cor = perigo ? TatuColors.dangerTexto : TatuColors.textSecondary;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: perigo ? TatuColors.dangerSoft : TatuColors.fill,
+        borderRadius: BorderRadius.circular(TatuMedidas.raioHorario),
+      ),
+      child: Row(
+        children: [
+          Icon(TablerIcons.alert_circle, size: 20, color: cor),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  titulo,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: cor,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(texto, style: TatuTexto.legenda.copyWith(color: cor)),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

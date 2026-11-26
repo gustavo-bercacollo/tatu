@@ -376,3 +376,48 @@ class PlanoFixoProfissionalPage extends StatelessWidget {
     },
   );
 }
+
+/// P152 · RN-225: "Visita de [dia] suspensa · Não precisa ir"; se o
+/// cliente resolver no prazo, a visita volta e o Tatu avisa.
+class CartaoVisitaSuspensaProfissional extends StatelessWidget {
+  const CartaoVisitaSuspensaProfissional({
+    super.key,
+    required this.plano,
+    required this.visita,
+  });
+
+  final PlanoFixo plano;
+  final VisitaPlano visita;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = plano;
+    final v = visita;
+    final ate = v.atualizarAte;
+    final ela = p.clienteFeminina ? 'ela' : 'ele';
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: TatuColors.fill,
+        borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Visita de ${diaLongo(v.dia.weekday)}, ${diaMes(v.dia)}, suspensa',
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'O pagamento ${p.clienteFeminina ? 'da' : 'do'} '
+            '${p.primeiroCliente} está pendente.'
+            '${ate == null ? '' : ' Se $ela resolver até ${diaLongo(ate.weekday)}, '
+                      '${horaCurta('${ate.hour}:00')}, a visita volta e avisamos você.'}',
+            style: TatuTexto.nota,
+          ),
+        ],
+      ),
+    );
+  }
+}

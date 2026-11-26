@@ -38,7 +38,7 @@ Future<void> _combinar(WidgetTester t) async {
   await t.pump(const Duration(seconds: 3));
   await t.tap(find.text('Aceitar R\$ 120,00'));
   await t.pump();
-  expect(find.text('Valor combinado'), findsOneWidget);
+  expect(find.text('Pagamento garantido · pode ir'), findsOneWidget);
 }
 
 void main() {

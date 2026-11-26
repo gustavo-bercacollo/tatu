@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import 'pagamento.dart';
+
 @immutable
 class Cartao {
   const Cartao({
@@ -39,6 +41,42 @@ class PagamentosRepo extends ChangeNotifier {
   late List<Cartao> _cartoes;
   String? _padraoId;
 
+  /// RN-223/RN-225 (simulação do banco): recusa todas as reservas. Nos
+  /// testes e para demonstrar. Cartões terminados em 0341 também recusam.
+  static bool recusarReservas = false;
+
+  /// RN-226 (simulação): a cobrança ao concluir falha mesmo nas novas
+  /// tentativas.
+  static bool falharCobranca = false;
+
+  /// RN-226: valor que não foi cobrado depois das tentativas (nulo = nada
+  /// pendente). Com pendência, o cliente não faz pedido novo.
+  double? pendencia;
+
+  bool get temPendencia => pendencia != null;
+
+  /// RN-222/RN-223: o banco aprova a reserva no cartão?
+  bool reservar(Cartao? c) =>
+      c != null && !recusarReservas && c.final4 != '0341';
+
+  /// RN-226: cobra ao concluir (a reserva já estava separada). Falha
+  /// técnica: tenta de novo sozinho; o profissional recebe de qualquer
+  /// jeito. Só se todas falharem, fica a pendência. Devolve se cobrou.
+  bool cobrarAoConcluir(double valor) {
+    for (var i = 0; i < RegrasPagamento.tentativasCobranca; i++) {
+      if (!falharCobranca) return true;
+    }
+    pendencia = (pendencia ?? 0) + valor;
+    notifyListeners();
+    return false;
+  }
+
+  /// RN-226: o cliente atualizou o cartão: cobra a pendência de novo.
+  void _tentarPendencia() {
+    if (pendencia == null || falharCobranca || !reservar(padrao)) return;
+    pendencia = null;
+  }
+
   List<Cartao> get cartoes => List.unmodifiable(_cartoes);
   Cartao? get padrao => _cartoes.where((c) => c.id == _padraoId).firstOrNull;
   bool ePadrao(Cartao c) => c.id == _padraoId;
@@ -62,6 +100,7 @@ class PagamentosRepo extends ChangeNotifier {
       ),
     ];
     _padraoId = 'visa';
+    pendencia = null;
     notifyListeners();
   }
 
@@ -91,12 +130,14 @@ class PagamentosRepo extends ChangeNotifier {
     );
     _cartoes.add(c);
     if (padrao || _padraoId == null) _padraoId = c.id;
+    _tentarPendencia();
     notifyListeners();
     return null;
   }
 
   void definirPadrao(Cartao c, bool sim) {
     _padraoId = sim ? c.id : (_padraoId == c.id ? null : _padraoId);
+    _tentarPendencia();
     notifyListeners();
   }
 

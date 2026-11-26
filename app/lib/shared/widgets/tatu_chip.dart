@@ -3,6 +3,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
+import 'icone_profissao.dart';
 
 /// Chip em pílula (38 px): cinza; selecionado fica preto, com ícone opcional.
 class TatuChip extends StatelessWidget {
@@ -18,7 +19,16 @@ class TatuChip extends StatelessWidget {
     this.desabilitado = false,
     this.contorno = false,
     this.seletor = false,
+    this.profissao,
+    this.iconeOutros = false,
   });
+
+  /// RN-227: ícone da profissão antes do texto (branco quando
+  /// selecionado). O [icone] da seleção (ex.: ✦ da IA) tem prioridade.
+  final String? profissao;
+
+  /// RN-227: o botão "Outros" (grade de quadradinhos).
+  final bool iconeOutros;
 
   /// Fundo branco com contorno escuro (ex.: "Tornar fixa", RN-209).
   final bool contorno;
@@ -87,6 +97,14 @@ class TatuChip extends StatelessWidget {
               children: [
                 if (selecionado && icone != null) ...[
                   Icon(icone, size: 16, color: cor),
+                  const SizedBox(width: 6),
+                ] else if (profissao != null) ...[
+                  IconeProfissao(profissao!, cor: cor),
+                  const SizedBox(width: 6),
+                ] else if (iconeOutros) ...[
+                  IconeProfissao.outros(
+                    cor: desabilitado ? cor : TatuColors.textPrimary,
+                  ),
                   const SizedBox(width: 6),
                 ],
                 if (iconeFixo != null) ...[

@@ -8,6 +8,7 @@ import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import 'chat_suporte_page.dart';
+import '../../../shared/widgets/icone_profissao.dart';
 
 /// Falar com o suporte · "Qual pedido?": escolhe um pedido recente.
 class EscolherPedidoPage extends StatefulWidget {
@@ -56,7 +57,10 @@ class _EscolherPedidoPageState extends State<EscolherPedidoPage> {
                         color: TatuColors.bg,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(p.icone, size: 20),
+                      // RN-227: o ícone da profissão.
+                      child: p.icone == null
+                          ? IconeProfissao(p.servico, tamanho: 20)
+                          : Icon(p.icone, size: 20),
                     ),
                   const SizedBox(width: 12),
                   Expanded(

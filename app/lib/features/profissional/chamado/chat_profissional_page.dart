@@ -49,6 +49,7 @@ import '../../../data/retorno.dart';
 import '../retorno/retorno_profissional.dart';
 
 import '../../../data/plano_fixo.dart';
+import '../../../data/pagamento.dart';
 import '../plano_fixo/plano_fixo_profissional.dart';
 import '../../../shared/widgets/negociacao_plano.dart';
 import '../../cliente/plano_fixo/plano_fixo.dart' show respostaValorPlano;
@@ -66,6 +67,10 @@ enum EstadoValor { inicio, aguardando, contraproposta, combinado }
 /// Protótipo: o cliente responde sozinho em [resposta]. Ele propõe 20%
 /// a menos no 1º valor e depois aceita qualquer valor até 15% acima da
 /// proposta dele.
+/// Protótipo: o pagamento do cliente fica garantido depois disso (RN-222;
+/// nulo nos testes: garantido na hora).
+Duration? simularPagamentoGarantido = const Duration(seconds: 3);
+
 class ChatProfissionalPage extends StatefulWidget {
   const ChatProfissionalPage({
     super.key,
@@ -131,13 +136,54 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
   double _proposta = 0; // proposta do cliente
   double _combinado = 0;
 
+  /// RN-222: o pagamento do cliente está garantido (reserva aprovada ou
+  /// Pix pago). Antes disso, "Não saia ainda".
+  bool _garantido = false;
+
+  /// RN-223: passou o prazo sem pagamento: o profissional fica livre.
+  bool _expirou = false;
+  Timer? _timerPagamento;
+  Timer? _timerExpira;
+
   /// RN-102: sinal pedido no valor enviado (à distância).
   double _meuSinal = 0;
 
   String get _nome => widget.chamado.primeiroNome;
 
+  /// RN-222/RN-223: depois do "valor combinado", espera o pagamento
+  /// garantido para liberar a saída; sem pagamento no prazo, expira e
+  /// ninguém leva falta. O profissional nunca sabe de cartão recusado.
+  void _aguardarPagamento() {
+    _timerPagamento?.cancel();
+    _timerExpira?.cancel();
+    _expirou = false;
+    final espera = simularPagamentoGarantido;
+    if (espera == null) {
+      _garantido = true;
+      _contarPrazoSaida();
+      return;
+    }
+    _garantido = false;
+    _timerPagamento = Timer(espera, () {
+      if (!mounted) return;
+      _timerExpira?.cancel();
+      setState(() => _garantido = true);
+      _contarPrazoSaida();
+    });
+    _timerExpira = Timer(RegrasPagamento.prazoPagar, () {
+      if (!mounted || _garantido) return;
+      _timerPagamento?.cancel();
+      setState(() {
+        _expirou = true;
+        _estado = EstadoValor.inicio;
+      });
+    });
+  }
+
   @override
   void dispose() {
+    _timerPagamento?.cancel();
+    _timerExpira?.cancel();
     _timer?.cancel();
     _timerPlano?.cancel();
     _prazoSaida?.cancel();
@@ -304,7 +350,10 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
     final novo = p.status == StatusPlano.ativo ? p.novoValor : null;
     final n = novo ?? p.negociacao;
     final encerrado = p.estado() == EstadoPlano.encerrado;
-    if (n.propostas.isEmpty && p.status != StatusPlano.pendente && !encerrado) {
+    if (n.propostas.isEmpty &&
+        p.status != StatusPlano.pendente &&
+        !encerrado &&
+        p.visitaSuspensa == null) {
       return const [];
     }
     final suaVez =
@@ -339,6 +388,11 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
         MarcadorChat(
           'Plano fixo encerrado · ${diaMes(p.encerradoEm ?? clock.now())}',
         ),
+      ],
+      // P152 · RN-225: visita suspensa: não precisa ir.
+      if (p.visitaSuspensa case final v?) ...[
+        const SizedBox(height: 18),
+        CartaoVisitaSuspensaProfissional(plano: p, visita: v),
       ],
     ];
   }
@@ -426,7 +480,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
       });
       // RN-181: confirmado, vira um atendimento novo (aparece na Atividade).
       if (_concluida) atendimentoProfissional.aceitar(widget.chamado);
-      _contarPrazoSaida();
+      _aguardarPagamento();
     } else if (_rodada >= maxRodadas) {
       atendimentoProfissional.encerrar();
       Navigator.of(context).pushReplacement(
@@ -451,7 +505,7 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
       _combinado = _proposta;
       _estado = EstadoValor.combinado;
     });
-    _contarPrazoSaida();
+    _aguardarPagamento();
   }
 
   /// RN-76: valor combinado; se não tocar em "Estou a caminho" dentro do
@@ -941,6 +995,12 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
           ],
         ] else
           ...switch (_estado) {
+            EstadoValor.inicio when _expirou => [
+              // RN-223: sem pagamento no prazo, ninguém leva falta.
+              NotaChat(
+                'O valor expirou sem pagamento. Você está livre, sem falta.',
+              ),
+            ],
             EstadoValor.inicio => const <Widget>[],
             // P104 · RN-181: novo valor no chat de um serviço concluído.
             EstadoValor.aguardando when _concluida => [
@@ -989,7 +1049,13 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
             // RN-212: à distância, o card combinado também fica (além do
             // marcador na conversa); sem endereço.
             EstadoValor.combinado when c.distancia => [
-              _ValorCombinado(valor: _combinado),
+              _ValorPagamento(
+                valor: _combinado,
+                detalhe: _meuDetalhe,
+                cliente: '${c.feminino ? 'a' : 'o'} $_nome',
+                garantido: _garantido,
+                distancia: true,
+              ),
             ],
             EstadoValor.combinado => [
               // RN-181: o mesmo card preto que o cliente vê.
@@ -1000,10 +1066,19 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
                 ),
                 const SizedBox(height: TatuMedidas.entreSecoes),
               ],
-              _ValorCombinado(valor: _combinado),
-              const SizedBox(height: TatuMedidas.entreItens),
-              // RN-28: no local, o endereço aparece.
-              _EnderecoLiberado(chamado: c),
+              // P38/P39 · RN-222: aguardando ou "Pagamento garantido".
+              _ValorPagamento(
+                valor: _combinado,
+                detalhe: _meuDetalhe,
+                cliente: '${c.feminino ? 'a' : 'o'} $_nome',
+                garantido: _garantido,
+              ),
+              // RN-28: no local, o endereço aparece (com o pagamento
+              // garantido, quando ele pode ir).
+              if (_garantido) ...[
+                const SizedBox(height: TatuMedidas.entreItens),
+                _EnderecoLiberado(chamado: c),
+              ],
             ],
           },
         const SizedBox(height: TatuMedidas.entreItens),
@@ -1048,7 +1123,8 @@ class _ChatProfissionalPageState extends State<ChatProfissionalPage> {
                   ),
                   const SizedBox(height: TatuMedidas.entreItens),
                 ],
-                if (_estado == EstadoValor.combinado) ...[
+                // RN-222: só começa com o pagamento garantido.
+                if (_estado == EstadoValor.combinado && _garantido) ...[
                   FilledButton(
                     onPressed: c.distancia ? _comecarDistancia : _irAteOCliente,
                     child: Text(
@@ -1227,52 +1303,117 @@ class _Valor extends StatelessWidget {
 }
 
 /// Cartão verde: os dois lados fecharam o valor.
-class _ValorCombinado extends StatelessWidget {
-  const _ValorCombinado({required this.valor});
+/// P38/P39 · RN-222: o valor combinado, do lado do profissional: antes
+/// do pagamento garantido, "Aguardando o pagamento da [cliente]" (laranja)
+/// e "Não saia ainda…"; depois, "✓ Pagamento garantido · pode ir".
+class _ValorPagamento extends StatelessWidget {
+  const _ValorPagamento({
+    required this.valor,
+    required this.detalhe,
+    required this.cliente,
+    required this.garantido,
+    this.distancia = false,
+  });
 
   final double valor;
+  final String detalhe;
+
+  /// "a Ana".
+  final String cliente;
+  final bool garantido;
+  final bool distancia;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: TatuColors.onlineSoft,
-        borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
-      ),
-      child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 16,
-            backgroundColor: TatuColors.online,
-            child: Icon(
-              TablerIcons.check,
-              size: 18,
-              color: TatuColors.onAction,
-            ),
-          ),
-          const SizedBox(width: TatuMedidas.entreItens),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Valor combinado',
-                  style: TatuTexto.nota.copyWith(color: TatuColors.onlineTexto),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  reais(valor),
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
+    final verde = garantido;
+    final cor = verde ? TatuColors.onlineTexto : TatuColors.warningTexto;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          garantido
+              ? '${cliente[0].toUpperCase()}${cliente.substring(1)} '
+                    'confirmou o valor'
+              : 'Você enviou um valor',
+          textAlign: TextAlign.center,
+          style: TatuTexto.legenda,
+        ),
+        const SizedBox(height: 10),
+        Align(
+          alignment: Alignment.centerRight,
+          child: FractionallySizedBox(
+            widthFactor: 0.85,
+            child: Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(TatuMedidas.raioOpcao),
+                border: Border.all(color: TatuColors.textPrimary, width: 1.5),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (detalhe.isNotEmpty)
+                    Text(
+                      detalhe,
+                      style: TatuTexto.nota.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  _Valor(valor),
+                  const SizedBox(height: TatuMedidas.entreItens),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: verde
+                          ? TatuColors.onlineSoft
+                          : TatuColors.warningSoft,
+                      borderRadius: BorderRadius.circular(
+                        TatuMedidas.raioHorario,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          verde ? TablerIcons.circle_check : TablerIcons.clock,
+                          size: 18,
+                          color: cor,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            verde
+                                ? 'Pagamento garantido · '
+                                      '${distancia ? 'pode começar' : 'pode ir'}'
+                                : 'Aguardando o pagamento ${cliente.startsWith('o ') ? 'do' : 'da'} '
+                                      '${cliente.substring(2)}',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: cor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  if (!verde) ...[
+                    const SizedBox(height: 10),
+                    Text(
+                      'Não saia ainda. Sem pagamento em '
+                      '${RegrasPagamento.prazoPagar.inMinutes} min, o valor '
+                      'expira e você fica livre, sem falta.',
+                      style: TatuTexto.legenda,
+                    ),
+                  ],
+                ],
+              ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -1326,7 +1467,7 @@ class _EnderecoLiberado extends StatelessWidget {
   }
 }
 
-/// P28 · RN-222: o cliente recusou o último valor: o chamado é encerrado
+/// P28 · RN-229: o cliente recusou o último valor: o chamado é encerrado
 /// sem custo e não conta contra o profissional (nem como cancelamento,
 /// RN-64, nem como abandono, RN-79).
 class SemAcordoPage extends StatelessWidget {

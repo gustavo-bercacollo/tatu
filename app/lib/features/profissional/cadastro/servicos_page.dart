@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/profissional.dart';
@@ -115,7 +114,8 @@ class _ServicosProfissionalPageState extends State<ServicosProfissionalPage> {
             for (final nome in opcoes)
               TatuChip(
                 label: nome,
-                icone: TablerIcons.check,
+                // RN-227: o ícone da profissão (branco se escolhida).
+                profissao: nome,
                 selecionado: _escolhidas.contains(nome),
                 desabilitado: _cheio && !_escolhidas.contains(nome),
                 onTap: () => _alternar(nome),
@@ -125,6 +125,7 @@ class _ServicosProfissionalPageState extends State<ServicosProfissionalPage> {
             TatuChip(
               label: 'Outros',
               seletor: true,
+              iconeOutros: true,
               desabilitado: _cheio,
               onTap: _outros,
             ),

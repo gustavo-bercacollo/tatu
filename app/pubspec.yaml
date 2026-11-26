@@ -82,6 +82,8 @@ flutter:
     - assets/sons/
     # RN-220: selos do profissional (de design/icones-selos/).
     - assets/selos/
+    # RN-227: ícones das profissões (de design/icones-profissoes/).
+    - assets/icones-profissoes/
     # RN-150: Termos e Política vêm de docs/ (fonte única).
     - ../docs/termos-de-uso.md
     - ../docs/politica-de-privacidade.md

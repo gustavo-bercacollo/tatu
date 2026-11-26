@@ -12,10 +12,12 @@ import '../../../shared/formatadores.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/aviso_topo.dart';
 import '../../../shared/widgets/estrelas.dart';
+import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/tatu_chip.dart';
 import '../../../shared/widgets/tela_interna.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../abas.dart';
+import '../pagamento/pagamento_page.dart';
 import 'gorjeta.dart';
 
 /// Tamanho do avatar no topo das telas de avaliação.
@@ -69,7 +71,29 @@ class _AvaliarPageState extends State<AvaliarPage> {
     super.dispose();
   }
 
-  void _enviar() {
+  /// RN-226: gorjeta recusada no cartão: "Não deu para enviar a
+  /// gorjeta. Tentar outro cartão?". O profissional não é avisado.
+  Future<bool> _cartaoDaGorjeta() async {
+    while (!pagamentos.reservar(pagamentos.padrao)) {
+      final outro = await confirmar(
+        context,
+        titulo: 'Não deu para enviar a gorjeta',
+        texto: 'Tentar outro cartão?',
+        confirmar: 'Tentar outro cartão',
+        cancelar: 'Agora não',
+        iconeAviso: false,
+      );
+      if (!outro || !mounted) return false;
+      final antes = pagamentos.padrao?.id;
+      await Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const PagamentoPage()),
+      );
+      if (!mounted || pagamentos.padrao?.id == antes) return false;
+    }
+    return true;
+  }
+
+  Future<void> _enviar() async {
     final p = widget.pedido;
     // RN-143: a gorjeta não entra na avaliação (nem na nota).
     pedidos.avaliar(
@@ -86,8 +110,11 @@ class _AvaliarPageState extends State<AvaliarPage> {
     final nav = Navigator.of(context);
     // RN-142: a gorjeta é cobrada no cartão padrão, no mesmo toque.
     final valor = _gorjeta;
+    final querGorjeta = valor != null && _temGorjeta;
+    final aprovada = querGorjeta && await _cartaoDaGorjeta();
+    if (!mounted) return;
     final cartao = pagamentos.padrao?.curto;
-    final g = valor == null || !_temGorjeta
+    final g = !aprovada
         ? null
         : gorjetas.cobrar(
             cliente: conta.nome,

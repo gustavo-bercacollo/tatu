@@ -49,6 +49,10 @@ class TatuMedidas {
   static const seloPequeno = 16.0; // selos no card de quem aceitou (RN-219)
   static const seloCartao = 36.0; // selo no card do perfil (RN-219)
   static const seloGrande = 40.0; // "Seus selos" do profissional (RN-219)
+  static const qrPix = 190.0; // QR code da folha "Pagar com Pix" (RN-224)
+  static const iconeProfissaoSelecao = 52.0; // quadrado cinza na seleção (RN-227)
+  static const iconeProfissaoCard = 40.0; // círculo cinza em cards e listas (RN-227)
+  static const iconeProfissaoTexto = 16.0; // junto de texto (RN-227)
   static const alturaOpcaoLista = 46.0; // motivos de denúncia (RN-133)
   static const alturaSegmento = 36.0;
   static const alturaSegmentoPequeno = 28.0; // "No local | À distância"

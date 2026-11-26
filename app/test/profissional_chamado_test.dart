@@ -71,7 +71,7 @@ void main() {
     // Aceita a proposta: valor combinado e endereço liberado.
     await t.tap(find.text('Aceitar R\$ 120,00'));
     await t.pump();
-    expect(find.text('Valor combinado'), findsOneWidget);
+    expect(find.text('Pagamento garantido · pode ir'), findsOneWidget);
     expect(find.text('R\$ 120,00'), findsWidgets);
     expect(find.text('Material incluso'), findsNothing);
     expect(find.text('Rua das Flores, 120 · apto 32'), findsOneWidget);
@@ -104,7 +104,7 @@ void main() {
     await t.tap(find.text('Enviar para Ana'));
     await t.pumpAndSettle();
     await t.pump(const Duration(seconds: 3));
-    expect(find.text('Valor combinado'), findsOneWidget);
+    expect(find.text('Pagamento garantido · pode ir'), findsOneWidget);
     expect(find.text('R\$ 130,00'), findsWidgets);
   });
 

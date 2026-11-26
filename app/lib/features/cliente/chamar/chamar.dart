@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import '../../../data/chamado.dart';
 import '../../../data/conta.dart';
 import '../../../data/enderecos.dart';
+import '../../../data/pagamentos.dart';
 import '../../../data/pedidos.dart';
 import '../../../shared/widgets/folha.dart';
 import '../atividade/pedido_andamento_page.dart';
 import '../endereco/onde_sheet.dart';
+import '../pagamento/pagamento_page.dart';
 import 'confirmar_celular_sheet.dart';
 import 'fora_da_area_page.dart';
 import 'localizacao_chamar_page.dart';
@@ -23,6 +25,24 @@ Future<void> chamarProfissional(
   String descricao = '',
 }) async {
   final nav = Navigator.of(context);
+
+  // 0. RN-226: com pagamento pendente, não faz pedido novo.
+  if (pagamentos.temPendencia) {
+    final atualizar = await confirmar(
+      context,
+      titulo: 'Pagamento pendente',
+      texto: 'Atualize o cartão para fazer novos pedidos.',
+      confirmar: 'Atualizar cartão',
+      cancelar: 'Agora não',
+      iconeAviso: false,
+    );
+    if (atualizar && context.mounted) {
+      await nav.push(
+        MaterialPageRoute(builder: (_) => const PagamentoPage()),
+      );
+    }
+    return;
+  }
 
   // 1. Sem localização não achamos profissionais perto.
   if (!distancia && !enderecos.localizacaoPermitida) {

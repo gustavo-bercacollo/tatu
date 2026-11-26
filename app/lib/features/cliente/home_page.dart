@@ -47,6 +47,8 @@ import 'endereco/onde_sheet.dart';
 import 'perfil_page.dart';
 import '../../data/aceites.dart';
 import '../entrada/documentos_legais_page.dart';
+import '../../data/pagamentos.dart';
+import 'pagamento/pagamento_page.dart';
 
 /// Home do cliente: descreve o problema, escolhe (ou a IA marca) o serviço e chama.
 class HomeClientePage extends StatefulWidget {
@@ -344,8 +346,26 @@ class _HomeClientePageState extends State<HomeClientePage> {
                             pedidos,
                             conta,
                             planosFixos,
+                            pagamentos,
                           ]),
                           builder: (context, _) {
+                            // C112 · RN-226: pagamento pendente no lugar
+                            // da saudação; sem resolver, não pede de novo.
+                            if (pagamentos.temPendencia) {
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                  top: 16,
+                                  bottom: TatuMedidas.entreSecoes + 4,
+                                ),
+                                child: FaixaPagamentoPendente(
+                                  onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => const PagamentoPage(),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
                             // RN-45: pedido em análise sai da faixa.
                             final ps = [
                               for (final a in pedidos.andamentos)
@@ -477,6 +497,8 @@ class _HomeClientePageState extends State<HomeClientePage> {
                                 label: s,
                                 selecionado: servico == s,
                                 icone: _pelaIa ? TablerIcons.sparkles : null,
+                                // RN-227: ícone próprio da profissão.
+                                profissao: s,
                                 onTap: () => _tocouServico(s),
                               ),
                             // Escolhido em "Outros": vira chip selecionado
@@ -485,6 +507,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
                               TatuChip(
                                 label: o,
                                 selecionado: true,
+                                profissao: o,
                                 onTap: () => _tocouServico(o),
                               ),
                             // RN-161: mesmo padrão do cadastro: "Outros"
@@ -492,6 +515,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
                             TatuChip(
                               label: 'Outros',
                               seletor: true,
+                              iconeOutros: true,
                               onTap: _outros,
                             ),
                           ],
@@ -860,4 +884,65 @@ class _BotaoCaixa extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// C112 · RN-226: "Pagamento pendente · Atualize o cartão para fazer
+/// novos pedidos" (vermelho claro, abre Pagamento).
+class FaixaPagamentoPendente extends StatelessWidget {
+  const FaixaPagamentoPendente({super.key, required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: TatuColors.dangerSoft,
+      borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(TatuMedidas.raioCartao),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 14, 16),
+          child: Row(
+            children: [
+              const Icon(
+                TablerIcons.alert_circle,
+                size: 24,
+                color: TatuColors.dangerTexto,
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Pagamento pendente',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: TatuColors.dangerTexto,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Atualize o cartão para fazer novos pedidos',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: TatuColors.dangerTexto,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                TablerIcons.chevron_right,
+                size: 18,
+                color: TatuColors.dangerTexto.withValues(alpha: 0.6),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

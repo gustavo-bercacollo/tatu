@@ -17,12 +17,11 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/pedidos.dart';
-import '../../../data/servicos.dart';
+import '../../../shared/widgets/icone_profissao.dart';
 import '../../../shared/widgets/abas_cliente.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/estado_vazio.dart';
 import '../../../shared/widgets/estrelas.dart';
-import '../../../shared/widgets/grupo_cartao.dart';
 import '../../../shared/widgets/linha_do_tempo.dart';
 import '../../../shared/widgets/abas_deslizantes.dart';
 import '../../../shared/widgets/tatu_chip.dart';
@@ -555,7 +554,8 @@ class _BuscaCompacta extends StatelessWidget {
         children: [
           Row(
             children: [
-              IconeCirculo(iconeServico(busca.servico)),
+              // RN-227: 40 px em cards.
+              IconeProfissaoCirculo(busca.servico),
               const SizedBox(width: TatuMedidas.entreItens),
               Expanded(
                 child: Column(

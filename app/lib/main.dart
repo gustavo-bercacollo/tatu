@@ -6,10 +6,11 @@ import 'features/entrada/boas_vindas_page.dart';
 import 'data/catalogo_servicos.dart';
 import 'data/demo_plano_fixo.dart';
 import 'data/documentos_legais.dart';
+import 'data/icones_profissoes.dart';
 import 'data/pedidos.dart';
 import 'data/profissoes_reguladas.dart';
 
-void main() {
+Future<void> main() async {
   // Os assets só podem ser lidos depois que o Flutter inicia.
   WidgetsFlutterBinding.ensureInitialized();
   // RN-150/RN-151: Termos e Política vêm dos .md de docs/.
@@ -17,6 +18,8 @@ void main() {
   // RN-156: lista de profissões reguladas de docs/.
   profissoesReguladas.carregar().ignore();
   catalogoServicos.carregar().ignore();
+  // RN-227: o mapa de ícones das profissões (pequeno; antes da 1ª tela).
+  await iconesProfissoes.carregar();
   // RN-200 a RN-205: planos fixos de demonstração (selo "Plano fixo").
   // O cliente abre sem nada em andamento: a visita da Júlia é amanhã.
   sementeDemoPlanoFixo(visitaHojeDoCliente: false);

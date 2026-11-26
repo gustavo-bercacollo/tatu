@@ -8,6 +8,7 @@ import 'conta.dart';
 import 'notificacoes.dart';
 import 'prazos.dart';
 import 'conversas.dart';
+import 'pagamentos.dart';
 import 'retorno.dart';
 import '../shared/formatadores.dart';
 import 'seguranca.dart';
@@ -508,7 +509,7 @@ class PedidosRepo extends ChangeNotifier {
   /// Buscas em segundo plano (uma por pedido sem ninguém ainda).
   final buscas = <BuscaSegundoPlano>[];
 
-  /// RN-222: profissionais que ficaram sem acordo de valor; não recebem de
+  /// RN-229: profissionais que ficaram sem acordo de valor; não recebem de
   /// novo o mesmo pedido.
   final recusados = <String>{};
   late List<PedidoConcluido> concluidos;
@@ -667,7 +668,7 @@ class PedidosRepo extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// RN-221/RN-222: o cliente recusou o último valor de [profissional]:
+  /// RN-228/RN-229: o cliente recusou o último valor de [profissional]:
   /// o pedido com ele sai de "Em andamento" sem custo e ele não recebe de
   /// novo o mesmo pedido. Devolve o pedido que saiu (nulo se não havia).
   PedidoAndamento? semAcordo(String profissional) {
@@ -968,6 +969,9 @@ class PedidosRepo extends ChangeNotifier {
     _pararRelogios();
     final feito = _concluido(p, valor: p.valor, pagamento: p.pagamento);
     concluidos = [feito, ...concluidos];
+    // RN-226: cobra a reserva; se as novas tentativas falharem, fica a
+    // pendência na Home (o profissional recebe de qualquer jeito).
+    pagamentos.cobrarAoConcluir(lerReais(p.valor));
     if (automatico) confirmadoSozinho = feito;
     // RN-194: guarda sozinho o pacote de provas (chargeback).
     final agora = clock.now();

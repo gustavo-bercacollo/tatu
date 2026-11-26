@@ -8,7 +8,7 @@ import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/servico_profissional.dart';
-import '../../../data/servicos.dart';
+import '../../../shared/widgets/icone_profissao.dart';
 import '../../../shared/widgets/folha.dart';
 import '../../../shared/widgets/mapa_falso.dart';
 import '../cadastro/especialidades_page.dart' show EtiquetaCinza;
@@ -119,15 +119,8 @@ class _NovoChamadoPageState extends State<NovoChamadoPage> {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: TatuColors.fill,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Icon(iconeServico(c.profissao), size: 22),
-                          ),
+                          // RN-227: 40 px em cards.
+                          IconeProfissaoCirculo(c.profissao),
                           const SizedBox(width: TatuMedidas.entreItens),
                           Expanded(
                             child: Text(

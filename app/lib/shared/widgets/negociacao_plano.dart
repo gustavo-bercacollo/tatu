@@ -220,7 +220,8 @@ class NegociacaoPlanoChat extends StatelessWidget {
         Text(
           '${plano.visitasNoPeriodo} visita'
           '${plano.visitasNoPeriodo == 1 ? '' : 's'} × '
-          '${reaisInteiros(porVisita)} · cobrado no fim do ${plano.periodo}',
+          // RN-146: cada visita é cobrada ao concluir.
+          '${reaisInteiros(porVisita)} · cobrado a cada visita',
           style: TatuTexto.legenda,
         ),
         const SizedBox(height: 16),

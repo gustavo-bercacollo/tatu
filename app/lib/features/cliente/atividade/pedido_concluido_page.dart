@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
@@ -112,7 +111,6 @@ class PedidoConcluidoPage extends StatelessWidget {
                     resumo: p.descricao,
                     descricao: p.descricao,
                     quando: p.dia,
-                    icone: TablerIcons.tool,
                   ),
                 ),
               ),

@@ -6,7 +6,7 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/profissional.dart';
-import '../../../data/servicos.dart';
+import '../../../shared/widgets/icone_profissao.dart';
 import '../../../data/sugestoes_profissao.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/grupo_cartao.dart';
@@ -163,7 +163,8 @@ class _CartaoProfissao extends StatelessWidget {
       ),
       child: Row(
         children: [
-          IconeCirculo(iconeServico(profissao.nome), fundo: TatuColors.bg),
+          // RN-227: ícone da profissão.
+          IconeProfissaoCirculo(profissao.nome, fundo: TatuColors.bg),
           const SizedBox(width: TatuMedidas.entreItens),
           Expanded(
             child: Column(

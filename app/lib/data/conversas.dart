@@ -8,6 +8,8 @@ import 'regras_distancia.dart';
 import 'regras_valor.dart';
 import 'suspensao.dart';
 import 'ligacao.dart';
+import 'pagamento.dart';
+import 'pagamentos.dart';
 
 /// Situação de uma mensagem enviada pela pessoa.
 enum EnvioMensagem { enviada, falhou }
@@ -226,6 +228,9 @@ class ValorProposta {
   /// Valor que o cliente pediu (quando pediu outro).
   double? pedido;
 
+  /// RN-222 a RN-224: o pagamento deste valor (nulo = ainda não tentou).
+  PagamentoValor? pagamento;
+
   double get total => visita + servico;
 }
 
@@ -255,7 +260,7 @@ class Conversa {
 
   bool get encerrada => encerramento != null;
 
-  /// RN-221/RN-222: o cliente recusou o último valor. A conversa fica só
+  /// RN-228/RN-229: o cliente recusou o último valor. A conversa fica só
   /// para leitura, com "Sem acordo de valor", e sai de "Em andamento".
   bool semAcordo = false;
 
@@ -487,7 +492,7 @@ class ConversasRepo extends ChangeNotifier {
     return c;
   }
 
-  /// RN-221: o cliente recusou o 3º valor: nada é cobrado e a conversa
+  /// RN-228: o cliente recusou o 3º valor: nada é cobrado e a conversa
   /// fica só para leitura.
   void recusarValor(Conversa c) {
     c.semAcordo = true;
@@ -496,15 +501,32 @@ class ConversasRepo extends ChangeNotifier {
 
   /// O cliente confirma o valor: fica reservado e só é cobrado no fim.
   /// À distância, começa a entrega e o sinal é cobrado agora (RN-103).
-  void confirmarValor(Conversa c) {
+  /// RN-222/RN-223: confirma o valor reservando no [cartao] (o padrão,
+  /// se nulo) ou com o Pix pago ([pix]). Reserva recusada: nada muda no
+  /// atendimento (o profissional não sai) e o card mostra "Cartão
+  /// recusado". Devolve se o pagamento ficou garantido.
+  bool confirmarValor(Conversa c, {Cartao? cartao, bool pix = false}) {
     final v = c.valor;
-    v?.situacao = SituacaoValor.confirmado;
+    if (v == null) return false;
+    if (v.pagamento?.expirado ?? false) return false;
+    final usado = cartao ?? pagamentos.padrao;
+    if (!pix && !pagamentos.reservar(usado)) {
+      v.pagamento = PagamentoValor(
+        situacao: SituacaoPagamento.recusado,
+        desde: v.pagamento?.desde,
+        cartaoRecusado: usado?.titulo,
+      );
+      notifyListeners();
+      return false;
+    }
+    v.pagamento = PagamentoValor(situacao: SituacaoPagamento.garantido);
+    v.situacao = SituacaoValor.confirmado;
     // RN-140: valor novo confirmado, a ligação volta a existir.
     c.servicoConcluido = false;
     // RN-181: novo valor confirmado no chat de um serviço concluído vira
     // um atendimento novo (aparece na Atividade). Sem confirmação, nada.
-    if (v != null && v.novo) c._emAndamento = true;
-    if (c.distancia && v != null) {
+    if (v.novo) c._emAndamento = true;
+    if (c.distancia) {
       c.entrega = EntregaDistancia(confirmadoEm: clock.now());
       c.mensagens.add(
         MensagemChat.marcador(
@@ -514,6 +536,35 @@ class ConversasRepo extends ChangeNotifier {
         ),
       );
     }
+    notifyListeners();
+    return true;
+  }
+
+  /// RN-224: "Pagar com Pix": gera o código (vale 30 minutos). O prazo
+  /// para pagar continua contando do primeiro "Cartão recusado".
+  void gerarPix(Conversa c) {
+    final v = c.valor;
+    if (v == null || (v.pagamento?.garantido ?? false)) return;
+    final agora = clock.now();
+    v.pagamento = PagamentoValor(
+      situacao: SituacaoPagamento.pixAguardando,
+      desde: v.pagamento?.desde ?? agora,
+      cartaoRecusado: v.pagamento?.cartaoRecusado,
+      pixAte: agora.add(RegrasPagamento.validadePix),
+    );
+    notifyListeners();
+  }
+
+  /// RN-223/RN-224: sem pagamento no prazo, o valor expira: nada é
+  /// cobrado, o profissional fica livre e ninguém leva falta.
+  void conferirPagamento(Conversa c, {DateTime? agora}) {
+    final p = c.valor?.pagamento;
+    if (p == null || !p.pendente) return;
+    if ((agora ?? clock.now()).isBefore(p.prazo)) return;
+    p.situacao = SituacaoPagamento.expirado;
+    c.mensagens.add(
+      MensagemChat.marcador('Valor expirado sem pagamento · nada foi cobrado'),
+    );
     notifyListeners();
   }
 

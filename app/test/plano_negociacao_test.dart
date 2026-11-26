@@ -181,7 +181,7 @@ void main() {
         findsWidgets,
       );
       expect(
-        _noCard(r'8 visitas × R$ 150 · cobrado no fim do mês'),
+        _noCard(r'8 visitas × R$ 150 · cobrado a cada visita'),
         findsOneWidget,
       );
       expect(_noCard('D'), findsOneWidget);

@@ -1,0 +1,326 @@
+{
+ "profissoes": {
+  "Encanador": {
+   "arquivo": "encanador.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Eletricista": {
+   "arquivo": "eletricista.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Pedreiro": {
+   "arquivo": "pedreiro.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Pintor": {
+   "arquivo": "pintor.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Montador de móveis": {
+   "arquivo": "montador-de-moveis.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Marceneiro": {
+   "arquivo": "marceneiro.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Gesseiro": {
+   "arquivo": "gesseiro.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Vidraceiro": {
+   "arquivo": "vidraceiro.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Serralheiro": {
+   "arquivo": "serralheiro.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Chaveiro": {
+   "arquivo": "chaveiro.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Telhadista": {
+   "arquivo": "telhadista.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Impermeabilizador": {
+   "arquivo": "impermeabilizador.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Instalador de ar-condicionado": {
+   "arquivo": "instalador-de-ar-condicionado.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Instalador de gás": {
+   "arquivo": "instalador-de-gas.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Técnico de eletrodomésticos": {
+   "arquivo": "tecnico-de-eletrodomesticos.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Instalador de antenas e câmeras": {
+   "arquivo": "instalador-de-antenas-e-cameras.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Instalador de painel solar": {
+   "arquivo": "instalador-de-painel-solar.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Faz-tudo": {
+   "arquivo": "faz-tudo.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Engenheiro(a)": {
+   "arquivo": "engenheiro.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Arquiteto(a)": {
+   "arquivo": "arquiteto.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Designer de interiores": {
+   "arquivo": "designer-de-interiores.svg",
+   "segmento": "Casa e reformas"
+  },
+  "Diarista": {
+   "arquivo": "diarista.svg",
+   "segmento": "Limpeza e cuidados com a casa"
+  },
+  "Passadeira": {
+   "arquivo": "passadeira.svg",
+   "segmento": "Limpeza e cuidados com a casa"
+  },
+  "Cozinheira": {
+   "arquivo": "cozinheira.svg",
+   "segmento": "Limpeza e cuidados com a casa"
+  },
+  "Organizador(a)": {
+   "arquivo": "organizador.svg",
+   "segmento": "Limpeza e cuidados com a casa"
+  },
+  "Limpeza de estofados": {
+   "arquivo": "limpeza-de-estofados.svg",
+   "segmento": "Limpeza e cuidados com a casa"
+  },
+  "Jardineiro(a)": {
+   "arquivo": "jardineiro.svg",
+   "segmento": "Limpeza e cuidados com a casa"
+  },
+  "Piscineiro(a)": {
+   "arquivo": "piscineiro.svg",
+   "segmento": "Limpeza e cuidados com a casa"
+  },
+  "Lavador de carros a domicílio": {
+   "arquivo": "lavador-de-carros.svg",
+   "segmento": "Limpeza e cuidados com a casa"
+  },
+  "Frete e mudança": {
+   "arquivo": "frete-e-mudanca.svg",
+   "segmento": "Mudanças e transporte"
+  },
+  "Motorista particular": {
+   "arquivo": "motorista-particular.svg",
+   "segmento": "Mudanças e transporte"
+  },
+  "Instrutor(a) de direção": {
+   "arquivo": "instrutor-de-direcao.svg",
+   "segmento": "Mudanças e transporte"
+  },
+  "Cabeleireiro(a)": {
+   "arquivo": "cabeleireiro.svg",
+   "segmento": "Beleza e bem-estar"
+  },
+  "Barbeiro": {
+   "arquivo": "barbeiro.svg",
+   "segmento": "Beleza e bem-estar"
+  },
+  "Manicure e pedicure": {
+   "arquivo": "manicure-e-pedicure.svg",
+   "segmento": "Beleza e bem-estar"
+  },
+  "Maquiador(a)": {
+   "arquivo": "maquiador.svg",
+   "segmento": "Beleza e bem-estar"
+  },
+  "Designer de sobrancelhas": {
+   "arquivo": "designer-de-sobrancelhas.svg",
+   "segmento": "Beleza e bem-estar"
+  },
+  "Esteticista": {
+   "arquivo": "esteticista.svg",
+   "segmento": "Beleza e bem-estar"
+  },
+  "Massoterapeuta": {
+   "arquivo": "massoterapeuta.svg",
+   "segmento": "Beleza e bem-estar"
+  },
+  "Personal trainer": {
+   "arquivo": "personal-trainer.svg",
+   "segmento": "Beleza e bem-estar"
+  },
+  "Professor(a) de yoga e pilates": {
+   "arquivo": "professor-de-yoga.svg",
+   "segmento": "Beleza e bem-estar"
+  },
+  "Nutricionista": {
+   "arquivo": "nutricionista.svg",
+   "segmento": "Beleza e bem-estar"
+  },
+  "Psicólogo(a)": {
+   "arquivo": "psicologo.svg",
+   "segmento": "Beleza e bem-estar"
+  },
+  "Fisioterapeuta": {
+   "arquivo": "fisioterapeuta.svg",
+   "segmento": "Beleza e bem-estar"
+  },
+  "Babá": {
+   "arquivo": "baba.svg",
+   "segmento": "Cuidados com pessoas e pets"
+  },
+  "Cuidador(a) de idosos": {
+   "arquivo": "cuidador-de-idosos.svg",
+   "segmento": "Cuidados com pessoas e pets"
+  },
+  "Técnico(a) de enfermagem": {
+   "arquivo": "tecnico-de-enfermagem.svg",
+   "segmento": "Cuidados com pessoas e pets"
+  },
+  "Passeador(a) de cães": {
+   "arquivo": "passeador-de-caes.svg",
+   "segmento": "Cuidados com pessoas e pets"
+  },
+  "Banho e tosa": {
+   "arquivo": "banho-e-tosa.svg",
+   "segmento": "Cuidados com pessoas e pets"
+  },
+  "Adestrador(a)": {
+   "arquivo": "adestrador.svg",
+   "segmento": "Cuidados com pessoas e pets"
+  },
+  "Médico(a) veterinário(a)": {
+   "arquivo": "medico-veterinario.svg",
+   "segmento": "Cuidados com pessoas e pets"
+  },
+  "Professor(a) particular": {
+   "arquivo": "professor-particular.svg",
+   "segmento": "Aulas"
+  },
+  "Professor(a) de idiomas": {
+   "arquivo": "professor-de-idiomas.svg",
+   "segmento": "Aulas"
+  },
+  "Professor(a) de música": {
+   "arquivo": "professor-de-musica.svg",
+   "segmento": "Aulas"
+  },
+  "Professor(a) de informática": {
+   "arquivo": "professor-de-informatica.svg",
+   "segmento": "Aulas"
+  },
+  "Técnico(a) de informática": {
+   "arquivo": "tecnico-de-informatica.svg",
+   "segmento": "Tecnologia e criação"
+  },
+  "Técnico(a) de celular": {
+   "arquivo": "tecnico-de-celular.svg",
+   "segmento": "Tecnologia e criação"
+  },
+  "Programador(a)": {
+   "arquivo": "programador.svg",
+   "segmento": "Tecnologia e criação"
+  },
+  "Designer gráfico": {
+   "arquivo": "designer-grafico.svg",
+   "segmento": "Tecnologia e criação"
+  },
+  "Social media": {
+   "arquivo": "social-media.svg",
+   "segmento": "Tecnologia e criação"
+  },
+  "Editor(a) de vídeo": {
+   "arquivo": "editor-de-video.svg",
+   "segmento": "Tecnologia e criação"
+  },
+  "Fotógrafo(a)": {
+   "arquivo": "fotografo.svg",
+   "segmento": "Tecnologia e criação"
+  },
+  "Tradutor(a)": {
+   "arquivo": "tradutor.svg",
+   "segmento": "Tecnologia e criação"
+  },
+  "Redator(a) e revisor(a)": {
+   "arquivo": "redator-e-revisor.svg",
+   "segmento": "Tecnologia e criação"
+  },
+  "Garçom / garçonete": {
+   "arquivo": "garcom.svg",
+   "segmento": "Eventos"
+  },
+  "Churrasqueiro": {
+   "arquivo": "churrasqueiro.svg",
+   "segmento": "Eventos"
+  },
+  "Confeiteiro(a)": {
+   "arquivo": "confeiteiro.svg",
+   "segmento": "Eventos"
+  },
+  "Decorador(a) de festas": {
+   "arquivo": "decorador-de-festas.svg",
+   "segmento": "Eventos"
+  },
+  "DJ e som": {
+   "arquivo": "dj-e-som.svg",
+   "segmento": "Eventos"
+  },
+  "Recreador(a)": {
+   "arquivo": "recreador.svg",
+   "segmento": "Eventos"
+  },
+  "Advogado(a)": {
+   "arquivo": "advogado.svg",
+   "segmento": "Consultoria e serviços profissionais"
+  },
+  "Contador(a)": {
+   "arquivo": "contador.svg",
+   "segmento": "Consultoria e serviços profissionais"
+  },
+  "Corretor(a) de imóveis": {
+   "arquivo": "corretor-de-imoveis.svg",
+   "segmento": "Consultoria e serviços profissionais"
+  },
+  "Corretor(a) de seguros": {
+   "arquivo": "corretor-de-seguros.svg",
+   "segmento": "Consultoria e serviços profissionais"
+  },
+  "Consultor(a) financeiro(a)": {
+   "arquivo": "consultor-financeiro.svg",
+   "segmento": "Consultoria e serviços profissionais"
+  }
+ },
+ "segmentos": {
+  "Casa e reformas": "seg-casa.svg",
+  "Limpeza e cuidados com a casa": "seg-limpeza.svg",
+  "Mudanças e transporte": "seg-mudancas.svg",
+  "Beleza e bem-estar": "seg-beleza.svg",
+  "Cuidados com pessoas e pets": "seg-cuidados.svg",
+  "Aulas": "seg-aulas.svg",
+  "Tecnologia e criação": "seg-tecnologia.svg",
+  "Eventos": "seg-eventos.svg",
+  "Consultoria e serviços profissionais": "seg-consultoria.svg"
+ },
+ "sem_segmento": "generico-cracha.svg",
+ "botao_outros": "outros.svg",
+ "apelidos_na_home": {
+  "Montador": "montador-de-moveis.svg",
+  "Designer": "designer-grafico.svg",
+  "Programador": "programador.svg",
+  "Professor": "professor-particular.svg",
+  "Contador": "contador.svg",
+  "Advogado": "advogado.svg",
+  "Outros": "outros.svg"
+ }
+}

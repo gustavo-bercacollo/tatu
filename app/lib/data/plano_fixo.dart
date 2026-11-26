@@ -2,6 +2,8 @@ import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 
 import 'canal_tatu.dart';
+import 'pagamento.dart';
+import 'pagamentos.dart';
 import 'profissional.dart' as pro;
 
 /// RN-144 a RN-149: plano fixo (cliente "torna" um profissional fixo).
@@ -36,6 +38,14 @@ enum SituacaoVisita {
 
   /// RN-147: faltou sem avisar (abandono, RN-76 a RN-79; não cobrada).
   faltou,
+
+  /// RN-225: a reserva da véspera foi recusada; o cliente pode atualizar
+  /// o pagamento até a véspera, às 20h.
+  suspensa,
+
+  /// RN-225: não resolvido no prazo: a visita não acontece, sem cobrança
+  /// e sem falta para ninguém.
+  semPagamento,
 }
 
 const _diasSemana = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
@@ -141,6 +151,12 @@ class VisitaPlano {
 
   /// RN-206: minutos até chegar (pílula escura "8 min").
   int minutosParaChegar = 8;
+
+  /// RN-146/RN-225: valor reservado na véspera.
+  bool reservada = false;
+
+  /// RN-225: suspensa: o cliente resolve até aqui (véspera, 20h).
+  DateTime? atualizarAte;
 
   /// Visita de hoje ainda acontecendo (agendada, a caminho ou em serviço).
   bool get emAberto =>
@@ -403,9 +419,27 @@ class PlanoFixo {
         .firstOrNull;
   }
 
+  /// RN-225: visita suspensa por pagamento (nula = nenhuma).
+  VisitaPlano? get visitaSuspensa => visitas
+      .where((v) => v.situacao == SituacaoVisita.suspensa)
+      .firstOrNull;
+
   /// RN-202/RN-205: barra do chat para quem está vendo ([cliente] ou
   /// profissional). Nula quando o plano está encerrado.
   BarraPlano? barra({required bool cliente, DateTime? agora}) {
+    // RN-225: visita suspensa: laranja para o cliente agir; cinza para o
+    // profissional ("Não precisa ir").
+    final suspensa = visitaSuspensa;
+    if (suspensa != null) {
+      final dia = diaLongo(suspensa.dia.weekday);
+      return cliente
+          ? BarraPlano(
+              'Visita de $dia suspensa',
+              direita: 'Atualizar',
+              laranja: true,
+            )
+          : BarraPlano('Visita de $dia suspensa', direita: 'Não precisa ir');
+    }
     final proxima = proximaVisita;
     final prox = proxima == null ? null : 'Próxima: ${diaMes(proxima.dia)}';
     return switch (estado(agora)) {
@@ -762,9 +796,76 @@ class PlanosFixosRepo extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// RN-146: a visita feita é cobrada (a reserva da véspera é capturada).
   void visitaFeita(VisitaPlano v) {
     v.situacao = SituacaoVisita.feita;
     notifyListeners();
+  }
+
+  /// RN-146/RN-225: na véspera, reserva o valor da visita no cartão do
+  /// cliente. Recusada: a visita fica suspensa até a véspera, às 20h.
+  /// Devolve se reservou.
+  bool reservarVespera(PlanoFixo p, VisitaPlano v) {
+    if (v.situacao != SituacaoVisita.agendada) return false;
+    if (pagamentos.reservar(pagamentos.padrao)) {
+      v.reservada = true;
+      notifyListeners();
+      return true;
+    }
+    v
+      ..situacao = SituacaoVisita.suspensa
+      ..atualizarAte = DateTime(
+        v.dia.year,
+        v.dia.month,
+        v.dia.day - 1,
+        RegrasPagamento.horaLimiteVespera,
+      );
+    notifyListeners();
+    return false;
+  }
+
+  /// RN-225: o cliente atualizou o pagamento no prazo: a visita volta e a
+  /// profissional é avisada. Devolve se deu certo.
+  bool atualizarPagamentoVisita(PlanoFixo p, VisitaPlano v, {DateTime? agora}) {
+    if (v.situacao != SituacaoVisita.suspensa) return false;
+    final hoje = agora ?? clock.now();
+    if (v.atualizarAte != null && hoje.isAfter(v.atualizarAte!)) return false;
+    if (!pagamentos.reservar(pagamentos.padrao)) return false;
+    v
+      ..situacao = SituacaoVisita.agendada
+      ..reservada = true
+      ..atualizarAte = null;
+    canalTatu.profissional.receber(
+      MensagemTatu(
+        id: 'fixo-volta-${v.dia.toIso8601String()}',
+        em: hoje,
+        resumo: 'A visita de ${diaLongo(v.dia.weekday)} voltou',
+        texto:
+            '${p.clienteFeminina ? 'A' : 'O'} ${p.primeiroCliente} resolveu o '
+            'pagamento. A visita de ${diaLongo(v.dia.weekday)}, '
+            '${diaMes(v.dia)}, às ${horaCurta(p.horario)}, está de pé.',
+      ),
+    );
+    notifyListeners();
+    return true;
+  }
+
+  /// RN-225: sem resolver no prazo, a visita não acontece: sem cobrança e
+  /// sem falta para ninguém.
+  void conferirSuspensas({DateTime? agora}) {
+    final hoje = agora ?? clock.now();
+    var mudou = false;
+    for (final p in planos) {
+      for (final v in p.visitas) {
+        if (v.situacao == SituacaoVisita.suspensa &&
+            v.atualizarAte != null &&
+            hoje.isAfter(v.atualizarAte!)) {
+          v.situacao = SituacaoVisita.semPagamento;
+          mudou = true;
+        }
+      }
+    }
+    if (mudou) notifyListeners();
   }
 
   /// RN-147: "Não vou nesta semana": sem penalidade, não cobrada; o

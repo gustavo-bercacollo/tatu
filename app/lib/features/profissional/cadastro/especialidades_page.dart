@@ -4,7 +4,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../data/profissional.dart';
-import '../../../data/servicos.dart';
+import '../../../shared/widgets/icone_profissao.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/tatu_chip.dart';
 import 'como_atende_page.dart';
@@ -166,7 +166,8 @@ class _EspecialidadesPageState extends State<EspecialidadesPage> {
       passo: 2,
       etiquetaPasso: total > 1 && !widget.edicao
           ? EtiquetaCinza(
-              icone: iconeServico(_prof.nome),
+              // RN-227: junto de texto.
+              iconeWidget: IconeProfissao(_prof.nome),
               texto: '${_prof.nome} · ${widget.indice + 1} de $total',
             )
           : null,
@@ -207,12 +208,16 @@ class _EspecialidadesPageState extends State<EspecialidadesPage> {
 class EtiquetaCinza extends StatelessWidget {
   const EtiquetaCinza({
     super.key,
-    required this.icone,
+    this.icone,
+    this.iconeWidget,
     required this.texto,
     this.verde = false,
   });
 
-  final IconData icone;
+  final IconData? icone;
+
+  /// No lugar de [icone] (ex.: ícone da profissão, RN-227).
+  final Widget? iconeWidget;
   final String texto;
 
   /// Verde claro com texto verde (ex.: "Pediu você de novo", RN-178).
@@ -230,7 +235,7 @@ class EtiquetaCinza extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icone, size: 14, color: cor),
+          iconeWidget ?? Icon(icone, size: 14, color: cor),
           const SizedBox(width: 6),
           Flexible(
             child: Text(

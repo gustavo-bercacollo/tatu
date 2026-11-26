@@ -32,6 +32,7 @@ class TatuColors {
 
   /// Fundo de erro e do botão de remover.
   static const dangerSoft = Color(0xFFFFE5E5);
+  static const dangerTexto = Color(0xFFD70015); // texto vermelho em fundo claro (cartão recusado)
 
   /// Fundo do teclado numérico (código na porta, RN-39).
   static const teclado = Color(0xFFD1D3D9);

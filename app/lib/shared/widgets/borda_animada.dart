@@ -19,7 +19,7 @@ enum ModoBorda {
   nenhuma,
 }
 
-/// Borda de 2 px desenhada por cima de [child], com o mesmo
+/// RN-221 · Borda de 2 px desenhada por cima de [child], com o mesmo
 /// arredondamento: grafite com uma faixa clara que dá uma volta a cada 8
 /// segundos (Home do cliente, "O que está acontecendo?").
 ///
@@ -136,17 +136,20 @@ class _PintorBorda extends CustomPainter {
   final double raio;
   final double largura;
 
-  /// Grafite com a faixa clara no meio (0,50 é o brilho).
+  /// Grafite com uma faixa clara larga (cerca de 1/4 da volta), branca
+  /// no meio, que vai clareando e escurecendo aos poucos.
   static const _cores = [
     TatuColors.action, // #1C1C1E
     TatuColors.action,
     TatuColors.textSecondary, // #8E8E93
     TatuColors.trilho, // #E5E5EA
+    TatuColors.bg, // #FFFFFF (o brilho)
+    TatuColors.trilho,
     TatuColors.textSecondary,
     TatuColors.action,
     TatuColors.action,
   ];
-  static const _paradas = [0.0, 0.35, 0.45, 0.50, 0.55, 0.65, 1.0];
+  static const _paradas = [0.0, 0.18, 0.32, 0.42, 0.50, 0.58, 0.68, 0.82, 1.0];
 
   @override
   void paint(Canvas canvas, Size size) {

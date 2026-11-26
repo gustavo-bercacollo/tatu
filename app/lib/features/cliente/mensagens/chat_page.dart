@@ -24,6 +24,7 @@ import '../atividade/pedido_andamento_page.dart';
 import '../foto/camera_desativada_page.dart';
 import '../atividade/pedido_concluido_page.dart';
 import '../pagamento/pagamento_page.dart';
+import '../pagamento/pagar_pix_sheet.dart';
 
 import 'package:clock/clock.dart';
 
@@ -153,6 +154,11 @@ class _ChatPageState extends State<ChatPage> {
       // RN-187/RN-188: confere os prazos do retorno e, se ele foi feito,
       // pergunta "Resolveu?".
       conferirPrazosRetorno();
+      // RN-225: visita suspensa sem resolver no prazo não acontece.
+      planosFixos.conferirSuspensas();
+      // RN-223: o prazo para pagar pode ter vencido com o chat fechado.
+      conversas.conferirPagamento(_c);
+      _contarPrazoPagamento();
       final r = _retorno;
       if (r != null && r.situacao == SituacaoRetorno.feito && mounted) {
         perguntarResolveu(context, r);
@@ -169,6 +175,7 @@ class _ChatPageState extends State<ChatPage> {
   void dispose() {
     _timer?.cancel();
     _campo.dispose();
+    _prazoPagamento?.cancel();
     super.dispose();
   }
 
@@ -180,6 +187,86 @@ class _ChatPageState extends State<ChatPage> {
       atual: v.parcelas,
     );
     if (n != null && mounted) conversas.escolherParcelas(_c, n);
+  }
+
+  /// RN-222/RN-223: confirma reservando no cartão. Recusado, o card
+  /// mostra "Cartão recusado" e o prazo para pagar começa a contar.
+  void _confirmarValor(ValorProposta v, {bool pix = false}) {
+    // RN-181: novo valor no chat de um serviço concluído.
+    final peloChat = v.novo && !_c.emAndamento;
+    if (!conversas.confirmarValor(_c, pix: pix)) return _contarPrazoPagamento();
+    _prazoPagamento?.cancel();
+    if (peloChat) return _novoServicoPeloChat(v);
+    // RN-76: começa o prazo do profissional para sair.
+    if (pedidos.doProfissional(_c.nome) case final p?) {
+      pedidos.abrir(p);
+      // RN-103: à distância, o sinal é cobrado agora.
+      pedidos.valorConfirmado(sinal: v.sinal);
+      // RN-165: no local, vai direto para o acompanhamento.
+      if (!_c.distancia) {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const PedidoAndamentoPage()),
+        );
+      }
+    }
+    // RN-99/RN-100: à distância, protótipo: chega uma prévia e depois a
+    // 1ª entrega.
+    if (_c.distancia) {
+      _timer?.cancel();
+      _timer = Timer(widget.resposta * 2, () {
+        conversas.receberPrevia(_c);
+        _timer = Timer(
+          widget.resposta * 2,
+          () => conversas.receberEntrega(_c),
+        );
+      });
+    }
+  }
+
+  Timer? _prazoPagamento;
+
+  /// RN-223: sem pagamento no prazo, o valor expira (nada cobrado).
+  void _contarPrazoPagamento() {
+    final p = _c.valor?.pagamento;
+    if (p == null || !p.pendente) return;
+    _prazoPagamento?.cancel();
+    final falta = p.prazo.difference(clock.now());
+    _prazoPagamento = Timer(
+      falta.isNegative ? Duration.zero : falta,
+      () => conversas.conferirPagamento(_c),
+    );
+  }
+
+  /// RN-223: "Usar outro cartão": escolhe o cartão e tenta de novo.
+  Future<void> _outroCartao(ValorProposta v) async {
+    final antes = pagamentos.padrao;
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const PagamentoPage()),
+    );
+    if (!mounted) return;
+    final agora = pagamentos.padrao;
+    if (agora != null && agora.id != antes?.id) _confirmarValor(v);
+  }
+
+  /// C111 · RN-224: Pix pago confirma o valor; código vencido = mesma
+  /// regra do cartão recusado.
+  Future<void> _pagarComPix(ValorProposta v) async {
+    conversas.gerarPix(_c);
+    _contarPrazoPagamento();
+    final p = v.pagamento;
+    if (p == null) return;
+    final pago = await pagarComPix(
+      context,
+      valor: v.total,
+      nome: '${_c.artigo} ${_c.primeiroNome}',
+      ate: p.pixAte ?? p.prazo,
+    );
+    if (!mounted) return;
+    if (pago ?? false) {
+      _confirmarValor(v, pix: true);
+    } else {
+      conversas.conferirPagamento(_c);
+    }
   }
 
   void _trocarPagamento() =>
@@ -386,38 +473,9 @@ class _ChatPageState extends State<ChatPage> {
         SituacaoValor.aguardandoVoce => CartaoValorRecebido(
           valor: v,
           nome: '${_c.artigo} ${_c.primeiroNome}',
-          onConfirmar: () {
-            // RN-181: novo valor no chat de um serviço concluído.
-            final peloChat = v.novo && !_c.emAndamento;
-            conversas.confirmarValor(_c);
-            if (peloChat) return _novoServicoPeloChat(v);
-            // RN-76: começa o prazo do profissional para sair.
-            if (pedidos.doProfissional(_c.nome) case final p?) {
-              pedidos.abrir(p);
-              // RN-103: à distância, o sinal é cobrado agora.
-              pedidos.valorConfirmado(sinal: v.sinal);
-              // RN-165: no local, vai direto para o acompanhamento.
-              if (!_c.distancia) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const PedidoAndamentoPage(),
-                  ),
-                );
-              }
-            }
-            // RN-99/RN-100: à distância, protótipo: chega uma prévia e
-            // depois a 1ª entrega.
-            if (_c.distancia) {
-              _timer?.cancel();
-              _timer = Timer(widget.resposta * 2, () {
-                conversas.receberPrevia(_c);
-                _timer = Timer(
-                  widget.resposta * 2,
-                  () => conversas.receberEntrega(_c),
-                );
-              });
-            }
-          },
+          onConfirmar: () => _confirmarValor(v),
+          onOutroCartao: () => _outroCartao(v),
+          onPix: () => _pagarComPix(v),
           onTrocar: _trocarPagamento,
           onParcelas: () => _parcelas(v),
           onPedirOutro: v.rodada < maxRodadasValor ? _pedirOutro : null,
@@ -465,7 +523,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  /// RN-221: "Recusar valor" no 3º valor: chamar outro ou cancelar.
+  /// RN-228: "Recusar valor" no 3º valor: chamar outro ou cancelar.
   Future<void> _recusar() async {
     final ela = '${_c.artigo} ${_c.primeiroNome}';
     final chamarOutro = await perguntar(
@@ -480,7 +538,7 @@ class _ChatPageState extends State<ChatPage> {
       iconeAviso: false,
     );
     if (chamarOutro == null || !mounted) return;
-    // RN-222: sem custo; o pedido com ela sai e ela não volta.
+    // RN-229: sem custo; o pedido com ela sai e ela não volta.
     conversas.recusarValor(_c);
     final p = pedidos.semAcordo(_c.nome);
     if (chamarOutro) {
@@ -665,7 +723,6 @@ class _ChatPageState extends State<ChatPage> {
     resumo: _c.descricao,
     descricao: _c.descricao,
     quando: _c.quando,
-    icone: TablerIcons.tool,
   );
 
   void _verPedido() {
@@ -865,6 +922,24 @@ class _ChatPageState extends State<ChatPage> {
     ];
   }
 
+  /// C228 · RN-225: "Atualizar pagamento": escolhe o cartão e reserva de
+  /// novo; dando certo, a visita volta e a profissional é avisada.
+  Future<void> _atualizarPagamentoVisita(PlanoFixo p, VisitaPlano v) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const PagamentoPage()),
+    );
+    if (!mounted) return;
+    if (planosFixos.atualizarPagamentoVisita(p, v)) {
+      mostrarAvisoTopo(
+        context,
+        titulo: 'Visita confirmada',
+        texto:
+            '${_c.artigo == 'a' ? 'A' : 'O'} ${_c.primeiroNome} vai na '
+            '${diaLongo(v.dia.weekday)}.',
+      );
+    }
+  }
+
   /// RN-211: valor do último serviço avulso com a pessoa (economia).
   double? get _ultimoAvulso {
     final c = pedidos.concluidos
@@ -882,7 +957,10 @@ class _ChatPageState extends State<ChatPage> {
     final novo = p.status == StatusPlano.ativo ? p.novoValor : null;
     final n = novo ?? p.negociacao;
     final encerrado = p.estado() == EstadoPlano.encerrado;
-    if (n.propostas.isEmpty && p.status != StatusPlano.pendente && !encerrado) {
+    if (n.propostas.isEmpty &&
+        p.status != StatusPlano.pendente &&
+        !encerrado &&
+        p.visitaSuspensa == null) {
       return const [];
     }
     return [
@@ -914,6 +992,15 @@ class _ChatPageState extends State<ChatPage> {
         if (n.propostas.isNotEmpty) const SizedBox(height: 18),
         MarcadorChat(
           'Plano fixo encerrado · ${diaMes(p.encerradoEm ?? clock.now())}',
+        ),
+      ],
+      // C228 · RN-225: visita suspensa por pagamento.
+      if (p.visitaSuspensa case final v?) ...[
+        const SizedBox(height: 18),
+        CartaoVisitaSuspensa(
+          plano: p,
+          visita: v,
+          onAtualizar: () => _atualizarPagamentoVisita(p, v),
         ),
       ],
     ];
@@ -1141,7 +1228,7 @@ class _ChatPageState extends State<ChatPage> {
                 NotaChat(fim.nota!),
               ],
             ] else if (_c.semAcordo) ...[
-              // RN-222: só leitura depois da recusa do último valor.
+              // RN-229: só leitura depois da recusa do último valor.
               const SizedBox(height: TatuMedidas.entreSecoes),
               const MarcadorChat('Sem acordo de valor'),
             ] else ...[

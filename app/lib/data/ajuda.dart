@@ -150,7 +150,7 @@ class PedidoRecente {
     required this.resumo,
     required this.descricao,
     required this.quando,
-    required this.icone,
+    this.icone,
     this.rotulo = 'Pedido',
     this.titulo,
     this.iniciais,
@@ -180,7 +180,8 @@ class PedidoRecente {
   /// Completo, no chat ("Vazamento na pia da cozinha").
   final String descricao;
   final String quando;
-  final IconData icone;
+  /// Sem ícone: o da profissão do [servico] (RN-227).
+  final IconData? icone;
 }
 
 /// Mais recentes primeiro. Versão simulada (sem backend).
@@ -191,7 +192,6 @@ const pedidosRecentes = [
     resumo: 'Vazamento na pia',
     descricao: 'Vazamento na pia da cozinha',
     quando: 'Hoje',
-    icone: TablerIcons.droplet,
   ),
   PedidoRecente(
     servico: 'Eletricista',
@@ -199,7 +199,6 @@ const pedidosRecentes = [
     resumo: 'Tomada sem energia',
     descricao: 'Tomada sem energia',
     quando: '12 out',
-    icone: TablerIcons.bolt,
   ),
   PedidoRecente(
     servico: 'Pintor',
@@ -207,7 +206,6 @@ const pedidosRecentes = [
     resumo: 'Parede da sala',
     descricao: 'Parede da sala',
     quando: '28 set',
-    icone: TablerIcons.brush,
   ),
 ];
 

@@ -63,7 +63,7 @@ void main() {
 
   group('RN-150: documentos lidos do .md', () {
     test('Termos: versão, essencial, 23 seções e histórico', () {
-      expect(termos.versao, '1.1');
+      expect(termos.versao, '1.2');
       expect(termos.essencial, hasLength(7));
       expect(termos.numeradas, 23);
       expect(
@@ -71,7 +71,7 @@ void main() {
         contains('8. Valor, pagamento e taxa'),
       );
       expect(termos.secoes.last.titulo, startsWith('Anexo I'));
-      expect(termos.desta?.versao, '1.1');
+      expect(termos.desta?.versao, '1.2');
     });
 
     test('Política: versão, essencial e seções', () {
@@ -122,7 +122,7 @@ void main() {
         await t.pumpAndSettle();
       });
       final a = aceites.ultimo(_cpf, TipoAceite.cliente)!;
-      expect(a.versaoTermos, '1.1');
+      expect(a.versaoTermos, '1.2');
       expect(a.versaoPolitica, '1.1');
       expect(a.em, DateTime(2026, 11, 20, 14, 32));
       expect(a.conta, _cpf);
@@ -142,7 +142,7 @@ void main() {
       await t.pumpAndSettle();
       expect(enviou, isTrue);
       final a = aceites.ultimo(contaDoAceite(), TipoAceite.profissional)!;
-      expect(a.versaoTermos, '1.1');
+      expect(a.versaoTermos, '1.2');
     });
   });
 
@@ -168,7 +168,7 @@ void main() {
       expect(find.byType(TermosAtualizadosPage), findsNothing);
       expect(find.text('Do que você precisa?'), findsOneWidget);
       final a = aceites.ultimo(contaDoAceite(), TipoAceite.cliente)!;
-      expect(a.versaoTermos, '1.2');
+      expect(a.versaoTermos, '1.3');
       expect(a.versaoPolitica, '1.1');
       expect(a.em, DateTime(2026, 12, 5, 9));
       });
@@ -191,8 +191,8 @@ void main() {
 
     test('pedido em andamento segue a versão em que foi feito', () {
       final nova = versaoNovaDemo(termos, vigencia: DateTime(2026, 12, 3));
-      expect(nova.versaoEm(DateTime(2026, 11, 25)), '1.1');
-      expect(nova.versaoEm(DateTime(2026, 12, 4)), '1.2');
+      expect(nova.versaoEm(DateTime(2026, 11, 25)), '1.2');
+      expect(nova.versaoEm(DateTime(2026, 12, 4)), '1.3');
     });
   });
 

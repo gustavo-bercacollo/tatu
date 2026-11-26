@@ -71,7 +71,8 @@ class GrupoLista extends StatelessWidget {
 class ItemLista extends StatelessWidget {
   const ItemLista({
     super.key,
-    required this.icone,
+    this.icone,
+    this.iconeWidget,
     required this.texto,
     required this.onTap,
     this.valor,
@@ -80,7 +81,10 @@ class ItemLista extends StatelessWidget {
     this.detalhe,
   });
 
-  final IconData icone;
+  final IconData? icone;
+
+  /// No lugar de [icone] (ex.: ícone da profissão, RN-227).
+  final Widget? iconeWidget;
   final String texto;
 
   /// Linha cinza embaixo do texto (a linha fica mais alta).
@@ -102,11 +106,15 @@ class ItemLista extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: 16,
-            vertical: detalhe == null ? 0 : 12,
+            vertical: iconeWidget != null
+                ? 8
+                : detalhe == null
+                ? 0
+                : 12,
           ),
           child: Row(
             children: [
-              Icon(icone, size: 22, color: c),
+              iconeWidget ?? Icon(icone, size: 22, color: c),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(

@@ -8,6 +8,7 @@ import '../../../data/servicos.dart';
 import '../../../shared/widgets/aviso_topo.dart';
 import '../../../shared/widgets/campo_busca.dart';
 import '../../../shared/widgets/folha.dart';
+import '../../../shared/widgets/icone_profissao.dart';
 import '../../../shared/widgets/lista_agrupada.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import '../../../shared/widgets/tatu_chip.dart';
@@ -57,7 +58,12 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
   @override
   Widget build(BuildContext context) {
     final termo = _busca.text.trim();
-    final achados = buscarServicos(termo, profissional: widget.profissional);
+    // RN-92: o cliente só acha o que atende no modo escolhido.
+    final achados = buscarServicos(
+      termo,
+      profissional: widget.profissional,
+      distancia: widget.profissional ? null : widget.distancia,
+    );
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: Padding(
@@ -135,7 +141,7 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
               bottom: TatuMedidas.entreSecoes,
             ),
             children: [
-              if (!widget.distancia) ...[
+              ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(
                     16,
@@ -146,6 +152,8 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
                   child: Text(
                     widget.profissional
                         ? 'MAIS PROCURADAS'
+                        : widget.distancia
+                        ? 'MAIS PEDIDOS À DISTÂNCIA'
                         : 'MAIS PEDIDOS PERTO DE VOCÊ',
                     style: TatuTexto.secao,
                   ),
@@ -154,10 +162,17 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    for (final s in widget.profissional
-                        ? maisProcuradas
-                        : maisPedidos)
-                      TatuChip(label: s, onTap: () => _escolher(s)),
+                    for (final s
+                        in widget.profissional
+                            ? maisProcuradas
+                            : widget.distancia
+                            ? maisPedidosDistancia
+                            : maisPedidos)
+                      TatuChip(
+                        label: s,
+                        profissao: s,
+                        onTap: () => _escolher(s),
+                      ),
                   ],
                 ),
               ],
@@ -166,34 +181,41 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
                 if (widget.profissional) ...[
                   ...gruposProfissoes,
                   // RN-156: reguladas que não estão no catálogo.
-                  ('Com registro profissional', [
-                    for (final s in servicosRegulados)
-                      if (!gruposProfissoes.any(
-                        (g) => g.$2.any((x) => x.nome == s.nome),
-                      ))
-                        s,
-                  ]),
-                ] else ...[
-                  if (!widget.distancia) ...gruposServicos,
-                  if (widget.distancia) grupoDistancia,
-                ],
+                  (
+                    'Com registro profissional',
+                    [
+                      for (final s in servicosRegulados)
+                        if (!gruposProfissoes.any(
+                          (g) => g.$2.any((x) => x.nome == s.nome),
+                        ))
+                          s,
+                    ],
+                  ),
+                ] else
+                  // RN-92/RN-161: todas as profissões do modo, por
+                  // segmento.
+                  ...gruposDoModo(distancia: widget.distancia),
               ])
                 if (lista.isNotEmpty) ...[
-                const SizedBox(height: TatuMedidas.entreSecoes),
-                GrupoLista(
-                  titulo: titulo,
-                  fundo: TatuColors.surfaceGrouped,
-                  itens: [
-                    for (final s in lista)
-                      ItemLista(
-                        icone: s.icone,
-                        texto: s.nome,
-                        seta: false,
-                        onTap: () => _escolher(s.nome),
-                      ),
-                  ],
-                ),
-              ],
+                  const SizedBox(height: TatuMedidas.entreSecoes),
+                  GrupoLista(
+                    titulo: titulo,
+                    fundo: TatuColors.surfaceGrouped,
+                    itens: [
+                      for (final s in lista)
+                        ItemLista(
+                          // RN-227: 52 px na seleção.
+                          iconeWidget: IconeProfissaoQuadrado(
+                            s.nome,
+                            fundo: TatuColors.bg,
+                          ),
+                          texto: s.nome,
+                          seta: false,
+                          onTap: () => _escolher(s.nome),
+                        ),
+                    ],
+                  ),
+                ],
             ],
           ),
         ),
@@ -225,7 +247,11 @@ class _FolhaOutrosState extends State<_FolhaOutros> {
           itens: [
             for (final s in achados)
               ItemLista(
-                icone: s.icone,
+                // RN-227: 52 px na seleção.
+                iconeWidget: IconeProfissaoQuadrado(
+                  s.nome,
+                  fundo: TatuColors.bg,
+                ),
                 texto: s.nome,
                 detalhe: s.detalhe,
                 seta: false,

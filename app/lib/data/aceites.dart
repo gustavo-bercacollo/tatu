@@ -45,7 +45,7 @@ class AceitesRepo extends ChangeNotifier {
   List<Aceite> get todos => List.unmodifiable(_aceites);
 
   /// Demonstração: a conta da Ana já aceitou as versões atuais (Termos
-  /// 1.1, Política 1.1) nos dois modos.
+  /// 1.2, Política 1.1) nos dois modos.
   void restaurar({bool comDemo = true}) {
     _aceites.clear();
     _avisados.clear();
@@ -55,7 +55,7 @@ class AceitesRepo extends ChangeNotifier {
           Aceite(
             conta: demoConta,
             tipo: t,
-            versaoTermos: '1.1',
+            versaoTermos: '1.2',
             versaoPolitica: '1.1',
             em: DateTime(2026, 11, 2, 10),
           ),
