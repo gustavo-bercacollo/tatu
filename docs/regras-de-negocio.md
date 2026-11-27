@@ -7,9 +7,9 @@ Este documento é a fonte única das regras do Tatu: o que o app faz, o que perm
 ## Como usar
 
 - Cada regra tem um número fixo (RN-01, RN-02…). O número nunca muda nem é reaproveitado, para telas, código e conversas poderem citá-lo.
-- Regra que mudou: a linha é reescrita e a mudança entra no Histórico, no fim.
+- Regra que mudou: a linha é reescrita.
 - Regra ainda não decidida fica em Decisões em aberto, não nas seções.
-- Problemas que o Tatu pode ter ficam em Problemas mapeados. Quando um é resolvido, as regras entram nas seções e o problema é marcado como resolvido.
+- Problemas que o Tatu pode ter ficam em Problemas mapeados. Quando um é resolvido, as regras entram nas seções e o problema sai da lista.
 - Valores marcados como exemplo (taxa de 10%, prazos) são provisórios até a decisão final.
 - Regras marcadas com **(fase 2)** já estão decididas, mas só entram no app depois da primeira versão.
 - Termos de Uso (`docs/termos-de-uso.md`) e Política de Privacidade (`docs/politica-de-privacidade.md`) são escritos a partir destas regras. Toda mudança de regra que afete cliente ou profissional atualiza esses documentos na mesma mudança (RN-150).
@@ -430,47 +430,16 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 
 | Nº | Problema | Situação | Regras |
 | --- | --- | --- | --- |
-| P-01 | O profissional aceita e não aparece. | Resolvido | RN-76 a RN-79 |
-| P-02 | O profissional chega e o cliente não está. | Resolvido | RN-80 a RN-82 |
 | P-03 | Cliente e profissional fecham por fora na próxima vez, sem o app. | Decidido · fase 2 | RN-83 a RN-86 |
 | P-04 | O profissional quebra algo na casa durante o serviço. | Adiado: fora do escopo por enquanto | — |
 | P-05 | O problema volta dias depois do serviço; o profissional se recusa a voltar; brechas e excesso de análises no suporte. | Resolvido · validação jurídica pendente (J-01 a J-05) | RN-40, RN-45 a RN-49, RN-107, RN-108, RN-183 a RN-199 |
 | P-06 | Preço abusivo, principalmente em emergência. | Adiado · decidir depois | — |
 | P-07 | Material comprado no meio do serviço, fora do combinado. | A resolver | — |
-| P-08 | Cartão recusado na reserva, durante o serviço, na cobrança final e no plano fixo. | Resolvido | RN-146, RN-222 a RN-226 |
-| P-09 | Avaliações falsas para inflar a nota. | Resolvido | RN-249 |
 | P-10 | Fraude no cadastro do profissional (documento de outra pessoa). | A resolver | — |
 | P-11 | Sem internet no local para tocar "Concluir serviço". | A resolver | — |
-| P-12 | Serviço que leva vários dias, semanas ou meses. | Resolvido | RN-42, RN-87 a RN-91 |
-| P-13 | Profissional à distância: serviço que não precisa de visita, em que a localização não importa. | Resolvido | RN-92 a RN-98 |
-| P-14 | Serviço à distância malfeito: o cliente não gosta da entrega e quer o dinheiro de volta. | Resolvido | RN-96, RN-99 a RN-106 |
-| P-15 | Menor de idade usando o app, como cliente ou profissional. | Resolvido · abuso do "só menor em casa" junto com a P-42 | RN-110 a RN-112, RN-114, RN-234 |
-| P-16 | Envio de arquivos maliciosos ou +18, inclusive venda ou troca de material de menores. | Resolvido | RN-119 a RN-124 |
-| P-17 | Conta suspensa com atendimentos ainda em andamento. | Resolvido | RN-128 a RN-132 |
-| P-18 | Denunciar profissional, cliente e mensagem. | Resolvido | RN-133 a RN-135 |
 | P-19 | Acessibilidade. | Em parte · ditado feito; outras ideias em Decisões em aberto | RN-137, RN-138 |
-| P-20 | Troca de contato por telefone e anexos na descrição do pedido. | Resolvido | RN-139, RN-140 |
-| P-21 | Gorjeta para o profissional. | Resolvido | RN-141 a RN-143 |
-| P-22 | Contrato fixo (semanal ou mensal) com um profissional, sem virar vínculo de emprego. | Resolvido | RN-144 a RN-149 |
 | P-23 | Termos de Uso e Política de Privacidade completos e sempre atualizados. | Rascunho v1.0 feito · revisão jurídica pendente | RN-150, RN-151 |
-| P-24 | Profissões que exigem registro ou documentação. | Resolvido | RN-156 a RN-160 |
-| P-25 | Poucas opções de profissões no cadastro do profissional. | Resolvido | RN-161, RN-162 |
-| P-26 | Depois do serviço: diferença entre "Pedir de novo" e mandar mensagem no chat; evitar serviços infinitos só pela mensagem. | Resolvido | RN-42, RN-175 a RN-182 |
-| P-27 | Plano fixo sem identificação clara nas listas e conversas. | Resolvido | RN-200 a RN-205 |
-| P-28 | Card do plano fixo em Atividade → Em andamento desorganizado e fora do padrão. | Resolvido | RN-206 |
-| P-29 | Card do retorno em Atividade → Em andamento com pouca informação e data cortada. | Resolvido | RN-207 |
-| P-30 | "Tornar fixa" difícil de encontrar (só no perfil e no menu do chat). | Resolvido | RN-144, RN-208, RN-209 |
-| P-31 | Valor do plano fixo sem negociação, e "Pedir outro valor" fora do card. | Resolvido | RN-144, RN-148, RN-210 |
-| P-32 | Card do plano pobre e sumindo do chat depois de combinado. | Resolvido | RN-211, RN-212 |
-| P-33 | Como combinar a data do retorno sem troca infinita de mensagens. | Resolvido | RN-186, RN-213 a RN-215 |
 | P-34 | Medalhas e conquistas: reconhecer bons profissionais sem incentivar pressa, volume ou fraude. | Resolvido · validação jurídica pendente (J-07) | RN-217 a RN-220 |
-| P-35 | Profissões dividindo ícones genéricos. | Resolvido | RN-227 |
-| P-36 | Cliente busca profissão que só existe no outro modo (No local × À distância). | Resolvido | RN-228 |
-| P-37 | Cards de valor sem validade e presos no fim do chat; card de retorno fora do padrão. | Resolvido | RN-229 a RN-231 |
-| P-38 | "Retorno · sem custo" solto no card, links soltos em Ganhos e card do plano em Concluídos mal resolvido. | Resolvido | RN-207, RN-232, RN-233 |
-| P-100 | Depois das 3 rodadas, o cliente não tem como recusar o valor. | Resolvido | RN-27, RN-300, RN-301 |
-| P-39 | Loops sem fim: negociação repetida, trocas de profissional, novos valores, horários do retorno, pausas e contestações (auditoria de 26/11/2026). | Resolvido | RN-188, RN-190, RN-191, RN-237 a RN-244, RN-248 |
-| P-40 | Contradições e casos sem regra da auditoria: texto do plano, "o Tatu nunca paga", prazo do retorno com pedido aberto, suspenso com retorno, só menor em casa, exclusão com dívida, avaliação por atendimento, fuso, provas e números ajustáveis. | Resolvido | RN-15, RN-183, RN-211, RN-234 a RN-236, RN-245 a RN-247, RN-249 |
 | P-41 | O limite de 2 visitas conta visitas e não dias, e não define a semana; o retorno pode virar a 3ª visita e ficar bloqueado. | A resolver · telas | RN-145 |
 | P-42 | "Cliente não apareceu" (e "só menor em casa") sem defesa do cliente. | A resolver · telas | RN-81, RN-234 |
 | P-43 | A reserva no cartão vence antes do serviço marcado para muitos dias depois. | A resolver · telas | RN-30 |
@@ -480,68 +449,3 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-47 | Denúncia usada como arma; suspensão na hora e "não era mulher". | A resolver · advogado (J-13) | RN-56, RN-60 |
 | P-48 | Escopo do lançamento grande demais e suporte manual para uma pessoa só. | A resolver | — |
 | P-49 | Conta roubada (troca de chip), sem recuperação de conta definida. | A resolver | RN-02 |
-
-## 12. Histórico de mudanças
-
-| Data | Regras | Mudança |
-| --- | --- | --- |
-| 26/11/2026 | RN-15, RN-22, RN-27, RN-32, RN-41, RN-48, RN-65, RN-147, RN-148, RN-183, RN-186, RN-188, RN-190, RN-191, RN-211, RN-213, RN-229, RN-234 a RN-249 | Auditoria de ponta a ponta (`docs/auditoria-ponta-a-ponta.md`): limites contra loops, casos sem regra e contradições corrigidas. "O Tatu nunca paga" vira "só no refazer do retorno". Novos problemas P-39 a P-49. |
-| 26/11/2026 | RN-207, RN-232, RN-233 | Rodapé verde no card do retorno; "Ver todos" e ⓘ da taxa em Ganhos; card do plano em Concluídos com as visitas do mês. |
-| 26/11/2026 | RN-27, RN-300, RN-301 | Recusa do 3º valor renumerada para RN-300/RN-301 e P-100 (números altos, para não colidir de novo com as regras novas). |
-| 26/11/2026 | RN-221 | Borda: uma volta só ao abrir o app, com o brilho mais largo e branco no centro (pedido do Gustavo). |
-| 26/11/2026 | RN-229 a RN-231 | Valor enviado expira; cards em ordem no chat com barra de valor pendente; card do retorno refeito. |
-| 26/11/2026 | RN-228 | Busca nos dois modos, seção "Só à distância" e troca de modo com um toque, sem aviso flutuante. |
-| 26/11/2026 | RN-227 | Ícone próprio para as 75 profissões, ícones de segmento como alternativa e crachá para profissão sem segmento. |
-| 26/11/2026 | RN-146, RN-206, RN-222 a RN-226 | Pagamento recusado em cada etapa; "Pagamento garantido" para o profissional; Pix; plano fixo passa a reservar na véspera e cobrar a cada visita. P-08 resolvido. |
-| 26/11/2026 | RN-221 | Borda animada em grafite na caixa de descrição da Home. |
-| 26/11/2026 | RN-217 a RN-220 | Selos do profissional (Pontual, Resolve de primeira, Clientes voltam), sem medalhas de jogo; só informam, não mudam chamados. |
-| 25/11/2026 | RN-216 | Deslizar para trocar de aba em Atividade; em Ganhos não. |
-| 25/11/2026 | RN-144 | "Precisa toda semana? Tornar a [nome] fixa" na folha "Pedir de novo" (pedido do Gustavo). |
-| 25/11/2026 | RN-210 | O card do plano não mostra mais "Último serviço avulso com a [nome]" (pedido do Gustavo). |
-| 25/11/2026 | RN-186, RN-213 a RN-215 | Agendamento do retorno: cliente dá até 3 horários, profissional escolhe um ou sugere outro, remarcar uma vez com 12 h de antecedência, lembretes e urgência. |
-| 25/11/2026 | RN-211, RN-212 | Card novo do plano no chat (quem propôs, rodada, semana em bolinhas, economia) e histórico da negociação; card não some depois de combinado. |
-| 25/11/2026 | RN-144, RN-148, RN-210 | Valor do plano fixo negociável, até 3 propostas pelo valor por visita; "Pedir outro valor" dentro do card. |
-| 25/11/2026 | RN-161 | Botão "Outros" do cadastro com seta para baixo e contorno, sem estado de selecionado. |
-| 25/11/2026 | RN-144, RN-208, RN-209 | "Tornar fixa" também segurando a conversa e no card de Concluídos (só profissões com Fixo: Sim no catálogo). Outras ideias adiadas. |
-| 25/11/2026 | RN-207 | Novo card do retorno em Atividade → Em andamento: data e hora completas, selo "Retorno · sem custo", dica do código e etapas quando o profissional sai. |
-| 25/11/2026 | RN-201, RN-206 | Novo card da visita do plano em Atividade → Em andamento: selo na foto, barra do mês e etapas quando a profissional sai. |
-| 24/11/2026 | RN-202 | Botão "Mensagem" na tela do plano fixo. |
-| 24/11/2026 | RN-83, RN-86, RN-200 a RN-205 | Identificação do plano fixo: selo único "Plano fixo", barra no chat, fixo × avulso, faixa no dia da visita e estados. "Seus profissionais" adiado. |
-| 24/11/2026 | RN-191, RN-192, RN-197 a RN-199 | Ajustes legais do retorno: termo de garantia no recibo, revisão de decisão automática (LGPD art. 20), guarda das fotos, dívida só dentro do Tatu. |
-| 24/11/2026 | RN-40, RN-45 a RN-49, RN-107, RN-108, RN-183 a RN-199 | Algo errado e retorno: prazo de 30 ou 90 dias por profissão, fluxo único, retorno pelo profissional primeiro, resolução automática, mediação só em 3 casos com 4 opções fixas, repasse preso, dívida no CPF, foto obrigatória ao concluir, contadores de abuso. |
-| 24/11/2026 | RN-42, RN-175 a RN-182 | Pedir de novo (chamado novo, 2 min só para a mesma pessoa) × mensagem no chat (só conversa); serviço novo pelo chat só com novo valor confirmado ("Novo serviço iniciado pelo chat"). |
-| 20/11/2026 | RN-174 | Aba Ganhos separada da Atividade no modo profissional. |
-| 20/11/2026 | RN-173 | Enviar sugestão ao Tatu pelo Perfil. |
-| 19/11/2026 | RN-31, RN-169 a RN-171 | Cliente vê o serviço em andamento; vários profissionais abrem a Atividade; cliente confirma a conclusão (2 horas para confirmar sozinho). |
-| 19/11/2026 | RN-168 | Depois de confirmar o valor, cliente e profissional saem do chat e vão direto para o acompanhamento. |
-| 18/11/2026 | RN-39, RN-165 a RN-167 | Cliente acompanha o profissional no mapa. O cliente passa o código e o profissional digita para começar o serviço. |
-| 18/11/2026 | RN-161, RN-162 | "Outros" no cadastro do profissional igual ao do pedido do cliente (por segmento, com busca) e sugestão de profissão. Especialidades continuam até 3. |
-| 18/11/2026 | RN-156 a RN-160 | Profissões reguladas: registro sem foto, conferido na consulta pública, selo no perfil. |
-| 18/11/2026 | RN-155 | Contador de mensagens não lidas na aba Mensagens e no ícone do app. |
-| 18/11/2026 | RN-150, RN-151 | Termos de Uso e Política de Privacidade em docs/, leitura no app, aceite de nova versão. |
-| 18/11/2026 | RN-144 a RN-149 | Plano fixo: "Tornar fixa", valor definido uma vez, cobrança automática no fim do período, limite de 2 visitas por semana no mesmo endereço. |
-| 17/11/2026 | RN-141 a RN-143 | Gorjeta opcional na avaliação, 100% para o profissional (só a taxa do cartão). |
-| 17/11/2026 | RN-137 a RN-140 | Ditado (fala vira texto) na descrição e no chat, sem mensagem de áudio. Anexos (galeria e arquivo) na descrição. Ligação pelo app só entre a confirmação do valor e a conclusão. |
-| 17/11/2026 | RN-133 a RN-136 | Denúncias: pessoa pelo menu do chat (motivos atualizados), mensagem ao segurar, análise do suporte. Ver perfil do profissional pelo topo do chat. |
-| 17/11/2026 | RN-128 a RN-132 | Conta pausada ou suspensa com atendimentos em andamento: pausa não afeta, suspensão encerra com regras de dinheiro para cada lado. |
-| 17/11/2026 | — | P-06 (preço abusivo) adiado: a proposta não foi aprovada, decidir depois. |
-| 17/11/2026 | RN-119, RN-124 a RN-127 | Sem links no chat. Link do site, programa e script só pela entrega à distância, com antivírus, verificação e aviso. |
-| 17/11/2026 | RN-119 a RN-124 | Arquivos no chat: tipos permitidos, antivírus, nudez bloqueada, abuso infantil com suspensão e comunicação às autoridades, denúncia, links. |
-| 17/11/2026 | RN-115 a RN-118 | Canal oficial do Tatu nas Mensagens: primeira mensagem de boas-vindas, avisos e novidades, atalho para Dicas Tatu. |
-| 17/11/2026 | RN-110 a RN-112, RN-114 | Só maiores de 18: idade descoberta pelo CPF, sem campo de data de nascimento. "Só menor em casa" foi para Decisões em aberto. |
-| 17/11/2026 | RN-107 a RN-109 | Depois das 24 horas: problema entre cliente e profissional, aviso do CDC nos termos, garantia própria do profissional na fase 2. |
-| 17/11/2026 | RN-96, RN-99 a RN-106 | Entrega à distância malfeita: prévia protegida, até 2 entregas, cliente aprova, sinal, reembolso pelo suporte, pausa por sinais sem entrega. |
-| 14/11/2026 | RN-92 a RN-98 | Serviço à distância: seletor No local / À distância na Home, busca sem raio, sem visita, entrega pelo chat. |
-| 14/11/2026 | RN-42, RN-87 a RN-91 | A conversa não fecha mais depois do serviço. Cada valor combinado é um pagamento, com comissão em cada um. Limite de 7 dias por valor. Parcelamento. |
-| 14/11/2026 | — | P-04 (dano na casa) e P-05 (problema volta dias depois) adiados. |
-| 14/11/2026 | RN-83 a RN-86 | Contra fechar por fora: Seus profissionais, nota só pelo app, contato oculto no chat. Decidido para a fase 2. |
-| 14/11/2026 | — | Nova seção Problemas mapeados (P-01 a P-12). |
-| 14/11/2026 | RN-80 a RN-82 | Cliente que não aparece: espera de 10 minutos, visita cobrada e pausa por ausências. |
-| 13/11/2026 | RN-76 a RN-79 | Profissional que aceita e não aparece: prazo para sair, devolução à busca, atraso sem custo e pausa por abandonos. |
-| 13/11/2026 | — | Documento criado com todas as regras decididas até aqui. |
-| 13/11/2026 | RN-26, RN-32, RN-33, RN-45 a RN-47, RN-63 | Valor dividido em Visita e Serviço. Encerrar cobrando só a visita. Contestação em 24 horas. Conta pausada por muitas visitas sem serviço. |
-| 13/11/2026 | RN-30, RN-31 | O valor fica reservado no cartão ao confirmar e é cobrado automaticamente ao concluir. Saem a tela de cobrança e o botão Pagar. |
-| 13/11/2026 | RN-29, RN-34 | Pagamento só pelo app. Sai o pagamento "por fora". Comissão em todo serviço. |
-| 12/11/2026 | RN-57 a RN-61, RN-73, RN-74 | Atendimento entre mulheres, com verificação de identidade. |
-| 12/11/2026 | RN-50 a RN-56, RN-62 | Botão de segurança, contatos de confiança e link de acompanhamento. |
-| 12/11/2026 | RN-70, RN-71 | Espaços de anúncio na Home e na busca. |
