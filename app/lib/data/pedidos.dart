@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'base_tecnica.dart';
+
 import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 
@@ -405,7 +407,12 @@ class PedidoConcluido {
     this.contestarAte,
     this.concluidoEm,
     this.valorServico,
+    this.deRefazer = false,
   });
+
+  /// RN-191: atendimento criado por "refazer com outro profissional" da
+  /// mediação (origem = refazer). Vai para o pedido de retorno dele.
+  final bool deRefazer;
 
   /// RN-45/RN-171: até quando dá para contestar (24 h da confirmação).
   final DateTime? contestarAte;
@@ -971,7 +978,11 @@ class PedidosRepo extends ChangeNotifier {
     concluidos = [feito, ...concluidos];
     // RN-226: cobra a reserva; se as novas tentativas falharem, fica a
     // pendência na Home (o profissional recebe de qualquer jeito).
-    pagamentos.cobrarAoConcluir(lerReais(p.valor));
+    pagamentos.cobrarAoConcluir(
+      lerReais(p.valor),
+      chave: 'cobranca:${feito.numero}',
+    );
+    registroAtendimentos.registrar(feito.numero, 'cobrado', quem: 'sistema');
     if (automatico) confirmadoSozinho = feito;
     // RN-194: guarda sozinho o pacote de provas (chargeback).
     final agora = clock.now();

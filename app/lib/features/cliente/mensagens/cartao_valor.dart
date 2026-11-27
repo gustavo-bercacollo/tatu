@@ -31,9 +31,8 @@ String detalheValor(ValorProposta v) {
 }
 
 /// RN-91: "Em 6x de R$ 200,00" ou "À vista".
-String textoParcelas(double total, int parcelas) => parcelas <= 1
-    ? 'À vista'
-    : 'Em ${parcelas}x de ${reais(total / parcelas)}';
+String textoParcelas(double total, int parcelas) =>
+    parcelas <= 1 ? 'À vista' : 'Em ${parcelas}x de ${reais(total / parcelas)}';
 
 /// C127 · Folha "Parcelar R$ 1.200,00": à vista, 3x ou 6x (RN-91).
 /// Devolve o número de parcelas escolhido (null se fechar).
@@ -342,6 +341,7 @@ class CartaoValorExpirado extends StatelessWidget {
     required this.total,
     required this.em,
     this.onPedirDeNovo,
+    this.pedidoEnviado,
   });
 
   /// "Luiza Souza" (o avatar) e o primeiro nome no texto.
@@ -349,6 +349,9 @@ class CartaoValorExpirado extends StatelessWidget {
   final double total;
   final DateTime em;
   final VoidCallback? onPedirDeNovo;
+
+  /// RN-237: "Pedido enviado à [nome]" no lugar do "Pedir de novo".
+  final String? pedidoEnviado;
 
   @override
   Widget build(BuildContext context) {
@@ -394,7 +397,9 @@ class CartaoValorExpirado extends StatelessWidget {
                 ],
               ),
             ),
-            if (onPedirDeNovo != null)
+            if (pedidoEnviado != null)
+              Text(pedidoEnviado!, style: TatuTexto.nota)
+            else if (onPedirDeNovo != null)
               GestureDetector(
                 onTap: onPedirDeNovo,
                 behavior: HitTestBehavior.opaque,
@@ -487,8 +492,11 @@ class CartaoValorConfirmado extends StatelessWidget {
       children: [
         Row(
           children: [
-            const Icon(TablerIcons.circle_check_filled,
-                size: 20, color: TatuColors.online),
+            const Icon(
+              TablerIcons.circle_check_filled,
+              size: 20,
+              color: TatuColors.online,
+            ),
             const SizedBox(width: 8),
             Text(
               avulso ? 'Valor combinado · avulso' : 'Valor confirmado',
@@ -521,11 +529,7 @@ class CartaoValorConfirmado extends StatelessWidget {
 
 /// Valor que o cliente pediu, esperando o profissional responder.
 class CartaoValorPedido extends StatelessWidget {
-  const CartaoValorPedido({
-    super.key,
-    required this.valor,
-    required this.nome,
-  });
+  const CartaoValorPedido({super.key, required this.valor, required this.nome});
 
   final ValorProposta valor;
   final String nome;
@@ -688,7 +692,10 @@ class _FolhaPedirState extends State<_FolhaPedir> {
             children: [
               const AlcaFolha(),
               const SizedBox(height: 22),
-              const Text('Quanto você quer pagar?', style: TatuTexto.tituloFolha),
+              const Text(
+                'Quanto você quer pagar?',
+                style: TatuTexto.tituloFolha,
+              ),
               const SizedBox(height: 6),
               Text(
                 '$artigo ${widget.nome} pode aceitar ou enviar outro valor.',

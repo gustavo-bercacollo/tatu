@@ -73,6 +73,16 @@ List<Widget> secaoRetornoProfissional(
           style: TatuTexto.nota,
         ),
       ]);
+    case SituacaoRetorno.semAcordoHorario:
+      // RN-243: ninguém leva falta.
+      depois.add(
+        CartaoSituacaoRetorno(
+          titulo: 'Sem acordo de horário',
+          nota:
+              'Vocês não acharam um horário. Ninguém leva falta. '
+              '${_maiuscula(r.oCliente)} pode pedir ajuda ao Tatu.',
+        ),
+      );
     case SituacaoRetorno.aceito when r.sugerido != null:
       // P158 · RN-213: esperando o cliente confirmar.
       depois.add(
@@ -349,12 +359,14 @@ class _FolhaQuandoVaiState extends State<_FolhaQuandoVai> {
               ),
             ),
             const SizedBox(height: 8),
-            Center(
-              child: LinkAzul(
-                'Nenhum serve? Sugerir outro horário',
-                onTap: () => Navigator.of(context).pop((null, true)),
+            // RN-243: no máximo 2 sugestões.
+            if (widget.retorno.podeSugerir)
+              Center(
+                child: LinkAzul(
+                  'Nenhum serve? Sugerir outro horário',
+                  onTap: () => Navigator.of(context).pop((null, true)),
+                ),
               ),
-            ),
           ],
         ),
       ),
@@ -490,7 +502,8 @@ Future<void> recusarRetorno(BuildContext context, PedidoRetorno r) async {
     builder: (_) => _FolhaRecusar(retorno: r),
   );
   if (motivo == null) return;
-  retornos.recusar(r, motivo);
+  // RN-186/RN-188: "Não consigo ir até lá" resolve sozinho.
+  recusarRetornoComMotivo(r, motivo);
 }
 
 class _FolhaRecusar extends StatefulWidget {

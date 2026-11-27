@@ -73,6 +73,8 @@ PedidoRetorno? pedirRetornoCliente(
       pagamento: p.pagamento.isEmpty ? 'Visa 4242' : p.pagamento,
       horarios: horarios,
       urgente: urgente,
+      // RN-191: retorno de um "refazer" não refaz de novo na mediação.
+      deRefazer: p.deRefazer,
     ),
   );
   // Protótipo: a profissional aceita o 1º horário que ainda dá (1 hora
@@ -222,6 +224,7 @@ String textoSituacaoCliente(PedidoRetorno r) => switch (r.situacao) {
         ? 'Devolvemos ${reais(r.valorServico)}'
         : 'O Tatu paga outro ${r.servicoNome.toLowerCase()}',
   SituacaoRetorno.emMediacao => 'O Tatu está analisando',
+  SituacaoRetorno.semAcordoHorario => 'Sem acordo de horário',
   SituacaoRetorno.encerrado => 'Encerrado',
 };
 
@@ -337,7 +340,32 @@ List<Widget> secaoRetornoCliente(
         CartaoHorarioSugerido(
           retorno: r,
           onConfirmar: () => retornos.confirmarSugerido(r),
-          onEscolherOutro: () => escolherOutrosHorarios(context, r),
+          // RN-243: "Escolher outro" uma vez; na 2ª sugestão, "Não posso".
+          onEscolherOutro: r.podeEscolherOutro
+              ? () => escolherOutrosHorarios(context, r)
+              : null,
+          onNaoPosso: () => retornos.naoPosso(r),
+        ),
+      );
+    case SituacaoRetorno.semAcordoHorario:
+      // RN-243: ninguém leva falta; o cliente encerra ou pede ajuda.
+      linha = SituacaoCartaoRetorno(
+        TablerIcons.calendar_x,
+        'Sem acordo de horário',
+        TatuColors.textSecondary,
+      );
+      depois.add(
+        CartaoTatuRetorno(
+          escudo: true,
+          titulo: 'Sem acordo de horário',
+          texto:
+              'Vocês não acharam um horário. Ninguém leva falta. Quer ajuda '
+              'do Tatu?',
+          botao: 'Pedir ajuda ao Tatu',
+          onBotao: () =>
+              pedirAjudaAoTatu(context, r, MotivoMediacao.semAcordoHorario),
+          segundo: 'Ok, entendi',
+          onSegundo: () => retornos.okEntendi(r),
         ),
       );
     case SituacaoRetorno.aceito when r.marcadoPara == null:
@@ -446,6 +474,8 @@ List<Widget> secaoRetornoCliente(
         FalhaProfissional.naoMarcou =>
           '$nome não marcou o retorno em ${RegrasRetorno.marcarEm.inDays} dias',
         FalhaProfissional.naoVeio => '$nome não veio no retorno',
+        FalhaProfissional.naoConsegueIr => '$nome não consegue ir até lá',
+        FalhaProfissional.suspenso => '$nome não atende mais pelo Tatu',
         _ =>
           '$nome não respondeu em '
               '${RegrasRetorno.respostaProfissional.inHours} horas',
@@ -710,11 +740,15 @@ class CartaoHorarioSugerido extends StatelessWidget {
     required this.retorno,
     required this.onConfirmar,
     required this.onEscolherOutro,
+    this.onNaoPosso,
   });
 
   final PedidoRetorno retorno;
   final VoidCallback onConfirmar;
-  final VoidCallback onEscolherOutro;
+
+  /// Nulo: já usou o "Escolher outro" (RN-243); aparece "Não posso".
+  final VoidCallback? onEscolherOutro;
+  final VoidCallback? onNaoPosso;
 
   @override
   Widget build(BuildContext context) {
@@ -771,7 +805,15 @@ class CartaoHorarioSugerido extends StatelessWidget {
               child: const Text('Confirmar horário'),
             ),
             const SizedBox(height: 8),
-            Center(child: LinkAzul('Escolher outro', onTap: onEscolherOutro)),
+            Center(
+              child: onEscolherOutro != null
+                  ? LinkAzul('Escolher outro', onTap: onEscolherOutro!)
+                  : LinkAzul(
+                      'Não posso',
+                      perigo: true,
+                      onTap: onNaoPosso ?? () {},
+                    ),
+            ),
           ],
         ),
       ),

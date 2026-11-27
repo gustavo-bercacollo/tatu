@@ -1,6 +1,8 @@
 import 'atendimento_profissional.dart';
 import 'conversas.dart';
 import 'pedidos.dart';
+import 'profissional.dart' show profissional;
+import 'retorno_acoes.dart';
 import 'suspensao.dart';
 
 /// Em que ponto está o pedido em andamento do cliente.
@@ -27,6 +29,8 @@ PontoAtendimento pontoDoPedido(PedidoAndamento p) {
 /// verdade, isso chega do backend). Encerra o atendimento dele no chat e
 /// no pedido em andamento.
 Encerramento profissionalSuspenso(Conversa c, {DateTime? agora}) {
+  // RN-235: retorno aberto com ele vai para a resolução automática.
+  retornosDoSuspenso(c.nome);
   final p = pedidos.doProfissional(c.nome);
   final e = conversas.profissionalSuspenso(
     c,
@@ -59,5 +63,8 @@ List<Encerramento> suspenderContaCliente() {
 /// RN-129/RN-130: a conta do profissional (esta) foi suspensa: o
 /// atendimento em andamento acaba na hora. O dinheiro do cliente é
 /// tratado do lado dele ([profissionalSuspenso]).
-Encerramento? suspenderContaProfissional({DateTime? agora}) =>
-    atendimentoProfissional.profissionalSuspenso(agora: agora);
+Encerramento? suspenderContaProfissional({DateTime? agora}) {
+  // RN-235: os retornos abertos dele resolvem sozinhos na hora.
+  retornosDoSuspenso(profissional.nome);
+  return atendimentoProfissional.profissionalSuspenso(agora: agora);
+}

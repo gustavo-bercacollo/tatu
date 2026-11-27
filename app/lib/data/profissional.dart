@@ -1,10 +1,12 @@
 import 'catalogo_servicos.dart';
+
 import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../shared/formatadores.dart';
 import 'consulta_registro.dart';
+import 'pausa_conta.dart';
 import 'prazos.dart';
 import 'profissoes_reguladas.dart';
 import 'regras_distancia.dart';
@@ -86,7 +88,13 @@ const _especialidades = {
   'Ar-condicionado': ['Instalação', 'Limpeza', 'Manutenção', 'Recarga de gás'],
   'Jardinagem': ['Corte de grama', 'Poda', 'Paisagismo', 'Limpeza de terreno'],
   'Limpeza': ['Residencial', 'Pós-obra', 'Vidros', 'Estofados'],
-  'Designer': ['Logos', 'Identidade visual', 'Posts', 'Cardápios', 'Embalagens'],
+  'Designer': [
+    'Logos',
+    'Identidade visual',
+    'Posts',
+    'Cardápios',
+    'Embalagens',
+  ],
   'Programador': ['Sites', 'Aplicativos', 'Planilhas', 'Automação'],
   'Professor': ['Reforço escolar', 'Inglês', 'Matemática', 'Redação'],
   'Contador': ['MEI', 'Imposto de renda', 'Abertura de empresa', 'Folha'],
@@ -212,9 +220,33 @@ abstract final class RegrasRegistro {
   static const antesDoVencimento = Duration(days: 30);
 
   static const ufs = [
-    'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS',
-    'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC',
-    'SP', 'SE', 'TO',
+    'AC',
+    'AL',
+    'AP',
+    'AM',
+    'BA',
+    'CE',
+    'DF',
+    'ES',
+    'GO',
+    'MA',
+    'MT',
+    'MS',
+    'MG',
+    'PA',
+    'PB',
+    'PR',
+    'PE',
+    'PI',
+    'RJ',
+    'RN',
+    'RS',
+    'RO',
+    'RR',
+    'SC',
+    'SP',
+    'SE',
+    'TO',
   ];
 }
 
@@ -342,12 +374,90 @@ class ProfissionalRepo extends ChangeNotifier {
   /// só a visita cobrada).
   final List<bool> visitas = [];
 
-  /// Visitas sem serviço entre as últimas [janelaVisitas].
-  int get visitasSemServico =>
-      visitas.reversed.take(janelaVisitas).where((v) => v).length;
+  /// Visitas sem serviço entre as últimas [janelaVisitas] (só as depois
+  /// da última pausa: quem volta começa do zero, RN-244).
+  int get visitasSemServico => visitas
+      .skip(_visitasDesde)
+      .toList()
+      .reversed
+      .take(janelaVisitas)
+      .where((v) => v)
+      .length;
 
-  /// Muitas visitas sem serviço pausam a conta (até falar com o suporte).
-  bool get pausadaPorVisitas => visitasSemServico >= limiteVisitasSemServico;
+  /// RN-244: a partir de qual visita conta de novo (a da última pausa).
+  int _visitasDesde = 0;
+
+  /// RN-244: histórico das pausas da conta.
+  final pausas = PausasConta();
+
+  /// RN-244: só contam os eventos depois do início da última pausa.
+  Iterable<DateTime> _depois(List<DateTime> l) {
+    final d = pausas.contarDepois;
+    return d == null ? l : l.where((x) => x.isAfter(d));
+  }
+
+  /// RN-244: o que pausaria a conta agora, com o motivo que a pessoa vê.
+  (CausaPausa, String)? get _motivoPausa {
+    if (RegrasRetorno.pausaPorFaltas(
+      _depois(faltasRetorno).toList(),
+      clock.now(),
+    )) {
+      // RN-193: 3 faltas no retorno em 90 dias.
+      return (
+        CausaPausa.faltas,
+        '$faltasRecentes faltas em retornos em '
+            '${RegrasRetorno.janelaFaltas.inDays} dias.',
+      );
+    }
+    if (sinaisSemEntregaRecentes >= RegrasDistancia.sinaisParaPausar) {
+      // RN-106: sinais à distância sem entrega.
+      return (
+        CausaPausa.sinais,
+        '$sinaisSemEntregaRecentes sinais sem entrega em '
+            '${RegrasDistancia.janelaSinais.inDays} dias.',
+      );
+    }
+    if (abandonosRecentes >= Prazos.abandonosParaPausar) {
+      // RN-79: 3 abandonos em 30 dias.
+      return (
+        CausaPausa.abandonos,
+        '$abandonosRecentes chamados abandonados em '
+            '${Prazos.janelaAbandonos.inDays} dias.',
+      );
+    }
+    if (visitasSemServico >= limiteVisitasSemServico) {
+      // RN-63: muitas visitas sem serviço.
+      return (
+        CausaPausa.visitas,
+        '$visitasSemServico das últimas $janelaVisitas visitas terminaram '
+            'sem serviço.',
+      );
+    }
+    return null;
+  }
+
+  /// RN-244: a pausa que vale agora (abre uma nova se algum limite foi
+  /// passado). Nula = conta ativa.
+  PausaConta? get pausa {
+    final agora = clock.now();
+    final a = pausas.atual(agora);
+    if (a != null) return a;
+    final m = _motivoPausa;
+    if (m == null) return null;
+    _visitasDesde = visitas.length;
+    return pausas.abrir(agora, m.$1, m.$2);
+  }
+
+  /// RN-244: "Entendi" no aviso da pausa.
+  void entenderPausa() {
+    final p = pausa;
+    if (p == null || p.entendida) return;
+    p.entendida = true;
+    notifyListeners();
+  }
+
+  /// RN-63: muitas visitas sem serviço pausaram a conta.
+  bool get pausadaPorVisitas => pausa?.causa == CausaPausa.visitas;
 
   /// RN-77: chamados que ele aceitou e não foi (devolvidos à busca).
   final List<DateTime> abandonos = [];
@@ -355,24 +465,22 @@ class ProfissionalRepo extends ChangeNotifier {
   /// RN-79: abandonos dentro de [Prazos.janelaAbandonos].
   int get abandonosRecentes {
     final desde = clock.now().subtract(Prazos.janelaAbandonos);
-    return abandonos.where((d) => d.isAfter(desde)).length;
+    return _depois(abandonos).where((d) => d.isAfter(desde)).length;
   }
 
-  /// RN-79: três abandonos em 30 dias pausam a conta.
-  bool get pausadaPorAbandonos =>
-      abandonosRecentes >= Prazos.abandonosParaPausar;
+  /// RN-79: três abandonos em 30 dias pausaram a conta.
+  bool get pausadaPorAbandonos => pausa?.causa == CausaPausa.abandonos;
 
   /// RN-106: sinais à distância que voltaram ao cliente sem entrega.
   final List<DateTime> sinaisSemEntrega = [];
 
   int get sinaisSemEntregaRecentes {
     final desde = clock.now().subtract(RegrasDistancia.janelaSinais);
-    return sinaisSemEntrega.where((d) => d.isAfter(desde)).length;
+    return _depois(sinaisSemEntrega).where((d) => d.isAfter(desde)).length;
   }
 
-  /// RN-106: 3 sinais sem entrega em 30 dias pausam a conta.
-  bool get pausadaPorSinais =>
-      sinaisSemEntregaRecentes >= RegrasDistancia.sinaisParaPausar;
+  /// RN-106: 3 sinais sem entrega em 30 dias pausaram a conta.
+  bool get pausadaPorSinais => pausa?.causa == CausaPausa.sinais;
 
   /// RN-106: um sinal voltou ao cliente sem entrega.
   void registrarSinalSemEntrega() {
@@ -398,13 +506,13 @@ class ProfissionalRepo extends ChangeNotifier {
   /// recusa ou "outro problema" derrubados na mediação).
   final List<DateTime> faltasRetorno = [];
 
-  /// RN-193: 3 faltas em 90 dias (exemplo) pausam a conta.
-  bool get pausadaPorFaltas =>
-      RegrasRetorno.pausaPorFaltas(faltasRetorno, clock.now());
+  /// RN-193: 3 faltas em 90 dias (exemplo) pausaram a conta.
+  bool get pausadaPorFaltas => pausa?.causa == CausaPausa.faltas;
 
-  int get faltasRecentes => faltasRetorno
-      .where((f) => clock.now().difference(f) < RegrasRetorno.janelaFaltas)
-      .length;
+  int get faltasRecentes =>
+      _depois(faltasRetorno)
+          .where((f) => clock.now().difference(f) < RegrasRetorno.janelaFaltas)
+          .length;
 
   /// RN-192: dívida sem saldo, ligada à conta no Tatu (não é negativação).
   /// Enquanto houver, não recebe chamados nem abre outra conta.
@@ -433,13 +541,8 @@ class ProfissionalRepo extends ChangeNotifier {
   }
 
   /// Conta pausada (por visitas sem serviço, abandonos, sinais, faltas no
-  /// retorno ou dívida): não fica online até falar com o suporte.
-  bool get pausada =>
-      pausadaPorVisitas ||
-      pausadaPorAbandonos ||
-      pausadaPorSinais ||
-      pausadaPorFaltas ||
-      comDivida;
+  /// retorno, RN-244, ou dívida, RN-192): não fica online.
+  bool get pausada => comDivida || pausa != null;
 
   /// RN-77: registra um abandono (chamado devolvido à busca).
   void registrarAbandono() {
@@ -565,6 +668,8 @@ class ProfissionalRepo extends ChangeNotifier {
     abandonos.clear();
     sinaisSemEntrega.clear();
     faltasRetorno.clear();
+    pausas.limpar();
+    _visitasDesde = 0;
     divida = 0;
     notifyListeners();
   }
@@ -579,11 +684,11 @@ class ProfissionalRepo extends ChangeNotifier {
     profissoes = const [
       ProfissaoEscolhida('Encanador', ['Reparos', 'Instalações', 'Esgoto']),
       // RN-97: uma profissão à distância para a demonstração.
-      ProfissaoEscolhida(
-        'Designer',
-        ['Logos', 'Identidade visual', 'Posts'],
-        ModoAtendimento.distancia,
-      ),
+      ProfissaoEscolhida('Designer', [
+        'Logos',
+        'Identidade visual',
+        'Posts',
+      ], ModoAtendimento.distancia),
     ];
     _chamadosDe = null;
     pixTipo = comPix ? TipoPix.cpf : null;
@@ -594,6 +699,8 @@ class ProfissionalRepo extends ChangeNotifier {
     visitas.clear();
     abandonos.clear();
     sinaisSemEntrega.clear();
+    pausas.limpar();
+    _visitasDesde = 0;
     historicoSelos = historicoSelosDemo(clock.now());
     notifyListeners();
   }
@@ -705,7 +812,11 @@ class ProfissionalRepo extends ChangeNotifier {
   }
 
   /// RN-158: corrigir o número ou o estado volta para "em análise".
-  void corrigirRegistro(String profissao, {required String uf, required String numero}) {
+  void corrigirRegistro(
+    String profissao, {
+    required String uf,
+    required String numero,
+  }) {
     final r = registros[profissao];
     if (r == null) return;
     r
@@ -775,12 +886,10 @@ class ProfissionalRepo extends ChangeNotifier {
   }
 
   /// Profissões ligadas em que atende no local / à distância (RN-93).
-  bool get recebeNoLocal => profissoes.any(
-    (p) => chamadosDe.contains(p.nome) && p.modo.local,
-  );
-  bool get recebeDistancia => profissoes.any(
-    (p) => chamadosDe.contains(p.nome) && p.modo.remoto,
-  );
+  bool get recebeNoLocal =>
+      profissoes.any((p) => chamadosDe.contains(p.nome) && p.modo.local);
+  bool get recebeDistancia =>
+      profissoes.any((p) => chamadosDe.contains(p.nome) && p.modo.remoto);
 
   void definirEspecialidades(String profissao, List<String> esp) {
     profissoes = [

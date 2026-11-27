@@ -29,9 +29,6 @@ import '../../data/sugestao_servico.dart';
 import '../../shared/widgets/abas_cliente.dart';
 import '../../shared/widgets/conta_pausada.dart';
 import '../../shared/widgets/segmento.dart';
-import '../../data/ajuda.dart';
-import 'ajuda/abrir_ajuda.dart';
-import '../../data/prazos.dart';
 import '../../shared/widgets/espaco_anuncio.dart';
 import '../../shared/widgets/avatar_usuario.dart';
 import '../../shared/widgets/folha.dart';
@@ -197,8 +194,7 @@ class _HomeClientePageState extends State<HomeClientePage> {
       _distancia = distancia;
       _manual = chip ?? c.nome;
       _sugerido = null;
-      _avisoModo =
-          '${c.nome} é só ${distancia ? 'à distância' : 'no local'}.';
+      _avisoModo = '${c.nome} é só ${distancia ? 'à distância' : 'no local'}.';
       _destacarModo = true;
     });
     _timerDestaque?.cancel();
@@ -375,13 +371,11 @@ class _HomeClientePageState extends State<HomeClientePage> {
                                   padding: const EdgeInsets.only(
                                     top: TatuMedidas.entreSecoes,
                                   ),
-                                  child: AvisoContaPausada(
-                                    motivo:
-                                        '${conta.ausenciasRecentes} ausências em '
-                                        '${Prazos.janelaAusencias.inDays} dias.',
-                                    destaque: 'Fale com o suporte para voltar a pedir.',
-                                    onTap: () =>
-                                        abrirSuporte(context, conteudoCliente),
+                                  // RN-244: motivo, quando volta e
+                                  // "Entendi".
+                                  child: AvisoContaPausada.pausa(
+                                    conta.pausa!,
+                                    onEntendi: conta.entenderPausa,
                                   ),
                                 )
                               : const SizedBox.shrink(),

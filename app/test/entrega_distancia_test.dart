@@ -386,11 +386,7 @@ void main() {
       const HomeProfissionalPage(chamadoEm: Duration(hours: 1)),
     );
     expect(find.text('Conta pausada'), findsOneWidget);
-    expect(
-      find.text(
-        '3 sinais sem entrega em 30 dias. Fale com o suporte para voltar.',
-      ),
-      findsOneWidget,
-    );
+    expect(find.text('3 sinais sem entrega em 30 dias.'), findsOneWidget);
+    expect(find.textContaining('Sua conta volta sozinha em'), findsOneWidget);
   });
 }

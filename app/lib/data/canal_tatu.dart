@@ -9,6 +9,13 @@ import 'package:flutter/foundation.dart';
 abstract final class DestinoTatu {
   static const dicas = 'tatu://dicas';
   static const distancia = 'tatu://distancia';
+
+  /// RN-242: abrir, pausar ou encerrar o plano fixo com [profissional].
+  static String plano(String profissional) => 'tatu://plano/$profissional';
+  static String pausarPlano(String profissional) =>
+      'tatu://plano-pausar/$profissional';
+  static String encerrarPlano(String profissional) =>
+      'tatu://plano-encerrar/$profissional';
 }
 
 /// Cartão dentro da mensagem ("Dicas Tatu · Ver dicas").
@@ -172,8 +179,7 @@ MensagemTatu boasVindasProfissional(String nome, {DateTime? em}) =>
 
 /// RN-118: atalho para as Dicas Tatu.
 const _dicas = CartaoTatu(
-  introducao:
-      'Separamos dicas para uma boa convivência e boas negociações:',
+  introducao: 'Separamos dicas para uma boa convivência e boas negociações:',
   titulo: 'Dicas Tatu',
   detalhe: 'Convivência e negociação',
   botao: 'Ver dicas',
@@ -249,9 +255,7 @@ class CanaisTatu {
       ..receber(novidadeDistanciaCliente(novidade))
       ..naoLidas = 1;
     profissional
-      ..comecar(
-        boasVindasProfissional('Luiza', em: DateTime(hoje.year, 11, 2)),
-      )
+      ..comecar(boasVindasProfissional('Luiza', em: DateTime(hoje.year, 11, 2)))
       ..receber(novidadeDistanciaProfissional(novidade))
       ..naoLidas = 1;
   }

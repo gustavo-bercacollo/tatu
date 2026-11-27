@@ -39,7 +39,8 @@ class PainelMediacaoPage extends StatelessWidget {
               ? const EstadoVazio(
                   icone: TablerIcons.shield_check,
                   titulo: 'Nenhuma mediação aberta',
-                  texto: 'Os casos aparecem aqui quando o cliente\n'
+                  texto:
+                      'Os casos aparecem aqui quando o cliente\n'
                       'pede ajuda ao Tatu.',
                 )
               : ListView(
@@ -131,6 +132,7 @@ String motivoMediacaoTexto(MotivoMediacao m) => switch (m) {
   MotivoMediacao.contestouRecusa => 'Cliente contestou a recusa',
   MotivoMediacao.continuouProblema => 'Problema continuou depois do retorno',
   MotivoMediacao.contestouOutroProblema => 'Cliente contestou "outro problema"',
+  MotivoMediacao.semAcordoHorario => 'Sem acordo de horário',
 };
 
 /// RN-191: decisão sugerida (no backend, pela IA; aqui, por regras).
@@ -161,6 +163,9 @@ String resumoMediacao(PedidoRetorno r) {
       'O retorno foi feito, mas ${r.primeiroCliente} diz que o problema '
           'continua.',
     '${r.fotos.length} foto(s) do problema, tiradas na hora.',
+    // RN-190/RN-243: o histórico dos horários vai no resumo.
+    if (r.historicoHorarios.isNotEmpty)
+      'Horários: ${r.historicoHorarios.join(' · ')}.',
   ];
   return partes.join(' ');
 }
@@ -278,7 +283,8 @@ class CasoMediacaoPage extends StatelessWidget {
             ],
           ),
           const SizedBox(height: TatuMedidas.entreItens),
-          for (final d in DecisaoMediacao.values) ...[
+          // RN-191: atendimento que já é um "refazer" não refaz de novo.
+          for (final d in r.decisoesPossiveis) ...[
             FilledButton(
               style: d == sugerida ? null : tatuBotaoSecundario(),
               onPressed: () => _decidir(context, d),

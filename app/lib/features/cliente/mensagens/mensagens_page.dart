@@ -1,8 +1,11 @@
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
-import '../plano_fixo/plano_fixo.dart' show tornarFixo, textoTornarFixo;
+
+import '../plano_fixo/plano_fixo.dart'
+    show PlanoFixoPage, tornarFixo, textoTornarFixo;
 import '../../../shared/widgets/menu_contexto.dart';
 import '../../../shared/widgets/selo_plano_fixo.dart';
 import '../../../data/plano_fixo.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tatu_colors.dart';
@@ -213,9 +216,7 @@ class _LinhaConversaState extends State<_LinhaConversa> {
         ItemMenuContexto(
           _AcaoConversa.plano,
           TablerIcons.calendar_repeat,
-          temPlano
-              ? 'Ver plano fixo'
-              : textoTornarFixo(c.nome, c.feminino),
+          temPlano ? 'Ver plano fixo' : textoTornarFixo(c.nome, c.feminino),
         ),
         const ItemMenuContexto(
           _AcaoConversa.pedirDeNovo,
@@ -249,9 +250,7 @@ class _LinhaConversaState extends State<_LinhaConversa> {
     // RN-132: conta suspensa vira "Conta indisponível".
     nome: conversa.nomeVisivel,
     iniciais: conversa.primeiroNome,
-    avatar: conversa.encerrada
-        ? const AvatarIndisponivel(tamanho: 48)
-        : null,
+    avatar: conversa.encerrada ? const AvatarIndisponivel(tamanho: 48) : null,
     ultima: conversa.ultima,
     quando: conversa.quando,
     naoLidas: conversa.naoLidas,
@@ -259,9 +258,7 @@ class _LinhaConversaState extends State<_LinhaConversa> {
     // RN-200/RN-201: selo "Plano fixo" embaixo da última mensagem.
     selo: conversa.encerrada
         ? null
-        : SeloPlanoFixo.de(
-            planosFixos.ultimoCom(profissional: conversa.nome),
-          ),
+        : SeloPlanoFixo.de(planosFixos.ultimoCom(profissional: conversa.nome)),
     onTap: widget.onTap,
     onLongPress: segurar && !conversa.encerrada ? _segurar : null,
   );
@@ -322,6 +319,20 @@ class _CobrancaPendente extends StatelessWidget {
 /// Destinos dos botões do Tatu no modo cliente (RN-117, RN-118).
 void abrirDestinoTatuCliente(BuildContext context, String destino) {
   final nav = Navigator.of(context);
+  // RN-242: "Ver plano", "Pausar plano" e "Encerrar plano".
+  for (final (prefixo, acao) in [
+    ('tatu://plano/', 0),
+    ('tatu://plano-pausar/', 1),
+    ('tatu://plano-encerrar/', 2),
+  ]) {
+    if (!destino.startsWith(prefixo)) continue;
+    final p = planosFixos.planoCom(destino.substring(prefixo.length));
+    if (p == null) return;
+    if (acao == 1) planosFixos.pausar(p);
+    if (acao == 2) planosFixos.cancelar(p);
+    nav.push(MaterialPageRoute(builder: (_) => PlanoFixoPage(plano: p)));
+    return;
+  }
   switch (destino) {
     case DestinoTatu.dicas:
       nav.push(MaterialPageRoute(builder: (_) => const DicasTatuPage()));

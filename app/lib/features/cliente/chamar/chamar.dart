@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../data/chamado.dart';
 import '../../../data/conta.dart';
 import '../../../data/enderecos.dart';
+import '../../../data/limites_uso.dart';
 import '../../../data/pagamentos.dart';
 import '../../../data/pedidos.dart';
 import '../../../shared/widgets/folha.dart';
@@ -37,9 +38,7 @@ Future<void> chamarProfissional(
       iconeAviso: false,
     );
     if (atualizar && context.mounted) {
-      await nav.push(
-        MaterialPageRoute(builder: (_) => const PagamentoPage()),
-      );
+      await nav.push(MaterialPageRoute(builder: (_) => const PagamentoPage()));
     }
     return;
   }
@@ -94,6 +93,21 @@ Future<void> chamarProfissional(
       return;
     }
   }
+
+  // RN-248: até 5 pedidos novos por hora por conta.
+  final libera = limitesUso.pedidoLiberadoEm();
+  if (libera != null) {
+    if (!context.mounted) return;
+    return avisar(
+      context,
+      titulo: 'Muitos pedidos seguidos',
+      texto:
+          'Por segurança, você pode fazer um pedido novo a partir das '
+          '${libera.hour.toString().padLeft(2, '0')}:'
+          '${libera.minute.toString().padLeft(2, '0')}.',
+    );
+  }
+  limitesUso.registrarPedido();
 
   // 5. Procura: pedido vai a todos os ativos por perto.
   nav.push(

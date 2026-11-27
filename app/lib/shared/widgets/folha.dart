@@ -69,7 +69,7 @@ Future<bool> confirmar(
   required String titulo,
   required String texto,
   required String confirmar,
-  String cancelar = 'Cancelar',
+  String? cancelar = 'Cancelar',
   bool perigo = false,
   bool destacarCancelar = false,
   IconData? icone,
@@ -94,6 +94,22 @@ Future<bool> confirmar(
     ) ??
     false;
 
+/// Folha só de aviso, com um botão ("Entendi").
+Future<void> avisar(
+  BuildContext context, {
+  required String titulo,
+  required String texto,
+  String botao = 'Entendi',
+  IconData? icone,
+}) => confirmar(
+  context,
+  titulo: titulo,
+  texto: texto,
+  confirmar: botao,
+  cancelar: null,
+  icone: icone,
+);
+
 /// Como [confirmar], mas devolve `null` se a pessoa fechar a folha sem
 /// escolher (para quando "cancelar" também é uma ação, ex.: "Ver pedido").
 /// [esquerda] alinha ícone e textos à esquerda; [nota] é uma linha pequena
@@ -103,7 +119,7 @@ Future<bool?> perguntar(
   required String titulo,
   required String texto,
   required String confirmar,
-  String cancelar = 'Cancelar',
+  String? cancelar = 'Cancelar',
   bool perigo = false,
   bool destacarCancelar = false,
   IconData? icone,
@@ -129,7 +145,7 @@ Future<bool?> perguntar(
       final botaoCancelar = FilledButton(
         style: destacarCancelar ? null : tatuBotaoSecundario(),
         onPressed: () => Navigator.of(ctx).pop(false),
-        child: Text(cancelar),
+        child: Text(cancelar ?? ''),
       );
       return SafeArea(
         top: false,
@@ -181,9 +197,13 @@ Future<bool?> perguntar(
                 CaixaAviso(aviso),
                 const SizedBox(height: TatuMedidas.entreItens + 4),
               ],
-              if (destacarCancelar) botaoCancelar else botaoConfirmar,
-              const SizedBox(height: 10),
-              if (destacarCancelar) botaoConfirmar else botaoCancelar,
+              if (cancelar == null)
+                botaoConfirmar
+              else ...[
+                if (destacarCancelar) botaoCancelar else botaoConfirmar,
+                const SizedBox(height: 10),
+                if (destacarCancelar) botaoConfirmar else botaoCancelar,
+              ],
               // Terceira saída, em texto: fecha sem escolher (devolve null).
               if (voltar != null) ...[
                 const SizedBox(height: 4),

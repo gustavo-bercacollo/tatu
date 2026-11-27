@@ -137,13 +137,38 @@ class DenunciasRepo extends ChangeNotifier {
     notifyListeners();
   }
 
-  static String _par(String a, String b) =>
-      ([a, b]..sort()).join('|');
+  static String _par(String a, String b) => ([a, b]..sort()).join('|');
 
   /// RN-56: [a] e [b] estão bloqueados um para o outro?
   bool bloqueados(String a, String b) => _bloqueios.contains(_par(a, b));
 
+  /// RN-241: denúncia da mesma pessoa sobre o mesmo atendimento (o mesmo
+  /// denunciado) ou a mesma mensagem que ainda está em análise.
+  Denuncia? jaDenunciou({
+    required String denunciante,
+    required String? denunciado,
+    String? mensagem,
+  }) => _fila
+      .where(
+        (d) =>
+            d.analise == AnaliseDenuncia.emAnalise &&
+            d.denunciante == denunciante &&
+            d.denunciado == denunciado &&
+            d.mensagem == mensagem,
+      )
+      .firstOrNull;
+
+  /// RN-241: texto para a denúncia repetida.
+  static const textoRepetida = 'Você já denunciou isto · em análise';
+
   Denuncia _registrar(Denuncia d) {
+    // RN-241: repetida vira uma só (fica a primeira, em análise).
+    final antes = jaDenunciou(
+      denunciante: d.denunciante,
+      denunciado: d.denunciado,
+      mensagem: d.mensagem,
+    );
+    if (antes != null && d.tipo != TipoDenuncia.arquivo) return antes;
     _fila.add(d);
     // RN-56/RN-135: assédio ou discriminação bloqueia os dois na hora.
     if (d.bloqueiaNaHora && d.denunciado != null) {

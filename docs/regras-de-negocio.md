@@ -1,6 +1,6 @@
 # Tatu · Regras de negócio
 
-Atualizado em 26/11/2026 (v51)
+Atualizado em 26/11/2026 (v52)
 
 Este documento é a fonte única das regras do Tatu: o que o app faz, o que permite e o que proíbe. Se uma tela ou o código discordar daqui, vale o que está aqui.
 
@@ -35,7 +35,7 @@ Uma pessoa tem uma conta só, que pode ter os dois perfis: cliente e profissiona
 | RN-12 | "Sobre você": até 300 caracteres. Não aceita telefone, e-mail nem rede social. |
 | RN-13 | Fotos de trabalhos: até 12, revisadas antes de aparecer. Recusadas se mostram rosto de pessoa ou endereço. |
 | RN-14 | Encerrar o perfil profissional mantém a conta de cliente. Para voltar, ele refaz a verificação. |
-| RN-15 | Excluir a conta apaga os dois perfis. Fica bloqueado enquanto houver pedido em andamento ou dinheiro a receber. |
+| RN-15 | Excluir a conta apaga os dois perfis. Com pedido em andamento, a exclusão espera ele terminar; com dinheiro a receber, espera o último Pix. Com dívida (RN-192), a exclusão é aceita: o perfil some e o Tatu guarda só o necessário (dívida, provas e registros que a lei exige), como permite a LGPD (art. 16). A dívida continua ligada ao CPF dentro do Tatu. |
 | RN-97 | No cadastro de cada profissão, o profissional marca como atende: no local, à distância ou os dois. Pode mudar depois no Perfil. |
 | RN-110 | O Tatu é só para maiores de 18 anos, cliente e profissional. Não existe conta de menor nem "permissão dos pais": o adulto pede pela conta dele, com o endereço e o cartão dele. |
 | RN-111 | No cadastro, o cliente informa nome completo e CPF. Não pedimos data de nascimento: o app descobre a idade consultando o CPF. Menor de 18 vê "O Tatu é para maiores de 18 anos" e não entra. O cartão também precisa ser de um adulto (CPF do titular). |
@@ -61,7 +61,7 @@ O cliente descreve o problema e toca em Chamar. O app avisa todos os profissiona
 | RN-19 | O raio amplia sozinho em 3 etapas (1, 2 e 3 km). O cliente não escolhe o raio. |
 | RN-20 | A busca continua em segundo plano. O cliente recebe notificação quando alguém aceitar, mesmo com o app fechado. |
 | RN-21 | O cliente tem 3 minutos para aceitar o profissional encontrado. Passou o prazo, o profissional é liberado e o pedido continua salvo. |
-| RN-22 | "Ver outro profissional" libera o atual e chama outro. |
+| RN-22 | "Ver outro profissional" libera o atual e chama outro (até 3 vezes por pedido, RN-239). |
 | RN-23 | Se o cliente já tem um pedido ativo do mesmo serviço, o app pergunta antes de chamar outro. |
 | RN-24 | Fora da área atendida, o app avisa e oferece "Me avise quando chegar". |
 | RN-25 | Sem localização ativa, o cliente usa um endereço salvo. |
@@ -71,19 +71,19 @@ O cliente descreve o problema e toca em Chamar. O app avisa todos os profissiona
 
 ## 3. Valor, visita e pagamento
 
-Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do próprio bolso.
+Todo dinheiro sai do cliente e passa pelo app. O Tatu só paga do próprio bolso num caso: o refazer do retorno (RN-188), coberto pela reserva (RN-196).
 
 | RN | Regra |
 | --- | --- |
 | RN-26 | O valor é combinado no chat. O profissional define dois valores: Visita (pode ser zero) e Serviço. O cliente confirma o total uma vez. |
-| RN-27 | São até 3 rodadas de proposta. Sem acordo, o chamado é encerrado e nada é cobrado. No 3º valor, o cliente confirma ou recusa (RN-300). |
+| RN-27 | São até 3 rodadas de proposta. Sem acordo, o chamado é encerrado e nada é cobrado; a mesma pessoa só pode ser chamada de novo depois de 24 horas (RN-238). No 3º valor, o cliente confirma ou recusa (RN-300). |
 | RN-300 | No 3º valor, "Pedir outro valor" vira "Recusar valor" (vermelho) e o cartão avisa antes: "Último valor. Se recusar, a conversa com a [nome] termina sem custo." Recusar abre a folha "Recusar o valor?" com três saídas: "Recusar e chamar outro" (o pedido volta à busca, RN-18 a RN-20), "Recusar e cancelar pedido" (volta para a Home com "Pedido cancelado. Nada foi cobrado.") e "Voltar". Nada é cobrado, nem a visita, e o endereço exato nunca chega ao profissional (RN-28). |
 | RN-301 | Depois da recusa, o profissional vê "Sem acordo de valor" ("A [cliente] recusou o último valor. O chamado foi encerrado sem custo e não conta contra você.") e continua online. Ele não recebe de novo o mesmo pedido. Sem acordo não conta como cancelamento (RN-64) nem como abandono (RN-79) para nenhum dos dois. A conversa fica nas Mensagens dos dois só para leitura, com "Sem acordo de valor". |
 | RN-28 | O endereço exato só vai para o profissional depois que o valor é confirmado. Antes disso, ele vê só o bairro e a distância. |
 | RN-29 | Pagamento só pelo app: cartão ou Pix. Não existe pagamento "por fora" nem em dinheiro. |
 | RN-30 | Ao confirmar o valor, o total fica reservado no cartão padrão. Não é cobrado ainda. |
 | RN-31 | Quando o profissional toca em "Concluir serviço", o cliente confirma ("A [nome] concluiu o serviço. Está tudo certo?"). "Sim, confirmar" cobra na hora; "Algo errado" segura o valor e abre a contestação (RN-45). Sem resposta em 2 horas (exemplo), a conclusão é confirmada sozinha e o cliente é cobrado. Não existe tela de pagamento nem botão "Pagar". |
-| RN-32 | Se o serviço for maior que o descrito, o profissional manda um novo valor pelo chat. Se o cliente aceita, a reserva sobe. Se recusa, o profissional faz só o combinado ou encerra cobrando só a visita. |
+| RN-32 | Se o serviço for maior que o descrito, o profissional manda um novo valor pelo chat. Se o cliente aceita, a reserva sobe. Se recusa, o profissional faz só o combinado ou encerra cobrando só a visita. Limite de novos valores: RN-240. |
 | RN-33 | A visita é sempre cobrada, mesmo que o serviço não aconteça. |
 | RN-34 | O Tatu cobra comissão sobre todo serviço, visita incluída. Valor de exemplo: 10%. |
 | RN-35 | O dinheiro fica retido por 24 horas depois da conclusão e então cai no Pix do profissional, já sem a comissão. |
@@ -99,8 +99,8 @@ Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do própri
 | RN-144 | Plano fixo: o cliente toca em "Tornar [nome] fixa" (no perfil aberto pelo chat, no menu do chat, segurando a conversa, no card de Concluídos ou na opção "Precisa toda semana? Tornar a [nome] fixa" da folha "Pedir de novo", que aparece em qualquer profissão quando ainda não há plano com a pessoa; RN-208 e RN-209) e escolhe Mensal ou Semanal, 1 ou 2 vezes por semana, dia e horário. O profissional responde com o valor por visita e o valor pode ser negociado (RN-210); com o valor confirmado pelo cliente, o plano fica ativo. Ninguém renegocia a cada visita. |
 | RN-145 | Limite legal: a mesma profissional vai no máximo 2 vezes por semana ao mesmo endereço pelo Tatu, somando plano fixo e pedidos avulsos, para qualquer serviço na casa. A 3ª visita na semana é bloqueada com o aviso: "Pelo Tatu, a mesma profissional pode vir até 2 vezes por semana. Para mais que isso, a lei exige contratação com carteira assinada." (Lei Complementar 150.) |
 | RN-146 | O valor do plano é de pacote de visitas (valor por visita × visitas do período), combinado entre cliente e profissional; o Tatu não define. O valor de cada visita é **reservado na véspera** e **cobrado quando a visita é concluída**, como no avulso; o cliente vê o resumo do período (ex.: "8 visitas · R$ 1.200"). Comissão normal do Tatu em cada visita. Reserva recusada suspende a visita (RN-225). |
-| RN-147 | O profissional pode avisar "Não vou nesta semana" sem penalidade: a visita não é cobrada e o Tatu avisa o cliente pelo canal oficial. Faltar sem avisar segue as regras de abandono (RN-76 a RN-79). |
-| RN-148 | Cliente e profissional podem pausar ou cancelar o plano quando quiserem, valendo a partir do próximo período. Mudar o valor exige nova proposta (mesma negociação da RN-210) e aceite dos dois. |
+| RN-147 | O profissional pode avisar "Não vou nesta semana" sem penalidade: a visita não é cobrada e o Tatu avisa o cliente pelo canal oficial. Faltar sem avisar segue as regras de abandono (RN-76 a RN-79). Avisos seguidos: RN-242. |
+| RN-148 | Cliente e profissional podem pausar (até 60 dias, RN-242) ou cancelar o plano quando quiserem, valendo a partir do próximo período. Mudar o valor exige nova proposta (mesma negociação da RN-210) e aceite dos dois. |
 | RN-149 | Nos termos de uso, o cliente declara que contrata um serviço autônomo, que o Tatu só intermedia e que está ciente do limite de 2 visitas por semana. Revisar com advogado trabalhista. |
 
 ### Identificação do plano fixo
@@ -117,7 +117,7 @@ Todo dinheiro sai do cliente e passa pelo app. O Tatu nunca paga nada do própri
 | RN-208 | **Segurar a conversa** (Mensagens, cliente): segurar uma conversa abre um menu com "Ver perfil da [nome]", "Tornar [nome] fixa" (ou "fixo") e "Pedir de novo". Vale para qualquer profissão. Se já existe plano com a pessoa, o item vira "Ver plano fixo". |
 | RN-209 | **Botão "Tornar fixa" em Atividade → Concluídos** (cliente): no card do serviço, ao lado de "Pedir de novo" e "Recibo", com contorno escuro. Só aparece em profissões marcadas como **Fixo: Sim** no catálogo (diarista, passadeira, jardineiro, babá, professor etc.). Se já existe plano com a pessoa, o botão não aparece. O acesso pelo perfil e pelo menu do chat continua para todas as profissões. |
 | RN-210 | **Negociação do valor do plano**, igual ao avulso (RN-27): até **3 propostas**, sempre pelo **valor por visita** (o total do mês aparece calculado). (1) A profissional envia o valor. (2) O cliente toca em "Confirmar plano" ou "Pedir outro valor" (botão cinza dentro do card, abaixo de "Confirmar plano") e digita quanto quer pagar por visita. (3) A profissional toca em "Aceitar R$ X por visita" ou "Enviar outro valor" (a última proposta). Na última, o cliente vê "Proposta 3 de 3 · última" em laranja, com "Confirmar plano" ou "Recusar". Sem acordo, o plano não começa e serviços avulsos continuam valendo. O card mostra "Proposta X de 3". A barra do chat mostra "Plano fixo · confirme o valor" (cliente) ou "Plano fixo · responda" (profissional) em laranja, com o valor por visita. |
-| RN-211 | **Card do plano no chat.** Topo: foto e nome de quem propôs ("propôs um plano mensal", "pediu outro valor", "enviou a última proposta") e as bolinhas da rodada (● ○ ○ "1 de 3"; na última, "Última" em laranja). Corpo: total do mês em destaque ("R$ 1.200 por mês"), "8 visitas × R$ 150 · cobrado no fim do mês", os 7 dias da semana em bolinhas (D S T Q Q S S) com os dias do plano marcados em preto, e "Sex e sáb, às 9h · 1ª visita: 28 nov". Para o cliente, quando já houve serviço avulso com a pessoa: selo verde "Economia de R$ X por mês vs. avulso" (avulso × visitas − total do plano). Embaixo, o cartão e os botões da rodada (RN-210). A proposta de quem está vendo aparece à direita, sem botões, com "Aguardando a [nome] responder". |
+| RN-211 | **Card do plano no chat.** Topo: foto e nome de quem propôs ("propôs um plano mensal", "pediu outro valor", "enviou a última proposta") e as bolinhas da rodada (● ○ ○ "1 de 3"; na última, "Última" em laranja). Corpo: total do mês em destaque ("R$ 1.200 por mês"), "8 visitas × R$ 150 · cobrado a cada visita", os 7 dias da semana em bolinhas (D S T Q Q S S) com os dias do plano marcados em preto, e "Sex e sáb, às 9h · 1ª visita: 28 nov". Para o cliente, quando já houve serviço avulso com a pessoa: selo verde "Economia de R$ X por mês vs. avulso" (avulso × visitas − total do plano). Embaixo, o cartão e os botões da rodada (RN-210). A proposta de quem está vendo aparece à direita, sem botões, com "Aguardando a [nome] responder". |
 | RN-212 | **Histórico da negociação e card que não some.** Quando chega uma proposta nova, a anterior encolhe para uma linha cinza ("Luiza · R$ 150 por visita · Proposta 1 · substituída"); só o card da vez fica grande. Confirmado o plano, o card **fica no chat** com contorno cinza, selo verde "Confirmado" e o botão "Ver plano". Sem acordo, as propostas ficam encolhidas (a última como "recusada") com o aviso "Sem acordo · o plano não começou". Vale para todos os cards de valor do chat: nenhum some depois de combinado. |
 
 ## 4. Atendimento
@@ -129,8 +129,9 @@ Do valor confirmado até a avaliação, o atendimento segue sempre a mesma ordem
 | RN-37 | O Tatu não tem GPS próprio. "Abrir rota" abre o app de navegação que o profissional escolher (Google Maps, Waze ou Apple Mapas), e ele pode deixar um como padrão. |
 | RN-38 | O botão "Cheguei" só libera quando o profissional está perto do endereço. Para isso, a localização dele precisa estar ativa. |
 | RN-39 | Código na porta: o cliente vê um código de 4 dígitos e passa para o profissional pessoalmente, na chegada. O profissional digita o código no app e o serviço começa sozinho ("Em andamento"). Sem o código certo o serviço não começa. Vale para todo atendimento no local. |
+| RN-234 | **Só menor em casa.** O código na porta é passado pelo titular da conta, que é adulto (RN-110). O adulto precisa estar no início para passar o código; depois pode sair (ex.: babá). Se só um menor de idade estiver em casa, o profissional não entra e o serviço não começa: segue como cliente ausente (RN-80 e RN-81), com só a visita cobrada. No retorno, vale a RN-187 (cliente ausente). |
 | RN-40 | Serviço no local: ao tocar "Concluir serviço", o profissional tira **1 foto obrigatória do serviço pronto**, pela câmera do app. Fotos ao chegar continuam opcionais. Todas as fotos do app levam data e hora e servem de prova no retorno e na mediação. |
-| RN-41 | Ao concluir, os dois se avaliam. O cliente pode editar a avaliação até 7 dias depois. |
+| RN-41 | Ao concluir, os dois se avaliam (uma avaliação por atendimento, RN-236). O cliente pode editar a avaliação até 7 dias depois. |
 | RN-42 | Depois de concluído, a conversa continua aberta. Cliente e profissional voltam a se falar por ela quando quiserem. Mensagem é só conversa: serviço novo só por "Pedir de novo" ou por novo valor confirmado no chat (RN-175 a RN-182). |
 | RN-95 | Serviço à distância não tem Visita, rota, "Cheguei" nem código na porta. O valor tem só o Serviço. Confirmado o valor, o pedido vai direto para Em andamento. |
 | RN-96 | A entrega à distância é feita pelo chat, com arquivos. O profissional toca em "Enviar entrega", mas quem conclui é o cliente (RN-100). |
@@ -177,7 +178,7 @@ Quem cancela ou falha não transfere o custo para o outro lado nem para o Tatu.
 | RN-45 | "Algo errado?" funciona durante todo o prazo de retorno (RN-183), com motivo, descrição e fotos tiradas na hora pela câmera do app. Nas primeiras 24 horas aparece como "Pagamento protegido por 24h"; depois, como "O problema voltou?". É um fluxo só (RN-183 a RN-196). |
 | RN-46 | Pedido feito nas primeiras 24 horas: o valor do serviço continua retido até o caso terminar (risco zero para o Tatu). A visita e a gorjeta nunca entram. |
 | RN-47 | Todo pedido vai primeiro ao profissional, que pode voltar sem custo (RN-186). O suporte só entra nos 3 casos da RN-190 e decide entre opções fixas (RN-191). O valor devolvido sai do profissional (RN-192). |
-| RN-48 | O profissional pode contestar uma avaliação injusta. O suporte revisa em até 3 dias úteis e, se for injusta, ela sai da nota. |
+| RN-48 | O profissional pode contestar uma avaliação injusta, uma vez por avaliação (RN-241). O suporte revisa em até 3 dias úteis e, se for injusta, ela sai da nota. |
 | RN-49 | Contadores automáticos de abuso, para cliente e profissional (RN-193). Ao passar do limite, perde o retorno mediado pelo app ou tem a conta pausada. |
 | RN-107 | Depois das 24 horas, o Tatu continua no caso: o cliente pede retorno pelo app até o fim do prazo (RN-183), e o Tatu acompanha, resolve sozinho os casos claros e media os outros. Substitui a regra anterior ("depois de 24 horas o problema é entre cliente e profissional"). |
 | RN-108 | O app nunca diz que a garantia acaba em 24 horas. A garantia legal (CDC: 30 dias para serviço não durável, 90 para durável, vício oculto contado da descoberta) é obrigatória e não pode ser reduzida nos termos. O pagamento protegido e o retorno mediado são extras do Tatu, que se somam a ela (CDC, art. 50). Validação jurídica pendente: J-01 a J-05 em `perguntas-para-o-advogado.md`. |
@@ -192,15 +193,15 @@ Quem cancela ou falha não transfere o custo para o outro lado nem para o Tatu.
 
 | RN | Regra |
 | --- | --- |
-| RN-183 | **Prazo de retorno** por profissão, no catálogo: **90 dias** para serviço durável e **30 dias** para não durável, contados da conclusão. Na dúvida, 90. O cliente vê só a data ("até 02 fev"). Depois do prazo, defeito que só apareceu agora (vício oculto) vai pela Ajuda. Garantia própria maior do profissional (RN-109, fase 2) vale no lugar. |
+| RN-183 | **Prazo de retorno** por profissão, no catálogo: **90 dias** para serviço durável e **30 dias** para não durável, contados da conclusão. Na dúvida, 90. O cliente vê só a data ("até 02 fev"). Pedido aberto dentro do prazo segue até o fim, mesmo que a data passe (CDC, art. 26, §2º, I). Depois do prazo, defeito que só apareceu agora (vício oculto) vai pela Ajuda. Garantia própria maior do profissional (RN-109, fase 2) vale no lugar. |
 | RN-184 | Um pedido de retorno por serviço, no mesmo endereço. Fotos **só pela câmera do app**, com data e hora; fotos da galeria não são aceitas. |
 | RN-185 | **Repasse preso:** com retorno aberto, os próximos repasses do profissional ficam presos até o valor do serviço. Ganhos mostra "R$ X presos · Retorno da [cliente] aberto · solta ao resolver". Com retorno aberto ou dívida, o profissional não consegue encerrar o perfil. |
-| RN-186 | O profissional tem **48 horas** para responder: **Aceitar retorno** (escolhe o horário, RN-213, em até **7 dias** depois do pedido), **É outro problema** (foto no local pela câmera + novo valor, RN-181) ou **Recusar** (motivo obrigatório: não é o mesmo problema, mau uso depois do serviço, não consigo ir até lá, outro motivo). |
+| RN-186 | O profissional tem **48 horas** para responder: **Aceitar retorno** (escolhe o horário, RN-213, em até **7 dias** depois do pedido), **É outro problema** (foto no local pela câmera + novo valor, RN-181) ou **Recusar** (motivo obrigatório: não é o mesmo problema, mau uso depois do serviço, não consigo ir até lá, outro motivo). "Não consigo ir até lá" não vai para a mediação: vale a RN-188. |
 | RN-187 | Retorno aceito: card "Retorno · sem custo" na Atividade dos dois. Sem cobrança, sem comissão e sem visita. Começa com o **código na porta** (RN-39). No fim, o cliente responde "Resolveu?"; sem resposta em 48 horas, conta como resolvido. Cliente ausente no dia (fluxo da RN-80 e RN-81): o retorno é dado como cumprido. |
-| RN-188 | **Resolução automática a favor do cliente, sem suporte,** quando o profissional não responde em 48 horas, não marca o retorno em 7 dias ou não aparece (sem código na porta). Se os repasses presos cobrem o valor, devolução do serviço; se não cobrem, o Tatu paga outro profissional para refazer, até o valor do serviço. Conta 1 falta. |
+| RN-188 | **Resolução automática a favor do cliente, sem suporte,** quando o profissional não responde em 48 horas, recusa com "Não consigo ir até lá", não aceita nem sugere horário em 7 dias (RN-243), não aparece (sem código na porta) ou é suspenso (RN-235). Se os repasses presos cobrem o valor, devolução do serviço; se não cobrem, o Tatu paga outro profissional para refazer, até o valor do serviço. Conta 1 falta; o "Não consigo ir" só conta falta a partir da 2ª vez em 90 dias. |
 | RN-189 | Recusa: o cliente escolhe "Ok, entendi" (encerra) ou "Pedir ajuda ao Tatu". Sem escolha em 7 dias, encerra. |
-| RN-190 | **Mediação humana só em 3 casos:** o cliente contesta a recusa; o cliente responde "Não, continua o problema"; o cliente contesta o "É outro problema". Uma mediação por serviço. |
-| RN-191 | Na mediação, a IA monta o resumo (foto do serviço pronto, fotos do problema e do local, chat, histórico dos dois) e sugere a decisão. A pessoa do suporte escolhe uma de 4 opções: **refazer com outro profissional · devolver 50% · devolver 100% · não procede**. Prazo de até 3 dias úteis. A decisão chega pelo chat do Tatu e encerra o pedido no app, sem recurso (ela já é de uma pessoa). |
+| RN-190 | **Mediação humana só em 4 casos:** o cliente contesta a recusa; o cliente responde "Não, continua o problema"; o cliente contesta o "É outro problema"; sem acordo de horário (RN-243). Uma mediação por serviço. |
+| RN-191 | Na mediação, a IA monta o resumo (foto do serviço pronto, fotos do problema e do local, chat, histórico dos dois) e sugere a decisão. A pessoa do suporte escolhe uma de 4 opções: **refazer com outro profissional · devolver 50% · devolver 100% · não procede**. Prazo de até 3 dias úteis. A decisão chega pelo chat do Tatu e encerra o pedido no app, sem recurso (ela já é de uma pessoa). O refazer é um atendimento novo, com retorno próprio do novo profissional; se esse retorno chegar à mediação, a opção "refazer com outro profissional" não aparece. No máximo 2 tentativas de conserto por problema; depois, dinheiro. |
 | RN-192 | **Dinheiro:** só o valor do serviço volta; visita e gorjeta, nunca. Do profissional se desconta o que ele recebeu; o Tatu devolve a comissão dele. O desconto sai dos repasses presos e futuros. Dívida sem saldo fica ligada à conta do profissional no Tatu (identificada pelo CPF, só dentro do Tatu; não é negativação em birô de crédito): ele não recebe chamados nem abre outra conta até quitar. Quando o Tatu cobre do próprio bolso, cobre em serviço (outro profissional), nunca em dinheiro. |
 | RN-193 | **Faltas e abuso.** Profissional: 1 falta por não responder, não marcar, não aparecer, recusa derrubada na mediação ou "É outro problema" derrubado; 3 faltas em 90 dias (exemplo) pausam a conta. Cliente: 3 pedidos "não procede" em 6 meses (exemplo) tiram o retorno mediado pelo app por 6 meses; reclamações seguem pela Ajuda e os direitos legais continuam. |
 | RN-194 | **Chargeback:** o app guarda sozinho o pacote de provas de cada serviço (valor confirmado, código na porta, fotos, chat, confirmação da conclusão) para responder a contestações no cartão. |
@@ -210,10 +211,12 @@ Quem cancela ou falha não transfere o custo para o outro lado nem para o Tatu.
 | RN-198 | **Revisão de decisão automática** (LGPD, art. 20): toda decisão tomada só pelo sistema no retorno (devolução automática, falta, retorno dado como cumprido, "resolvido" por falta de resposta, pausa por faltas) mostra **"Pedir revisão"**. O pedido vale por 7 dias e uma pessoa do Tatu revisa em até 3 dias úteis. A decisão da mediação (RN-191) já é de uma pessoa e não tem nova revisão. |
 | RN-199 | **Fotos e provas:** as fotos do serviço e do retorno são usadas só como prova (retorno, mediação, chargeback). Ficam guardadas por [5 anos] (exemplo, prazo do CDC para ações por danos, art. 27), com acesso restrito ao suporte, e depois são apagadas. A IA da mediação só resume e sugere; quem decide é uma pessoa. |
 | RN-207 | **Card do retorno em Atividade → Em andamento (cliente).** Mesma estrutura dos outros cards: foto com as iniciais, nome e profissão. **Agendado:** pílula clara "Agendado" à direita; no meio, a data e a hora completas com ícone de calendário ("Sexta, 27 nov · 13h") e "Código 0417 · passe para a [nome] na hora". **A caminho em diante:** pílula escura com o tempo ("8 min") e a linha de etapas Agendado → A caminho → Retorno → Feito. Nos dois estados, **rodapé** com linha divisória, a pílula verde "Retorno · sem custo" à esquerda e "do serviço de [data]" à direita (mesmo lugar onde o card do plano mostra a visita do mês). |
-| RN-213 | **Agendar o retorno.** No passo 2 do pedido de retorno, o cliente escolhe **até 3 horários** numa grade dos próximos 7 dias por período: **manhã (8h–12h), tarde (12h–18h) e noite (18h–21h)**; horários que já passaram ficam apagados. Chave **"É urgente? Pedir para hoje, se der"**. Ao aceitar, o profissional escolhe uma das opções e a hora dentro do período ("Aceitar · sexta, 27 nov, 9h"): fica marcado, sem confirmação do cliente. Se nenhuma serve, toca em "Sugerir outro horário" e escolhe dia e hora até 7 dias depois do pedido; o cliente recebe no chat "[nome] sugeriu outro horário" com "Confirmar horário" ou "Escolher outro" (volta à grade). Sem horário combinado até o fim do prazo, vale a RN-188 (não marcou). |
+| RN-213 | **Agendar o retorno.** No passo 2 do pedido de retorno, o cliente escolhe **até 3 horários** numa grade dos próximos 7 dias por período: **manhã (8h–12h), tarde (12h–18h) e noite (18h–21h)**; horários que já passaram ficam apagados. Chave **"É urgente? Pedir para hoje, se der"**. Ao aceitar, o profissional escolhe uma das opções e a hora dentro do período ("Aceitar · sexta, 27 nov, 9h"): fica marcado, sem confirmação do cliente. Se nenhuma serve, toca em "Sugerir outro horário" e escolhe dia e hora até 7 dias depois do pedido; o cliente recebe no chat "[nome] sugeriu outro horário" com "Confirmar horário" ou "Escolher outro" (volta à grade). Sem horário combinado até o fim do prazo, vale a RN-188 (não marcou). Limites das sugestões: RN-243. |
 | RN-214 | **Remarcar o retorno:** cliente e profissional podem remarcar **uma vez cada**, até **12 horas antes**, com o novo dia dentro do prazo. Quem pede escolhe o dia e o período; o outro escolhe a hora e confirma. Não existe segunda remarcação: faltou, vale a RN-187 (cliente ausente) ou a RN-188 (profissional não veio). |
+| RN-243 | **Limites no horário do retorno.** O profissional pode tocar em "Sugerir outro horário" no máximo 2 vezes, e o cliente em "Escolher outro" (voltar à grade) 1 vez. Na 2ª sugestão, o cliente vê só "Confirmar horário" e "Não posso". "Não posso", ou o cliente sem responder até o fim do prazo, vira **"Sem acordo de horário"**: ninguém leva falta e o cliente escolhe "Ok, entendi" (encerra) ou "Pedir ajuda ao Tatu" (mediação, RN-190, com o histórico dos horários). A RN-188 ("não marcou") vale só quando o profissional não aceitou nem sugeriu horário. |
 | RN-215 | **Lembretes e urgência:** os dois recebem lembrete na véspera e 1 hora antes do retorno. Pedido marcado como urgente aparece para o profissional em destaque: "Urgente · a [cliente] pediu hoje, se der". |
 | RN-216 | **Deslizar entre abas em Atividade** (cliente e profissional): além de tocar em "Em andamento" e "Concluídos", dá para trocar de aba deslizando o dedo para os lados. A marcação da aba acompanha o dedo. O gesto não começa na borda esquerda (para não brigar com o "voltar" do iPhone) e não dispara durante a rolagem vertical. **Em Ganhos não:** Dia, Semana e Mês continuam só por toque (deslizar ali, no futuro, seria para ir ao período anterior ou ao próximo). |
+| RN-235 | **Profissional suspenso ou banido com retorno aberto:** o pedido vai na hora para a resolução automática (RN-188), sem esperar as 48 horas. Conta pausada continua fazendo o retorno (a pausa só impede chamados novos, RN-128). |
 
 ### Selos do profissional
 
@@ -236,7 +239,7 @@ Quem cancela ou falha não transfere o custo para o outro lado nem para o Tatu.
 | RN-226 | **Cobrança ao concluir:** com a reserva válida, não falha (o dinheiro já estava separado). Falha técnica: o Tatu tenta de novo sozinho, **o profissional recebe normalmente** (o valor estava reservado) e o cliente só vê "Pagamento pendente · Atualize o cartão para fazer novos pedidos" na Home se as tentativas não derem certo; com pendência, não faz pedido novo. **Gorjeta recusada:** "Não deu para enviar a gorjeta. Tentar outro cartão?"; o profissional não é avisado. |
 | RN-227 | **Ícones das profissões.** Cada uma das 75 profissões do catálogo tem um ícone próprio (24 × 24, traço 1,8, pontas arredondadas, sem preenchimento, cor do texto), em `design/icones-profissoes/` com o mapa `icones-profissoes.json`. Tamanhos: 52 px na seleção (quadrado arredondado cinza), 40 px em cards e listas (círculo cinza) e 16 px junto de texto. **Sem ícone próprio** (profissão nova ou sugerida): usa o ícone do segmento (9 segmentos); sem segmento, o crachá. O botão "Outros" usa a grade de quadradinhos. Profissão nova no catálogo só entra com ícone, ou cai na alternativa. |
 | RN-228 | **Profissão de outro modo na busca.** A busca de profissão procura nos dois modos. As do modo atual aparecem normalmente; as do outro vêm numa seção "Só à distância" (ou "Só no local"), com etiqueta cinza no item e a dica "Tocar muda o pedido para À distância". Tocar no item troca o modo e já seleciona a profissão: a chave No local / À distância desliza e fica destacada por 1 segundo, e a linha cinza abaixo dos serviços diz "[Profissão] é só à distância." (ou "só no local"). **Sem card ou aviso flutuante.** A descrição escrita não se perde. Para desfazer, basta tocar no outro modo na chave. Profissão que atende nos dois modos não troca o modo. Sem resultado em nenhum modo: "Sugerir esse serviço ao Tatu" (RN-162). |
-| RN-229 | **Validade do valor enviado.** Todo card de valor mostra "Vale até [hora]". Prazos: **30 minutos** para chamado imediato e para novo valor durante o serviço; **24 horas** para serviço agendado, à distância e plano fixo (exemplos). O valor também expira quando a mesma pessoa envia outro valor ou o pedido é cancelado. Expirado, o card encolhe para uma linha cinza ("[nome] · R$ X · Valor expirado · [hora]") com "Pedir de novo", que avisa o profissional. |
+| RN-229 | **Validade do valor enviado.** Todo card de valor mostra "Vale até [hora]". Prazos: **30 minutos** para chamado imediato e para novo valor durante o serviço; **24 horas** para serviço agendado, à distância e plano fixo (exemplos). O valor também expira quando a mesma pessoa envia outro valor ou o pedido é cancelado. Expirado, o card encolhe para uma linha cinza ("[nome] · R$ X · Valor expirado · [hora]") com "Pedir de novo" (uma vez, RN-237), que avisa o profissional. |
 | RN-230 | **Ordem no chat.** Cards de valor, de plano e de retorno ficam **no lugar em que foram enviados**, em ordem como qualquer mensagem; nunca presos no fim da conversa. Enquanto houver um valor pendente que saiu da tela, aparece a barra laranja fixa no topo: "Valor pendente · R$ X · vale até [hora] ›"; tocar rola até o card. Confirmado ou expirado, a barra some. |
 | RN-231 | **Card do retorno no chat.** Um card só, que muda de estado (não existe bloco verde solto). Topo: ícone do serviço, "Pedido de retorno", "[profissão] · serviço de [data]" e pílula de status (**Aguardando** laranja, **Aceito** verde, **Recusado** e **Sem resposta** cinza, **Feito** verde). Meio: a descrição entre aspas e as fotos. Embaixo, aguardando: até quando o profissional responde e os horários do cliente; aceito: data e hora em destaque, "Código [0000] · passe na hora", selo "Sem custo" e "Remarcar". A aceitação vira um aviso pequeno entre as mensagens ("A [nome] aceitou · [dia], [hora]"). |
 | RN-232 | **Ganhos (profissional), parte de baixo.** "Ver todos" fica no título "Últimos recebimentos", à direita, como link. A explicação da taxa fica num ⓘ na própria linha "Taxa do Tatu (10%)" do resumo: tocar abre uma folha com "10% sobre o valor do serviço", "A visita também tem 10%", "Gorjetas são 100% suas, sem taxa" e "A taxa já sai descontada no Pix". Não há mais links soltos no fim da tela. |
@@ -303,7 +306,7 @@ As penalidades existem para impedir abuso, nunca para punir quem se protegeu.
 | --- | --- |
 | RN-63 | Muitas visitas sem serviço pausam a conta do profissional até ele falar com o suporte. Valor de exemplo: 5 das últimas 8 visitas. |
 | RN-64 | Cancelar atendimentos com frequência baixa a posição do profissional na fila de chamados. |
-| RN-65 | Conta pausada não fica online. O suporte vê o histórico e decide se libera. |
+| RN-65 | Conta pausada não fica online (profissional) nem faz pedidos (cliente). A volta segue a RN-244. |
 | RN-66 | Banimento é para fraude, identidade falsa e assédio comprovado. |
 | RN-79 | Três abandonos em 30 dias pausam a conta do profissional até ele falar com o suporte. |
 | RN-82 | Três ausências em 30 dias pausam a conta do cliente até ele falar com o suporte. |
@@ -314,6 +317,21 @@ As penalidades existem para impedir abuso, nunca para punir quem se protegeu.
 | RN-131 | Cliente suspenso: o profissional recebe do Tatu "Este atendimento foi encerrado pelo Tatu" e recebe pelo que já fez, tirado da reserva do cartão do cliente: a visita se já estava a caminho ou no local; o serviço se já concluiu. O Tatu não paga nada. |
 | RN-132 | Nos dois casos o chat fica só para leitura, o nome vira "Conta indisponível" e o histórico é guardado como prova. Parcelas futuras de serviços longos são canceladas; o que já foi pago pelo trabalho feito continua valendo. |
 
+### Limites contra loops e abuso
+
+Todo processo do app tem fim. Os limites valem para o processo do app, nunca para os direitos da pessoa (CDC): quem terminar sem acordo ainda pode ir ao Procon ou à Justiça.
+
+| RN | Regra |
+| --- | --- |
+| RN-237 | **"Pedir de novo" no valor expirado** (RN-229) funciona uma vez por card. Tocado, vira "Pedido enviado à [nome]" e não avisa de novo. |
+| RN-238 | **Depois de "Sem acordo"** no valor (RN-27), "Chamar a [nome]" fica desativado por 24 horas, com "Vocês não chegaram a um valor. Você pode chamar a [nome] de novo a partir de [dia], [hora]." "Chamar qualquer [profissão]" continua. No plano fixo (RN-210), nova proposta para a mesma pessoa só depois de 7 dias ("Você pode propor de novo a partir de [data]"); serviços avulsos com ela continuam. |
+| RN-239 | **Trocas de profissional:** "Ver outro profissional" (RN-22) vale até 3 vezes por pedido. Depois, o botão some e o cliente aceita o profissional atual ou cancela o pedido. |
+| RN-240 | **Novo valor durante o serviço** (RN-32 e RN-87): só um novo valor pendente por vez. Com 2 novos valores recusados no mesmo atendimento, o botão "Novo valor" fica desativado nele, com "A [cliente] recusou 2 valores. Conclua o combinado ou encerre cobrando a visita." Não vale para serviço novo depois de concluído (RN-181). |
+| RN-241 | **Um pedido por decisão.** Cada avaliação pode ser contestada uma vez (RN-48). Cada decisão automática tem uma revisão (RN-198). Denúncias repetidas da mesma pessoa sobre o mesmo atendimento ou a mesma mensagem viram uma só ("Você já denunciou isto · em análise"). |
+| RN-242 | **Plano fixo sem visitas.** Com "Não vou nesta semana" (RN-147) em 2 semanas seguidas, o cliente recebe no chat "A [nome] não vem há 2 semanas", com "Pausar plano" e "Encerrar plano". Na 3ª semana seguida, o plano pausa sozinho e os dois são avisados. **Pausa:** no máximo 60 dias; 7 dias antes do fim, os dois recebem "O plano pausado termina em [data]"; sem retomar, o plano encerra. |
+| RN-244 | **Voltar de uma pausa** (RN-63, RN-79, RN-82, RN-106, RN-193). 1ª pausa em 6 meses: a pessoa vê o motivo, toca em "Entendi" e a conta volta sozinha depois de 7 dias, sem falar com o suporte. 2ª pausa em 6 meses: volta depois de 30 dias. 3ª: a conta fica parada até o suporte analisar (pode haver banimento, RN-66). Substitui o "até falar com o suporte" dessas regras. |
+| RN-248 | **Limites contra robôs e teste de cartão.** Código de acesso (RN-02): até 3 envios por número a cada 15 minutos e 10 por dia, também por aparelho. Cartão: com 3 cartões recusados na mesma conta em 24 horas, só Pix até o dia seguinte. Pedidos: até 5 pedidos novos por hora por conta. |
+
 ## 8. Avaliações, perfil e anúncios
 
 | RN | Regra |
@@ -321,6 +339,8 @@ As penalidades existem para impedir abuso, nunca para punir quem se protegeu.
 | RN-67 | Antes de aceitar, o cliente vê do profissional: nota, número de serviços, distância, tempo de chegada, fotos de trabalhos, "Sobre" e avaliações. |
 | RN-68 | O profissional vê as próprias avaliações em Perfil → Minhas avaliações: média, distribuição por estrelas, elogios mais citados e comentários com filtros. |
 | RN-69 | Profissional não responde publicamente às avaliações. Discordância vai pela contestação (RN-48). |
+| RN-236 | **Uma avaliação por atendimento.** Cada atendimento (cada card na Atividade) tem a sua avaliação, feita ao concluir. Novos valores no mesmo atendimento (RN-32) não abrem outra. No plano fixo, uma avaliação por mês, pedida depois da última visita do mês. A nota do profissional é a média das avaliações válidas (RN-249). |
+| RN-249 | **Avaliação que conta.** Só conta para a nota e aparece no perfil a avaliação de atendimento pago pelo app, com código na porta (ou, à distância, com entrega aprovada). Avaliação entre contas ligadas (mesmo CPF, cartão, aparelho ou endereço, como na RN-218) não conta e não aparece. |
 | RN-70 | Anúncios aparecem em dois lugares só: na Home, acima do botão Chamar, e na tela de busca, abaixo da barra de carregamento. |
 | RN-71 | O espaço de anúncio mede 353 × 76 e leva o selo "Patrocinado". Sem anúncio, o espaço some. Na Home, some também enquanto o cliente digita. |
 | RN-83 | **(adiado)** "Seus profissionais" (lista em Atividade com quem já atendeu o cliente e o botão Chamar) saiu do app por enquanto. Proposta guardada em Decisões em aberto. |
@@ -360,13 +380,20 @@ Cada dado é usado só para o motivo pelo qual foi pedido.
 | RN-150 | Os Termos de Uso e a Política de Privacidade ficam em `docs/` (fonte única) e são lidos no app em Perfil → Privacidade e termos, para cliente e profissional: versão e data, "O essencial em 1 minuto", índice e cada seção. O aceite é ativo: no cadastro do cliente, caixa desmarcada "Li e concordo com os Termos de Uso e a Política de Privacidade" (com links) e o resumo "O essencial do Tatu"; o botão só libera depois de marcar. O profissional confirma de novo no fim da verificação, com os pontos principais (autônomo, taxa, Pix em 24h, pagamento só pelo app). Versão e data do aceite ficam registradas. |
 | RN-151 | Mudança relevante nos documentos é avisada pelo canal oficial do Tatu com pelo menos 15 dias de antecedência (salvo exigência legal ou de segurança). Ao abrir o app depois da data, a pessoa vê "Atualizamos os Termos de uso" com o que mudou e só continua depois de "Concordo e continuar". Pedidos em andamento seguem a versão em que foram feitos. |
 
+### Base técnica
+
+| RN | Regra |
+| --- | --- |
+| RN-245 | **Fuso horário.** Prazos são guardados como um instante único. Todo horário (vale até, responde até, visita, lembrete) aparece no fuso do aparelho de quem está vendo. As faixas do retorno (manhã, tarde, noite, RN-213) usam o fuso do endereço do serviço. |
+| RN-246 | **Linha do tempo do atendimento.** Cada etapa (valor enviado, confirmado, reservado, a caminho, cheguei, código, novo valor, concluído, confirmado, cobrado, repasse, retorno, decisões) fica guardada com data, hora e quem fez, sem poder ser editada nem apagada, pelo mesmo prazo das fotos (RN-199). É a base das provas da RN-194 e da mediação (RN-191). |
+| RN-247 | **Números ajustáveis.** Todo prazo, limite, valor e percentual marcado como exemplo nestas regras fica numa configuração do servidor e muda sem nova versão do app. Mudança que afete cliente ou profissional segue a RN-151 (aviso antes). |
+
 ## 10. Decisões em aberto
 
 O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa e sai daqui.
 
 - [ ] **Foto da cliente no modo só mulheres.** Recomendação: a profissional vê só o selo "Cliente verificada", nunca a selfie. Opcional: a cliente escolhe mostrar uma foto de perfil conferida com a selfie. As telas atuais ainda mostram a foto.
 - [ ] **Parcelamento.** Valor mínimo, número de parcelas e quem paga os juros (o Tatu não paga). Hoje: a partir de R$ 300, até 6 vezes, como exemplo.
-- [ ] **Avaliação em conversas com vários pagamentos.** Avaliar a cada valor concluído ou manter uma avaliação só por profissional, que o cliente atualiza.
 - [ ] **Valor da comissão.** 10% é exemplo.
 - [ ] **Prazos finais.** Tempo do profissional para aceitar um chamado, tempo do cliente para aceitar (hoje 3 minutos), retenção antes do repasse (hoje 24 horas).
 - [ ] **Recuperação de conta.** O que fazer quando a pessoa perde o celular: recuperar pelo e-mail, selfie para profissional, "Sair de todos os aparelhos".
@@ -376,7 +403,6 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
 - [ ] **Arquivos e links no chat à distância.** Como conviver com o contato oculto (RN-85, fase 2).
 - [ ] **Print no iPhone.** O Android bloqueia print de verdade. O iPhone não deixa bloquear, só esconder o conteúdo no print e na gravação. Foto com outro celular sempre funciona, por isso a marca d'água com o nome do cliente.
 - [ ] **Números do serviço à distância.** Sinal de até 30%, prévia de 24 horas, aprovação automática em 48 horas, resposta do suporte em 2 dias úteis: todos são exemplos.
-- [ ] **Só menor de idade em casa.** O que o profissional faz quando só um menor abre a porta. Cuidado: profissional pode usar isso como desculpa para cobrar a visita sem trabalhar. Ver mais para frente.
 - [ ] **Conferir a idade pelo CPF.** Escolher o serviço que consulta o CPF na Receita e devolve a data de nascimento (ex.: Consulta CPF do Serpro ou outro fornecedor; custo por consulta).
 - [ ] **Canal do Tatu.** Se a pessoa pode silenciar o canal, quantas mensagens por mês no máximo, e o conteúdo das Dicas Tatu.
 - [ ] **Moderação de arquivos.** Escolher os fornecedores (antivírus, nudez, abuso infantil), quanto tempo guardar as provas e como fazer a comunicação às autoridades. Revisar com advogado.
@@ -386,12 +412,12 @@ O que ainda não foi decidido. Quando decidir, a regra sobe para a seção certa
   - Base técnica: leitor de tela (VoiceOver/TalkBack) com nome em todos os botões, inclusive mapa e contadores; respeitar o tamanho de letra e o alto contraste do celular; botões grandes; avisos importantes também vibram.
 - [ ] **Perfil por seções e certificações (adiado).** Perfil do profissional estilo LinkedIn: cada seção (sobre, especialidades, fotos, certificações) só aparece se estiver preenchida; avaliações e verificação sempre aparecem. Certificações com selo "Informado pelo profissional" ou "Conferido pelo Tatu". Telas de prévia feitas em 17/11/2026, não aprovadas para agora.
 - [ ] **Contas com CNPJ (adiado).** Proposta: a conta continua sendo de uma pessoa verificada (CPF); o CNPJ entra como dado opcional. Profissional MEI/CNPJ recebe no Pix do CNPJ e emite nota (selo "Emite nota fiscal"); cliente pode pedir nota para CNPJ (condomínio, loja). Profissional sem CNPJ: avisar "Este profissional não emite nota fiscal". Empresa com equipe e conta de empresa com vários usuários: fase 2. Nota do serviço é do profissional; o Tatu emite só a da comissão. Confirmar com contador.
-- [ ] **Plano fixo · detalhes.** Comissão menor no plano fixo como incentivo? Quanto tempo dura uma pausa?
+- [ ] **Plano fixo · detalhes.** Comissão menor no plano fixo como incentivo?
 - [ ] **Termos e Política · dados para publicar.** Razão social, CNPJ, endereço, e-mails de suporte e do encarregado (DPO), fornecedores (pagamento, consulta de CPF, verificação, moderação, ditado, ligação, nuvem), prazos de guarda e URL pública. Revisão por advogado antes de publicar.
 - [ ] **Entrar com Google e Apple (adiado).** Proposta: "Continuar com Google" e "Continuar com Apple" (a Apple exige a dela se houver login social), aproveitando nome, e-mail confirmado e foto; falta só CPF e aceite; celular confirmado antes do primeiro pedido; e-mail que já tem conta vincula com código, sem duplicar. Layout das telas ainda não aprovado (opções A: folha na boas-vindas, B: tela com 3 botões, C: celular com ícones).
 - [ ] **Antecedentes criminais (adiado).** Pedir certidão de antecedentes de quem cuida de criança, idoso ou pessoa com deficiência, ou de todos que vão até a casa do cliente. Atualizar a Política de Privacidade se for adotado.
 - [ ] **Uso fora da finalidade (adiado).** Proposta: (1) IA confere se o pedido é um serviço do catálogo e bloqueia termos proibidos ("Esse pedido não é um serviço do Tatu"); (2) profissões sensíveis (ex.: massagem) com regra extra e "acompanhante" fora do catálogo; (3) trava de autopagamento (mesmo CPF, celular, aparelho, cartão ou Pix dos dois lados); (4) revisão de serviços sem chegada/código, valores muito acima do normal e muitos serviços caros entre as mesmas pessoas; (5) teto de valor e sem parcelamento nos primeiros serviços de conta nova; (6) fila de revisão, banimento e comunicação às autoridades; parceiro de pagamentos com antifraude.
-- [ ] **Números do retorno.** Exemplos a confirmar: 48 horas para o profissional responder, 7 dias para marcar, 48 horas para o cliente responder "Resolveu?", 12 horas de antecedência para remarcar, 3 dias úteis de mediação, 3 faltas em 90 dias, 3 "não procede" em 6 meses, reserva de 1% da comissão. Tempo para pagar depois de recusado: 10 minutos (exemplo). Validade do valor enviado: 30 minutos (imediato) e 24 horas (agendado, à distância, plano) (exemplos). Classificação 30/90 dias do catálogo a validar com o advogado. Prazo de guarda das fotos (5 anos é exemplo, J-06).
+- [ ] **Números do retorno.** Exemplos a confirmar: 48 horas para o profissional responder, 7 dias para marcar, 48 horas para o cliente responder "Resolveu?", 12 horas de antecedência para remarcar, 3 dias úteis de mediação, 3 faltas em 90 dias, 3 "não procede" em 6 meses, reserva de 1% da comissão. Tempo para pagar depois de recusado: 10 minutos (exemplo). Validade do valor enviado: 30 minutos (imediato) e 24 horas (agendado, à distância, plano) (exemplos). Classificação 30/90 dias do catálogo a validar com o advogado. Prazo de guarda das fotos (5 anos é exemplo, J-06). Limites da auditoria (exemplos): 24 horas e 7 dias depois de "Sem acordo", 3 trocas de profissional, 2 novos valores recusados, 2 sugestões de horário, pausa do plano de 60 dias, volta da pausa em 7 e 30 dias, limites de SMS, cartão e pedidos (RN-237 a RN-248).
 - [ ] **Seus profissionais (adiado).** Lista em Atividade com quem já atendeu o cliente e botão Chamar (RN-83). Saiu do app em 24/11/2026; decidir depois se volta e como.
 - [ ] **Último valor sem resposta.** O que acontece quando o cliente não confirma nem recusa o 3º valor. Sugestão: depois de um prazo (ex.: 10 minutos) vale como recusa e o pedido volta à busca (RN-300).
 - [ ] **Mais lugares para "Tornar fixa" (adiado).** Ideias avaliadas e guardadas: sugestão "Quer a [nome] sempre?" depois de avaliar com 4 ou 5 estrelas; dica "Chama a [nome] sempre?" no chat a partir do 2º serviço. Testar a de depois de avaliar primeiro se poucos clientes criarem plano.
@@ -412,13 +438,13 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-06 | Preço abusivo, principalmente em emergência. | Adiado · decidir depois | — |
 | P-07 | Material comprado no meio do serviço, fora do combinado. | A resolver | — |
 | P-08 | Cartão recusado na reserva, durante o serviço, na cobrança final e no plano fixo. | Resolvido | RN-146, RN-222 a RN-226 |
-| P-09 | Avaliações falsas para inflar a nota. | A resolver | — |
+| P-09 | Avaliações falsas para inflar a nota. | Resolvido | RN-249 |
 | P-10 | Fraude no cadastro do profissional (documento de outra pessoa). | A resolver | — |
 | P-11 | Sem internet no local para tocar "Concluir serviço". | A resolver | — |
 | P-12 | Serviço que leva vários dias, semanas ou meses. | Resolvido | RN-42, RN-87 a RN-91 |
 | P-13 | Profissional à distância: serviço que não precisa de visita, em que a localização não importa. | Resolvido | RN-92 a RN-98 |
 | P-14 | Serviço à distância malfeito: o cliente não gosta da entrega e quer o dinheiro de volta. | Resolvido | RN-96, RN-99 a RN-106 |
-| P-15 | Menor de idade usando o app, como cliente ou profissional. | Resolvido em parte · "só menor em casa" para depois | RN-110 a RN-112, RN-114 |
+| P-15 | Menor de idade usando o app, como cliente ou profissional. | Resolvido · abuso do "só menor em casa" junto com a P-42 | RN-110 a RN-112, RN-114, RN-234 |
 | P-16 | Envio de arquivos maliciosos ou +18, inclusive venda ou troca de material de menores. | Resolvido | RN-119 a RN-124 |
 | P-17 | Conta suspensa com atendimentos ainda em andamento. | Resolvido | RN-128 a RN-132 |
 | P-18 | Denunciar profissional, cliente e mensagem. | Resolvido | RN-133 a RN-135 |
@@ -443,11 +469,23 @@ Situações que podem dar errado no uso real do app. Resolvemos um por vez, em o
 | P-37 | Cards de valor sem validade e presos no fim do chat; card de retorno fora do padrão. | Resolvido | RN-229 a RN-231 |
 | P-38 | "Retorno · sem custo" solto no card, links soltos em Ganhos e card do plano em Concluídos mal resolvido. | Resolvido | RN-207, RN-232, RN-233 |
 | P-100 | Depois das 3 rodadas, o cliente não tem como recusar o valor. | Resolvido | RN-27, RN-300, RN-301 |
+| P-39 | Loops sem fim: negociação repetida, trocas de profissional, novos valores, horários do retorno, pausas e contestações (auditoria de 26/11/2026). | Resolvido | RN-188, RN-190, RN-191, RN-237 a RN-244, RN-248 |
+| P-40 | Contradições e casos sem regra da auditoria: texto do plano, "o Tatu nunca paga", prazo do retorno com pedido aberto, suspenso com retorno, só menor em casa, exclusão com dívida, avaliação por atendimento, fuso, provas e números ajustáveis. | Resolvido | RN-15, RN-183, RN-211, RN-234 a RN-236, RN-245 a RN-247, RN-249 |
+| P-41 | O limite de 2 visitas conta visitas e não dias, e não define a semana; o retorno pode virar a 3ª visita e ficar bloqueado. | A resolver · telas | RN-145 |
+| P-42 | "Cliente não apareceu" (e "só menor em casa") sem defesa do cliente. | A resolver · telas | RN-81, RN-234 |
+| P-43 | A reserva no cartão vence antes do serviço marcado para muitos dias depois. | A resolver · telas | RN-30 |
+| P-44 | Pagamento por intermediador autorizado (split), Banco Central, tributos e margem real (taxa, antecipação, parcelamento). | A resolver · advogado e contador (J-09, J-10) | RN-29 a RN-36 |
+| P-45 | Cartão roubado, profissional laranja, chargeback (quem paga) e reserva pequena. | A resolver | RN-194, RN-196 |
+| P-46 | Profissões reguladas pagando comissão (OAB, saúde) e profissões com pessoas vulneráveis sem antecedentes. | A resolver · advogado (J-11, J-12) | RN-156 a RN-160 |
+| P-47 | Denúncia usada como arma; suspensão na hora e "não era mulher". | A resolver · advogado (J-13) | RN-56, RN-60 |
+| P-48 | Escopo do lançamento grande demais e suporte manual para uma pessoa só. | A resolver | — |
+| P-49 | Conta roubada (troca de chip), sem recuperação de conta definida. | A resolver | RN-02 |
 
 ## 12. Histórico de mudanças
 
 | Data | Regras | Mudança |
 | --- | --- | --- |
+| 26/11/2026 | RN-15, RN-22, RN-27, RN-32, RN-41, RN-48, RN-65, RN-147, RN-148, RN-183, RN-186, RN-188, RN-190, RN-191, RN-211, RN-213, RN-229, RN-234 a RN-249 | Auditoria de ponta a ponta (`docs/auditoria-ponta-a-ponta.md`): limites contra loops, casos sem regra e contradições corrigidas. "O Tatu nunca paga" vira "só no refazer do retorno". Novos problemas P-39 a P-49. |
 | 26/11/2026 | RN-207, RN-232, RN-233 | Rodapé verde no card do retorno; "Ver todos" e ⓘ da taxa em Ganhos; card do plano em Concluídos com as visitas do mês. |
 | 26/11/2026 | RN-27, RN-300, RN-301 | Recusa do 3º valor renumerada para RN-300/RN-301 e P-100 (números altos, para não colidir de novo com as regras novas). |
 | 26/11/2026 | RN-221 | Borda: uma volta só ao abrir o app, com o brilho mais largo e branco no centro (pedido do Gustavo). |

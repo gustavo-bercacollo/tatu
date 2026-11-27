@@ -137,16 +137,19 @@ void main() {
     await _abrir(t, const HomeProfissionalPage());
     expect(find.text('Conta pausada'), findsOneWidget);
     expect(
-      find.text('5 das últimas 8 visitas terminaram sem serviço. '
-          'Fale com o suporte para voltar.'),
+      find.text('5 das últimas 8 visitas terminaram sem serviço.'),
       findsOneWidget,
     );
     await t.tap(find.text('Ficar online'));
     await t.pump();
     expect(profissional.online, isFalse);
-    await t.tap(find.text('Falar com o suporte'));
-    await t.pumpAndSettle();
-    expect(find.text('Sobre o que é?'), findsOneWidget);
+    // RN-244: sem "Falar com o suporte"; "Entendi" e a conta volta
+    // sozinha (1ª pausa: 7 dias).
+    expect(find.text('Falar com o suporte'), findsNothing);
+    expect(find.textContaining('Sua conta volta sozinha em'), findsOneWidget);
+    await t.tap(find.text('Entendi'));
+    await t.pump();
+    expect(find.text('Entendi'), findsNothing);
   });
 
   testWidgets('Cliente: serviço concluído e contestação', (t) async {

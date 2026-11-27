@@ -1,6 +1,8 @@
 import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 
+import 'limites.dart';
+import 'base_tecnica.dart';
 import 'catalogo_servicos.dart';
 import 'codigo_porta.dart';
 import 'plano_fixo.dart' show diaMes, diaLongo, diaCurto;
@@ -133,10 +135,9 @@ abstract final class RegrasRetorno {
     List<DateTime> naoProcede,
     DateTime agora,
   ) {
-    final recentes = naoProcede
-        .where((d) => agora.difference(d) < janelaNaoProcede)
-        .toList()
-      ..sort();
+    final recentes =
+        naoProcede.where((d) => agora.difference(d) < janelaNaoProcede).toList()
+          ..sort();
     if (recentes.length < naoProcedeLimite) return null;
     final ate = recentes.last.add(semRetornoMediado);
     return agora.isBefore(ate) ? ate : null;
@@ -161,8 +162,18 @@ abstract final class RegrasRetorno {
 }
 
 const _mesesCurtos = [
-  'jan', 'fev', 'mar', 'abr', 'mai', 'jun',
-  'jul', 'ago', 'set', 'out', 'nov', 'dez',
+  'jan',
+  'fev',
+  'mar',
+  'abr',
+  'mai',
+  'jun',
+  'jul',
+  'ago',
+  'set',
+  'out',
+  'nov',
+  'dez',
 ];
 
 /// "02 fev" (dia com dois dígitos, como no recibo e no cartão do retorno).
@@ -350,12 +361,19 @@ enum DecisaoMediacao {
   };
 }
 
-/// RN-190: os 3 casos que vão para a mediação humana.
+/// RN-190: os 4 casos que vão para a mediação humana.
 enum MotivoMediacao {
   contestouRecusa,
   continuouProblema,
   contestouOutroProblema,
+
+  /// RN-243: sem acordo de horário e o cliente pediu ajuda.
+  semAcordoHorario,
 }
+
+/// RN-186/RN-188: este motivo de recusa não vai para a mediação: dispara
+/// a resolução automática.
+const motivoNaoConsigoIr = 'Não consigo ir até lá';
 
 /// Em que ponto está o pedido de retorno.
 enum SituacaoRetorno {
@@ -382,6 +400,10 @@ enum SituacaoRetorno {
 
   /// RN-190/RN-191: na mediação do Tatu.
   emMediacao,
+
+  /// RN-243: o horário não fechou ("Não posso" ou o cliente sem
+  /// responder até o fim do prazo). Ninguém leva falta.
+  semAcordoHorario,
 
   /// Encerrado (resolveu, "Ok, entendi", decisão do Tatu, prazos).
   encerrado,
@@ -424,7 +446,17 @@ class PedidoRevisao {
 }
 
 /// RN-188: por que a resolução automática aconteceu.
-enum FalhaProfissional { naoRespondeu, naoMarcou, naoVeio }
+enum FalhaProfissional {
+  naoRespondeu,
+  naoMarcou,
+  naoVeio,
+
+  /// RN-186/RN-188: recusou com "Não consigo ir até lá".
+  naoConsegueIr,
+
+  /// RN-235: suspenso ou banido com o retorno aberto.
+  suspenso,
+}
 
 /// RN-194: o pacote de provas de um serviço, guardado sozinho para
 /// responder a contestações no cartão (chargeback).
@@ -470,7 +502,39 @@ class PedidoRetorno {
     this.pagamento = 'Visa 4242',
     List<OpcaoHorario>? horarios,
     this.urgente = false,
+    this.deRefazer = false,
   }) : horarios = horarios ?? [];
+
+  /// RN-191: atendimento criado por "refazer com outro profissional" na
+  /// mediação. Se o retorno dele chegar à mediação, essa opção não
+  /// aparece de novo.
+  final bool deRefazer;
+
+  /// RN-191: as decisões que a mediação pode tomar neste pedido.
+  List<DecisaoMediacao> get decisoesPossiveis => [
+    for (final d in DecisaoMediacao.values)
+      if (!(deRefazer && d == DecisaoMediacao.refazerComOutro)) d,
+  ];
+
+  /// RN-243: vezes que o profissional sugeriu outro horário e que o
+  /// cliente tocou em "Escolher outro".
+  int sugestoes = 0;
+  int escolheuOutro = 0;
+
+  /// RN-243: o profissional ainda pode sugerir outro horário?
+  bool get podeSugerir => sugestoes < Limites.sugestoesHorario;
+
+  /// RN-243: o cliente ainda pode "Escolher outro"? Na 2ª sugestão, só
+  /// "Confirmar horário" e "Não posso".
+  bool get podeEscolherOutro =>
+      escolheuOutro < Limites.escolherOutroHorario &&
+      sugestoes < Limites.sugestoesHorario;
+
+  /// RN-190/RN-243: histórico dos horários (vai no resumo da mediação).
+  final historicoHorarios = <String>[];
+
+  /// RN-188: a recusa com "Não consigo ir até lá" contou falta?
+  bool contouFalta = true;
 
   /// Número do serviço ("#TT-48213").
   final String servico;
@@ -577,7 +641,8 @@ class PedidoRetorno {
 
   /// RN-198: decisão automática deste retorno (nula = nenhuma).
   DecisaoAutomatica? get decisaoAutomatica => switch (situacao) {
-    SituacaoRetorno.resolvidoAutomatico => DecisaoAutomatica.devolucaoAutomatica,
+    SituacaoRetorno.resolvidoAutomatico =>
+      DecisaoAutomatica.devolucaoAutomatica,
     SituacaoRetorno.cumpridoAusente => DecisaoAutomatica.cumpridoAusente,
     SituacaoRetorno.encerrado when resolvidoSemResposta =>
       DecisaoAutomatica.resolvidoSemResposta,
@@ -595,7 +660,9 @@ class PedidoRetorno {
   /// RN-186: até quando o profissional responde.
   DateTime get respondaAte => pedidoEm.add(RegrasRetorno.respostaProfissional);
 
-  /// RN-185: retorno aberto prende os repasses do profissional.
+  /// RN-185: retorno aberto prende os repasses do profissional. RN-183:
+  /// pedido aberto segue até terminar (mesmo na mediação), ainda que o
+  /// prazo de retorno do serviço passe.
   bool get aberto =>
       situacao != SituacaoRetorno.encerrado &&
       situacao != SituacaoRetorno.resolvidoAutomatico &&
@@ -780,6 +847,9 @@ class RetornosRepo extends ChangeNotifier {
         (r.semHorario && quando != null);
     if (!pode) return false;
     if (quando != null && quando.isAfter(r.marcarAte)) return false;
+    if (quando != null) {
+      r.historicoHorarios.add('Profissional marcou: ${quandoRetorno(quando)}');
+    }
     r
       ..situacao = SituacaoRetorno.aceito
       ..marcadoPara = quando
@@ -796,6 +866,12 @@ class RetornosRepo extends ChangeNotifier {
     if (!pode || quando.isAfter(r.marcarAte) || !quando.isAfter(hoje)) {
       return false;
     }
+    // RN-243: no máximo 2 sugestões.
+    if (!r.podeSugerir) return false;
+    r.sugestoes++;
+    r.historicoHorarios.add(
+      'Profissional sugeriu (${r.sugestoes}ª): ${quandoRetorno(quando)}',
+    );
     r
       ..situacao = SituacaoRetorno.aceito
       ..marcadoPara = null
@@ -808,6 +884,7 @@ class RetornosRepo extends ChangeNotifier {
   bool confirmarSugerido(PedidoRetorno r) {
     final s = r.sugerido;
     if (!r.semHorario || s == null) return false;
+    r.historicoHorarios.add('Cliente confirmou: ${quandoRetorno(s)}');
     r
       ..marcadoPara = s
       ..sugerido = null;
@@ -823,6 +900,15 @@ class RetornosRepo extends ChangeNotifier {
     bool urgente = false,
   }) {
     if (!r.semHorario || horarios.isEmpty) return false;
+    // RN-243: "Escolher outro" uma vez só.
+    if (r.sugerido != null) {
+      if (!r.podeEscolherOutro) return false;
+      r.escolheuOutro++;
+    }
+    r.historicoHorarios.add(
+      'Cliente mandou outros horários: '
+      '${horarios.map(textoOpcaoCurto).join(', ')}',
+    );
     r
       ..horarios = horarios.take(RegrasRetorno.maxHorarios).toList()
       ..urgente = urgente
@@ -887,18 +973,58 @@ class RetornosRepo extends ChangeNotifier {
     if (!hoje.isBefore(m)) return const [];
     final devidos = [
       for (final d in RegrasRetorno.lembretes)
-        if (!r.lembretesEnviados.contains(d) &&
-            !hoje.isBefore(m.subtract(d)))
+        if (!r.lembretesEnviados.contains(d) && !hoje.isBefore(m.subtract(d)))
           d,
     ];
     r.lembretesEnviados.addAll(devidos);
     return devidos;
   }
 
-  /// "Recusar": motivo obrigatório.
-  bool recusar(PedidoRetorno r, String motivo, {DateTime? agora}) {
+  /// RN-243: "Não posso" na 2ª sugestão: sem acordo de horário,
+  /// ninguém leva falta.
+  bool naoPosso(PedidoRetorno r) {
+    if (!r.semHorario || r.sugerido == null) return false;
+    r.historicoHorarios.add('Cliente: não posso');
+    r
+      ..situacao = SituacaoRetorno.semAcordoHorario
+      ..sugerido = null;
+    notifyListeners();
+    return true;
+  }
+
+  /// RN-188: quando cada profissional recusou com "Não consigo ir até
+  /// lá" (só conta falta a partir da 2ª vez em 90 dias).
+  final naoConsigoIr = <String, List<DateTime>>{};
+
+  /// "Recusar": motivo obrigatório. RN-186/RN-188: "Não consigo ir até
+  /// lá" não vai para a mediação: resolve sozinho a favor do cliente.
+  bool recusar(
+    PedidoRetorno r,
+    String motivo, {
+    DateTime? agora,
+    double Function(String profissional)? presos,
+    void Function(String profissional)? falta,
+  }) {
     if (motivo.trim().isEmpty || r.situacao != SituacaoRetorno.aguardando) {
       return false;
+    }
+    if (motivo == motivoNaoConsigoIr) {
+      final hoje = agora ?? clock.now();
+      final vezes = (naoConsigoIr[r.profissional] ??= [])..add(hoje);
+      r
+        ..motivoRecusa = motivo
+        ..contouFalta =
+            Limites.naJanela(vezes, Limites.janelaNaoConsigoIr, hoje) >=
+            Limites.naoConsigoIrFaltaAPartirDe;
+      _resolverSozinho(
+        r,
+        FalhaProfissional.naoConsegueIr,
+        presos,
+        r.contouFalta ? falta : null,
+        agora: hoje,
+      );
+      notifyListeners();
+      return true;
     }
     r
       ..situacao = SituacaoRetorno.recusado
@@ -1008,7 +1134,19 @@ class RetornosRepo extends ChangeNotifier {
             agora: hoje,
           );
           mudou = true;
-        // RN-213: sem horário combinado até 7 dias depois do pedido.
+        // RN-243: o profissional sugeriu e o cliente não respondeu até o
+        // fim do prazo: sem acordo de horário, ninguém leva falta.
+        case SituacaoRetorno.aceito
+            when r.marcadoPara == null &&
+                r.sugerido != null &&
+                hoje.isAfter(r.marcarAte):
+          r
+            ..historicoHorarios.add('Cliente não respondeu até o prazo')
+            ..situacao = SituacaoRetorno.semAcordoHorario
+            ..sugerido = null;
+          mudou = true;
+        // RN-213/RN-188: o profissional não marcou nem sugeriu horário até
+        // 7 dias depois do pedido.
         case SituacaoRetorno.aceito
             when r.marcadoPara == null && hoje.isAfter(r.marcarAte):
           _resolverSozinho(
@@ -1052,6 +1190,40 @@ class RetornosRepo extends ChangeNotifier {
     if (mudou) notifyListeners();
   }
 
+  /// RN-235: profissional suspenso ou banido: cada retorno aberto dele
+  /// vai na hora para a resolução automática (sem esperar as 48 horas).
+  /// Conta só pausada continua fazendo o retorno (não chama isto).
+  /// Devolve os retornos resolvidos.
+  List<PedidoRetorno> profissionalSuspenso(
+    String profissional, {
+    DateTime? agora,
+    double Function(String profissional)? presos,
+  }) {
+    final resolvidos = <PedidoRetorno>[];
+    for (final r in retornos.where((r) => r.profissional == profissional)) {
+      final cabe = switch (r.situacao) {
+        SituacaoRetorno.aguardando ||
+        SituacaoRetorno.aceito ||
+        SituacaoRetorno.outroProblema ||
+        SituacaoRetorno.recusado ||
+        SituacaoRetorno.semAcordoHorario => true,
+        _ => false,
+      };
+      if (!cabe) continue;
+      r.contouFalta = false;
+      _resolverSozinho(
+        r,
+        FalhaProfissional.suspenso,
+        presos,
+        null,
+        agora: agora,
+      );
+      resolvidos.add(r);
+    }
+    if (resolvidos.isNotEmpty) notifyListeners();
+    return resolvidos;
+  }
+
   /// RN-188: o profissional não veio (sem código na porta).
   void naoVeio(
     PedidoRetorno r, {
@@ -1070,6 +1242,11 @@ class RetornosRepo extends ChangeNotifier {
     DateTime? agora,
   }) {
     r.decididoEm = agora ?? clock.now();
+    registroAtendimentos.registrar(
+      r.servico,
+      'retorno resolvido sozinho (${motivo.name})',
+      quem: 'sistema',
+    );
     // Os presos deste próprio retorno contam (RN-185).
     final saldo = presos?.call(r.profissional) ?? presosDe(r.profissional);
     r

@@ -744,6 +744,17 @@ Future<void> tornarFixo(
     }
     return;
   }
+  // RN-238: depois de "Sem acordo" no plano, nova proposta à mesma pessoa
+  // só depois do prazo (os avulsos continuam).
+  final libera = planosFixos.proporDeNovoEm(profissional);
+  if (libera != null) {
+    return avisar(
+      context,
+      titulo: 'Proposta recusada há pouco',
+      texto: 'Você pode propor de novo a partir de ${diaMes(libera)}.',
+      icone: TablerIcons.calendar,
+    );
+  }
   final e = await escolherPlano(
     context,
     nome: profissional.split(' ').first,

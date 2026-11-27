@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
 
+import 'base_tecnica.dart';
+
+import 'limites_uso.dart';
 import 'pagamento.dart';
 
 @immutable
@@ -56,19 +59,31 @@ class PagamentosRepo extends ChangeNotifier {
   bool get temPendencia => pendencia != null;
 
   /// RN-222/RN-223: o banco aprova a reserva no cartão?
-  bool reservar(Cartao? c) =>
-      c != null && !recusarReservas && c.final4 != '0341';
+  /// RN-248: com 3 cartões recusados em 24 horas, só Pix até o dia
+  /// seguinte (o cartão nem é tentado).
+  bool reservar(Cartao? c) {
+    if (limitesUso.soPix) return false;
+    final ok = c != null && !recusarReservas && c.final4 != '0341';
+    if (!ok && c != null) limitesUso.cartaoRecusado();
+    return ok;
+  }
 
   /// RN-226: cobra ao concluir (a reserva já estava separada). Falha
   /// técnica: tenta de novo sozinho; o profissional recebe de qualquer
   /// jeito. Só se todas falharem, fica a pendência. Devolve se cobrou.
-  bool cobrarAoConcluir(double valor) {
-    for (var i = 0; i < RegrasPagamento.tentativasCobranca; i++) {
-      if (!falharCobranca) return true;
+  /// [chave]: chave única da cobrança. Tentar de novo com a mesma chave
+  /// nunca cobra duas vezes (devolve o resultado da 1ª vez).
+  bool cobrarAoConcluir(double valor, {String? chave}) {
+    bool cobrar() {
+      for (var i = 0; i < RegrasPagamento.tentativasCobranca; i++) {
+        if (!falharCobranca) return true;
+      }
+      pendencia = (pendencia ?? 0) + valor;
+      notifyListeners();
+      return false;
     }
-    pendencia = (pendencia ?? 0) + valor;
-    notifyListeners();
-    return false;
+
+    return chave == null ? cobrar() : idempotencia.executar(chave, cobrar);
   }
 
   /// RN-226: o cliente atualizou o cartão: cobra a pendência de novo.

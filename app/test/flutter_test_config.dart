@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tatu/data/base_tecnica.dart';
 import 'package:tatu/data/catalogo_servicos.dart';
 import 'package:tatu/data/icones_profissoes.dart';
+import 'package:tatu/data/limites.dart';
+import 'package:tatu/data/limites_uso.dart';
 import 'package:tatu/data/retorno.dart';
 import 'package:tatu/features/cliente/plano_fixo/plano_fixo.dart';
 import 'package:tatu/features/cliente/retorno/retorno_cliente.dart';
@@ -29,5 +32,13 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   // RN-222/RN-224: pagamento garantido na hora e sem Pix automático.
   simularPagamentoGarantido = null;
   simularPixPago = null;
+  // RN-247/RN-248: números de exemplo e contadores zerados em cada teste.
+  setUp(() {
+    Limites.restaurar();
+    limitesUso.restaurar();
+    aceitesChamado.restaurar();
+    idempotencia.restaurar();
+    registroAtendimentos.limparParaTeste();
+  });
   await testMain();
 }

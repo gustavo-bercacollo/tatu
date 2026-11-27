@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:clock/clock.dart';
 
 import 'codigo_porta.dart';
+import 'base_tecnica.dart';
+import 'limites.dart';
 import 'regras_distancia.dart';
 import 'servico_profissional.dart';
 import 'suspensao.dart';
@@ -50,6 +52,47 @@ class AtendimentoProfissionalRepo extends ChangeNotifier {
   /// RN-99: prévias protegidas enviadas (sem limite).
   int previas = 0;
 
+  /// RN-240: novo valor durante o serviço esperando o cliente (só um por
+  /// vez) e quantos o cliente já recusou neste atendimento.
+  bool novoValorPendente = false;
+  int novosValoresRecusados = 0;
+
+  /// RN-240: "Novo valor" ativo? (Não vale para serviço novo depois de
+  /// concluído, RN-181: esse começa outro atendimento.)
+  bool get podeEnviarNovoValor =>
+      !novoValorPendente &&
+      novosValoresRecusados < Limites.novosValoresRecusados;
+
+  /// RN-240: texto do "Novo valor" desativado (nulo = ativo ou só
+  /// esperando a resposta).
+  String? avisoNovoValor({required String cliente, required bool feminino}) =>
+      novosValoresRecusados < Limites.novosValoresRecusados
+      ? null
+      : '${feminino ? 'A' : 'O'} $cliente recusou '
+            '$novosValoresRecusados valores. Conclua o combinado ou encerre '
+            'cobrando a visita.';
+
+  /// RN-32/RN-240: manda um novo valor no meio do serviço.
+  bool enviarNovoValor() {
+    if (!podeEnviarNovoValor) return false;
+    novoValorPendente = true;
+    registroAtendimentos.registrar(
+      servico?.cliente ?? chamado?.cliente ?? '',
+      'novo valor',
+      quem: 'profissional',
+    );
+    notifyListeners();
+    return true;
+  }
+
+  /// RN-32/RN-240: o cliente respondeu o novo valor.
+  void respostaNovoValor({required bool aceito}) {
+    if (!novoValorPendente) return;
+    novoValorPendente = false;
+    if (!aceito) novosValoresRecusados++;
+    notifyListeners();
+  }
+
   /// RN-101: ainda pode mandar entrega?
   bool get podeEntregar => entregas < RegrasDistancia.maxEntregas;
 
@@ -87,7 +130,15 @@ class AtendimentoProfissionalRepo extends ChangeNotifier {
     final c = codigo;
     if (c == null) return ResultadoCodigo.bloqueado;
     final r = c.conferir(digitado);
-    if (r == ResultadoCodigo.certo) iniciar(agora ?? clock.now());
+    if (r == ResultadoCodigo.certo) {
+      iniciar(agora ?? clock.now());
+      // RN-246: o código na porta entra na linha do tempo.
+      registroAtendimentos.registrar(
+        servico?.cliente ?? chamado?.cliente ?? '',
+        'código',
+        quem: 'profissional',
+      );
+    }
     notifyListeners();
     return r;
   }
@@ -100,7 +151,9 @@ class AtendimentoProfissionalRepo extends ChangeNotifier {
   /// caminho").
   PontoAtendimento get ponto => switch (etapa) {
     EtapaAtendimento.combinando =>
-      servico == null ? PontoAtendimento.combinando : PontoAtendimento.confirmado,
+      servico == null
+          ? PontoAtendimento.combinando
+          : PontoAtendimento.confirmado,
     EtapaAtendimento.aCaminho => PontoAtendimento.aCaminho,
     EtapaAtendimento.noLocal => PontoAtendimento.noLocal,
     EtapaAtendimento.emServico => PontoAtendimento.emServico,
@@ -172,6 +225,8 @@ class AtendimentoProfissionalRepo extends ChangeNotifier {
     inicio = null;
     entregas = 0;
     previas = 0;
+    novoValorPendente = false;
+    novosValoresRecusados = 0;
     codigo = null;
     posicoesEnviadas = 0;
   }

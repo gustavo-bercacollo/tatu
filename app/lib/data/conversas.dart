@@ -1,10 +1,14 @@
 import 'package:clock/clock.dart';
+
 import '../shared/formatadores.dart';
+
 import 'package:flutter/foundation.dart';
 
 import 'conta.dart';
+import 'base_tecnica.dart';
 import 'plano_fixo.dart' show diaMes;
 import 'regras_distancia.dart';
+import 'limites.dart';
 import 'regras_valor.dart';
 import 'suspensao.dart';
 import 'ligacao.dart';
@@ -238,6 +242,12 @@ class ValorProposta {
   /// RN-229: quando expirou (nulo = não expirou).
   DateTime? expiradoEm;
 
+  /// RN-237: vezes que "Pedir de novo" foi tocado neste card.
+  int pedidosDeNovo = 0;
+
+  /// RN-237: já usou o "Pedir de novo" deste card.
+  bool get pedidoDeNovo => pedidosDeNovo >= Limites.pedirDeNovoPorCard;
+
   /// RN-230: depois de quantas mensagens ele foi enviado (nulo = ainda
   /// não fixado; o chat fixa na primeira vez que mostra).
   int? ancora;
@@ -291,7 +301,7 @@ class Conversa {
     this.concluidoEm,
     this.valor,
     this.distancia = false,
-  // ignore: prefer_initializing_formals (parâmetro com nome não pode ser privado)
+    // ignore: prefer_initializing_formals (parâmetro com nome não pode ser privado)
   }) : _emAndamento = emAndamento;
 
   /// RN-129 a RN-132: o Tatu encerrou este atendimento porque uma das
@@ -392,6 +402,7 @@ class ConversasRepo extends ChangeNotifier {
   Iterable<Conversa> get anteriores => conversas.where((c) => !c.emAndamento);
 
   void restaurar() {
+    _semAcordoEm.clear();
     conversas = [
       Conversa(
         nome: 'Luiza Souza',
@@ -490,7 +501,11 @@ class ConversasRepo extends ChangeNotifier {
         // RN-179: segue o fluxo normal (valor, confirmação, código…).
         // Protótipo: o valor já chega enviado.
         ..valor = ValorProposta(visita: 40, servico: 110);
-      conversas = [anterior, for (final c in conversas) if (c != anterior) c];
+      conversas = [
+        anterior,
+        for (final c in conversas)
+          if (c != anterior) c,
+      ];
       notifyListeners();
       return anterior;
     }
@@ -505,7 +520,11 @@ class ConversasRepo extends ChangeNotifier {
           hora: horaAgora(),
         ),
       );
-      conversas = [atual, for (final c in conversas) if (c != atual) c];
+      conversas = [
+        atual,
+        for (final c in conversas)
+          if (c != atual) c,
+      ];
       notifyListeners();
       return atual;
     }
@@ -542,9 +561,23 @@ class ConversasRepo extends ChangeNotifier {
 
   /// RN-300: o cliente recusou o 3º valor: nada é cobrado e a conversa
   /// fica só para leitura.
-  void recusarValor(Conversa c) {
+  void recusarValor(Conversa c, {DateTime? agora}) {
     c.semAcordo = true;
+    registroAtendimentos.registrar(c.nome, 'sem acordo', quem: 'cliente');
+    _semAcordoEm[c.nome] = agora ?? clock.now();
     notifyListeners();
+  }
+
+  /// RN-238: quando houve "Sem acordo" com cada profissional.
+  final _semAcordoEm = <String, DateTime>{};
+
+  /// RN-238: depois de "Sem acordo", "Chamar a [nome]" só volta nesta
+  /// data (nulo = já pode chamar).
+  DateTime? chamarDeNovoEm(String profissional, {DateTime? agora}) {
+    final em = _semAcordoEm[profissional];
+    if (em == null) return null;
+    final libera = em.add(Limites.esperaSemAcordo);
+    return libera.isAfter(agora ?? clock.now()) ? libera : null;
   }
 
   /// O cliente confirma o valor: fica reservado e só é cobrado no fim.
@@ -559,7 +592,12 @@ class ConversasRepo extends ChangeNotifier {
     if (v.pagamento?.expirado ?? false) return false;
     if (v.situacao == SituacaoValor.expirado) return false;
     final usado = cartao ?? pagamentos.padrao;
-    if (!pix && !pagamentos.reservar(usado)) {
+    // Reserva com chave única: confirmar de novo não reserva duas vezes.
+    final chave =
+        'reserva:${c.nome}:${v.rodada}:'
+        '${v.enviadoEm.microsecondsSinceEpoch}:${usado?.id}';
+    if (!pix &&
+        !idempotencia.executar(chave, () => pagamentos.reservar(usado))) {
       v.pagamento = PagamentoValor(
         situacao: SituacaoPagamento.recusado,
         desde: v.pagamento?.desde,
@@ -903,13 +941,18 @@ class ConversasRepo extends ChangeNotifier {
 
   /// RN-229: "Pedir de novo": avisa o profissional que o cliente quer um
   /// novo valor.
-  void pedirValorDeNovo(Conversa c) {
+  /// RN-237: uma vez por card; de novo não faz nada (devolve falso).
+  bool pedirValorDeNovo(Conversa c) {
+    final v = c.valor;
+    if (v == null || v.pedidoDeNovo) return false;
+    v.pedidosDeNovo++;
     c.mensagens.add(
       MensagemChat.marcador(
         'Você pediu um novo valor ${c.feminino ? 'à' : 'ao'} ${c.primeiroNome}',
       ),
     );
     notifyListeners();
+    return true;
   }
 
   /// Protótipo: o profissional manda o valor de novo.

@@ -215,30 +215,50 @@ void main() {
     });
 
     test('confirmadas contam para o denunciado; falsas para quem denunciou', () {
+      // RN-241: cada uma é analisada antes da próxima (repetida em
+      // análise vira uma só).
       final a = denuncias.denunciarPessoa(
         denunciante: 'Ana',
         denunciado: 'Luiza',
         motivo: 'Golpe ou pagamento por fora',
       );
+      denuncias.analisar(a, AnaliseDenuncia.confirmada);
       final b = denuncias.denunciarPessoa(
         denunciante: 'Ana',
         denunciado: 'Luiza',
         motivo: 'Perfil falso',
       );
+      denuncias.analisar(b, AnaliseDenuncia.falsa);
       final c = denuncias.denunciarPessoa(
         denunciante: 'Ana',
         denunciado: 'Luiza',
         motivo: 'Outro motivo',
       );
       denuncias
-        ..analisar(a, AnaliseDenuncia.confirmada)
-        ..analisar(b, AnaliseDenuncia.falsa)
         ..analisar(c, AnaliseDenuncia.naoConfirmada)
         // Analisar de novo não conta duas vezes.
         ..analisar(a, AnaliseDenuncia.confirmada);
       expect(denuncias.confirmadas, {'Luiza': 1});
       expect(denuncias.falsas, {'Ana': 1});
     });
+  });
+
+  test('RN-241: denúncia repetida em análise vira uma só', () {
+    final a = denuncias.denunciarPessoa(
+      denunciante: 'Ana',
+      denunciado: 'Luiza',
+      motivo: 'Perfil falso',
+    );
+    final b = denuncias.denunciarPessoa(
+      denunciante: 'Ana',
+      denunciado: 'Luiza',
+      motivo: 'Outro motivo',
+    );
+    expect(identical(a, b), isTrue);
+    expect(
+      denuncias.jaDenunciou(denunciante: 'Ana', denunciado: 'Luiza'),
+      same(a),
+    );
   });
 
   testWidgets('Menu do chat tem "Ver perfil" e abre o perfil', (t) async {

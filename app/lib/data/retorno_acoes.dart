@@ -1,9 +1,11 @@
 import 'package:clock/clock.dart';
 
 import '../shared/formatadores.dart';
+import 'base_tecnica.dart';
 import 'canal_tatu.dart';
 import 'conta.dart';
 import 'ganhos.dart';
+import 'limites.dart';
 import 'profissional.dart';
 import 'retorno.dart';
 
@@ -33,9 +35,7 @@ void faltaNoRetorno(String nome) {
 
 /// RN-188: confere os prazos (48 h, 7 dias, não veio, "Resolveu?").
 void conferirPrazosRetorno({DateTime? agora}) {
-  final antes = {
-    for (final r in retornos.retornos) r: r.situacao,
-  };
+  final antes = {for (final r in retornos.retornos) r: r.situacao};
   retornos.conferirPrazos(
     agora: agora,
     presos: saldoPresoDe,
@@ -67,7 +67,8 @@ void _lembrar(PedidoRetorno r, Duration antes, DateTime agora) {
   final resumo = antes >= const Duration(hours: 24)
       ? 'Retorno amanhã'
       : 'Retorno em 1 hora';
-  final id = 'retorno-lembrete-${r.servico}-${m.toIso8601String()}-'
+  final id =
+      'retorno-lembrete-${r.servico}-${m.toIso8601String()}-'
       '${antes.inMinutes}';
   if (_ehOCliente(r.cliente)) {
     canalTatu.cliente.receber(
@@ -109,6 +110,11 @@ MensagemTatu mensagemResolvidoAutomatico(PedidoRetorno r) {
     FalhaProfissional.naoMarcou =>
       'você não marcou o retorno em ${RegrasRetorno.marcarEm.inDays} dias',
     FalhaProfissional.naoVeio => 'você não veio no retorno marcado',
+    // RN-186/RN-188: a recusa por distância resolve sozinha.
+    FalhaProfissional.naoConsegueIr =>
+      'você recusou com “Não consigo ir até lá”',
+    // RN-235: conta suspensa com o retorno aberto.
+    FalhaProfissional.suspenso => 'sua conta foi suspensa',
     _ =>
       'você não respondeu em '
           '${RegrasRetorno.respostaProfissional.inHours} horas',
@@ -130,7 +136,12 @@ MensagemTatu mensagemResolvidoAutomatico(PedidoRetorno r) {
           ? 'Descontada dos seus próximos repasses.'
           : 'Até ${reais(r.valorServico)}, descontado dos seus próximos '
                 'repasses.',
-      rodape: '1 falta registrada',
+      // RN-188: "Não consigo ir" só conta falta a partir da 2ª vez em 90
+      // dias.
+      rodape: r.contouFalta
+          ? '1 falta registrada'
+          : 'Sem falta (1ª vez em '
+                '${Limites.janelaNaoConsigoIr.inDays} dias)',
       rodapeAviso: true,
       automatica: true,
       revisaoServico: r.servico,
@@ -144,6 +155,31 @@ MensagemTatu mensagemResolvidoAutomatico(PedidoRetorno r) {
   );
 }
 
+/// RN-186/RN-188: recusa do profissional. "Não consigo ir até lá" não
+/// vai para a mediação: resolve sozinho a favor do cliente.
+bool recusarRetornoComMotivo(PedidoRetorno r, String motivo) {
+  final ok = retornos.recusar(
+    r,
+    motivo,
+    presos: saldoPresoDe,
+    falta: faltaNoRetorno,
+  );
+  if (ok && r.situacao == SituacaoRetorno.resolvidoAutomatico) {
+    _cobrar(r, RegrasRetorno.devolucao(r.valorServico));
+    _avisarResolvidoAutomatico(r);
+  }
+  return ok;
+}
+
+/// RN-235: profissional suspenso ou banido: os retornos abertos dele
+/// vão na hora para a resolução automática.
+void retornosDoSuspenso(String nome) {
+  for (final r in retornos.profissionalSuspenso(nome, presos: saldoPresoDe)) {
+    _cobrar(r, RegrasRetorno.devolucao(r.valorServico));
+    _avisarResolvidoAutomatico(r);
+  }
+}
+
 /// RN-188: o profissional não apareceu no retorno marcado.
 void naoVeioNoRetorno(PedidoRetorno r) {
   retornos.naoVeio(r, presos: saldoPresoDe, falta: faltaNoRetorno);
@@ -155,6 +191,9 @@ void naoVeioNoRetorno(PedidoRetorno r) {
 /// dívida ligada à conta dele no Tatu. A comissão o Tatu devolve.
 void _cobrar(PedidoRetorno r, Devolucao d) {
   if (!_ehOProfissional(r.profissional) || d.total <= 0) return;
+  // Devolução com chave única: nunca desconta duas vezes.
+  if (idempotencia.jaFeita('devolucao:${r.servico}')) return;
+  idempotencia.executar('devolucao:${r.servico}', () => true);
   final saldo = saldoPresoDe(r.profissional);
   final falta = d.doProfissional - saldo;
   if (falta > 0) profissional.registrarDivida(falta);

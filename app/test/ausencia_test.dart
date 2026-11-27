@@ -140,10 +140,10 @@ void main() {
     await _abrir(t, const HomeClientePage());
     expect(find.text('Conta pausada'), findsOneWidget);
     expect(find.text('3 ausências em 30 dias.'), findsOneWidget);
-    expect(
-      find.text('Fale com o suporte para voltar a pedir.'),
-      findsOneWidget,
-    );
+    // RN-244: 1ª pausa volta sozinha em 7 dias, sem "fale com o suporte".
+    expect(find.textContaining('Sua conta volta sozinha em'), findsOneWidget);
+    expect(find.text('Fale com o suporte para voltar a pedir.'), findsNothing);
+    expect(find.text('Entendi'), findsOneWidget);
     await t.enterText(find.byType(TextField), 'o cano da pia está vazando');
     await t.pump(const Duration(milliseconds: 600));
     final b = t.widget<FilledButton>(

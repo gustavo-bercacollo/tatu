@@ -144,12 +144,120 @@ void main() {
 
     test('sem horário até 7 dias depois do pedido, vale a RN-188', () {
       final r = retornos.pedir(_pedido())!;
-      retornos.sugerirHorario(r, DateTime(2026, 11, 29, 10), agora: _agora);
+      // Aceitou sem marcar nem sugerir horário.
+      retornos.aceitar(r, null, agora: _agora);
       retornos.conferirPrazos(agora: DateTime(2026, 12, 2, 20));
       expect(r.situacao, SituacaoRetorno.aceito);
       retornos.conferirPrazos(agora: DateTime(2026, 12, 3, 8));
       expect(r.situacao, SituacaoRetorno.resolvidoAutomatico);
       expect(r.falha, FalhaProfissional.naoMarcou);
+    });
+
+    test(
+      'RN-243: sugeriu e o cliente não respondeu: sem acordo, sem falta',
+      () {
+        final r = retornos.pedir(_pedido())!;
+        retornos.sugerirHorario(r, DateTime(2026, 11, 29, 10), agora: _agora);
+        retornos.conferirPrazos(agora: DateTime(2026, 12, 3, 8));
+        expect(r.situacao, SituacaoRetorno.semAcordoHorario);
+        expect(r.falha, isNull);
+        expect(r.historicoHorarios, isNotEmpty);
+      },
+    );
+
+    test('RN-243: 2 sugestões, 1 "Escolher outro" e "Não posso"', () {
+      final r = retornos.pedir(_pedido())!;
+      expect(
+        retornos.sugerirHorario(r, DateTime(2026, 11, 28, 10), agora: _agora),
+        isTrue,
+      );
+      expect(r.podeEscolherOutro, isTrue);
+      expect(
+        retornos.novosHorarios(r, [OpcaoHorario(_dia(4), PeriodoDia.tarde)]),
+        isTrue,
+      );
+      expect(
+        retornos.sugerirHorario(r, DateTime(2026, 11, 30, 10), agora: _agora),
+        isTrue,
+      );
+      // Na 2ª sugestão: só "Confirmar horário" e "Não posso".
+      expect(r.podeEscolherOutro, isFalse);
+      expect(r.podeSugerir, isFalse);
+      expect(
+        retornos.novosHorarios(r, [OpcaoHorario(_dia(5), PeriodoDia.tarde)]),
+        isFalse,
+      );
+      expect(retornos.naoPosso(r), isTrue);
+      expect(r.situacao, SituacaoRetorno.semAcordoHorario);
+      // "Pedir ajuda ao Tatu" vira o 4º caso de mediação (RN-190).
+      expect(retornos.mediar(r, MotivoMediacao.semAcordoHorario), isTrue);
+    });
+
+    test('RN-186/RN-188: "Não consigo ir" resolve sozinho; falta na 2ª', () {
+      final r = retornos.pedir(_pedido())!;
+      var faltas = 0;
+      retornos.recusar(
+        r,
+        motivoNaoConsigoIr,
+        agora: _agora,
+        falta: (_) => faltas++,
+      );
+      expect(r.situacao, SituacaoRetorno.resolvidoAutomatico);
+      expect(r.falha, FalhaProfissional.naoConsegueIr);
+      expect(r.contouFalta, isFalse);
+      expect(faltas, 0);
+      final r2 = retornos.pedir(
+        PedidoRetorno(
+          servico: '#TT-78',
+          servicoNome: 'Encanador',
+          descricaoServico: 'Torneira',
+          diaServico: '05 nov',
+          profissional: 'Luiza Souza',
+          profissionalFeminino: true,
+          cliente: conta.nomeCompleto,
+          clienteFeminina: true,
+          valorServico: 90,
+          descricao: 'Pinga de novo.',
+          fotos: [FotoProva(tiradaEm: _agora)],
+          pedidoEm: _agora,
+          retido: false,
+        ),
+      )!;
+      retornos.recusar(
+        r2,
+        motivoNaoConsigoIr,
+        agora: _agora.add(const Duration(days: 10)),
+        falta: (_) => faltas++,
+      );
+      expect(r2.contouFalta, isTrue);
+      expect(faltas, 1);
+    });
+
+    test('RN-235: suspenso resolve na hora; RN-191: refazer não refaz', () {
+      final r = retornos.pedir(_pedido())!;
+      final resolvidos = retornos.profissionalSuspenso('Luiza Souza');
+      expect(resolvidos, [r]);
+      expect(r.falha, FalhaProfissional.suspenso);
+      final refazer = PedidoRetorno(
+        servico: '#TT-79',
+        servicoNome: 'Encanador',
+        descricaoServico: 'Refazer',
+        diaServico: '06 nov',
+        profissional: 'Carlos Lima',
+        profissionalFeminino: false,
+        cliente: conta.nomeCompleto,
+        clienteFeminina: true,
+        valorServico: 150,
+        descricao: 'Continua.',
+        fotos: const [],
+        pedidoEm: _agora,
+        retido: false,
+        deRefazer: true,
+      );
+      expect(
+        refazer.decisoesPossiveis,
+        isNot(contains(DecisaoMediacao.refazerComOutro)),
+      );
     });
 
     test('remarcar: uma vez cada lado, até 12 horas antes', () {

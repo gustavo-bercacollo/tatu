@@ -12,8 +12,6 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/ajuda.dart';
-import '../../../data/prazos.dart';
-import '../../../data/regras_distancia.dart';
 import '../../../data/profissional.dart';
 import '../../../data/servico_profissional.dart';
 import '../../../shared/widgets/conta_pausada.dart';
@@ -163,7 +161,9 @@ class _HomeProfissionalPageState extends State<HomeProfissionalPage> {
                       ),
                       if (p.pausada) ...[
                         const SizedBox(height: TatuMedidas.entreItens + 4),
-                        const _ContaPausada(),
+                        // RN-244: não const: o "Entendi" redesenha.
+                        // ignore: prefer_const_constructors
+                        _ContaPausada(),
                         // RN-198: a pausa por faltas é automática.
                         if (p.pausadaPorFaltas && !p.comDivida)
                           Padding(
@@ -239,32 +239,19 @@ class _ContaPausada extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = profissional;
-    return AvisoContaPausada(
-      motivo: p.comDivida
-          // RN-192: a dívida bloqueia chamados até quitar.
-          ? 'Você tem uma dívida ligada à sua conta no Tatu: '
-                '${reais(p.divida)} de retorno. Fale com o suporte para '
-                'quitar.'
-          : p.pausadaPorFaltas
-          // RN-193: 3 faltas no retorno em 90 dias.
-          ? '${p.faltasRecentes} faltas em retornos em '
-                '${RegrasRetorno.janelaFaltas.inDays} dias. '
-                'Fale com o suporte para voltar.'
-          : p.pausadaPorSinais
-          // RN-106: sinais à distância sem entrega.
-          ? '${p.sinaisSemEntregaRecentes} sinais sem entrega em '
-                '${RegrasDistancia.janelaSinais.inDays} dias. '
-                'Fale com o suporte para voltar.'
-          : p.pausadaPorAbandonos
-          // RN-79: 3 abandonos em 30 dias.
-          ? '${p.abandonosRecentes} chamados abandonados em '
-                '${Prazos.janelaAbandonos.inDays} dias. '
-                'Fale com o suporte para voltar.'
-          : '${p.visitasSemServico} das últimas $janelaVisitas '
-                'visitas terminaram sem serviço. Fale com o '
-                'suporte para voltar.',
-      onSuporte: () => abrirSuporte(context, conteudoProfissional),
-    );
+    final pausa = p.pausa;
+    // RN-192: a dívida bloqueia chamados até quitar.
+    if (p.comDivida || pausa == null) {
+      return AvisoContaPausada(
+        motivo:
+            'Você tem uma dívida ligada à sua conta no Tatu: '
+            '${reais(p.divida)} de retorno. Fale com o suporte para quitar.',
+        onSuporte: () => abrirSuporte(context, conteudoProfissional),
+      );
+    }
+    // RN-244: o motivo, quando volta e "Entendi" (sem "fale com o
+    // suporte"; da 3ª pausa em diante, o suporte analisa).
+    return AvisoContaPausada.pausa(pausa, onEntendi: p.entenderPausa);
   }
 }
 

@@ -1,9 +1,11 @@
 import '../../../data/retorno.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
+import '../../../data/atendimento_profissional.dart';
 import '../../../data/conta.dart';
 import '../../../data/ganhos.dart';
 import '../../../data/profissional.dart';
@@ -147,12 +149,23 @@ class DadosContaProfissionalPage extends StatelessWidget {
                   ),
                   _LinhaPerigo(
                     'Excluir conta',
-                    onTap: () => _abrir(
-                      context,
-                      _aReceber > 0
-                          ? const ExcluirComSaldoPage()
-                          : const ExcluirContaPage(),
-                    ),
+                    // RN-15: com serviço em andamento, espera terminar;
+                    // com dinheiro a receber, espera o último Pix.
+                    onTap: () => atendimentoProfissional.ativo
+                        ? avisar(
+                            context,
+                            titulo: 'Agora não dá para excluir',
+                            texto:
+                                'Você tem um serviço em andamento. Termine '
+                                'antes de excluir a conta.',
+                            icone: TablerIcons.alert_triangle,
+                          )
+                        : _abrir(
+                            context,
+                            _aReceber > 0
+                                ? const ExcluirComSaldoPage()
+                                : const ExcluirContaPage(),
+                          ),
                   ),
                 ],
               ),

@@ -4,7 +4,9 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_texto.dart';
+import '../../../data/conversas.dart';
 import '../../../data/enderecos.dart';
+import '../../../data/retorno.dart' show diaHora;
 import '../../../data/pedidos.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
 import '../../../shared/widgets/folha.dart';
@@ -14,6 +16,7 @@ import '../chamar/procurando_page.dart';
 import '../endereco/onde_sheet.dart';
 import '../../../data/plano_fixo.dart';
 import '../plano_fixo/plano_fixo.dart';
+
 import 'package:clock/clock.dart';
 
 /// RN-176: folha "Pedir de novo": chamar o mesmo profissional (se estiver
@@ -39,7 +42,8 @@ Future<void> abrirPedirDeNovo(BuildContext context, PedidoConcluido p) async {
   }
   // RN-145: com a mesma profissional, no máximo 2 visitas por semana no
   // mesmo endereço, somando o plano fixo.
-  if (mesmo && !planosFixos.pedirAvulso(p.profissional, endereco, clock.now())) {
+  if (mesmo &&
+      !planosFixos.pedirAvulso(p.profissional, endereco, clock.now())) {
     return mostrarLimiteSemana(context);
   }
   if (mesmo) {
@@ -76,8 +80,13 @@ class _FolhaPedirDeNovo extends StatefulWidget {
 }
 
 class _FolhaPedirDeNovoState extends State<_FolhaPedirDeNovo> {
-  /// Mesmo profissional (só se estiver online) ou qualquer um.
-  late bool _mesmo = widget.pedido.online;
+  /// RN-238: depois de "Sem acordo", a mesma pessoa só a partir daqui.
+  late final DateTime? _liberaEm = conversas.chamarDeNovoEm(
+    widget.pedido.profissional,
+  );
+
+  /// Mesmo profissional (só se estiver online e liberado) ou qualquer um.
+  late bool _mesmo = widget.pedido.online && _liberaEm == null;
 
   /// RN-144: "Precisa toda semana?" escolhido (borda só ao tocar).
   bool _fixo = false;
@@ -124,10 +133,10 @@ class _FolhaPedirDeNovoState extends State<_FolhaPedirDeNovo> {
             Text('${p.servico} · ${p.descricao}', style: TatuTexto.detalhe),
             const SizedBox(height: TatuMedidas.entreSecoes),
             Opacity(
-              opacity: p.online ? 1 : 0.5,
+              opacity: p.online && _liberaEm == null ? 1 : 0.5,
               child: _Opcao(
                 selecionado: _mesmo && !_fixo,
-                onTap: p.online
+                onTap: p.online && _liberaEm == null
                     ? () => setState(() {
                         _mesmo = true;
                         _fixo = false;
@@ -135,7 +144,12 @@ class _FolhaPedirDeNovoState extends State<_FolhaPedirDeNovo> {
                     : null,
                 icone: _AvatarStatus(nome: p.profissional, online: p.online),
                 titulo: 'Chamar $artigo ${p.primeiroNome}',
-                detalhe: p.online
+                detalhe: _liberaEm != null
+                    // RN-238: desativado por 24 h depois de "Sem acordo".
+                    ? 'Vocês não chegaram a um valor. Você pode chamar '
+                          '$artigo ${p.primeiroNome} de novo a partir de '
+                          '${diaHora(_liberaEm)}.'
+                    : p.online
                     ? 'Online · chega em ${p.chegaEm}'
                     : 'Offline agora',
               ),
@@ -208,9 +222,9 @@ class _FolhaPedirDeNovoState extends State<_FolhaPedirDeNovo> {
             ),
             const SizedBox(height: TatuMedidas.entreItens + 4),
             FilledButton(
-              onPressed: () => Navigator.of(
-                context,
-              ).pop((_mesmo && !_fixo, _endereco, _fixo)),
+              onPressed: () =>
+                  Navigator.of(context)
+                      .pop((_mesmo && !_fixo, _endereco, _fixo)),
               child: Text(
                 _fixo
                     ? tornarFixoTexto

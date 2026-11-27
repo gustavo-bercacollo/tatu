@@ -155,7 +155,9 @@ class _ChatPageState extends State<ChatPage> {
       // pergunta "Resolveu?".
       conferirPrazosRetorno();
       // RN-225: visita suspensa sem resolver no prazo não acontece.
-      planosFixos.conferirSuspensas();
+      planosFixos
+        ..conferirSuspensas()
+        ..conferirPausas();
       // RN-223: o prazo para pagar pode ter vencido com o chat fechado.
       conversas.conferirPagamento(_c);
       _contarPrazoPagamento();
@@ -498,6 +500,10 @@ class _ChatPageState extends State<ChatPage> {
           nome: _c.nome,
           total: v.total,
           em: v.expiradoEm ?? v.valeAte,
+          // RN-237: uma vez por card; depois, "Pedido enviado à [nome]".
+          pedidoEnviado: v.pedidoDeNovo
+              ? 'Pedido enviado ${_c.feminino ? 'à' : 'ao'} ${_c.primeiroNome}'
+              : null,
           onPedirDeNovo: () => _pedirValorDeNovo(),
         ),
       ];
@@ -551,7 +557,7 @@ class _ChatPageState extends State<ChatPage> {
   /// RN-229: "Pedir de novo": avisa o profissional; protótipo: ele manda
   /// o valor de novo.
   void _pedirValorDeNovo() {
-    conversas.pedirValorDeNovo(_c);
+    if (!conversas.pedirValorDeNovo(_c)) return;
     _timer?.cancel();
     _timer = Timer(widget.resposta, () {
       conversas.profissionalReenviaValor(_c);

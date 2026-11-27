@@ -8,6 +8,7 @@ import '../../../core/theme/tatu_medidas.dart';
 import '../../../core/theme/tatu_theme.dart';
 import '../../../data/conversas.dart';
 import '../../../data/encontrados.dart';
+import '../../../data/limites.dart';
 import '../../../data/pedidos.dart';
 import '../../../data/seguranca.dart';
 import '../../../shared/widgets/avatar_iniciais.dart';
@@ -37,7 +38,11 @@ class EncontradoPage extends StatefulWidget {
     this.animar = true,
     this.distancia = false,
     this.descricao = '',
+    this.trocas = 0,
   });
+
+  /// RN-239: quantas vezes o cliente já tocou em "Ver outro" neste pedido.
+  final int trocas;
 
   /// O que a pessoa escreveu (vazio = o nome do serviço).
   final String descricao;
@@ -74,22 +79,19 @@ String _profissao(String servico, bool feminino) =>
     feminino && servico.endsWith('or') ? '${servico}a' : servico;
 
 class _EncontradoPageState extends State<EncontradoPage> {
-  late int _restante =
-      widget.restante ?? EncontradoPage.prazo.inSeconds;
+  late int _restante = widget.restante ?? EncontradoPage.prazo.inSeconds;
   Timer? _timer;
   final _som = SomEncontrado();
 
   /// Onde a fila começou (para "Ver outro" passar por todos uma vez).
   int get _inicio => widget.inicio ?? widget.indice;
 
-  ProfissionalEncontrado get _base =>
-      _fila[widget.indice % _fila.length];
+  ProfissionalEncontrado get _base => _fila[widget.indice % _fila.length];
 
-  List<ProfissionalEncontrado> get _fila =>
-      filaPara(
-        soMulheres: seguranca.preferirMulheres,
-        distancia: widget.distancia,
-      );
+  List<ProfissionalEncontrado> get _fila => filaPara(
+    soMulheres: seguranca.preferirMulheres,
+    distancia: widget.distancia,
+  );
 
   /// A profissão segue o serviço pedido.
   ProfissionalEncontrado get _p => ProfissionalEncontrado(
@@ -129,8 +131,12 @@ class _EncontradoPageState extends State<EncontradoPage> {
     super.dispose();
   }
 
-  /// Próximo da fila; depois do último, volta a procurar.
-  void _proximo() {
+  /// RN-239: ainda pode trocar de profissional neste pedido?
+  bool get _podeTrocar => widget.trocas < Limites.trocasPorPedido;
+
+  /// Próximo da fila; depois do último, volta a procurar. [troca]: veio
+  /// do "Ver outro" (conta para a RN-239), não do fim do prazo.
+  void _proximo({bool troca = false}) {
     if (!mounted) return;
     _timer?.cancel();
     _som.parar();
@@ -149,6 +155,7 @@ class _EncontradoPageState extends State<EncontradoPage> {
                 inicio: _inicio,
                 distancia: widget.distancia,
                 descricao: widget.descricao,
+                trocas: widget.trocas + (troca ? 1 : 0),
               )
             : ProcurandoPage(
                 servico: widget.servico,
@@ -162,6 +169,7 @@ class _EncontradoPageState extends State<EncontradoPage> {
   }
 
   Future<void> _verOutro() async {
+    if (!_podeTrocar) return;
     _som.parar();
     final p = _p;
     final ok = await confirmar(
@@ -175,7 +183,7 @@ class _EncontradoPageState extends State<EncontradoPage> {
       cancelar: 'Ficar com ${p.artigo} ${p.primeiroNome}',
       iconeAviso: false,
     );
-    if (ok) _proximo();
+    if (ok) _proximo(troca: true);
   }
 
   void _aceitar() {
@@ -193,9 +201,7 @@ class _EncontradoPageState extends State<EncontradoPage> {
         pagamento: '',
         etapasFeitas: 1,
         chegaEm: p.chegaEm,
-        descricao: widget.descricao.isEmpty
-            ? widget.servico
-            : widget.descricao,
+        descricao: widget.descricao.isEmpty ? widget.servico : widget.descricao,
         distancia: widget.distancia,
       ),
     );
@@ -224,7 +230,7 @@ class _EncontradoPageState extends State<EncontradoPage> {
           avatar: AvatarIniciais(nome: p.nome, tamanho: 96),
           rodape: _Botoes(
             nome: p.primeiroNome,
-            onVerOutro: () => Navigator.of(ctx).pop(false),
+            onVerOutro: _podeTrocar ? () => Navigator.of(ctx).pop(false) : null,
             onAceitar: () => Navigator.of(ctx).pop(true),
           ),
         ),
@@ -446,9 +452,10 @@ class _EncontradoPageState extends State<EncontradoPage> {
           ),
         ),
         const SizedBox(height: 20),
+        // RN-239: depois de 3 trocas, "Ver outro" some.
         _Botoes(
           nome: p.primeiroNome,
-          onVerOutro: _verOutro,
+          onVerOutro: _podeTrocar ? _verOutro : null,
           onAceitar: _aceitar,
         ),
       ],
@@ -554,32 +561,33 @@ class _Botoes extends StatelessWidget {
   });
 
   final String nome;
-  final VoidCallback onVerOutro;
+
+  /// Nulo: sem "Ver outro" (RN-239); "Aceitar" ocupa a linha.
+  final VoidCallback? onVerOutro;
   final VoidCallback onAceitar;
 
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      SizedBox(
-        width: 120,
-        child: FilledButton(
-          style: tatuBotaoSecundario().copyWith(
-            padding: const WidgetStatePropertyAll(
-              EdgeInsets.symmetric(horizontal: 12),
+      if (onVerOutro != null) ...[
+        SizedBox(
+          width: 120,
+          child: FilledButton(
+            style: tatuBotaoSecundario().copyWith(
+              padding: const WidgetStatePropertyAll(
+                EdgeInsets.symmetric(horizontal: 12),
+              ),
             ),
+            onPressed: onVerOutro,
+            child: const Text('Ver outro', maxLines: 1, softWrap: false),
           ),
-          onPressed: onVerOutro,
-          child: const Text('Ver outro', maxLines: 1, softWrap: false),
         ),
-      ),
-      const SizedBox(width: 10),
+        const SizedBox(width: 10),
+      ],
       Expanded(
         child: FilledButton(
           onPressed: onAceitar,
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text('Aceitar $nome'),
-          ),
+          child: FittedBox(fit: BoxFit.scaleDown, child: Text('Aceitar $nome')),
         ),
       ),
     ],
@@ -634,7 +642,11 @@ class _Prazo extends StatelessWidget {
 
 /// Caixinha cinza com um número grande e o rótulo embaixo.
 class _Caixa extends StatelessWidget {
-  const _Caixa({required this.valor, required this.rotulo, this.estrela = false});
+  const _Caixa({
+    required this.valor,
+    required this.rotulo,
+    this.estrela = false,
+  });
 
   final String valor;
   final String rotulo;

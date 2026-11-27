@@ -2,7 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../data/atendimento_profissional.dart';import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import '../../../data/atendimento_profissional.dart';
+
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+
+import '../../../data/base_tecnica.dart';
+import '../../../data/profissional.dart';
 
 import '../../../core/theme/tatu_colors.dart';
 import '../../../core/theme/tatu_medidas.dart';
@@ -63,6 +68,22 @@ class _NovoChamadoPageState extends State<NovoChamadoPage> {
   }
 
   void _aceitar() {
+    // RN-18: só o 1º aceite vale; os outros veem "Outro profissional
+    // aceitou".
+    final c = widget.chamado;
+    final id = '${c.cliente}:${c.titulo}:${c.rua}';
+    if (!aceitesChamado.aceitar(id, profissional.nome)) {
+      _timer?.cancel();
+      _toque.parar();
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text(AceitesChamado.textoOutroAceitou)),
+        );
+      Navigator.of(context).maybePop();
+      return;
+    }
+    registroAtendimentos.registrar(id, 'aceito', quem: 'profissional');
     atendimentoProfissional.aceitar(widget.chamado);
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
@@ -137,7 +158,8 @@ class _NovoChamadoPageState extends State<NovoChamadoPage> {
                           alignment: Alignment.centerLeft,
                           child: EtiquetaCinza(
                             icone: TablerIcons.refresh,
-                            texto: 'Pediu você de novo · atendeu '
+                            texto:
+                                'Pediu você de novo · atendeu '
                                 '${c.feminino ? 'a' : 'o'} ${c.primeiroNome} '
                                 'em $dia',
                             verde: true,

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../core/theme/tatu_colors.dart';
 import '../../core/theme/tatu_medidas.dart';
 import '../../data/conta.dart';
+import '../../data/limites_uso.dart';
 import '../../shared/widgets/cadastro_scaffold.dart';
 import '../cliente/home_page.dart';
 import 'dados_cliente_page.dart';
@@ -61,6 +62,8 @@ class _CodigoPageState extends State<CodigoPage> {
   @override
   void initState() {
     super.initState();
+    // RN-248: o envio que trouxe a pessoa até aqui conta no limite.
+    limitesUso.enviarCodigo(widget.destino);
     _iniciarContagem();
   }
 
@@ -82,6 +85,23 @@ class _CodigoPageState extends State<CodigoPage> {
   }
 
   void _reenviar() {
+    // RN-248: até 3 envios a cada 15 min e 10 por dia (número e aparelho).
+    final libera = limitesUso.codigoLiberadoEm(widget.destino);
+    if (libera != null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              'Muitos códigos pedidos. Tente de novo às '
+              '${libera.hour.toString().padLeft(2, '0')}:'
+              '${libera.minute.toString().padLeft(2, '0')}.',
+            ),
+          ),
+        );
+      return;
+    }
+    limitesUso.enviarCodigo(widget.destino);
     // Sem backend ainda: só reinicia a contagem.
     _iniciarContagem();
     ScaffoldMessenger.of(context)
@@ -108,10 +128,9 @@ class _CodigoPageState extends State<CodigoPage> {
       celular: widget.porEmail ? null : widget.destino,
       email: widget.porEmail ? widget.destino : null,
     );
-    Navigator.of(context)
-        .pushReplacement(
-          MaterialPageRoute(builder: (_) => const DadosClientePage()),
-        );
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const DadosClientePage()),
+    );
   }
 
   String get _tempo =>

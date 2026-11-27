@@ -1,6 +1,6 @@
 # Tatu · Perguntas para o advogado
 
-**Atualizado em 26/11/2026**
+**Atualizado em 26/11/2026** · A J-04 é a mais importante.
 
 Dúvidas jurídicas que precisam de resposta antes do lançamento. Quando o advogado responder, registre aqui a resposta e ajuste as regras ligadas em `regras-de-negocio.md`.
 
@@ -21,10 +21,22 @@ Dúvidas jurídicas que precisam de resposta antes do lançamento. Quando o advo
 | --- | --- | --- | --- |
 | J-07 | Selos que só informam o cliente (Pontual, Resolve de primeira, Clientes voltam), calculados pelo app e sem efeito em chamados, preço ou prioridade, podem pesar como controle de comportamento numa discussão de vínculo de emprego? E o uso desses dados no perfil precisa de algo a mais na Política de Privacidade? | RN-217 a RN-220 | Pendente |
 
+## Auditoria de ponta a ponta (P-41 a P-49 · `auditoria-ponta-a-ponta.md`)
+
+| Nº | Pergunta | Regras ligadas | Resposta |
+| --- | --- | --- | --- |
+| J-08 | Podemos cobrar a visita quando o cliente cancela depois que o profissional saiu? O direito de arrependimento (CDC, art. 49) atrapalha? Proposta: grátis até 2 min depois de "Estou a caminho"; depois, cobra a visita, com aviso antes de confirmar. | RN-43, Termos 10.1 | Pendente |
+| J-09 | Com intermediador de pagamento (split e subcontas), o Tatu precisa de alguma autorização do Banco Central? O que muda com a Resolução BCB 522/2025? | RN-29 a RN-36, RN-224 | Pendente |
+| J-10 | (Contador) Com split, a receita do Tatu é só a comissão? Como ficam a nota da comissão e a responsabilidade pelo IBS/CBS (LC 214/2025) quando o profissional não emite nota? | RN-34, Contas com CNPJ | Pendente |
+| J-11 | Advogados e profissionais de saúde podem pagar comissão ao Tatu? (Estatuto da OAB, art. 34, III; conselhos de saúde.) Enquanto não houver resposta, essas profissões ficam fora do lançamento. | RN-156 a RN-160, catálogo | Pendente |
+| J-12 | Podemos exigir antecedentes criminais de babá, cuidador de idosos, técnico de enfermagem e professor particular de criança? Como guardar esse dado? | Decisão em aberto "Antecedentes criminais" | Pendente |
+| J-13 | Como fazer a suspensão na hora por denúncia (RN-56) e a denúncia "não era mulher" (RN-60) sem discriminar e sem punir inocente? Proposta: suspensão na hora só com prova no app, relato de violência física ou 2 denúncias de pessoas diferentes; "não era mulher" nunca suspende sozinho. | RN-56, RN-60 | Pendente |
+
 ## Histórico
 
 | Data | O que mudou |
 | --- | --- |
+| 26/11/2026 | J-08 a J-13 incluídas (auditoria); J-04 marcada como a mais importante. |
 | 26/11/2026 | J-07 incluída (selos). |
 | 24/11/2026 | J-06 incluída (guarda das fotos). |
 | 24/11/2026 | J-02 ajustada (prazo separado em 30 e 90 dias); J-04 e J-05 incluídas. |

@@ -2,6 +2,7 @@ import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 
 import 'canal_tatu.dart';
+import 'limites.dart';
 import 'pagamento.dart';
 import 'pagamentos.dart';
 import 'profissional.dart' as pro;
@@ -368,6 +369,24 @@ class PlanoFixo {
   /// RN-205: quando o plano acabou de vez (cancelado e fora do período).
   DateTime? encerradoEm;
 
+  /// RN-238: quando o cliente recusou a última proposta (sem acordo).
+  DateTime? semAcordoEm;
+
+  /// RN-242: semanas seguidas com "Não vou nesta semana" e o dia da
+  /// última.
+  int semanasSemVisita = 0;
+  DateTime? ultimoNaoVou;
+
+  /// RN-242: quando o plano pausou (a pausa dura no máximo 60 dias) e se
+  /// os dois já receberam o aviso do fim.
+  DateTime? pausadoEm;
+  bool avisoFimPausa = false;
+
+  /// RN-242: até quando a pausa vale (nulo se não está pausado).
+  DateTime? get fimDaPausa => status == StatusPlano.pausado && pausadoEm != null
+      ? pausadoEm!.add(Limites.pausaPlanoMaxima)
+      : null;
+
   /// RN-205: estado para o selo e a barra.
   EstadoPlano estado([DateTime? agora]) {
     final hoje = agora ?? clock.now();
@@ -621,6 +640,21 @@ class PlanosFixosRepo extends ChangeNotifier {
       .where((p) => p.cliente == cliente && p.status != StatusPlano.cancelado)
       .firstOrNull;
 
+  /// RN-238: depois de "Sem acordo" no plano, nova proposta para a mesma
+  /// pessoa só a partir desta data (nulo = já pode propor). Avulsos com
+  /// ela continuam.
+  DateTime? proporDeNovoEm(String pessoa, {DateTime? agora}) {
+    DateTime? ultimo;
+    for (final p in planos) {
+      final em = p.semAcordoEm;
+      if (p.profissional != pessoa || em == null) continue;
+      if (ultimo == null || em.isAfter(ultimo)) ultimo = em;
+    }
+    if (ultimo == null) return null;
+    final libera = ultimo.add(Limites.esperaPropostaPlano);
+    return libera.isAfter(agora ?? clock.now()) ? libera : null;
+  }
+
   PlanoFixo? planoCom(String pessoa) => planos
       .where(
         (p) => p.profissional == pessoa && p.status != StatusPlano.cancelado,
@@ -722,6 +756,7 @@ class PlanosFixosRepo extends ChangeNotifier {
     final n = p.negociacaoAberta;
     if (n == null || !n.vezDoCliente) return;
     n.recusada = true;
+    p.semAcordoEm = clock.now();
     if (p.status == StatusPlano.pendente) {
       p
         ..status = StatusPlano.cancelado
@@ -888,6 +923,15 @@ class PlanosFixosRepo extends ChangeNotifier {
   void naoVou(PlanoFixo p, VisitaPlano v) {
     if (v.situacao != SituacaoVisita.agendada) return;
     v.situacao = SituacaoVisita.naoVai;
+    // RN-242: conta as semanas seguidas (a semana de antes, sem visita).
+    final antes = p.ultimoNaoVou;
+    final seguida =
+        antes != null &&
+        v.dia.difference(antes).inDays > 0 &&
+        v.dia.difference(antes).inDays <= 9;
+    p
+      ..semanasSemVisita = seguida ? p.semanasSemVisita + 1 : 1
+      ..ultimoNaoVou = v.dia;
     final proxima = p.proximas.firstOrNull;
     final artigo = p.feminino ? 'A' : 'O';
     final texto =
@@ -904,7 +948,104 @@ class PlanosFixosRepo extends ChangeNotifier {
         texto: texto,
       ),
     );
+    _semVisitas(p);
     notifyListeners();
+  }
+
+  /// RN-242: 2 semanas seguidas sem visita, avisa o cliente com "Pausar
+  /// plano" e "Encerrar plano"; na 3ª, o plano pausa sozinho e avisa os
+  /// dois.
+  void _semVisitas(PlanoFixo p) {
+    final artigo = p.feminino ? 'A' : 'O';
+    final agora = clock.now();
+    if (p.semanasSemVisita >= Limites.semanasSemVisitaPausa) {
+      p
+        ..status = StatusPlano.pausado
+        ..noProximoPeriodo = null
+        ..pausadoEm = agora
+        ..avisoFimPausa = false;
+      p.visitas.removeWhere((v) => v.situacao == SituacaoVisita.agendada);
+      final texto =
+          'Foram ${p.semanasSemVisita} semanas seguidas sem visita, então o '
+          'plano pausou sozinho. Nada é cobrado enquanto estiver pausado.';
+      canalTatu.cliente.receber(
+        MensagemTatu(
+          id: 'fixo-pausou-${p.profissional}-${agora.toIso8601String()}',
+          em: agora,
+          resumo: 'Seu plano com $artigo ${p.primeiroNome} pausou',
+          texto: texto,
+          link: LinkTatu('Ver plano', DestinoTatu.plano(p.profissional)),
+        ),
+      );
+      canalTatu.profissional.receber(
+        MensagemTatu(
+          id: 'fixo-pausou-${p.cliente}-${agora.toIso8601String()}',
+          em: agora,
+          resumo:
+              'O plano com ${p.clienteFeminina ? 'a' : 'o'} '
+              '${p.primeiroCliente} pausou',
+          texto: texto,
+        ),
+      );
+    } else if (p.semanasSemVisita == Limites.semanasSemVisitaAviso) {
+      canalTatu.cliente.receber(
+        MensagemTatu(
+          id: 'fixo-sem-visita-${p.profissional}-${agora.toIso8601String()}',
+          em: agora,
+          resumo:
+              '$artigo ${p.primeiroNome} não vem há '
+              '${p.semanasSemVisita} semanas',
+          texto:
+              '$artigo ${p.primeiroNome} não vem há ${p.semanasSemVisita} '
+              'semanas. Quer pausar ou encerrar o plano?',
+          cartao: CartaoTatu(
+            titulo: 'Plano fixo com $artigo ${p.primeiroNome}',
+            botao: 'Pausar plano',
+            link: DestinoTatu.pausarPlano(p.profissional),
+          ),
+          link: LinkTatu(
+            'Encerrar plano',
+            DestinoTatu.encerrarPlano(p.profissional),
+          ),
+        ),
+      );
+    }
+  }
+
+  /// RN-242: a pausa dura no máximo 60 dias. 7 dias antes do fim, os dois
+  /// recebem "O plano pausado termina em [data]"; sem retomar, encerra.
+  void conferirPausas({DateTime? agora}) {
+    final hoje = agora ?? clock.now();
+    var mudou = false;
+    for (final p in planos) {
+      final fim = p.fimDaPausa;
+      if (fim == null) continue;
+      if (!hoje.isBefore(fim)) {
+        p
+          ..status = StatusPlano.cancelado
+          ..encerradoEm = fim;
+        mudou = true;
+      } else if (!p.avisoFimPausa &&
+          !hoje.isBefore(fim.subtract(Limites.avisoFimPausaPlano))) {
+        p.avisoFimPausa = true;
+        final texto = 'O plano pausado termina em ${diaMes(fim)}';
+        for (final (canal, quem) in [
+          (canalTatu.cliente, p.profissional),
+          (canalTatu.profissional, p.cliente),
+        ]) {
+          canal.receber(
+            MensagemTatu(
+              id: 'fixo-fim-pausa-$quem-${fim.toIso8601String()}',
+              em: hoje,
+              resumo: texto,
+              texto: '$texto. Para continuar, retome o plano antes disso.',
+            ),
+          );
+        }
+        mudou = true;
+      }
+    }
+    if (mudou) notifyListeners();
   }
 
   /// RN-147: faltou sem avisar: vale a regra de abandono (RN-76 a RN-79).
@@ -933,12 +1074,36 @@ class PlanosFixosRepo extends ChangeNotifier {
       ],
     );
     p.cobrancas.add(c);
+    // RN-236: uma avaliação por mês, pedida depois da última visita.
+    if (c.visitasFeitas > 0) {
+      final artigo = p.feminino ? 'a' : 'o';
+      final agora = clock.now();
+      canalTatu.cliente.receber(
+        MensagemTatu(
+          id: 'fixo-avaliar-${p.profissional}-${agora.toIso8601String()}',
+          em: agora,
+          resumo: 'Como foi o mês com $artigo ${p.primeiroNome}?',
+          texto:
+              'O mês do plano fixo com $artigo ${p.primeiroNome} terminou '
+              '(${c.visitasFeitas} '
+              '${c.visitasFeitas == 1 ? 'visita' : 'visitas'}). Uma '
+              'avaliação vale pelo mês todo.',
+          link: LinkTatu('Ver plano', DestinoTatu.plano(p.profissional)),
+        ),
+      );
+    }
     // RN-148: novo valor aceito vale do próximo período em diante.
     final muda = p.noProximoPeriodo;
     if (muda != null) {
       p
         ..status = muda
         ..noProximoPeriodo = null;
+      // RN-242: a pausa começa a contar aqui (no máximo 60 dias).
+      if (muda == StatusPlano.pausado) {
+        p
+          ..pausadoEm = clock.now()
+          ..avisoFimPausa = false;
+      }
       // RN-205: cancelado no fim do período vira "encerrado".
       if (muda == StatusPlano.cancelado) {
         p.encerradoEm = p.proximaCobranca ?? clock.now();
@@ -983,7 +1148,10 @@ class PlanosFixosRepo extends ChangeNotifier {
   /// Volta um plano pausado (no próximo período).
   void retomar(PlanoFixo p, {DateTime? inicio}) {
     if (p.status != StatusPlano.pausado) return;
-    p.status = StatusPlano.ativo;
+    p
+      ..status = StatusPlano.ativo
+      ..pausadoEm = null
+      ..semanasSemVisita = 0;
     _agendar(p, inicio ?? clock.now());
     notifyListeners();
   }

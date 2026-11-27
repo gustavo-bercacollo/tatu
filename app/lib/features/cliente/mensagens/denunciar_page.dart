@@ -8,6 +8,7 @@ import '../../../data/conversas.dart';
 import '../../../data/denuncias.dart';
 import '../../../data/profissional.dart';
 import '../../../data/suspender_conta.dart';
+import '../../../shared/widgets/aviso_topo.dart';
 import '../../../shared/widgets/cadastro_scaffold.dart';
 import '../../../shared/widgets/opcao_selecionavel.dart';
 import '../../../shared/widgets/tatu_field.dart';
@@ -63,9 +64,25 @@ class _DenunciarPageState extends State<DenunciarPage> {
 
   void _enviar() {
     final c = widget.conversa;
+    final denunciante = c != null ? conta.nomeCompleto : profissional.nome;
+    final denunciado = widget.denunciado ?? c!.nome;
+    // RN-241: a mesma pessoa sobre o mesmo atendimento vira uma só.
+    if (denuncias.jaDenunciou(
+          denunciante: denunciante,
+          denunciado: denunciado,
+        ) !=
+        null) {
+      mostrarAvisoTopo(
+        context,
+        titulo: 'Denúncia já enviada',
+        texto: DenunciasRepo.textoRepetida,
+      );
+      Navigator.of(context).pop();
+      return;
+    }
     final d = denuncias.denunciarPessoa(
-      denunciante: c != null ? conta.nomeCompleto : profissional.nome,
-      denunciado: widget.denunciado ?? c!.nome,
+      denunciante: denunciante,
+      denunciado: denunciado,
       motivo: motivosDenunciaPessoa[_escolhido!],
       texto: _texto.text,
     );

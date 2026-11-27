@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/theme/tatu_colors.dart';
+import '../../data/pausa_conta.dart';
 import '../../core/theme/tatu_medidas.dart';
 
 /// Aviso vermelho de conta pausada (profissional: RN-63/RN-79; cliente:
@@ -15,12 +16,24 @@ class AvisoContaPausada extends StatelessWidget {
     this.destaque,
     this.onSuporte,
     this.onTap,
+    this.onEntendi,
   });
+
+  /// RN-244: a pausa de [PausaConta], com o motivo e quando volta.
+  factory AvisoContaPausada.pausa(PausaConta p, {VoidCallback? onEntendi}) =>
+      AvisoContaPausada(
+        motivo: p.motivo,
+        destaque: p.quandoVolta,
+        onEntendi: p.entendida ? null : onEntendi,
+      );
 
   final String motivo;
   final String? destaque;
   final VoidCallback? onSuporte;
   final VoidCallback? onTap;
+
+  /// RN-244: botão "Entendi" (some depois de tocado).
+  final VoidCallback? onEntendi;
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +78,7 @@ class AvisoContaPausada extends StatelessWidget {
                         destaque!,
                         style: texto.copyWith(fontWeight: FontWeight.w600),
                       ),
-                    if (onSuporte != null) ...[
+                    if (onSuporte != null || onEntendi != null) ...[
                       const SizedBox(height: 10),
                       Align(
                         alignment: Alignment.centerLeft,
@@ -81,8 +94,12 @@ class AvisoContaPausada extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                 ),
                           ),
-                          onPressed: onSuporte,
-                          child: const Text('Falar com o suporte'),
+                          onPressed: onEntendi ?? onSuporte,
+                          child: Text(
+                            onEntendi != null
+                                ? 'Entendi'
+                                : 'Falar com o suporte',
+                          ),
                         ),
                       ),
                     ],
