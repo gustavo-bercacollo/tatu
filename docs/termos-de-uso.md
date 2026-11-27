@@ -1,6 +1,6 @@
 # Termos de Uso do Tatu
 
-**Versão 1.2 · Vigente a partir de [DATA DE PUBLICAÇÃO]**
+**Versão 1.3 · Vigente a partir de [DATA DE PUBLICAÇÃO]**
 
 > **Rascunho para revisão jurídica.** Este texto foi escrito a partir das regras de negócio oficiais do Tatu (`docs/regras-de-negocio.md`). Antes de publicar, um advogado precisa revisar o documento, preencher os campos entre colchetes e confirmar os valores do Anexo I. Apague este aviso na versão publicada.
 
@@ -103,13 +103,13 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 7.2. **No local:** o pedido usa o endereço escolhido pelo Cliente e vai ao mesmo tempo para profissionais próximos, com raio que aumenta sozinho. **À distância:** o pedido vai para profissionais online que atendem à distância, de qualquer cidade.
 
-7.3. O primeiro Profissional que aceitar aparece para o Cliente, que tem **3 minutos** para aceitá-lo ou ver outro.
+7.3. O primeiro Profissional que aceitar aparece para o Cliente, que tem **3 minutos** para aceitá-lo ou ver outro (até 3 trocas por pedido).
 
 7.4. O **endereço exato** só é mostrado ao Profissional depois que o valor é confirmado. Telefone, e-mail e CPF de uma parte nunca aparecem para a outra.
 
 ## 8. Valor, pagamento e taxa
 
-8.1. **Valor combinado.** O Profissional propõe o valor no chat. No serviço no local, ele pode separar **Visita** (pode ser zero) e **Serviço**. São até 3 rodadas de proposta; sem acordo, o chamado é encerrado sem custo.
+8.1. **Valor combinado.** O Profissional propõe o valor no chat. No serviço no local, ele pode separar **Visita** (pode ser zero) e **Serviço**. São até 3 rodadas de proposta; sem acordo, o chamado é encerrado sem custo, e o mesmo Profissional só pode ser chamado de novo pelo Cliente depois de 24 horas.
 
 8.2. **Reserva e cobrança.** Ao confirmar, o total fica **reservado** no cartão padrão do Cliente. A cobrança acontece quando o Cliente **confirma a conclusão** depois que o Profissional toca em "Concluir serviço" (no local); sem resposta do Cliente em 2 horas, a conclusão é confirmada automaticamente ou quando o Cliente aprova a entrega (à distância).
 
@@ -119,7 +119,7 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 8.4. **Visita.** A Visita é cobrada sempre que o Profissional vai até o local, mesmo que o serviço não aconteça, salvo nas hipóteses em que estes Termos dizem que nada é cobrado (seção 10).
 
-8.5. **Mudança de valor.** Se o serviço se mostrar diferente do descrito, o Profissional envia um novo valor pelo chat. Ele só vale se o Cliente aceitar. Se o Cliente recusar, o Profissional faz só o combinado ou encerra cobrando só a Visita.
+8.5. **Mudança de valor.** Se o serviço se mostrar diferente do descrito, o Profissional envia um novo valor pelo chat. Ele só vale se o Cliente aceitar. Se o Cliente recusar, o Profissional faz só o combinado ou encerra cobrando só a Visita. Fica um novo valor pendente por vez; depois de 2 recusados no mesmo atendimento, o Profissional não pode enviar outro nele.
 
 8.6. **Vários pagamentos na mesma conversa.** A conversa continua aberta depois do serviço. Cada novo valor combinado é um novo pagamento. Um valor não pode ficar aberto por mais de **7 dias**; depois disso o app pede para concluir ou dividir o trabalho em partes.
 
@@ -131,7 +131,7 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 8.10. **Reembolso** volta pelo mesmo meio do pagamento (estorno no cartão ou devolução do Pix), nos prazos da operadora.
 
-8.11. O Tatu **nunca adianta dinheiro** ao Profissional nem paga custos do serviço. Valores devolvidos ao Cliente saem do valor retido do Profissional.
+8.11. O Tatu **nunca adianta dinheiro** ao Profissional. Valores devolvidos ao Cliente saem do valor retido do Profissional. O Tatu só paga um serviço do próprio bolso no caso do item 11.5 (refazer com outro profissional).
 
 ## 9. Atendimento no local
 
@@ -143,7 +143,7 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 9.4. Em serviço no local, o Profissional tira **uma foto obrigatória do serviço pronto** ao concluir, pela câmera do app. Fotos ao chegar são opcionais. As fotos levam data e hora e podem ser usadas no retorno e na mediação (seção 11).
 
-9.5. Quem recebe o Profissional no local deve ser maior de idade.
+9.5. Quem recebe o Profissional no local deve ser maior de idade. O código é passado pelo titular da conta, adulto, no início do atendimento; depois ele pode sair (por exemplo, com babá). Se só um menor de idade estiver no local, o serviço não começa e vale o item 10.5.
 
 ## 10. Cancelamentos, atrasos e ausências
 
@@ -161,17 +161,17 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 ## 11. Algo errado, retorno e garantia
 
-11.1. **Garantia legal.** O Código de Defesa do Consumidor garante ao Cliente reclamar de problemas no serviço em **30 dias** (serviço não durável) ou **90 dias** (serviço durável), contados do fim do serviço; se o problema estava oculto, o prazo conta de quando ele aparecer. Essa garantia é obrigatória e nada nestes Termos a reduz.
+11.1. **Garantia legal.** O Código de Defesa do Consumidor garante ao Cliente reclamar de problemas no serviço em **30 dias** (serviço não durável) ou **90 dias** (serviço durável), contados do fim do serviço; se o problema estava oculto, o prazo conta de quando ele aparecer. Essa garantia é obrigatória e nada nestes Termos a reduz. Um pedido aberto dentro do prazo segue até o fim, mesmo que a data passe.
 
 11.2. **Extras do Tatu.** Além da garantia legal, o Tatu oferece, nos termos do art. 50 do CDC: (a) **pagamento protegido por 24 horas**; e (b) **retorno mediado pelo app** durante o prazo de retorno de cada serviço. O prazo (30 ou 90 dias) é definido por profissão e aparece no app como uma data ("retorno sem custo até [data]").
 
 11.3. **Como pedir.** Em "Algo errado?", o Cliente descreve o problema e envia fotos tiradas na hora pela câmera do app. Fotos da galeria não são aceitas. Há um pedido de retorno por serviço, no mesmo endereço. Pedidos feitos nas primeiras 24 horas mantêm o valor do serviço retido até o caso terminar. A Visita e a gorjeta não entram.
 
-11.4. **Resposta do Profissional.** O Profissional tem **48 horas** para: aceitar o retorno e marcá-lo em até **7 dias**; informar que é outro problema, com foto no local e novo valor; ou recusar, informando o motivo. O retorno aceito não tem custo para o Cliente nem taxa do Tatu e começa com o código de 4 dígitos. Ao final, se o Cliente não responder em 48 horas se o problema foi resolvido, o retorno é considerado resolvido. Se o Cliente não estiver no local no horário marcado, o retorno é considerado cumprido.
+11.4. **Resposta do Profissional.** O Profissional tem **48 horas** para: aceitar o retorno e marcá-lo em até **7 dias**; informar que é outro problema, com foto no local e novo valor; ou recusar, informando o motivo. O retorno aceito não tem custo para o Cliente nem taxa do Tatu e começa com o código de 4 dígitos. Ao final, se o Cliente não responder em 48 horas se o problema foi resolvido, o retorno é considerado resolvido. Se o Cliente não estiver no local no horário marcado, o retorno é considerado cumprido. Para marcar o horário, o Profissional pode sugerir outro horário até 2 vezes e o Cliente pode escolher outros horários 1 vez; sem acordo de horário, ninguém recebe falta e o Cliente pode pedir a mediação (11.6).
 
-11.5. **Resolução automática.** Se o Profissional não responder em 48 horas, não marcar o retorno em 7 dias ou não comparecer, o Tatu resolve a favor do Cliente, sem análise: devolve o valor do serviço ou, quando não for possível recuperar o valor do Profissional, paga outro profissional para refazer o serviço, até o valor pago.
+11.5. **Resolução automática.** Se o Profissional não responder em 48 horas, recusar por não conseguir ir, não aceitar nem sugerir horário em 7 dias, não comparecer ou tiver a conta suspensa, o Tatu resolve a favor do Cliente, sem análise: devolve o valor do serviço ou, quando não for possível recuperar o valor do Profissional, paga outro profissional para refazer o serviço, até o valor pago.
 
-11.6. **Mediação.** O Tatu analisa o caso quando o Cliente contesta a recusa, quando o problema continua depois do retorno ou quando contesta a informação de "outro problema". A análise usa as fotos, o chat e o histórico das partes e termina em até 3 dias úteis com uma destas decisões: refazer com outro profissional, devolver 50%, devolver 100% ou não procede. Há uma mediação por serviço, e a decisão é comunicada pelo canal oficial do Tatu. [Revisar com advogado: J-04.]
+11.6. **Mediação.** O Tatu analisa o caso quando o Cliente contesta a recusa, quando o problema continua depois do retorno, quando contesta a informação de "outro problema" ou quando não houve acordo de horário. A análise usa as fotos, o chat e o histórico das partes e termina em até 3 dias úteis com uma destas decisões: refazer com outro profissional, devolver 50%, devolver 100% ou não procede. Há uma mediação por serviço, e a decisão é comunicada pelo canal oficial do Tatu. O refazer é um novo atendimento, com retorno próprio; se ele também chegar à mediação, a decisão não pode ser refazer de novo. [Revisar com advogado: J-04.]
 
 11.7. **Abuso.** Pedidos repetidos considerados improcedentes podem suspender o retorno mediado pelo app por um período (Anexo I), sem prejuízo dos direitos legais do Cliente, que pode reclamar pela Ajuda. Profissionais que não respondem, não comparecem ou têm recusas derrubadas na mediação recebem faltas e podem ter a conta pausada (seção 15).
 
@@ -207,7 +207,7 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 13.4. **Declaração do Cliente:** ao ativar um plano fixo, o Cliente declara que contrata um **serviço autônomo**, que o Tatu apenas intermedia, que não há subordinação nem controle de jornada, e que está ciente do limite do item 13.3. Se o Cliente decidir contratar o Profissional como empregado, essa relação deve ser formalizada fora do Tatu, com todas as obrigações legais do empregador.
 
-13.5. O Profissional pode avisar que **não vai numa semana** sem penalidade; a visita não é cobrada. Cliente e Profissional podem **pausar ou cancelar** o plano a qualquer momento, valendo a partir do próximo período. Mudar o valor exige nova proposta e aceite.
+13.5. O Profissional pode avisar que **não vai numa semana** sem penalidade; a visita não é cobrada. Cliente e Profissional podem **pausar ou cancelar** o plano a qualquer momento, valendo a partir do próximo período. Se o Profissional avisar que não vai por 3 semanas seguidas, o plano pausa sozinho. A pausa dura até 60 dias; sem retomar, o plano termina. Mudar o valor exige nova proposta e aceite.
 
 ## 14. Conduta e conteúdo
 
@@ -237,9 +237,9 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 15.2. **Atendimento entre mulheres.** Clientes e Profissionais podem preferir atender ou ser atendidas só por mulheres, depois de verificar a identidade com documento e selfie. Quem usar identidade falsa para se aproximar de uma mulher é banido e denunciado à polícia.
 
-15.3. **Denúncias.** É possível denunciar uma pessoa, uma mensagem ou um arquivo. A denúncia não é mostrada para o denunciado. O suporte analisa todas. Denúncia de assédio ou discriminação bloqueia as duas partes uma para a outra imediatamente. Denúncias falsas feitas de propósito e repetidas também são punidas.
+15.3. **Denúncias.** É possível denunciar uma pessoa, uma mensagem ou um arquivo. A denúncia não é mostrada para o denunciado. O suporte analisa todas. Denúncia de assédio ou discriminação bloqueia as duas partes uma para a outra imediatamente. Denúncias falsas feitas de propósito e repetidas também são punidas. Denúncias repetidas sobre o mesmo fato são tratadas como uma só.
 
-15.4. **Pausa.** A conta pode ser pausada por abandonos, ausências, visitas sem serviço, sinais sem entrega ou outras repetições previstas no Anexo I. A pausa impede novos pedidos ou chamados até a pessoa falar com o suporte; o que já está em andamento continua.
+15.4. **Pausa.** A conta pode ser pausada por abandonos, ausências, visitas sem serviço, sinais sem entrega ou outras repetições previstas no Anexo I. A pausa impede novos pedidos ou chamados; o que já está em andamento continua. Na 1ª pausa em 6 meses, a conta volta sozinha depois de 7 dias; na 2ª, depois de 30 dias; na 3ª, só depois da análise do suporte, que pode levar ao banimento.
 
 15.5. **Suspensão.** Em casos graves (abuso, violência, golpe, vírus, suspeita de crime), a conta é **suspensa na hora** e os atendimentos em andamento são encerrados. Os valores seguem estas regras:
 - **Profissional suspenso:** valores reservados são liberados ao Cliente; sinal sem entrega volta ao Cliente; repasse de serviço concluído há menos de 24 horas fica retido até decisão do suporte.
@@ -252,17 +252,19 @@ O Tatu é operado por **[RAZÃO SOCIAL]**, CNPJ **[CNPJ]**, com sede em **[ENDER
 
 ## 16. Avaliações
 
-16.1. Depois de cada serviço, Cliente e Profissional se avaliam. O Cliente pode editar a avaliação por até 7 dias.
+16.1. Cada atendimento tem uma avaliação de cada lado (no plano fixo, uma por mês). O Cliente pode editar a avaliação por até 7 dias.
 
 16.2. Avaliações devem ser honestas e sobre o serviço. É proibido avaliar em troca de vantagem, combinar avaliações ou avaliar de forma ofensiva.
 
-16.3. O Profissional pode contestar uma avaliação que considere injusta; o suporte revisa em até 3 dias úteis e pode removê-la da nota.
+16.3. O Profissional pode contestar uma vez uma avaliação que considere injusta; o suporte revisa em até 3 dias úteis e pode removê-la da nota.
+
+16.4. Só contam para a nota avaliações de serviços pagos pelo app com código na porta (ou, à distância, com entrega aprovada). Avaliações entre contas ligadas (mesmo CPF, cartão, aparelho ou endereço) não contam.
 
 ## 17. Excluir a conta
 
 17.1. Você pode excluir sua conta a qualquer momento em **Perfil → Dados da conta → Excluir conta**. A exclusão apaga os dois perfis.
 
-17.2. A exclusão fica bloqueada enquanto houver pedido em andamento ou valor a receber, para proteger as duas partes.
+17.2. Com pedido em andamento, a exclusão espera ele terminar; com valor a receber, espera o último Pix. Com dívida, a exclusão é aceita, mas o Tatu guarda o necessário para a cobrança dentro do Tatu e para as provas, e a dívida continua ligada ao CPF.
 
 17.3. Alguns dados são mantidos pelo tempo exigido por lei mesmo após a exclusão (veja a Política de Privacidade).
 
@@ -343,11 +345,22 @@ Os valores abaixo vêm das regras de negócio e **são provisórios até a decis
 | Plano fixo: visitas por semana no mesmo endereço | no máximo 2 | RN-145 |
 | Anexos por pedido | até 5 | RN-139 |
 | Contatos de confiança | até 5 | RN-53 |
+| Trocas de profissional por pedido | até 3 | RN-239 |
+| Chamar de novo o mesmo profissional depois de "Sem acordo" | depois de 24 horas (plano fixo: 7 dias) | RN-238 |
+| Novos valores recusados no mesmo atendimento | 2; depois, não pode enviar outro | RN-240 |
+| Horário do retorno | Profissional sugere até 2 vezes; Cliente escolhe outros horários 1 vez | RN-243 |
+| Plano fixo sem visitas | 3 semanas seguidas de "não vou" pausam o plano | RN-242 |
+| Pausa do plano fixo | até 60 dias | RN-242 |
+| Volta de uma pausa da conta | 1ª em 6 meses: 7 dias; 2ª: 30 dias; 3ª: análise do suporte | RN-244 |
+| Envios de código de acesso | até 3 a cada 15 minutos e 10 por dia | RN-248 |
+| Cartões recusados | 3 em 24 horas: só Pix até o dia seguinte | RN-248 |
+| Pedidos novos | até 5 por hora | RN-248 |
 
 ## Histórico de versões
 
 | Versão | Data | O que mudou |
 | --- | --- | --- |
+| 1.3 | 26/11/2026 (rascunho) | Limites da auditoria (7.3, 8.1, 8.5, 11.4, 11.6, 13.5, 15.3, 15.4, 16, Anexo I), só menor em casa (9.5), pedido aberto além do prazo (11.1), suspenso com retorno (11.5), quando o Tatu paga (8.11) e exclusão com dívida (17.2). |
 | 1.2 | 26/11/2026 (rascunho) | Pagamento recusado (8.2.1) e plano fixo cobrado a cada visita, com valor negociável (13.1 e 13.2). |
 | 1.1 | 24/11/2026 (rascunho) | Seção 11 reescrita: garantia legal, pagamento protegido, retorno mediado e mediação (RN-183 a RN-196). Itens 6.5.1, 6.7, 9.4 e 19.2 ajustados. Termo de garantia no recibo (11.8) e revisão de decisão automática (11.9). Novos prazos no Anexo I. |
 | 1.0 | [DATA DE PUBLICAÇÃO] | Primeira versão, baseada nas regras de negócio v22 (RN-01 a RN-149). |
